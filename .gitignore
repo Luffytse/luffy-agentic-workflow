@@ -1,0 +1,84 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.Spotlight-V100
+.Trashes
+
+# JetBrains IDEs (IntelliJ, PyCharm, RubyMine, etc.)
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# VS Code (keep team-shared workspace settings opt-in only)
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+*.code-workspace
+
+# Sublime / Vim / Emacs
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+*~
+.#*
+\#*\#
+
+# Direnv / dotenv / secrets
+.env
+.env.*
+!.env.example
+.envrc
+.direnv/
+
+# Claude Code local-only state (the harness writes per-project state here)
+.claude/local/
+.claude/settings.local.json
+
+# Logs and temp
+*.log
+logs/
+tmp/
+.tmp/
+*.tmp
+*.bak
+
+# OS / archive cruft
+*.tar
+*.tar.gz
+*.tgz
+*.zip
+dist/
+build/
+
+# Node (in case any plugin later uses npm)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.npm/
+.yarn/
+.pnp.*
+
+# Python (in case any plugin later uses Python)
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Coverage
+coverage/
+*.lcov
+.nyc_output/
