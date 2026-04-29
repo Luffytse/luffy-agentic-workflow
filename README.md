@@ -10,12 +10,18 @@ Personal Claude Code plugin marketplace.
 
 ## Install
 
-```bash
-# Add this marketplace (local path or git URL once pushed)
-/plugin marketplace add ~/Projects/luffy-dev-plugin
+From inside Claude Code:
 
-# Install a plugin from it
+```
+/plugin marketplace add https://github.com/Luffytse/luffy-dev-plugin
 /plugin install dai-portal-data@luffy-dev
+```
+
+Or from the shell:
+
+```bash
+claude plugin marketplace add https://github.com/Luffytse/luffy-dev-plugin
+claude plugin install dai-portal-data@luffy-dev
 ```
 
 After install, the plugin's skills are namespaced as `dai-portal-data:dai-portal-db-lifecycle` and `dai-portal-data:dai-portal-db-queries`.
@@ -23,7 +29,20 @@ After install, the plugin's skills are namespaced as `dai-portal-data:dai-portal
 ## Update
 
 ```bash
+# In Claude Code
 /plugin marketplace update luffy-dev
+
+# Or from the shell
+claude plugin marketplace update luffy-dev
+```
+
+## Contributing / local development
+
+If you're hacking on the plugin itself, point the marketplace at your local clone instead of GitHub:
+
+```bash
+claude plugin marketplace add /path/to/luffy-dev-plugin
+claude plugin install dai-portal-data@luffy-dev
 ```
 
 ## Layout
