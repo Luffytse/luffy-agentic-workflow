@@ -1,0 +1,15 @@
+{
+  "name": "luffy-dev",
+  "owner": {
+    "name": "lufei.xie",
+    "email": "12742482+Luffytse@users.noreply.github.com"
+  },
+  "description": "Personal Claude Code plugin marketplace — internal tooling and project-specific skill bundles.",
+  "plugins": [
+    {
+      "name": "dai-portal-data",
+      "source": "./plugins/dai-portal-data",
+      "description": "Local DAI Portal Postgres docker lifecycle commands and a verified query cookbook against the example_db schema."
+    }
+  ]
+}
