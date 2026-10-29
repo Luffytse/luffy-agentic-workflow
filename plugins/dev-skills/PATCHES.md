@@ -59,4 +59,6 @@ No other kept skill mentions a dropped skill (checked with grep for `teach`, `to
 
 ## Vendor model names in Upstream text
 
-None found in the kept skills (grep for haiku, sonnet, opus, claude-, gpt-). Nothing to patch for ADR 0002 yet; the model-tier Patches come with later tickets.
+None in the kept skills at the Base commit, so no Patch was needed for ADR 0002 (checked for ticket #4: grep for `haiku`, `sonnet`, `opus`, `claude-`, `gpt-`, `gemini` over `upstream-skills/`). Some kept skills start subagents (for example `grilling`, `wayfinder`, `code-review`, `implement-spec`), but none picks a model for them. Spec #1 adds tiers in later tickets (the `code-review` Finders and Verifiers, the `implement` and `implement-spec` Implementers, and a tier on each ticket from `to-tickets`); each of those edits gets its own Patch here.
+
+`scripts/check-plugin.sh` now runs the vendor-name grep over `upstream-skills/` too, so an Upstream merge that brings in a model name fails the check and must be patched to a tier.

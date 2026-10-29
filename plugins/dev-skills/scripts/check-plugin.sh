@@ -63,17 +63,21 @@ if [ -d "$forked" ] && grep -rn --include=openai.yaml 'allow_implicit_invocation
   bad "a skill's agents/openai.yaml still sets allow_implicit_invocation: false"
 fi
 
-# 6. no vendor model names in our own text. Upstream text, the README tier table,
-# PATCHES.md (which describes this grep), this script and ADR 0002 (which defines the
-# tiers by naming the models) are exempt.
+# 6. no vendor model names in forked or own text (ADR 0002): skills name cheap,
+# regular or premium tiers. The README tier table, PATCHES.md (which describes this
+# grep), this script and ADR 0002 (which define the tiers by naming the models) are exempt.
 plugin_rel="plugins/dev-skills"
 repo="$(cd "$root/../.." && pwd)"
-own="$(cd "$repo" && find . -type f -not -path './.git/*' -not -path "./$plugin_rel/upstream-skills/*" \
+# NUL-separated file list and a check on grep's output (not xargs' exit code), so file
+# names with spaces and multi-batch xargs runs cannot hide a match.
+hits="$(cd "$repo" && find . -type f -not -path './.git/*' \
   -not -path "./$plugin_rel/README.md" -not -path "./$plugin_rel/PATCHES.md" \
-  -not -path "./$plugin_rel/scripts/check-plugin.sh" -not -name 'LICENSE*' \
-  -not -path './docs/adr/0002-*')"
-if [ -n "$own" ] && (cd "$repo" && echo "$own" | xargs grep -nIiE '\b(haiku|sonnet|opus)\b|(^|[^./a-z-])claude-(opus|sonnet|haiku|[0-9])|\bgpt-' ); then
-  bad "own text names a vendor model"
+  -not -path "./$plugin_rel/scripts/check-plugin.sh" -not -path './LICENSE*' \
+  -not -path "./$plugin_rel/LICENSE-mattpocock-skills" -not -path './docs/adr/0002-*' -print0 |
+  xargs -0 grep -nIiE '\b(haiku|sonnet|opus)\b|claude[-_]?(opus|sonnet|haiku|[0-9])|\bgpt-?[0-9]|\bgemini\b')"
+if [ -n "$hits" ]; then
+  echo "$hits"
+  bad "forked or own text names a vendor model"
 fi
 
 [ "$fail" -eq 0 ] && echo "OK: dev-skills plugin checks passed ($count skills)"
