@@ -80,5 +80,18 @@ if [ -n "$hits" ]; then
   bad "forked or own text names a vendor model"
 fi
 
+# 7. docs index (ADR 0006): the rule file exists, writing skills link it, reading skills start at the index
+writers="domain-modeling/SKILL.md improve-codebase-architecture/SKILL.md triage/SKILL.md triage/OUT-OF-SCOPE.md retro/SKILL.md setup-matt-pocock-skills/SKILL.md research/SKILL.md grill-with-docs/SKILL.md"
+readers="tdd diagnosing-bugs improve-codebase-architecture pr to-spec to-tickets triage grill-with-docs wayfinder implement implement-spec code-review"
+[ -f "$forked/domain-modeling/DOCS-INDEX.md" ] || bad "missing domain-modeling/DOCS-INDEX.md"
+for f in $writers; do
+  grep -qF "DOCS-INDEX.md" "$forked/$f" || bad "writing skill file $f does not mention DOCS-INDEX.md"
+done
+for s in $readers; do
+  grep -qiF 'start at `docs/index.md`' "$forked/$s/SKILL.md" || bad "reading skill $s does not say to start at \`docs/index.md\`"
+  grep -qF 'GLOSSARY-MAP.md' "$forked/$s/SKILL.md" || bad "reading skill $s does not name GLOSSARY-MAP.md in its fallback"
+done
+grep -qF 'docs/index.md' "$forked/setup-matt-pocock-skills/domain.md" || bad "domain.md template does not start at docs/index.md"
+
 [ "$fail" -eq 0 ] && echo "OK: dev-skills plugin checks passed ($count skills)"
 exit "$fail"

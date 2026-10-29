@@ -29,20 +29,26 @@ _Avoid_: Client, buyer, account
 - **Only include terms specific to this project's context.** General programming concepts (timeouts, error types, utility patterns) don't belong even if the project uses them extensively. Before adding a term, ask: is this a concept unique to this context, or a general programming concept? Only the former belongs.
 - **Group terms under subheadings** when natural clusters emerge. If all terms belong to a single cohesive area, a flat list is fine.
 
+## Single glossary, or one page per Area
+
+A repo starts with one root `GLOSSARY.md`. When it passes about 10 KB, `domain-modeling` splits it into one page per Area at `docs/glossary/<area>.md`, with a root `GLOSSARY-MAP.md` listing the pages (see "Splitting the glossary" in [SKILL.md](./SKILL.md)). The root `GLOSSARY.md` is removed. A page uses the same structure as above, with the Area as its title. The docs index links `GLOSSARY.md` or `GLOSSARY-MAP.md`, whichever exists ([DOCS-INDEX.md](./DOCS-INDEX.md)).
+
+A map that points at `docs/glossary/` lists Area pages of one glossary. The map format below also covers Upstream's multi-context repos, where the map points into `src/` and the pages live next to the code.
+
 ## Single vs multi-context repos
 
 **Single context (most repos):** One `GLOSSARY.md` at the repo root.
 
-**Multiple contexts:** A `GLOSSARY-MAP.md` at the repo root lists the contexts, where they live, and how they relate to each other:
+**Area pages or multiple contexts:** A `GLOSSARY-MAP.md` at the repo root lists the pages (Areas) or contexts, where they live, and how they relate to each other:
 
 ```md
 # Glossary Map
 
 ## Contexts
 
-- [Ordering](./src/ordering/GLOSSARY.md): receives and tracks customer orders
-- [Billing](./src/billing/GLOSSARY.md): generates invoices and processes payments
-- [Fulfillment](./src/fulfillment/GLOSSARY.md): manages warehouse picking and shipping
+- [Ordering](./docs/glossary/ordering.md): receives and tracks customer orders
+- [Billing](./docs/glossary/billing.md): generates invoices and processes payments
+- [Fulfillment](./docs/glossary/fulfillment.md): manages warehouse picking and shipping
 
 ## Relationships
 
@@ -51,10 +57,12 @@ _Avoid_: Client, buyer, account
 - **Ordering ↔ Billing**: Shared types for `CustomerId` and `Money`
 ```
 
+(In an Upstream multi-context repo the links point at `./src/<context>/GLOSSARY.md` instead.)
+
 The skill infers which structure applies:
 
-- If `GLOSSARY-MAP.md` exists, read it to find contexts
+- If `GLOSSARY-MAP.md` exists, read it. If it points into `src/`, the repo is multi-context; if it points at `docs/glossary/`, it lists Area pages of one glossary
 - If only a root `GLOSSARY.md` exists, single context
 - If neither exists, create a root `GLOSSARY.md` lazily when the first term is resolved
 
-When multiple contexts exist, infer which one the current topic relates to. If unclear, ask.
+When there are several pages, infer which one the current topic relates to. If unclear, ask which Area (or, in a multi-context repo, which context).

@@ -4,26 +4,43 @@ How the engineering skills should consume this repo's domain documentation when 
 
 ## Before exploring, read these
 
-- **`GLOSSARY.md`** at the repo root, or
-- **`GLOSSARY-MAP.md`** at the repo root if it exists: it points at one `GLOSSARY.md` per context. Read each one relevant to the topic.
-- **`docs/adr/`**: read ADRs that touch the area you're about to work in. In multi-context repos, also check `src/<context>/docs/adr/` for context-scoped decisions.
+- **`docs/index.md`**: start here. It lists the repo's docs by Area, each with a "read when..." line. Open only the docs whose line fits your work.
+- If there is no `docs/index.md`, fall back to:
+  - **`GLOSSARY.md`** at the repo root, or **`GLOSSARY-MAP.md`** at the repo root if it exists: it points at one glossary page per Area (or per context). Read each one relevant to the topic.
+  - **`docs/adr/`**: read ADRs that touch the area you're about to work in. In multi-context repos, also check `src/<context>/docs/adr/` for context-scoped decisions.
 
-If any of these files don't exist, **proceed silently**. Don't flag their absence; don't suggest creating them upfront. The `/domain-modeling` skill (reached via `/grill-with-docs` and `/improve-codebase-architecture`) creates them lazily when terms or decisions actually get resolved.
+If any of these files don't exist, **proceed silently**. Don't flag their absence; don't suggest creating them upfront. The `/domain-modeling` skill (reached via `/grill-with-docs` and `/improve-codebase-architecture`) creates them lazily when terms or decisions actually get resolved. Any skill that writes a doc adds or fixes its line in `docs/index.md` in the same commit.
 
 ## File structure
 
-Single-context repo (most repos):
+Small repo (most repos):
 
 ```
 /
 ├── GLOSSARY.md
-├── docs/adr/
-│   ├── 0001-event-sourced-orders.md
-│   └── 0002-postgres-for-write-model.md
+├── docs/
+│   ├── index.md
+│   └── adr/
+│       ├── 0001-event-sourced-orders.md
+│       └── 0002-postgres-for-write-model.md
 └── src/
 ```
 
-Multi-context repo (presence of `GLOSSARY-MAP.md` at the root):
+Once `GLOSSARY.md` passes about 10 KB, `domain-modeling` splits it into one page per Area. The repo keeps one `docs/adr/`:
+
+```
+/
+├── GLOSSARY-MAP.md                    ← lists one page per Area
+├── docs/
+│   ├── index.md                       ← links GLOSSARY-MAP.md
+│   ├── glossary/
+│   │   ├── ordering.md
+│   │   └── billing.md
+│   └── adr/
+└── src/
+```
+
+Multi-context repo (a `GLOSSARY-MAP.md` that points into `src/`):
 
 ```
 /
@@ -40,7 +57,7 @@ Multi-context repo (presence of `GLOSSARY-MAP.md` at the root):
 
 ## Use the glossary's vocabulary
 
-When your output names a domain concept (in an issue title, a refactor proposal, a hypothesis, a test name), use the term as defined in `GLOSSARY.md`. Don't drift to synonyms the glossary explicitly avoids.
+When your output names a domain concept (in an issue title, a refactor proposal, a hypothesis, a test name), use the term as defined in the glossary. Don't drift to synonyms the glossary explicitly avoids.
 
 If the concept you need isn't in the glossary yet, that's a signal: either you're inventing language the project doesn't use (reconsider) or there's a real gap (note it for `/domain-modeling`).
 

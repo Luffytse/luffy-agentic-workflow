@@ -95,11 +95,12 @@ The flow:
 4. If no: create a new file with the concept name, decision, reason, and first prior request
 5. Post a comment on the issue explaining the decision and mentioning the `.out-of-scope/` file
 6. Close the issue with the `wontfix` label
+7. In the same commit as the file, update `docs/index.md` ([DOCS-INDEX.md](../domain-modeling/DOCS-INDEX.md)): a new file gets a line, and an edited file's line is fixed only if its subject changed
 
 ## Updating or removing out-of-scope files
 
 If the maintainer changes their mind about a previously rejected concept:
 
-- Delete the `.out-of-scope/` file
+- Delete the `.out-of-scope/` file, and remove its line from `docs/index.md`
 - The skill does not need to reopen old issues; they're historical records
 - The new issue that triggered the reconsideration proceeds through normal triage
