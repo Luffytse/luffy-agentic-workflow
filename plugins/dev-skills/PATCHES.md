@@ -57,6 +57,43 @@ What:
 
 No other kept skill mentions a dropped skill (checked with grep for `teach`, `to-questionnaire`, `grill-me`, `wait-what`), so no other edit was needed.
 
+## Patch 3: Evidence and one-way doors (`pr/SKILL.md`)
+
+Why: ADR 0004 makes Evidence a required part of every pull request and a one-way door a reason for a human to merge.
+
+What. In the template:
+
+- Under `## Evidence`, replace the two lines `- **Before:** <screenshot/output/failing test run>` and `  **After:** <screenshot/output/passing test run>` with:
+
+  ```text
+  - **Tests:** <the exact test that fails before and passes after, or what was checked instead>
+  - **Checks:** <typecheck output, or the repo's checks (lint, validate script)>
+  - **Screenshots:** <before and after for anything visual, or "not visual", or why not captured>
+
+  <a spec's PR: repeat these bullets per ticket, under the ticket's number; else delete this line>
+  ```
+
+- Under `## Merge Danger`, replace `**Door:** <one-way or two-way>` with `**Door:** <one-way or two-way; a spec's PR: one-way (#a, #b) if any ticket is>`, and replace `<optional: description>` with `<if one-way: one line on what a revert would not undo; else delete this line>`.
+
+In `### Evidence`:
+
+- Replace "Concrete evidence that the change works. Show a before and after." with "Concrete evidence that the change works: what failed before now passes."
+- Replace "Screenshots are S-tier - when the environment is set up for it and the change is visual." with "Screenshots are S-tier - for anything visual. If the environment can't take them, say so."
+- In the A-tier paragraph, replace "Show the exact test that now fails and passes, using pseudocode." with "Show the exact test that fails before and passes after, using pseudocode. Include the typecheck output, or the output of the repo's checks (a lint or validate script)."
+- After that paragraph, add these two paragraphs:
+
+  > When something can't be shown (a docs-only change has no tests), say what was checked instead; never leave an Evidence line empty.
+  >
+  > A PR that collects several tickets (a spec's PR) carries each ticket's evidence into its body.
+
+In `### Merge Danger`, after Upstream's door paragraph (ending "...are one-way doors.") and before "The blast radius is...", add these two paragraphs:
+
+> Decide with one test: would reverting the PR's commits undo everything the change did, including anything outside git? If not, it is a one-way door. For example: a data migration, deleted data, a public interface others depend on, a message sent outside the project, a published release. Mark it plainly as `**Door:** one-way`, with one line on what a revert would not undo, so a reader or merging agent can find it. A one-way door is not self-merged.
+>
+> A PR that collects several tickets (a spec's PR) carries each ticket's Door call into its body, and is one-way if any ticket's Door is, naming those tickets.
+
+Summary section: unchanged.
+
 ## Vendor model names in Upstream text
 
 None in the kept skills at the Base commit, so no Patch was needed for ADR 0002 (checked for ticket #4: grep for `haiku`, `sonnet`, `opus`, `claude-`, `gpt-`, `gemini` over `upstream-skills/`). Some kept skills start subagents (for example `grilling`, `wayfinder`, `code-review`, `implement-spec`), but none picks a model for them. Spec #1 adds tiers in later tickets (the `code-review` Finders and Verifiers, the `implement` and `implement-spec` Implementers, and a tier on each ticket from `to-tickets`); each of those edits gets its own Patch here.

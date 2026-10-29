@@ -18,14 +18,17 @@ Use this template for writing the PR body:
 
 ## Evidence
 
-- **Before:** <screenshot/output/failing test run>
-  **After:** <screenshot/output/passing test run>
+- **Tests:** <the exact test that fails before and passes after, or what was checked instead>
+- **Checks:** <typecheck output, or the repo's checks (lint, validate script)>
+- **Screenshots:** <before and after for anything visual, or "not visual", or why not captured>
+
+<a spec's PR: repeat these bullets per ticket, under the ticket's number; else delete this line>
 
 ## Merge Danger
 
-**Door:** <one-way or two-way>
+**Door:** <one-way or two-way; a spec's PR: one-way (#a, #b) if any ticket is>
 
-<optional: description>
+<if one-way: one line on what a revert would not undo; else delete this line>
 
 **Blast Radius:** <one-word description>
 
@@ -157,14 +160,22 @@ You may use one of these, you may use several, it is unlikely you will use all o
 
 ### Evidence
 
-Concrete evidence that the change works. Show a before and after.
+Concrete evidence that the change works: what failed before now passes.
 
-Screenshots are S-tier - when the environment is set up for it and the change is visual.
+Screenshots are S-tier - for anything visual. If the environment can't take them, say so.
 
-Execution-based evidence is A-tier. Test results, console output. Show the exact test that now fails and passes, using pseudocode.
+Execution-based evidence is A-tier. Test results, console output. Show the exact test that fails before and passes after, using pseudocode. Include the typecheck output, or the output of the repo's checks (a lint or validate script).
+
+When something can't be shown (a docs-only change has no tests), say what was checked instead; never leave an Evidence line empty.
+
+A PR that collects several tickets (a spec's PR) carries each ticket's evidence into its body.
 
 ### Merge Danger
 
 Describe whether it's a one-way or two-way door. You can walk back through two-way doors, but not one-way doors. A PR that is cheap to roll back is lower risk. Changes that involve destructive actions or hard-to-reverse decisions are one-way doors.
+
+Decide with one test: would reverting the PR's commits undo everything the change did, including anything outside git? If not, it is a one-way door. For example: a data migration, deleted data, a public interface others depend on, a message sent outside the project, a published release. Mark it plainly as `**Door:** one-way`, with one line on what a revert would not undo, so a reader or merging agent can find it. A one-way door is not self-merged.
+
+A PR that collects several tickets (a spec's PR) carries each ticket's Door call into its body, and is one-way if any ticket's Door is, naming those tickets.
 
 The blast radius is the potential impact or scope of the changes introduced by this PR. Consider all possibilities. Examples are layout shift, breakages for consumers, mobile responsiveness, etc.
