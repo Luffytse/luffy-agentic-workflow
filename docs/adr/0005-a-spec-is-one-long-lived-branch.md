@@ -1,0 +1,16 @@
+# A spec is one long-lived branch; tickets squash into it
+
+Each spec is built on its own **spec branch** off main. Each ticket under it is built on a **ticket branch** off the spec branch, in its own git worktree so several Implementers can work at the same time. A finished ticket (tests passing, ticket check clean, see [ADR 0004](0004-build-threads-coordinate-and-subagents-code.md)) is squash-merged into the spec branch as one commit, with no pull request, and the thread pushes the spec branch straight away. The full review happens on the spec's pull request. That pull request opens as a draft when the first ticket lands, is marked ready once the last ticket lands, then gets the full Rounds of [ADR 0003](0003-code-review-runs-find-verify-rank-in-rounds.md), closes all its tickets and the spec issue, and merges into main with a **merge commit**, so main keeps each ticket as its own commit. A lone ticket works on its own branch off main and squash-merges into main with a summary message.
+
+A spec's ticket branches stay inside the build thread and are never pushed; only spec branches and lone-ticket branches go to GitHub. Before each ticket merge and before each Round, the spec thread fetches main; if it moved, the thread merges main into the spec branch, with an Implementer resolving any conflicts; it never rebases, so ticket worktrees started from the spec branch stay valid. For a commits-only Round, such a merge counts among the new commits, but only its conflict resolutions are reviewed, not the commits that came from main.
+
+## Why
+
+- A live test in a cloud thread (2026-10-29) showed two subagents can each work in their own worktree off a spec branch, commit, and be squash-merged back, in parallel.
+- Claude Code's built-in worktree option for subagents starts only from the default branch or the current HEAD, never from a named branch, so `implement-spec` creates ticket worktrees itself with `git worktree add` from the spec branch.
+- The cloud's GitHub connection refuses to delete branches, so pushed ticket branches would pile up. Keeping them local avoids that. The cost: if the cloud machine is reclaimed mid-ticket, that ticket's unfinished work is lost and is redone.
+
+## Consequences
+
+- The repo should turn on GitHub's "Automatically delete head branches", so merged spec and lone-ticket branches clean themselves up.
+- Each worktree is a full checkout, sharing the thread's 30 GB disk, and may need its dependencies installed again.
