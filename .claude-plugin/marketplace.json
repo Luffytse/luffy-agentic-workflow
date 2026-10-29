@@ -10,6 +10,11 @@
       "name": "dai-portal-data",
       "source": "./plugins/dai-portal-data",
       "description": "Local DAI Portal Postgres docker lifecycle commands and a verified query cookbook against the example_db schema."
+    },
+    {
+      "name": "dev-skills",
+      "source": "./plugins/dev-skills",
+      "description": "Lufei's development skills: a fork of Matt Pocock's skills (wayfinder, grilling, specs, tickets, TDD, code review) made model-invocable, plus our own."
     }
   ]
 }

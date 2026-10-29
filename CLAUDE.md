@@ -3,7 +3,7 @@
 Lufei's personal Claude Code plugin marketplace, named `luffy-dev`. Each plugin lives under `plugins/<name>/` and is listed in `.claude-plugin/marketplace.json`.
 
 - `dai-portal-data`: tooling for the local DAI Portal Postgres database.
-- `dev-skills` (planned): the development skill set used across Lufei's projects, a fork of Matt Pocock's skills plus our own review pipeline. See `docs/adr/`.
+- `dev-skills`: the development skill set used across Lufei's projects, a fork of Matt Pocock's skills plus our own review pipeline. See `docs/adr/`.
 
 Words used here (Finder, Verifier, Finding, Bug class, Review depth, Model tier and so on) are defined in `GLOSSARY.md`. Decisions are in `docs/adr/`. Start at `docs/index.md`, which says which doc to read for what.
 

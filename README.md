@@ -7,24 +7,27 @@ Personal Claude Code plugin marketplace.
 | Plugin | Description |
 |--------|-------------|
 | [`dai-portal-data`](plugins/dai-portal-data/) | Local DAI Portal Postgres docker lifecycle + verified query cookbook for the `example_db` schema |
+| [`dev-skills`](plugins/dev-skills/) | Development skills: a model-invocable fork of Matt Pocock's skills plus our own (wayfinder, grilling, specs, tickets, TDD, code review) |
 
 ## Install
 
 From inside Claude Code:
 
 ```
-/plugin marketplace add https://github.com/Luffytse/luffy-dev-plugin
+/plugin marketplace add https://github.com/Luffytse/luffy-dev-skills
 /plugin install dai-portal-data@luffy-dev
+/plugin install dev-skills@luffy-dev
 ```
 
 Or from the shell:
 
 ```bash
-claude plugin marketplace add https://github.com/Luffytse/luffy-dev-plugin
+claude plugin marketplace add https://github.com/Luffytse/luffy-dev-skills
 claude plugin install dai-portal-data@luffy-dev
+claude plugin install dev-skills@luffy-dev
 ```
 
-After install, the plugin's skills are namespaced as `dai-portal-data:dai-portal-db-lifecycle` and `dai-portal-data:dai-portal-db-queries`.
+After install, the plugins' skills are namespaced, for example `dai-portal-data:dai-portal-db-lifecycle` and `dev-skills:wayfinder`.
 
 ## Update
 
@@ -38,24 +41,34 @@ claude plugin marketplace update luffy-dev
 
 ## Contributing / local development
 
-If you're hacking on the plugin itself, point the marketplace at your local clone instead of GitHub:
+If you're hacking on a plugin itself, point the marketplace at your local clone instead of GitHub:
 
 ```bash
-claude plugin marketplace add /path/to/luffy-dev-plugin
+claude plugin marketplace add /path/to/luffy-dev-skills
 claude plugin install dai-portal-data@luffy-dev
+claude plugin install dev-skills@luffy-dev
 ```
+
+For `dev-skills`, run `plugins/dev-skills/scripts/check-plugin.sh` and `claude plugin validate .` before pushing, and record any change to Upstream text in `plugins/dev-skills/PATCHES.md`.
 
 ## Layout
 
 ```
-luffy-dev-plugin/
+luffy-dev-skills/
 ├── .claude-plugin/
 │   └── marketplace.json        # marketplace catalog
 └── plugins/
-    └── dai-portal-data/
+    ├── dai-portal-data/
+    │   ├── .claude-plugin/
+    │   │   └── plugin.json     # plugin manifest
+    │   └── skills/
+    │       ├── dai-portal-db-lifecycle/SKILL.md
+    │       └── dai-portal-db-queries/SKILL.md
+    └── dev-skills/
         ├── .claude-plugin/
         │   └── plugin.json     # plugin manifest
-        └── skills/
-            ├── dai-portal-db-lifecycle/SKILL.md
-            └── dai-portal-db-queries/SKILL.md
+        ├── upstream-skills/    # forked from Matt Pocock's skills
+        ├── skills/             # our own skills
+        ├── PATCHES.md          # changes to Upstream text
+        └── scripts/check-plugin.sh
 ```
