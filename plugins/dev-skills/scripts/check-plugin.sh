@@ -34,6 +34,18 @@ if [ -d "$forked" ] && grep -rn --include=SKILL.md -E '^[[:space:]]*["'"'"']?(di
   bad "a skill still sets disable-model-invocation or user-invocable in frontmatter"
 fi
 
+# 2b. our own skills: each has a SKILL.md and is model-invoked
+own="$root/skills"
+if [ -d "$own" ]; then
+  for d in "$own"/*/; do
+    [ -d "$d" ] || continue
+    [ -f "$d/SKILL.md" ] || bad "own skill $(basename "$d") has no SKILL.md"
+  done
+  if grep -rn --include=SKILL.md -E '^[[:space:]]*["'"'"']?(disable-model-invocation|user-invocable)["'"'"']?[[:space:]]*:' "$own"; then
+    bad "an own skill sets disable-model-invocation or user-invocable in frontmatter"
+  fi
+fi
+
 # 3. ask-matt no longer names the dropped skills
 if [ -f "$forked/ask-matt/SKILL.md" ]; then
   for s in $dropped; do

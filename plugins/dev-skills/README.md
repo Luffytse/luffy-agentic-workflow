@@ -26,13 +26,17 @@ Skills are namespaced, for example `dev-skills:wayfinder`. For a Claude project,
 plugins/dev-skills/
 ├── .claude-plugin/plugin.json   # lists both skill folders below
 ├── upstream-skills/             # forked from Upstream; every change is in PATCHES.md
-├── skills/                      # our own skills (none yet)
+├── skills/                      # our own skills: setup-project
 ├── PATCHES.md                   # what we changed in Upstream text, and the Upstream commit
 ├── LICENSE-mattpocock-skills    # Upstream's MIT licence
 └── scripts/check-plugin.sh      # checks the layout and the Patches
 ```
 
 Forked and own skills live in separate folders so it is always clear which text came from Upstream. Never put our own skill in `upstream-skills/`. To add one, create `skills/<name>/SKILL.md`; `plugin.json` already points at the folder.
+
+## Our own skills
+
+- `setup-project`: interviews Lufei with `grilling` and drafts the project instructions that tell the coordinator how to brief build threads. After approval the thread sends the text to the coordinator to save; it never edits project settings itself.
 
 ## Model tiers
 
