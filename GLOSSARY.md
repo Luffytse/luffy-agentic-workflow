@@ -119,3 +119,17 @@ _Avoid_: priority, blocker
 **Bug class**:
 The kind of problem a Finding is (for example "unescaped user input"), so every place it occurs is fixed together.
 _Avoid_: category, type
+
+## Retros
+
+**Retro issue**:
+One suggestion from `retro` filed as a GitHub issue labelled `retro`, in the repo where its fix lands. It is never `needs-triage`; Retro planning decides what happens to it.
+_Avoid_: retro ticket, action item
+
+**Retro backlog**:
+The open Retro issues of one repo.
+_Avoid_: retro queue, improvement list
+
+**Retro planning**:
+The batch review of one repo's Retro backlog, which merges duplicates, closes most one-offs and turns at most 3 groups into Tickets. Each planning leaves a closed record issue labelled `retro-planning`.
+_Avoid_: retro triage, retro review

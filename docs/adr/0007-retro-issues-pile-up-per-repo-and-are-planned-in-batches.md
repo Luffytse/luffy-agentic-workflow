@@ -1,0 +1,42 @@
+# Retro issues pile up per repo and are planned in batches
+
+`retro` used to hand its suggestions to the person in its report, where most were read once and lost. Now every suggestion except a repeated Bug class becomes a **Retro issue** on a GitHub tracker, and the open ones form that repo's **Retro backlog**. A **Retro planning** session, run by the new `retro-planning` skill, works through one repo's backlog in a batch: it merges duplicates, closes what was seen only once, and turns at most 3 groups into Tickets. We chose this because one thread's retro sees one session, so it cannot tell a one-off from a pattern; only a backlog that collects "seen again" votes across threads can. `dev-skills` is loaded by several projects, so no skill text names one project or repo, and a Retro issue goes to the repo where its fix lands.
+
+## Filing (what `retro` does)
+
+- A repeated Bug class from `code-review` still becomes a check or a `REVIEW.md` line straight away, in the retro's own pull request ([ADR 0003](0003-code-review-runs-find-verify-rank-in-rounds.md)). Every other suggestion becomes a Retro issue: label `retro`, title starting `Retro:`, and **no** `needs-triage`, so build threads ignore it and `triage` skips it (see Consequences). Its body names the source thread, what went wrong, and the suggested fix. `retro` creates the `retro` label if the repo lacks it.
+- **Routing follows where the fix lands.** A problem with a skill or the workflow (skill text, review rules, how threads run) goes to the `dev-skills` repo, from any project. A problem only one project has (its CI, its docs, its `CLAUDE.md`) goes to that project's repo. No suggestion goes to both. A project that wants a skill of its own builds it in its own repo or `CLAUDE.md`; it may still suggest a `dev-skills` change, which `dev-skills`' Retro planning accepts or closes as won't do, with a reason.
+- `retro` finds the `dev-skills` repo from the `repository` field of the plugin's manifest (`plugins/dev-skills/.claude-plugin/plugin.json`), and the project's tracker from its `docs/agents/issue-tracker.md`. When the thread cannot write to the `dev-skills` repo, `retro` puts the issue text in its report so the coordinator can file it.
+- **Votes.** When an open Retro issue already covers a suggestion, `retro` comments "seen again in <thread>" on it instead of opening a duplicate.
+- **Trigger.** After filing, `retro` counts the repo's open Retro issues and reads the newest Retro planning record. Its report says Retro planning is due when 10 or more are open, or when 2 weeks have passed since the last planning and at least 4 are open. The numbers live in one place in the skill. The person decides when to start; the coordinator offers a thread.
+- `implement` and `implement-spec` run `retro` on their own thread as their last step, once the pull request is merged or handed to the person. Planning threads keep their project's rule instead.
+
+## Retro planning (what `retro-planning` does)
+
+It runs per repo and reads only that repo's Retro issues; the `dev-skills` repo is planned in the project that builds it.
+
+1. Pull every open Retro issue with its "seen again" votes and its age.
+2. Group them by root cause and merge duplicates.
+3. Propose a verdict per group. Seen in only one thread: close as `wontfix` with a reason, unless it is severe (lost data, security, a large waste). Seen in 2 or more threads: act on it.
+4. Act on at most 3 groups. Each becomes a `ready-for-agent` Ticket with a done condition, linking the Retro issues it absorbs; those issues close when the Ticket closes. Prefer a check or hook over a new prose rule. A repeated group over the cap stays open and comes next at the next planning, after any group from step 7.
+5. The person approves the verdict list before anything is closed.
+6. An issue with no new vote across 2 plannings is closed with "reopen if seen again", unless it was held back only by the cap.
+7. Recheck whether the problem behind an earlier fix has come back. If it has, the fix did not work, and that group goes first.
+8. End by filing a **closed** record issue titled `Retro planning <yyyy-mm-dd>`, label `retro-planning`, listing every verdict and vote count. `retro` reads the newest record for its 2-week clock.
+
+The thresholds (10, 2 weeks with 4, at most 3 groups, 2 plannings) are Lufei's choices, not taken from a source.
+
+## Considered options
+
+- **Keep suggestions in the report only.** Nothing tracks them, and no thread can see that two others hit the same problem.
+- **File them as `needs-triage` issues.** `triage` and build threads would pick them up one at a time and act on one-offs; Retro issues need batch judgement across threads, which is what Retro planning is for.
+- **Act on every repeated suggestion.** A planning that turns many groups into Tickets crowds out feature work; a limit of 3 keeps the fixes small and makes each planning choose.
+- **One shared backlog for every project.** Routing by where the fix lands keeps each repo's backlog about things that repo can change, and keeps `dev-skills` free of any one project's problems.
+
+## Consequences
+
+- `retro` gains filing, routing, votes and the trigger (Patches). `plugin.json` gains a `repository` field.
+- A new skill of our own, `retro-planning`, lives under `plugins/dev-skills/skills/`, and `ask-matt` routes to it (a Patch).
+- `triage` must skip issues labelled `retro`, since they carry no `needs-triage` and would otherwise look untriaged (a Patch).
+- `implement` and `implement-spec` end with `retro` (Patches).
+- This repo gets a CI job running `plugins/dev-skills/scripts/check-plugin.sh` and `claude plugin validate .` on every pull request.

@@ -4,7 +4,7 @@ Read this first, then open only the docs whose line fits your work. Specs and ti
 
 ## Whole repo
 
-- [GLOSSARY.md](../GLOSSARY.md): the words used here (Plugin, Patch, Model tier, Spec, Ticket, Implementer, Finder, Verifier, Round...). Read when writing or reviewing any skill text.
+- [GLOSSARY.md](../GLOSSARY.md): the words used here (Plugin, Patch, Model tier, Spec, Ticket, Implementer, Finder, Verifier, Round, Retro issue...). Read when writing or reviewing any skill text.
 
 ## Packaging
 
@@ -29,6 +29,10 @@ Read this first, then open only the docs whose line fits your work. Specs and ti
 - [code-review eval SPEC.md](../plugins/dev-skills/evals/code-review/SPEC.md): the ticket the fixture pull request builds, given to the Review as its spec. Read when changing the fixture.
 - [code-review eval EXPECTED.md](../plugins/dev-skills/evals/code-review/EXPECTED.md): the planted Findings and false alarms a run is scored against. Read when scoring a run or changing the fixture; keep it away from the reviewing session.
 - [code-review eval RESULTS.md](../plugins/dev-skills/evals/code-review/RESULTS.md): one entry per eval run. Read to see how `code-review` did last time.
+
+## Retros
+
+- [ADR 0007](adr/0007-retro-issues-pile-up-per-repo-and-are-planned-in-batches.md): how `retro` files Retro issues, routes them to the repo where the fix lands, and how `retro-planning` works through a repo's Retro backlog. Read when working on `retro`, `retro-planning`, or the end of `implement` and `implement-spec`.
 
 ## Docs
 
