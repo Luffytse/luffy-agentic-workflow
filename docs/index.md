@@ -30,6 +30,7 @@ Read this first, then open only the docs whose line fits your work. Specs and ti
 
 ## Code review
 
+- [REVIEW.md](../REVIEW.md): this repo's review rules: what Important means, what to skip, and the Always check lines. Read when reviewing a change or adding an Always check line.
 - [ADR 0003](adr/0003-code-review-runs-find-verify-rank-in-rounds.md): Find, Verify, Rank, depths and Rounds. Read when working on `agentic-review`, `retro` or `pr`.
 - [agentic-review eval README](../plugins/dev-skills/evals/agentic-review/README.md): the planted-bugs fixture pull request and how to rerun it. Read after changing `agentic-review`. The fixture's own files under `base/` and `after/` are test data and get no lines here.
 - [agentic-review eval SPEC.md](../plugins/dev-skills/evals/agentic-review/SPEC.md): the ticket the fixture pull request builds, given to the Review as its spec. Read when changing the fixture.
