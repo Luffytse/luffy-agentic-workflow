@@ -91,11 +91,15 @@ _Avoid_: section, module
 ## Code review
 
 **Review**:
-One run of the `agentic-review` skill over a pull request (or, for a Ticket check, over a Ticket branch's diff), in three stages: find candidate Findings, verify them, then rank the survivors.
+One run of the `agentic-review` skill, in three stages: find candidate Findings, verify them, then rank the survivors. It has two entry points: a pull request (reviewed in Rounds), or the diff since a fixed point (a commit, branch, tag or merge-base; it also reads uncommitted work). The second kind is one Review, not a Round; a Ticket check is that kind, one Review at Quick depth over a Ticket branch's diff.
 
 **Round**:
-One Review plus the fix commits that follow it (the final commit of "fix" Nits is not reviewed by another Round). Rounds 1 and 2 are **full-PR rounds**; rounds 3 to 5 are **commit rounds**, which review only the commits added since the last Round.
+One Review plus the fix commits that follow it (the final commit of "fix" Nits is not reviewed by another Round). Rounds 1 and 2 are **full-PR Rounds**; Rounds 3 to 5 are **commit Rounds**, which review only the commits added since the last Round.
 _Avoid_: pass, iteration
+
+**Question round**:
+One batch of questions a skill (`grilling`, `triage`) puts to the user at once. Not a Round, and not a Review: the skills' "round" without a capital R means this.
+_Avoid_: Round (for a batch of questions)
 
 **Merge-only Round**:
 A Round 3 to 5 whose new commits are only a merge from main, plus the commit that takes the numbers after it. When the merge's conflicts were only numbers or text, it runs at Quick depth, not the carried one, unless a resolution touches logic.
