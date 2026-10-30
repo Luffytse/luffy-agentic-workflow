@@ -16,7 +16,7 @@ If the brief says this thread owns a spun-off group, skip steps 0 to 7 and go st
 Look for an open issue labelled `retro-planning`. If there is one, this is a resumed planning, and its creation time stays the snapshot time:
 
 1. If its Snapshot section is still "None", continue at step 1.
-2. Otherwise read its snapshot table and cap, then reconcile the record with each snapshot issue's current state: closed, an `Absorbed by` comment, a `Spun off to` comment, or a Ticket labelled `ready-for-agent` filed since the snapshot that links it and is not named in a spin-off's `Filed #<ticket> (from spin-off` comment. Any call carried out on the issues but missing from the record goes into the record now, so no group is walked twice and no Ticket filed twice. An issue with a `Spun off to` comment belongs to its spin-off: record only the spin-off itself, if the record lacks it, and leave its later closes and Tickets to the spin-off's comments.
+2. Otherwise read its snapshot table and cap, then reconcile the record with each snapshot issue's current state: closed, an `Absorbed by` comment made since the snapshot, a `Spun off to` comment, or a Ticket labelled `ready-for-agent` filed since the snapshot that links it and is not named in a spin-off's `Filed #<ticket> (from spin-off` comment. Any call carried out on the issues but missing from the record goes into the record now, so no group is walked twice and no Ticket filed twice. An issue with a `Spun off to` comment belongs to its spin-off: record only the spin-off itself, if the record lacks it, and leave its later closes and Tickets to the spin-off's comments.
 3. Redo steps 2 to 4 on the snapshot issues that still have no verdict, counting the record's "Tickets filed" toward the cap, then continue at step 5.
 
 Otherwise file the record now as an **open** issue (format in "The record", with Cap `3 (default)` and every other section "None" for now), creating the `retro` and `retro-planning` labels if the repo lacks them. Its creation time is the **snapshot** time.
@@ -36,9 +36,11 @@ Give each issue a status:
 
 - **Waiting on an open Ticket**: absorbed by a Ticket that is still open. List it, and leave it out of steps 2 to 5.
 - **Spun off, waiting**: it has a `Spun off to <thread link>` comment and no later `Absorbed by` comment. Its owning planning has not decided it yet. List it, and leave it out of steps 2 to 5.
-- **Failed-fix candidate**: absorbed by a closed Ticket, with a new vote since the Ticket closed. It goes to step 2.
-- **Closing with its Ticket**: absorbed by a closed Ticket, with no new vote since. Its verdict is **Close with its Ticket**.
-- **In the backlog**: every other issue.
+- **Failed-fix candidate**: absorbed by a Ticket closed as completed (read the close reason with `gh issue view <n> --json state,stateReason`, or `state_reason` on the REST route, or the tracker doc's equivalent), with a new vote since the Ticket closed. It goes to step 2.
+- **Closing with its Ticket**: absorbed by a Ticket closed as completed, with no new vote since. Its verdict is **Close with its Ticket**.
+- **In the backlog**: every other issue, including one absorbed by a Ticket closed any other way than completed (not planned, duplicate, abandoned). Nothing fixed it, so it is not closing, not a failed-fix candidate and not waiting: it keeps its votes and new-vote answer, and is grouped and judged in steps 2 to 5 like any other.
+
+An issue's latest `Absorbed by` comment decides which Ticket it waits on or closes with.
 
 Write the snapshot table into the record.
 
@@ -46,9 +48,11 @@ Done when every open `retro` issue in the snapshot has its distinct-thread count
 
 ## 2. Recheck earlier fixes
 
-For each closed Ticket named in an earlier record, check whether its problem has come back: an absorbed issue with a new vote after the Ticket closed, or a Retro issue in the snapshot filed or voted on after it closed that matches the Ticket's problem. Each match makes a **failed-fix group**: the fix did not work. This runs before the cap is filled, and a failed-fix group counts toward it.
+For each Ticket named in an earlier record that closed as completed, check whether its problem has come back: an absorbed issue with a new vote after the Ticket closed, or a Retro issue in the snapshot filed or voted on after it closed that matches the Ticket's problem. Each match makes a **failed-fix group**: the fix did not work. This runs before the cap is filled, and a failed-fix group counts toward it.
 
-Done when every closed Ticket in the earlier records is marked "holding" or "came back", with the matching issues.
+A Ticket closed any way other than completed (not planned, duplicate, abandoned) fixed nothing: mark it "not fixed", and its issues stay in the backlog.
+
+Done when every closed Ticket in the earlier records is marked "holding", "came back" or "not fixed", with the matching issues.
 
 ## 3. Group and propose verdicts
 
@@ -72,7 +76,7 @@ Order the acting groups:
 2. Groups the newest record held back by the cap.
 3. The rest, by distinct-thread count, highest first; on a tie, the group with the oldest issue first.
 
-After them come the `wontfix` groups, oldest issue first. Expiries and issues closing with their Ticket are the **mechanical closes**: they leave no judgment to make and wait for the end of step 5.
+After them come the `wontfix` groups, oldest issue first. Expiries and issues closing with their completed Ticket are the **mechanical closes**: they leave no judgment to make and wait for the end of step 5.
 
 Done when every group has its place in one ordered walk.
 
@@ -90,17 +94,17 @@ Show one group, with full details:
 
 Then ask for the user's call and wait for it: act as a Ticket, spin off, close, or the user's own change (a different verdict, a reshaped Ticket, keep it open). The user's call is that group's approval: carry it out at once with step 6, update the record, then show the next group. A call that changes the grouping regroups only the groups not yet walked.
 
-When every group is walked, show the mechanical closes in one short list (each issue, and the Ticket that absorbed it or "expired"), and carry them out once the user agrees. One the user holds back stays open.
+When every group is walked, show the mechanical closes in one short list (each issue, and the completed Ticket that absorbed it, or "expired"), and carry them out once the user agrees. One the user holds back stays open.
 
 Done when every group in the walk and every mechanical close has the user's call, carried out and in the record.
 
 ## 6. Carry out a call
 
-- **Ticket**: file it with `to-tickets`' issue template, including its `**Model tier:**` line. Label it `ready-for-agent` (the string `docs/agents/triage-labels.md` maps it to, if the repo has that file). Its done condition goes in the acceptance criteria. Link each Retro issue it absorbs, and add a criterion that those issues close with the Ticket (list them as `Closes #<n>` in the pull request that closes the Ticket). On each absorbed issue, comment `Absorbed by #<ticket>; closes when it closes.`
+- **Ticket**: file it with `to-tickets`' issue template, including its `**Model tier:**` line. Label it `ready-for-agent` (the string `docs/agents/triage-labels.md` maps it to, if the repo has that file). Its done condition goes in the acceptance criteria. Link each Retro issue it absorbs, and add a criterion that those issues close with the Ticket (list them as `Closes #<n>` in the pull request that closes the Ticket), and only when the Ticket is completed: if it is closed as not planned, they stay open. On each absorbed issue, comment `Absorbed by #<ticket>; closes when it is completed.`
 - **`wontfix`** or another close: comment the reason, add the `wontfix` label (the string `docs/agents/triage-labels.md` maps it to, if the repo has that file) when the verdict is `wontfix`, and close.
 - **Spin off**: the group needs more discussion, so this planning does not decide it. Ask for a separate planning thread for its issues: in a project with a coordinator, ask the coordinator; otherwise tell the user to start one, and give them the brief. The brief names the issues, this record, and "Running a spun-off planning" below. On each issue, comment `Spun off to <thread link>; that planning decides it.` (with no link yet, name the thread as the user or coordinator named it). A spun-off group stays open, does not count toward the cap, and cannot expire.
 - **Expire**: comment `No new vote across 2 plannings. Reopen if seen again.` and close.
-- **Close with its Ticket**: comment `Closed with #<ticket>.` and close.
+- **Close with its Ticket**: first check the Ticket's close reason is `completed`; if not, leave the issue open in the backlog. Comment `Closed with #<ticket>.` and close.
 - **Held back by the cap**, or kept open: leave open.
 
 Then update the record straight away: the group's row in "Verdicts", its line in "Tickets filed", "Held back by the cap" or "Spun off", and "Cap" when the user raised the cap.
@@ -147,7 +151,7 @@ Snapshot time: <the record's creation time>
 | <root cause> | #14 | 2 | held back by the cap | |
 | <root cause> | #20 | 2 | spun off | <thread link> |
 | <root cause> | #16 | 1 | kept open by the user | |
-| absorbed by a closed Ticket | #11 | 2 | closed with its Ticket | #31 |
+| absorbed by a Ticket closed as completed | #11 | 2 | closed with its Ticket | #31 |
 
 ## Held back by the cap
 
@@ -163,7 +167,7 @@ Snapshot time: <the record's creation time>
 
 ## Earlier fixes rechecked
 
-- #31: holding / came back (#17)
+- #31: holding / came back (#17) / not fixed
 
 ## Arrived during this planning
 
@@ -184,4 +188,4 @@ Snapshot time: <the record's creation time>
 - #19: <thread link>
 ```
 
-Every verdict appears, kept-open ones included. "Plannings without a new vote" covers every snapshot issue left open that is not waiting on a Ticket or spun off: 0 if it had a new vote since the previous record or is held back by the cap, otherwise the previous record's count plus 1. "Spun off, waiting" lists issues spun off by an earlier planning and still undecided; this planning's own spin-offs are under "Spun off".
+Every verdict appears, kept-open ones included. "Plannings without a new vote" covers every snapshot issue left open that is not waiting on a Ticket or spun off: 0 if it had a new vote since the previous record or is held back by the cap, otherwise the previous record's count plus 1 (a missing count is 0). "Spun off, waiting" lists issues spun off by an earlier planning and still undecided; this planning's own spin-offs are under "Spun off".

@@ -609,6 +609,12 @@ What (all in `scripts/check-plugin.sh` and this file; no skill text changed):
 
 Merging an Upstream update: nothing to re-apply, since no Upstream text changed; if Upstream renames a skill or its `display_name`, the two checks fail until the folder, `name:` and `display_name` agree again.
 
+## Not a Patch: `retro-planning` closes absorbed Retro issues only when their Ticket completed (issue #146, absorbs #95)
+
+Our own, not Upstream; no Upstream text changed. `skills/retro-planning/SKILL.md` treats an absorbed Retro issue as closing with its Ticket, or as a failed-fix candidate, only when the Ticket closed as completed; a Ticket closed any other way (not planned, duplicate, abandoned) leaves the issue in the backlog with its votes, and step 2 marks that Ticket "not fixed". ADR 0007 step 4 and the plugin README say the same.
+
+- `.claude-plugin/plugin.json`: version 0.22.4 to 0.22.5.
+
 ## Vendor model names in Upstream text
 
 None in the kept skills at the Base commit, so no Patch was needed for ADR 0002 (checked for ticket #4: grep for `haiku`, `sonnet`, `opus`, `claude-`, `gpt-`, `gemini` over `upstream-skills/`). Some kept skills start subagents (for example `grilling`, `wayfinder`, `code-review`, `implement-spec`), but none picks a model for them. Spec #1 adds tiers in later tickets (the `code-review` Finders and Verifiers, and the `implement` and `implement-spec` Implementers; the tier on each ticket from `to-tickets` is Patch 7, the `implement` Implementer's tier is Patch 8, and the `implement-spec` Implementers' tiers are Patch 11); each of those edits gets its own Patch here.
