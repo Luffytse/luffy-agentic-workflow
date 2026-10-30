@@ -70,3 +70,7 @@ The user then merges, or tells you to. Otherwise merge it yourself once the Revi
 ## 8. Report
 
 Tell the user (or the coordinator) the pull request link and the outcome: merged with its commit, or waiting for the user and why.
+
+## 9. Run the retro
+
+Whether the pull request was merged or handed to the user, run the `retro` skill on this thread. If it finds a repeated Bug class to turn into a check, a regular-tier Implementer builds the check on a branch off main (you still write no code), and you open its pull request with `pr` and run the `agentic-review` Rounds as in steps 5 to 7. A check that changes `REVIEW.md` goes to the user, not merged by you. Add the retro's outcome to your report.

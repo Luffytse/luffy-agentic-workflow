@@ -210,5 +210,55 @@ if [ -n "$name_hits" ]; then
   bad "skill or doc text names a person (Lufei or Luffy); say \"the user\""
 fi
 
+# 17. retro files its suggestions as Retro issues (ADR 0007, "Filing"): the manifest names the dev-skills
+# repo, retro/SKILL.md links the filing reference file, which names the label, title, vote and record,
+# triage skips Retro issues, and no skill text names a particular project, repo or person
+grep -qE '"repository"[[:space:]]*:[[:space:]]*"https://github.com/[^"/]+/[^"/]+"' "$root/.claude-plugin/plugin.json" || bad "plugin.json has no repository field with a GitHub URL"
+fil="$forked/retro/FILING.md"
+if [ ! -f "$fil" ]; then bad "missing retro/FILING.md"
+else
+  grep -q "(FILING.md" "$forked/retro/SKILL.md" || bad "retro/SKILL.md does not link FILING.md"
+  for w in '`retro`' 'Retro:' 'seen again' '`retro-planning`'; do
+    grep -qiF "$w" "$fil" || bad "FILING.md does not mention $w"
+  done
+fi
+grep -qiE 'skip.*`retro`|`retro`.*skip' "$forked/triage/SKILL.md" || bad "triage/SKILL.md does not skip issues labelled retro"
+if grep -rniE --include='*.md' --include='*.yaml' 'luffydev|luffytse|luffy-dev|lufei' "$forked" "$root/skills"; then
+  bad "skill text names a particular project, repo or person"
+fi
+
+# 18. implement and implement-spec end with a retro step (issue #42): their last step, after the report,
+# runs `retro` on the thread, so each build feeds the Retro backlog
+for s in implement implement-spec; do
+  [ -f "$forked/$s/SKILL.md" ] || continue
+  last="$(awk '/^## /{buf=""} {buf=buf"\n"$0} END{print buf}' "$forked/$s/SKILL.md")"
+  printf '%s' "$last" | grep -qF '`retro`' || bad "$s/SKILL.md: the last step does not run \`retro\`"
+  printf '%s' "$last" | grep -qF 'REVIEW.md' || bad "$s/SKILL.md: the last step does not say a retro check that changes REVIEW.md goes to the user"
+done
+
+# 19. CI (issue #39, spec #38): a GitHub Actions workflow runs on pull requests and pushes to main,
+# installs Claude Code's CLI from npm, and runs this script and `claude plugin validate .`
+wf="$repo/.github/workflows/plugin-checks.yml"
+if [ ! -f "$wf" ]; then bad "missing .github/workflows/plugin-checks.yml"
+else
+  grep -qE '^[[:space:]]*pull_request:' "$wf" || bad "plugin-checks.yml does not run on pull_request"
+  { grep -qE '^[[:space:]]*push:' "$wf" && grep -qE 'main' "$wf"; } || bad "plugin-checks.yml does not run on pushes to main"
+  grep -qF '@anthropic-ai/claude-code' "$wf" || bad "plugin-checks.yml does not install @anthropic-ai/claude-code from npm"
+  grep -qF 'plugins/dev-skills/scripts/check-plugin.sh' "$wf" || bad "plugin-checks.yml does not run check-plugin.sh"
+  grep -qF 'claude plugin validate .' "$wf" || bad "plugin-checks.yml does not run claude plugin validate ."
+fi
+
+# 20. retro-planning works through one repo's Retro backlog (ADR 0007, "Retro planning"): our own skill
+# exists, names the `retro-planning` record label, the cap of 3 and the labels its verdicts use, and
+# ask-matt routes a due Retro backlog to it. A presence check only: it does not test the rules' wording.
+rp="$root/skills/retro-planning/SKILL.md"
+if [ ! -f "$rp" ]; then bad "missing skills/retro-planning/SKILL.md"
+else
+  for w in '`retro-planning`' 'Retro planning <yyyy-mm-dd>' 'at most 3' '`wontfix`' '`ready-for-agent`'; do
+    grep -qiF "$w" "$rp" || bad "retro-planning/SKILL.md does not mention $w"
+  done
+fi
+grep -qF '`/retro-planning`' "$forked/ask-matt/SKILL.md" || bad "ask-matt/SKILL.md does not route to \`/retro-planning\`"
+
 [ "$fail" -eq 0 ] && echo "OK: dev-skills plugin checks passed ($count skills)"
 exit "$fail"
