@@ -168,7 +168,7 @@ What:
 
 - `retro/SKILL.md`: new step 3, "If the session reviewed or built a pull request with `code-review` Rounds (or the user names one), turn its repeated Bug classes into checks: [BUG-CLASSES.md](BUG-CLASSES.md)."; Upstream's steps 3 and 4 become 4 and 5; the new step 5 (step 6 since Patch 16; Upstream's "Present these candidates to the user, in order of severity.") gains the sentence "Report repeated Bug classes as done, with the link to the retro's pull request." Every other line is Upstream's.
 - New `retro/BUG-CLASSES.md` (ours, not Upstream): reads every Round and Ticket-check comment of a pull request, merges them into one row per Finding id, groups by Bug class, and for each repeated class repairs an existing guardrail, adds a deterministic check, or adds a `REVIEW.md` Always-check line; the changes go in their own pull request, which a person merges when it touches `REVIEW.md`.
-- `scripts/check-plugin.sh`: `retro/BUG-CLASSES.md` joins the `writers` list of check 7; new check 9 (`BUG-CLASSES.md` exists, `retro/SKILL.md` links it, `BUG-CLASSES.md` and `code-review/ROUNDS.md` both contain the `<!-- code-review kind=round` and `<!-- code-review kind=ticket-check` markers, `BUG-CLASSES.md` mentions `REVIEW.md`).
+- `scripts/check-plugin.sh`: `retro/BUG-CLASSES.md` joins the `writers` list of check 7; new check 9 (retro-bug-classes: `BUG-CLASSES.md` exists, `retro/SKILL.md` links it, `BUG-CLASSES.md` and `code-review/ROUNDS.md` both contain the `<!-- code-review kind=round` and `<!-- code-review kind=ticket-check` markers, `BUG-CLASSES.md` mentions `REVIEW.md`).
 - `.claude-plugin/plugin.json`: version 0.4.0 to 0.5.0.
 
 Merging an Upstream update: carry Upstream's `retro/SKILL.md` changes over by hand and re-apply the step 3 insertion and the step 6 sentence (step 5 before Patch 16).
@@ -186,7 +186,7 @@ What:
   - `<issue-template>`: a "**Model tier:** this ticket's tier as agreed with the user: `regular` or `premium`." line at the end of `## What to build`.
   - New step 6, "Offer `setup-project`": once published, if the tickets changed what threads need (a new spec or map to point at, a new repo, a new kind of thread, a new standing rule), offer `setup-project` in one line; run it only after the user says yes; say nothing if nothing changed.
 - `wayfinder/SKILL.md`: new section "Offer `setup-project`" at the end (same rule, with "build threads to start" once the way is clear); "Chart the map" step 6 becomes "Offer `setup-project`, then stop: ..."; "Work through the map" gains step 6, "Offer `setup-project`".
-- `scripts/check-plugin.sh`: new check 10 (both `to-tickets` templates carry a `**Model tier:**` line; `to-tickets` and `wayfinder` both name `` `setup-project` ``).
+- `scripts/check-plugin.sh`: new check 10 (ticket-templates: both `to-tickets` templates carry a `**Model tier:**` line; `to-tickets` and `wayfinder` both name `` `setup-project` ``).
 - `.claude-plugin/plugin.json`: version 0.5.0 to 0.6.0.
 
 Merging an Upstream update: carry Upstream's changes to both files over by hand and re-apply the lines above.
@@ -207,7 +207,7 @@ What:
   - "Commit your work to the current branch.": replaced by the pushed Ticket branch from main (step 2), the Implementer committing there (step 3), and the squash-merge (step 7).
   - Added: the issue-tracker line from `implement-spec` and `code-review`; blocking edges; Model tier (regular unless the issue says premium); cheap subagents for trivial jobs such as rerunning tests or the checks (steps 3 and 4); keeping one Implementer by message, or a new one with a handoff, telling the user you did; the fallback when a repo has no checks or no CI; a Review depth in the brief wins; fetching main before each Round and having the Implementer merge it in (never rebasing), so a Round reviews the conflict resolutions; the final "fix" Nits commit on a clean Round 2 to 5; filing Pre-existing Findings as `code-review` says; the self-merge rules of ADR 0004; at merge time, merging main in if the Ticket branch lacks its commits, running one more Round over that merge's conflict resolutions if it had conflicts and the 5-Round cap allows, otherwise bringing the pull request to the user, and rerunning the checks and CI on the final head; the summary squash-merge message; the final report.
 - `agents/openai.yaml`: `short_description` now "Coordinate one lone ticket: Implementer, PR, review Rounds, merge".
-- `scripts/check-plugin.sh`: new check 11 (`implement/SKILL.md` names `` `tdd` ``, `` `pr` `` and `` `code-review` ``, says Implementer, and says squash).
+- `scripts/check-plugin.sh`: new check 11 (implement-coordinator: `implement/SKILL.md` names `` `tdd` ``, `` `pr` `` and `` `code-review` ``, says Implementer, and says squash).
 - `.claude-plugin/plugin.json`: version 0.6.0 to 0.7.0.
 
 Merging an Upstream update: Upstream's `implement/SKILL.md` is replaced whole, so diff Upstream's old and new text and carry any change over by hand into the step it maps to above (ticket fetching into step 1, building advice into the Implementer's brief in step 3, review into step 6). Keep Patch 4's reader line and the words check 11 looks for.
@@ -221,7 +221,7 @@ What:
 - `FINDERS.md`: the standards Finder is also given the new `REVIEW.md` Always check section when `REVIEW.md` has at least one Always check line (else (d) is dropped from the brief); its brief, the Upstream standards prompt as Patch 5 left it, gains "(d) every `REVIEW.md` Always check line the diff breaks, reported once under (d) and not again under (a)"; new section "`REVIEW.md` Always check" after "Docs index drift": check every line against the whole diff (the whole pull request in Rounds 3 to 5), one Finding per broken line under the Bug class the line names, and a closing `clear`-or-Finding list of every line.
 - `VERIFY.md`: the Verifier is told `REVIEW.md` comes with its Always check lines, and that a Finding raised from one is real when the code breaks that line as written.
 - `SKILL.md` step 2: "always-check list" became "Always check list", and the `REVIEW.md` paragraph says the standards Finder checks each Always check line, linking the new `FINDERS.md` section.
-- `scripts/check-plugin.sh`: new check 12 (`FINDERS.md`, `VERIFY.md` and `SKILL.md` mention Always check; `FINDERS.md` has the section).
+- `scripts/check-plugin.sh`: new check 12 (always-check: `FINDERS.md`, `VERIFY.md` and `SKILL.md` mention Always check; `FINDERS.md` has the section).
 - `.claude-plugin/plugin.json`: version 0.7.0 to 0.7.1.
 
 Merging an Upstream update: the standards brief is Upstream text, so when Upstream changes its standards prompt, carry the change into `FINDERS.md` (Patch 5's note) and keep the "(d)" clause. The rest of this Patch edits text that is ours.
@@ -240,7 +240,7 @@ What:
 - Left as Upstream wrote them, for ticket #11: the `/implement-spec` bullet ("integration branch"), and the clause "`/implement-spec`'s implementers each drive `/tdd`, and it runs one `/code-review` over the integration branch". Patch 11 (ticket #11) has since rewritten both.
 - The Yes-branch's routing of a Spec's tickets to `/implement` was left open here; Patch 12 fixed it.
 - Checked and kept as they are, because they still fit: Context hygiene's `/clear` before `/retro` (it is about clearing a session, not about `/implement`); the wayfinder on-ramp's "go straight to `/implement`" (its "`/to-tickets` and `/implement` as usual" was later changed to `/implement-spec` by Patch 12); the triage line ("which **`/implement`** later picks up").
-- `scripts/check-plugin.sh`: new check 13 (`ask-matt/SKILL.md` must not say "same context window" or "two-axis", and must mention Rounds).
+- `scripts/check-plugin.sh`: new check 13 (ask-matt-routing: `ask-matt/SKILL.md` must not say "same context window" or "two-axis", and must mention Rounds).
 - `.claude-plugin/plugin.json`: version 0.7.1 to 0.7.2.
 
 Merging an Upstream update: carry Upstream's changes to step 3 and Context hygiene over by hand and re-apply the lines above. The two `implement-spec` lines are Patch 11's now; merge Upstream changes to them there.
@@ -271,7 +271,7 @@ What:
 - After the build-flow check: step 2 says "fetch main" means `git fetch origin main` and comparing against `origin/main`, never a stale local `main`; step 6.2 says conflict resolutions from the ticket's re-merge are reviewed by the Spec pull request's Rounds 1 and 2, with no new ticket check.
 - New file (ours, not Upstream text): `evals/implement-spec/RESULTS.md`, one entry per build-flow check of `implement-spec`.
 - `ask-matt/SKILL.md` (the `/implement-spec` bullet under "Is this a multi-session build?" and the paragraph after it): "integration branch" becomes "spec branch"; the bullet now says Implementers work in their own worktrees, each ticket gets a Quick ticket check and is squash-merged into the spec branch, whose pull request gets the full review and a merge commit into main; the next paragraph says `/implement-spec` runs `/code-review` as a ticket check per ticket and in Rounds over the spec branch's pull request. No other text in `ask-matt` changed. These are the two lines Patch 10 left as Upstream wrote them for this ticket; Patch 10's rewording of the rest of step 3 is kept, and its open point on the Yes-branch routing a Spec's tickets to `/implement` was not part of this Patch; Patch 12 fixed it.
-- `scripts/check-plugin.sh`: new check 14 (`implement-spec/SKILL.md` names `` `tdd` ``, `` `pr` `` and `` `code-review` ``, says Implementer, `git worktree add` and merge commit, and does not say "integration branch"; `ask-matt/SKILL.md` does not say "integration branch").
+- `scripts/check-plugin.sh`: new check 14 (implement-spec-coordinator: `implement-spec/SKILL.md` names `` `tdd` ``, `` `pr` `` and `` `code-review` ``, says Implementer, `git worktree add` and merge commit, and does not say "integration branch"; `ask-matt/SKILL.md` does not say "integration branch").
 - `.claude-plugin/plugin.json`: version 0.7.2 to 0.8.0.
 
 Merging an Upstream update: Upstream's `implement-spec/SKILL.md` is replaced whole, so diff Upstream's old and new text and carry any change over by hand into the step it maps to above (reading the spec and the task graph into step 1, worktree and building advice into step 3, merging into step 6, review into steps 5 and 7, cleanup into step 9). Keep Patch 4's reader line and the words check 14 looks for. Upstream changes to the `/implement-spec` lines in `ask-matt` are merged the same way, keeping "spec branch".
@@ -302,7 +302,7 @@ What (Upstream text changed):
 - Every other mention of the skill name in `implement`, `implement-spec`, `ask-matt`, `retro` (`SKILL.md`, `BUG-CLASSES.md`) and `tdd` is now `agentic-review`.
 - Not changed: the `<!-- code-review kind=round ... -->`, `kind=ticket-check` and `kind=pre-existing` marker lines. They are a data format that `retro` reads out of Round comments already posted on past pull requests, so renaming them would hide those Rounds.
 - Outside Upstream text: `evals/code-review/` becomes `evals/agentic-review/`; GLOSSARY.md, `docs/index.md`, READMEs, ADRs 0001, 0003, 0004, 0006 and 0007 and `plugin.json` keywords follow. ADR 0003 keeps its filename so existing links hold. ADR 0001 still says Upstream has a `code-review` skill, which is true.
-- `scripts/check-plugin.sh`: checks 7 to 14 use the new name; new check 15 fails if any skill file under `upstream-skills/` or `skills/` tells an agent to run `code-review` (`` `code-review` ``, `dev-skills:code-review`, `/code-review`, "the code-review skill", `name: code-review`) or the old folder exists.
+- `scripts/check-plugin.sh`: checks 7 to 14 use the new name; new check 15 (no-code-review-skill) fails if any skill file under `upstream-skills/` or `skills/` tells an agent to run `code-review` (`` `code-review` ``, `dev-skills:code-review`, `/code-review`, "the code-review skill", `name: code-review`) or the old folder exists.
 - `.claude-plugin/plugin.json`: version 0.8.1 to 0.9.0.
 
 Merging an Upstream update: Upstream's skill is still `code-review`. Merge its text into `agentic-review/` and keep the name `agentic-review`.
@@ -314,7 +314,7 @@ Why: issue #49. The plugin will be shared, so skill and doc text says "the user"
 What:
 
 - No text under `upstream-skills/` changed: it contained no person's name, so there is nothing to re-apply when merging an Upstream update.
-- `scripts/check-plugin.sh`: new check 16 fails if `upstream-skills/`, `skills/` or the plugin `README.md` contains "Lufei" or "Luffy" (case-insensitive), after removing `luffy-dev-skills`, `luffy-dev`, `Luffytse` and `luffydev`. It matches file contents only, not paths.
+- `scripts/check-plugin.sh`: new check 16 (no-person-names) fails if `upstream-skills/`, `skills/` or the plugin `README.md` contains "Lufei" or "Luffy" (case-insensitive), after removing `luffy-dev-skills`, `luffy-dev`, `Luffytse` and `luffydev`. It matches file contents only, not paths.
 - `.claude-plugin/plugin.json`: version 0.9.0 to 0.9.1, and the description no longer says whose skills they are.
 
 ## Patch 15: check 16 also scans the repo's doc text (no Upstream text changed)
@@ -336,7 +336,7 @@ What:
 - `retro/SKILL.md`: new step 5, "File every candidate that is not a repeated Bug class as a Retro issue, or vote on an open one that covers it, and check whether Retro planning is due: [FILING.md](FILING.md)."; Patch 6's step 5 (Upstream's "Present these candidates...") becomes step 6 and gains "For each other candidate, give the issue it went to; add the due notice from step 5 when it applies." Every other line is as Patch 6 left it.
 - New `retro/FILING.md` (ours, not Upstream): routing (skill or workflow problems to the repo in the plugin manifest's `repository` field, a project's own problems to its tracker from `docs/agents/issue-tracker.md`, else the `origin` remote), votes (`Seen again in <thread link>`), the `retro` label and `Retro:` title, the can't-write fallback, the thresholds (10 open; 2 weeks with at least 4 open) and the trigger clock from the newest closed `retro-planning` record, and what the report lists. Since one retro can file into both repos, the due check runs once per repo that was filed or voted into, and the report's due notice names each repo that is due.
 - `triage/SKILL.md`: in "Show what needs attention", a sentence after the three buckets, "Skip issues labelled `retro`: they are Retro issues, planned in batches, not untriaged work."; in "Triage a specific issue or PR" step 1, a leading sentence "If the issue is labelled `retro`, stop: it is a Retro issue, planned in batches, so skip it." before "Read the full", which becomes "Otherwise read the full". Every other line is Upstream's.
-- `scripts/check-plugin.sh`: new check 17 (`plugin.json` has a `repository` GitHub URL; `retro/FILING.md` exists, `retro/SKILL.md` links it, and it names `retro`, `Retro:`, "seen again" and `retro-planning`; `triage/SKILL.md` skips `retro`; no forked or own skill text names a project, repo or person).
+- `scripts/check-plugin.sh`: new check 17 (retro-filing: `plugin.json` has a `repository` GitHub URL; `retro/FILING.md` exists, `retro/SKILL.md` links it, and it names `retro`, `Retro:`, "seen again" and `retro-planning`; `triage/SKILL.md` skips `retro`; no forked or own skill text names a project, repo or person).
 - `.claude-plugin/plugin.json`: a new `repository` field, and version 0.9.2 to 0.9.3, one bump shared by Patches 16 to 18 and the CI workflow below, which shipped together (spec #38).
 
 Merging an Upstream update: carry Upstream's `retro/SKILL.md` and `triage/SKILL.md` changes over by hand and re-apply the lines above.
@@ -348,7 +348,7 @@ Why: issue #42. Each build thread knows its own Review, so it ends by running `r
 What:
 
 - `implement/SKILL.md`: new step 9, "Run the retro", after the report. `implement-spec/SKILL.md`: new step 10, "Run the retro", after "Clean up and report". Each says: run `retro` on the thread whether the pull request was merged or handed to the user; for a repeated Bug class, a regular-tier Implementer builds the check on a branch off main, and the thread opens the pull request with `pr`, runs the `agentic-review` Rounds and merges it as a lone pull request (squash-merge, or brings it to the user); a check that changes `REVIEW.md` goes to the user; add the outcome to the report. Every other line is as Patches 8 and 11 left it.
-- `scripts/check-plugin.sh`: new check 18 (the last step of both skills names `` `retro` `` and `REVIEW.md`).
+- `scripts/check-plugin.sh`: new check 18 (retro-last-step: the last step of both skills names `` `retro` `` and `REVIEW.md`).
 - `.claude-plugin/plugin.json`: no bump of its own; covered by Patch 16's 0.9.2 to 0.9.3.
 
 Merging an Upstream update: both `SKILL.md` files are already replaced whole by Patches 8 and 11, so after carrying Upstream's changes over, re-append the final retro step and keep it last, since check 18 reads the last `## ` section.
@@ -361,7 +361,7 @@ What:
 
 - `ask-matt/SKILL.md`: step 4 (the `/retro` item, as Patch 10 left it) gains a closing sentence: "Suggestions it doesn't act on straight away pile up as Retro issues; when its report says your Retro backlog is due, start a thread for **`/retro-planning`**, which groups the backlog by root cause, closes one-offs, and turns the most repeated problems into tickets." Every other word of the item is unchanged.
 - New `skills/retro-planning/SKILL.md` (ours, not Upstream): ADR 0007's Retro planning steps and the record format.
-- `scripts/check-plugin.sh`: new check 20 (`skills/retro-planning/SKILL.md` exists and names `retro-planning`, `Retro planning <yyyy-mm-dd>`, "at most 3", `wontfix` and `ready-for-agent`; `ask-matt/SKILL.md` names `/retro-planning`).
+- `scripts/check-plugin.sh`: new check 20 (retro-planning: `skills/retro-planning/SKILL.md` exists and names `retro-planning`, `Retro planning <yyyy-mm-dd>`, "at most 3", `wontfix` and `ready-for-agent`; `ask-matt/SKILL.md` names `/retro-planning`).
 - `.claude-plugin/plugin.json`: no bump of its own; covered by Patch 16's 0.9.2 to 0.9.3.
 
 Merging an Upstream update: carry Upstream's changes to the `/retro` item over by hand and re-append the sentence above.
@@ -372,7 +372,7 @@ Our own, not Upstream: `.github/workflows/plugin-checks.yml` (issue #39) runs `s
 
 ## Not a Patch: check 21 (PATCHES.md and the script agree on check numbers)
 
-Our own, not Upstream. `scripts/check-plugin.sh` gets check 21, from the retro of PR #56 (PATCHES.md describing a change wrongly after renumbering came up 5 times): every "new check N" in this file names a check whose `# N.` header is in the script, no N is claimed as "new check" twice, and every check from 9 up is named as "check N" somewhere in this file (case-insensitive). No Upstream text changed. `.claude-plugin/plugin.json`: 0.9.3 to 0.9.4.
+Our own, not Upstream. `scripts/check-plugin.sh` gets check 21, from the retro of PR #56 (PATCHES.md describing a change wrongly after renumbering came up 5 times): every "new check N" in this file names a check whose `# N.` header is in the script (later, see Not a Patch: `check-plugin.sh` gives the same result however it runs, and catches numbering and name drift: compared as number and name pairs), no N is claimed as "new check" twice, and every check from 9 up is named as "check N" somewhere in this file (case-insensitive). No Upstream text changed. `.claude-plugin/plugin.json`: 0.9.3 to 0.9.4.
 
 ## Patch 19: `agentic-review` takes the built-in review's strengths (`agentic-review/`)
 
@@ -385,7 +385,7 @@ What (Upstream-derived text changed):
 - `VERIFY.md`: call 1 corrects a real Finding's wrong failure scenario instead of dropping it, and the answer returns the corrected one; keeps realistic rare paths, judges a cleanup Finding by its cost and an `(unsure)` one like any other; the tracer shows the failure scenario happens; new section "Gap sweep": a second Deep Verify of the gap sweep's Findings with three brand-new Verifiers and the same rules.
 - `ROUNDS.md`: "Filing Pre-existing Findings" step 2 now lists every location "with its claim, failure scenario and evidence" (was "with its claim and evidence"), since the Claim no longer says what goes wrong. The `<!-- code-review kind=... -->` marker lines are unchanged.
 - Outside Upstream text: `GLOSSARY.md` gains Failure scenario and Gap sweep, and its Finder and Finding lines name them; ADR 0003 amended in place (intro, Find, Verify, Deep, uncommitted work, and a considered option on the gap sweep's tier).
-- `scripts/check-plugin.sh`: new check 22 (`SKILL.md` says untracked and gap sweep; `FINDERS.md` has the Failure scenario line, `(unsure)`, the five angles and the Gap sweep section; `VERIFY.md` says gap sweep, failure scenario and rare; `GLOSSARY.md` and ADR 0003 name Gap sweep and Failure scenario).
+- `scripts/check-plugin.sh`: new check 22 (agentic-review-strengths: `SKILL.md` says untracked and gap sweep; `FINDERS.md` has the Failure scenario line, `(unsure)`, the five angles and the Gap sweep section; `VERIFY.md` says gap sweep, failure scenario and rare; `GLOSSARY.md` and ADR 0003 name Gap sweep and Failure scenario).
 - `.claude-plugin/plugin.json`: version 0.9.4 to 0.10.0.
 
 Merging an Upstream update: of Patch 5's Upstream-moved text, this Patch edits only the shared brief list at the top of `FINDERS.md` (the untracked new files) and `SKILL.md` step 1 (the fixed-point diff), both listed above; the smell baseline, the standards and spec briefs and the step-2 source lookup are untouched. Carry Upstream changes over as Patch 5 says and re-apply the lines above.
@@ -399,7 +399,7 @@ What:
 - `ask-matt/SKILL.md`, step 3's Yes-branch: "On a local tracker that's one file per ticket under `.scratch/<feature>/issues/`; on a real tracker the edges become native blocking links." is now "On a local tracker the spec is `.scratch/<feature-slug>/spec.md` and the tickets are one file per ticket under `.scratch/<feature-slug>/issues/`, each with a "Blocked by" line; on a real tracker the edges are native blocking links where the tracker has them, and a "Blocked by" line otherwise."
 - `ask-matt/SKILL.md`, triage on-ramp: "which **`/implement`** later picks up" is now "which **`/implement-spec`** (for an issue under a Spec) or **`/implement`** (for a lone one) later picks up".
 - `ask-matt/SKILL.md`, wayfinder on-ramp: "go straight to `/implement` only when the effort turned out genuinely small." now continues ": write one lone ticket first (for example with `/to-tickets`), then run `/implement` on it."
-- `scripts/check-plugin.sh`: new check 23 (`ask-matt/SKILL.md` no longer says "become native blocking links", and names the "Blocked by" line, `.scratch/<feature-slug>/spec.md`, "write one lone ticket", and `/implement-spec` in the triage bullet).
+- `scripts/check-plugin.sh`: new check 23 (ask-matt-tracker: `ask-matt/SKILL.md` no longer says "become native blocking links", and names the "Blocked by" line, `.scratch/<feature-slug>/spec.md`, "write one lone ticket", and `/implement-spec` in the triage bullet).
 - `.claude-plugin/plugin.json`: version 0.10.0 to 0.11.0.
 
 Merging an Upstream update: carry Upstream's changes to step 3, the triage on-ramp and the wayfinder on-ramp over by hand and re-apply the lines above.
@@ -442,14 +442,14 @@ Left as Upstream wrote them: the local and GitLab mentions in `to-tickets`, `age
 
 Also in this Patch:
 
-- `scripts/check-plugin.sh`: check 1 expects 22 skills (the kept list drops `setup-matt-pocock-skills`); check 7 takes `setup-dev-skills/SKILL.md` and `setup-dev-skills/domain.md` from `skills/`; new check 24 (the old folder is gone; the own skill has `SKILL.md`, the seeds, no `agents/openai.yaml` and no GitLab or local seed; `SKILL.md` credits `LICENSE-mattpocock-skills`, names `wayfinder:map` and says settings are never changed).
+- `scripts/check-plugin.sh`: check 1 expects 22 skills (the kept list drops `setup-matt-pocock-skills`); check 7 takes `setup-dev-skills/SKILL.md` and `setup-dev-skills/domain.md` from `skills/`; new check 24 (setup-dev-skills: the old folder is gone; the own skill has `SKILL.md`, the seeds, no `agents/openai.yaml` and no GitLab or local seed; `SKILL.md` credits `LICENSE-mattpocock-skills`, names `wayfinder:map` and says settings are never changed).
 - ADR 0001 and ADR 0006 and the plugin `README.md` name `setup-dev-skills`; this repo's `docs/agents/` and `CLAUDE.md` match what a re-run writes, apart from repo-specific examples (real ADR names, the ADR 0007 link).
 - `.claude-plugin/plugin.json`: version 0.12.0 to 0.13.0 (a skill name was removed).
 ## Not a Patch: `retro-planning` walks one item at a time (issue #70)
 
 Our own, not Upstream. `skills/retro-planning/SKILL.md` now snapshots the backlog at the start, files its record as an open issue then and closes it at the end (a planning whose record is open is resumed from it), walks the user through one group at a time and carries out each call at once, frees a cap slot when a proposed Ticket is closed or spun off, lets only the user raise the cap for one planning, and sends a group that needs more discussion to its own planning thread (via the coordinator, or the user). The record gains Snapshot, Cap, Spun off, Arrived during this planning and Spun off, waiting sections. ADR 0007's Retro planning steps, `GLOSSARY.md` (Retro planning, new Spin-off) and the plugin README match. No Upstream text changed. `ask-matt`'s routing sentence still holds. `retro/FILING.md` is unchanged, but its clock, which runs from the creation of the newest closed record, now runs from the start of the last planning rather than its end, since the record is filed at the start.
 
-- `scripts/check-plugin.sh`: new check 25 (the record template keeps its Snapshot, Cap, Spun off, Spun off, waiting, Arrived during this planning, Held back by the cap, plannings-without-a-new-vote and Waiting on open Tickets sections; the skill files the record as an **open** issue, walks one at a time, and has the spin-off comment and the "Running a spun-off planning" section).
+- `scripts/check-plugin.sh`: new check 25 (retro-planning-record: the record template keeps its Snapshot, Cap, Spun off, Spun off, waiting, Arrived during this planning, Held back by the cap, plannings-without-a-new-vote and Waiting on open Tickets sections; the skill files the record as an **open** issue, walks one at a time, and has the spin-off comment and the "Running a spun-off planning" section).
 - `.claude-plugin/plugin.json`: version 0.13.0 to 0.14.0.
 
 ## Patch 23: `grilling` asks at most 3 questions per round (`grilling/`)
@@ -460,7 +460,7 @@ What:
 
 - `grilling/SKILL.md`: "Ask the whole frontier in one round: number each question and give your recommended answer." is now "Ask at most **3** frontier questions in a round: number each question and give your recommended answer. When the frontier holds more than 3, ask the 3 whose answers unblock the most other decisions, and keep the rest for later rounds; they go first in the next round, ahead of questions the user's answers newly unblock." Later in the file, "ask the rest of the frontier now" is now "ask the rest of this round's questions now". The recommended answers and the round format are unchanged.
 - `setup-project/SKILL.md` (our own skill, not Upstream text): drops its override of "whole frontier per round", since `grilling` now carries the rule. `grill-with-docs` and the other skills built on `grilling` inherit it and needed no edit.
-- `scripts/check-plugin.sh`: new check 26 (`grilling/SKILL.md` says at most 3 questions and keeps the rest for later rounds, and no longer says "whole frontier"; `setup-project/SKILL.md` no longer says it overrides).
+- `scripts/check-plugin.sh`: new check 26 (grilling-round-cap: `grilling/SKILL.md` says at most 3 questions and keeps the rest for later rounds, and no longer says "whole frontier"; `setup-project/SKILL.md` no longer says it overrides).
 - New file (ours, not Upstream text): `evals/implement/RESULTS.md`, one entry per build-flow check of `implement`, listed in `docs/index.md`.
 - `.claude-plugin/plugin.json`: version 0.14.0 to 0.15.0.
 
@@ -479,7 +479,7 @@ What:
 - `agentic-review/SKILL.md`: step 3 (Find), step 4 (Verify) and the gap sweep paragraph each have the thread count reports (one report from each Finder or Verifier started), ask again for a missing one, start a new agent on the same brief if it cannot be reached, and not go on without it. The counts gate the next step: Verify (after Find), then the gap sweep on Deep or Rank (after Verify), then the second Verify (after the sweep Finder) and Rank (after the second Verifiers).
 - `agentic-review/FINDERS.md`: each of the 5 briefs (standards, spec, adversarial, security, gap sweep) ends with "Your last action is to return your full report."
 - `agentic-review/VERIFY.md`: the Verifier brief ends with the same line.
-- `scripts/check-plugin.sh`: new check 28 (every Finder brief and the Verifier brief end with that line; `SKILL.md` keeps each of the four count gates as a literal phrase: Finders before Verify, Verifiers before the next step, the gap sweep Finder before the second Verify, the second Verifiers before Rank).
+- `scripts/check-plugin.sh`: new check 28 (report-counts: every Finder brief and the Verifier brief end with that line; `SKILL.md` keeps each of the four count gates as a literal phrase: Finders before Verify, Verifiers before the next step, the gap sweep Finder before the second Verify, the second Verifiers before Rank).
 - `.claude-plugin/plugin.json`: version 0.16.0 to 0.17.0.
 
 Merging an Upstream update: take Upstream's text, then re-apply the four count gates (check 28 lists their phrases) and the closing line on each brief.
@@ -495,7 +495,7 @@ What (Upstream-derived text changed):
 - `agentic-review/SKILL.md`: "Depth and tiers" adds the exception after "later Rounds reuse it unless the user changes it": a merge-only Round runs at Quick unless the resolutions touch logic, and the Round after it goes back to the carried depth. Step 1's list of what earlier comments give says the carried depth is the one in the latest comment that is not a merge-only Round's.
 - `agentic-review/ROUNDS.md`: the Round comment's `Reviewed:` line gains a third form, `the merge from main <base>..<head> (merge-only Round)`; a new bullet says the marker's and heading's depth is the depth that Round ran at; new section "Merge-only Rounds" (what one is, Quick unless a resolution touches logic, its comment says so, the next Round takes the carried depth from the latest comment that is not merge-only, and it counts toward the cap). The `<!-- code-review kind=... -->` marker shape is unchanged, so `retro/BUG-CLASSES.md`, which keys on the marker prefix and not on its depth, needs no edit.
 - Outside Upstream text: `CLAUDE.md` gains the working rule (every plugin change bumps its version; version, Patch and check numbers are taken at merge time; `TBD-N` until then); `GLOSSARY.md` gains Placeholder number and Merge-only Round; ADR 0003 amended in place (the depth stays the same across Rounds except for a merge-only Round); `.github/workflows/plugin-checks.yml` checks out with `fetch-depth: 0` so `origin/main` exists in CI for check 29b (the user committed it to main in 8886bcf, since the agents' GitHub access cannot push workflow files).
-- `scripts/check-plugin.sh`: new check 29. (a) Fails on a leftover placeholder: `TBD-N` after Patch, check, version or "to" (bare, in backticks or in parentheses) in `PATCHES.md`, the plugin READMEs, `README.md`, `CLAUDE.md`, `GLOSSARY.md` and `docs/`, a `# TBD-N` header in the script, or a `"version": "TBD...` in a manifest. (b) For every plugin under `plugins/` with a `plugin.json`, if any file under it differs from `origin/main` (committed since the merge-base, `git diff --name-only origin/main...HEAD`, plus staged, unstaged and untracked work), its working-tree version must be strictly higher than `origin/main`'s (dot-separated fields compared as numbers); a plugin new on this branch is skipped, and without `origin/main` (b) is skipped with a note, not a failure. On a push to main, `HEAD` is `origin/main`, so (b) passes.
+- `scripts/check-plugin.sh`: new check 29 (placeholders-and-bumps). (a) Fails on a leftover placeholder: `TBD-N` after Patch, check, version or "to" (bare, in backticks or in parentheses) in `PATCHES.md`, the plugin READMEs, `README.md`, `CLAUDE.md`, `GLOSSARY.md` and `docs/`, a `# TBD-N` header in the script, or a `"version": "TBD...` in a manifest. (b) For every plugin under `plugins/` with a `plugin.json`, if any file under it differs from `origin/main` (committed since the merge-base, `git diff --name-only origin/main...HEAD`, plus staged, unstaged and untracked work), its working-tree version must be strictly higher than `origin/main`'s (dot-separated fields compared as numbers); a plugin new on this branch is skipped, and without `origin/main` (b) is skipped with a note, not a failure. On a push to main, `HEAD` is `origin/main`, so (b) passes.
 - `.claude-plugin/plugin.json`: version 0.17.0 to 0.18.0.
 
 This Patch was built before its own rule applied, so its numbers were written in place, then re-taken when main moved: #103 took check 27 and 0.16.0, then #105 took Patch 24, check 28 and 0.17.0, so this Patch is Patch 25, check 29 and 0.18.0.
@@ -512,7 +512,7 @@ What:
 - `agentic-review/VERIFY.md`: the Verifier brief gains the same copy rule, in the same words, as the paragraph before its answer-format paragraph (check 28 needs the brief to end with the last-action line).
 - `implement/SKILL.md` (step 3): the Implementer brief gains a bullet: before each push, check `git status -sb` shows the Ticket branch; after it, report `git rev-parse origin/<branch>` equals `HEAD`. Step 4 checks that report.
 - `implement-spec/SKILL.md`: the Ticket-branch Implementer brief (step 3) gains a bullet to check `git status -sb` shows its Ticket branch before each commit (it never pushes); the Spec-branch Implementers (step 6.1's merge-and-resolve one and step 7's fix one) are briefed to run the same push check as `implement`.
-- `scripts/check-plugin.sh`: new check 30 (`FINDERS.md` and `VERIFY.md` keep the copy rule: own copy, `git archive`, `git worktree`, and the ban on `checkout`, `switch`, `stash` and `reset` in the shared tree, and leaving it on its branch). The Implementer's push check is not scripted.
+- `scripts/check-plugin.sh`: new check 30 (review-own-copy: `FINDERS.md` and `VERIFY.md` keep the copy rule: own copy, `git archive`, `git worktree`, and the ban on `checkout`, `switch`, `stash` and `reset` in the shared tree, and leaving it on its branch). The Implementer's push check is not scripted.
 - `.claude-plugin/plugin.json`: version 0.18.0 to 0.19.0.
 
 Merging an Upstream update: take Upstream's `FINDERS.md`, `VERIFY.md`, `implement` and `implement-spec` text, then re-apply the bullets above.
@@ -525,7 +525,7 @@ What:
 
 - `handoff/SKILL.md`: "Save to the temporary directory of the user's OS (`$TMPDIR`, else `/tmp`; `%TEMP%` on Windows) - not the current workspace." is now a save-location rule. By default the handoff is an issue on the tracker `docs/agents/issue-tracker.md` names, linked from the work it continues; with no tracker configured the skill says so and asks the user for a location. A shared folder is used only when the user names one; the temp directory only when the next agent runs on the same machine; the skill ends by telling the user where the handoff is (issue link or path). The suggested skills section, the no-duplication rule, redaction and arguments are unchanged. Patch 21's edit to the `description` needed no change.
 - `ask-matt/SKILL.md` and `ask-matt/PHASE-BOUNDARIES.md` (Upstream text): where they called a handoff a "portable markdown file" ("open a fresh session against that file", "a file that travels"), they now say it is a document the next agent can read (a tracker issue by default), a session that reads the handoff, and a document that travels. The portability point is unchanged.
-- `scripts/check-plugin.sh`: new check 31 (`handoff/SKILL.md` keeps the tracker default, shared folder only when the user names one, temp directory only when the next agent runs on the same machine, the ask when no tracker is configured and the closing report of the location, and no longer makes the temp directory the default).
+- `scripts/check-plugin.sh`: new check 31 (handoff-location: `handoff/SKILL.md` keeps the tracker default, shared folder only when the user names one, temp directory only when the next agent runs on the same machine, the ask when no tracker is configured and the closing report of the location, and no longer makes the temp directory the default).
 - `.claude-plugin/plugin.json`: version 0.19.0 to 0.20.0.
 
 Merging an Upstream update: take Upstream's `handoff`, `ask-matt/SKILL.md` and `ask-matt/PHASE-BOUNDARIES.md` text, then re-apply the save-location rule above (check 31 lists its phrases) and the `ask-matt` and `PHASE-BOUNDARIES` wording edits listed above.
@@ -538,7 +538,7 @@ What:
 
 - `grilling/SKILL.md`: after "Word each question so "yes" accepts your recommended answer." two paragraphs are added: a question that changes or extends an existing rule opens, before the options, with one line saying what the rule does today and why it exists, citing the ADR or doc; and a recommendation that rests on a fact nobody has checked waits for that fact, or is marked as a guess. After "don't ask the user for anything you could look up yourself." a sentence says a fact-finding sub-agent counts as this skill asking for a sub-agent, however light the lookup looks; a few greps do not replace it. The 3-question round format is unchanged.
 - `grill-with-docs/SKILL.md`: a closing paragraph says that when the plan renames or reworks a skill, the first fact to gather is what every other skill expects of that skill.
-- `scripts/check-plugin.sh`: new check 32 (one distinctive phrase per new sentence plus two clause pins, so a revert fails: five on `grilling` for the rule purpose, citing the ADR or doc, the checked-fact-or-marked-guess rule, the sub-agent counting as asked for, and a few greps not replacing it; one on `grill-with-docs`).
+- `scripts/check-plugin.sh`: new check 32 (grilling-facts: one distinctive phrase per new sentence plus two clause pins, so a revert fails: five on `grilling` for the rule purpose, citing the ADR or doc, the checked-fact-or-marked-guess rule, the sub-agent counting as asked for, and a few greps not replacing it; one on `grill-with-docs`).
 - `.claude-plugin/plugin.json`: version 0.20.0 to 0.21.0.
 
 Merging an Upstream update: take Upstream's `grilling` and `grill-with-docs` text, then re-apply the edits above.
@@ -556,7 +556,7 @@ What:
 - `agentic-review/SKILL.md` (step 1): Ticket-check Importants stay open until confirmed fixed, "or until they are dismissed because the user kept the design".
 - `retro/BUG-CLASSES.md` (ours, not Upstream text): step 2 keeps `dismissed` rows whose Note says "user keeps the design", since they were real.
 - `docs/adr/0004-build-threads-coordinate-and-subagents-code.md` (ours, not Upstream text): the Fixes bullet and the Ticket-check bullet say design Findings go to the user first.
-- `scripts/check-plugin.sh`: new check 33 (`ROUNDS.md` has the section heading and its key phrases, including the Round 5 "saying plainly that the change is unreviewed", "the Round counts as clean" and "edit that Round's own comment", and at least 3 links to the section in the file (the Nit status bullet, the Round loop's fixes paragraph and its clean "Round 2 to Round 5" bullet); `implement/SKILL.md` links it at least once and `implement-spec/SKILL.md` at least twice, for steps 5 and 7).
+- `scripts/check-plugin.sh`: new check 33 (design-findings: `ROUNDS.md` has the section heading and its key phrases, including the Round 5 "saying plainly that the change is unreviewed", "the Round counts as clean" and "edit that Round's own comment", and at least 3 links to the section in the file (the Nit status bullet, the Round loop's fixes paragraph and its clean "Round 2 to Round 5" bullet); `implement/SKILL.md` links it at least once and `implement-spec/SKILL.md` at least twice, for steps 5 and 7).
 - `.claude-plugin/plugin.json`: version 0.21.0 to 0.22.0.
 
 Merging an Upstream update: take Upstream's text, then re-append the section to `ROUNDS.md`, re-add the two pointer sentences to its Round loop (after the fixes paragraph and on the clean "Round 2 to Round 5" bullet), the "user kept the design" clauses (Rank step 2, the clean test, Nit status, the Round 1 bullet, Ticket checks, and `SKILL.md` step 1), and in `implement` and `implement-spec` the three parentheses and the two "one more Round instead" sentences. Check 33 fails if the section heading or one of its key phrases is missing, if `ROUNDS.md` has fewer than 3 links to the section, or if `implement` has fewer than 1 or `implement-spec` fewer than 2; it does not check the "user kept the design" clauses.
@@ -568,7 +568,7 @@ Why: issue #142 (absorbs #120 and #121). `setup-project` now writes how the proj
 What:
 
 - `to-tickets/SKILL.md` (step 6) and `wayfinder/SKILL.md` ("Offer `setup-project`"): the list of what counts as a change to what threads need drops "a new spec or map to point at" (wayfinder: "a new map to point at" and "(when the way to the destination is now clear) build threads to start"); it is now only a new repo, a new kind of thread or a new standing rule. Both still name `` `setup-project` `` (check 10).
-- `scripts/check-plugin.sh`: new check 34 (`setup-project/SKILL.md` tells the coordinator to find open specs, plannings and tickets on the tracker, asks for the tier-to-model map, carries the rule to start each thread on its tier's model, no longer links the map or open specs or says "pointers stay current", and names no vendor model; `to-tickets` and `wayfinder` no longer offer it for a new spec or map).
+- `scripts/check-plugin.sh`: new check 34 (setup-project-state: `setup-project/SKILL.md` tells the coordinator to find open specs, plannings and tickets on the tracker, asks for the tier-to-model map, carries the rule to start each thread on its tier's model, no longer links the map or open specs or says "pointers stay current", and names no vendor model; `to-tickets` and `wayfinder` no longer offer it for a new spec or map).
 - Our own text, not Upstream: `setup-project/SKILL.md`, `setup-dev-skills/SKILL.md` (offers `setup-project` only if the project's instructions do not yet cover the repo), the plugin `README.md` and ADR 0004.
 - `.claude-plugin/plugin.json`: version 0.22.1 to 0.22.2.
 
@@ -579,6 +579,21 @@ Merging an Upstream update: carry Upstream's changes to both files over by hand 
 Our own, not Upstream. The `setup-dev-skills` skill's `SKILL.md` step 1 names both remote URL forms, the GitHub seed gives REST routes for pull requests and open blockers, and the seed files name skills without a leading slash.
 
 - `.claude-plugin/plugin.json`: version 0.22.0 to 0.22.1.
+
+## Not a Patch: `check-plugin.sh` gives the same result however it runs, and catches numbering and name drift
+
+Our own, not Upstream; no Upstream text changed. Why: issue #143 (absorbs #130, #76, #123, #78, #61 and #62). Under `bash -e` the script exited 123 with no output (the no-match `grep` in the vendor-name check aborted it); through a symlink it looked for the plugin tree next to the link; two Patches could share a number; a "new check N" line could point at another check's number without check 21 noticing; and nothing compared a skill's `name:` or `display_name` with its folder.
+
+What (all in `scripts/check-plugin.sh` and this file; no skill text changed):
+
+- The script sets `set +e` after `set -u`, so `bash -e` and `SHELLOPTS=errexit` give the same output and exit code as a plain run (every failure goes through `bad()`; a no-match `grep` is an answer, not an error). It resolves its own path with plain `readlink`, one symlink hop at a time (absolute or relative links, chains), not the GNU-only `readlink -f`; running by real path is unchanged.
+- Every check header now reads `# N. <name>: <description>`, and every "new check N" line in this file reads "new check N (<name>...". Check 21 compares the pairs: a "new check" line whose number and name match no header fails, even when that number is named elsewhere; a header without a name fails; a "new check" mention without a name fails; a pair claimed twice fails, and so does a number claimed twice under different names (two branches adding different checks with the same number) or two headers sharing a number (`2` and `2b` are different header numbers; for the pairs, `2b` is written as `2`). A `TBD-N` placeholder is exempt from those two number rules, since several new checks in one pull request share it, but a placeholder pair (same name) claimed twice still fails. Check 21 still requires every check from 9 up to be named as "check N" in this file. Placeholder numbers (`TBD-N`) pair the same way, by name. This file's existing "new check" lines gained their names.
+- new check 35 (patch-heading-numbers): two `## Patch N` headings with the same number fail, naming the number. A `TBD-N` heading is not counted.
+- new check 36 (skill-name-matches-folder): for every skill under `upstream-skills/` and `skills/`, the `name:` in the `SKILL.md` frontmatter must equal the folder name.
+- new check 37 (openai-display-name): for every `agents/openai.yaml` under `upstream-skills/` and `skills/`, the `display_name`, lowercased with each run of other characters turned into one hyphen, must equal the skill's folder name ("Grill with Docs" is `grill-with-docs`, "PR" is `pr`). This is the rule the Ticket picked: it keeps a skill from taking another skill's or a built-in skill's name (`agentic-review` as "Code Review"), and all 22 current skills pass. A folder rename needs a new `display_name`.
+- `.claude-plugin/plugin.json`: version 0.22.2 to 0.22.3.
+
+Merging an Upstream update: nothing to re-apply, since no Upstream text changed; if Upstream renames a skill or its `display_name`, the two checks fail until the folder, `name:` and `display_name` agree again.
 
 ## Vendor model names in Upstream text
 
