@@ -588,6 +588,21 @@ What:
 
 Merging an Upstream update: take Upstream's text, then drop "find deepening opportunities" from the `codebase-design` description again and re-apply the `ask-matt` wording.
 
+## Patch 35: the Ticket thread never moves the Implementer's checkout (`implement/`, `implement-spec/`)
+
+Why: issue #155 (absorbs Retro issue #135; follows Patch 26). The Ticket thread and its Implementer shared one checkout, and the thread's `git checkout origin/<branch>` to read a head for a Round left it detached: the Implementer's fix was committed off the branch and its push said "Everything up-to-date" (PR #119, again in PR #131). Patch 26 fenced off the review subagents and added the Implementer's push check, but not the thread.
+
+What:
+
+- `implement/SKILL.md` (step 2): the thread makes the Ticket branch in its own git worktree, outside its checkout (`git worktree add <path> -b <ticket-branch> origin/main`) and pushes it from there; its own checkout stays where it was.
+- `implement/SKILL.md` (step 3): the Implementer brief gains the worktree path and that it works only there, and that the worktree may need its dependencies installed again. The "keep this same Implementer" paragraph says it keeps the same worktree for every later fix, merge of main and numbering, the handoff names the worktree, and a reclaimed machine means making the worktree again. A new paragraph says the thread never runs `git checkout`, `switch` or `reset` in that worktree, and reads a head by `git fetch` plus `git show` or `git diff`, or a `git archive` copy. Patch 26's push check is unchanged.
+- `implement/SKILL.md` (steps 4, 5, 6, 7.2, 9): the checks rerun in the worktree, by a subagent that runs no git command that moves it; step 5 opens the pull request (the branch is already pushed); step 6 runs `agentic-review` from the worktree with read-only git commands, so its `HEAD` is the Ticket branch's head; the retro check's Implementer gets its own worktree as in step 2. `implement-spec/SKILL.md` step 10's retro check line says the same, with its branch pushed. Both briefs tell the Implementer to run every git command as `git -C <path> ...`, and the Review's Finders and Verifiers get the worktree path to do the same; `implement`'s reclaim path runs `git worktree prune` first. The new and edited lines name the default branch as `origin/<default-branch>`, not `origin/main`, and the reclaim and "never pushed" notes no longer assume a cloud environment. The thread runs its own Review git commands as `git -C <path> ...` too. The retro check's Implementer is briefed as in step 3 of `implement`, in both skills (it is a lone pull request off main whose branch is pushed), not as in `implement-spec` step 3.2.
+- `implement-spec/SKILL.md`: checked for the same gap. Its ticket worktrees are already made by the thread, but nothing said how it reads a head without moving one. Step 2 adds `switch` and `reset` to the commands the Spec thread runs in its own checkout while an Implementer works there, and says to read a head with fetch plus `git show` or `git diff`, or a `git archive` copy; step 3 says the same of the ticket worktrees.
+- `scripts/check-plugin.sh`: new check 40 (ticket-thread-keeps-out-of-worktree: `implement` keeps the worktree step and the ban on `checkout`, `switch` and `reset` in it, with `git archive`; `implement-spec` keeps the same ban for ticket worktrees).
+- `.claude-plugin/plugin.json`: version 0.22.8 to 0.22.9.
+
+Merging an Upstream update: `implement` and `implement-spec` are already replaced whole by Patches 8 and 11, so re-apply the lines above after carrying Upstream's changes over.
+
 ## Patch 33: the numbering step retakes numbers when main moves again (`implement/`, `implement-spec/`)
 
 Why: issue #154 (absorbs #67 and #127). After the first numbering pass no `TBD-N` is left, so "repeat steps 1 and 2" had nothing to replace and never said to move numbers already real; Implementers renumbered only when the thread messaged them the new numbers, and one pass left a stale cross-reference.

@@ -585,5 +585,19 @@ if [ -n "$hits" ]; then
   bad "skill text names this repo's ADR numbers or says \"Upstream\""
 fi
 
+# 40. ticket-thread-keeps-out-of-worktree: the Ticket thread gives the Implementer its own worktree and never moves its
+# checkout (issues #155, #135): a thread that ran `git checkout origin/<branch>` in the checkout it shared with the
+# Implementer left it on a detached HEAD, and the Implementer's commits landed off the branch. `implement` must
+# say to make the worktree and to run no checkout, switch or reset in it; `implement-spec` must say the same of its
+# ticket worktrees. The Implementer's push check (issue #104) is a step, not scripted.
+im="$forked/implement/SKILL.md"
+is="$forked/implement-spec/SKILL.md"
+for w in 'git worktree add' 'own git worktree' 'never run `git checkout`, `switch` or `reset`' 'git archive'; do
+  [ ! -f "$im" ] || grep -qF -- "$w" "$im" || bad "implement/SKILL.md does not keep the thread out of the Implementer's worktree ($w)"
+done
+for w in 'git worktree add' '`git checkout`, `switch` or `reset` in a ticket worktree' 'git archive'; do
+  [ ! -f "$is" ] || grep -qF -- "$w" "$is" || bad "implement-spec/SKILL.md does not keep the thread out of the ticket worktrees ($w)"
+done
+
 [ "$fail" -eq 0 ] && echo "OK: dev-skills plugin checks passed ($count skills)"
 exit "$fail"

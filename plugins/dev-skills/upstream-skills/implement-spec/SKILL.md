@@ -26,15 +26,15 @@ Done when you have stated the title, know the graph and the frontier, and know e
 
 ## 2. Make the Spec branch
 
-Create the Spec branch from an up-to-date main and push it. Keep your own checkout on it: any Implementer working on the Spec branch itself (steps 6.1 and 7) works there, and while one does, you run no git commands that change that checkout (merge, squash, commit, checkout); `git worktree add` and `git worktree remove` are fine. Here and below, "fetch main" means `git fetch origin main`; merge, diff and compare against `origin/main` (also as `agentic-review`'s `<base>`), never a local `main` that may be stale. Done when the branch exists on the remote.
+Create the Spec branch from an up-to-date main and push it. Keep your own checkout on it: any Implementer working on the Spec branch itself (steps 6.1, 7 and 8.2) works there, and while one does, you run no git commands that change that checkout (merge, squash, commit, checkout, switch, reset); `git worktree add` and `git worktree remove` are fine. To read a head, fetch and use `git show` or `git diff`, or `git archive` it into a scratch directory. Here and below, "fetch main" means `git fetch origin <default-branch>`; merge, diff and compare against `origin/<default-branch>` (also as `agentic-review`'s `<base>`), never a local `main` that may be stale. Done when the branch exists on the remote.
 
 ## 3. Start an Implementer per frontier ticket
 
 Run at most **3 Implementers at once**, counting every Implementer that is working: building a ticket, fixing Findings or conflicts, or on the Spec branch. Before starting or resuming one, wait for a free slot. For each frontier ticket, when a slot is free:
 
-1. Make its worktree yourself: `git worktree add <path> -b <ticket-branch> <spec-branch>`, with `<path>` outside your checkout. Claude Code's own subagent worktrees start only from the default branch or HEAD, so don't use them. The Ticket branch stays local and is **never pushed** (the cloud's GitHub connection cannot delete branches, so pushed ones would pile up).
+1. Make its worktree yourself: `git worktree add <path> -b <ticket-branch> <spec-branch>`, with `<path>` outside your checkout. Claude Code's own subagent worktrees start only from the default branch or HEAD, so don't use them. The Ticket branch stays local and is **never pushed** (a pushed branch would have to be deleted afterwards, and where the remote cannot delete branches they would pile up).
 2. Start one Implementer on the ticket's tier. Brief it with pointers, not copies:
-   - the ticket link, its worktree path and Ticket branch, and that it commits there and never pushes;
+   - the ticket link, its worktree path and Ticket branch, and that it commits there and never pushes, running every git command as `git -C <path> ...` (a shell may start each command back in your checkout);
    - start at `docs/index.md`, plus the exploration notes if any;
    - the worktree is a fresh checkout and may need its dependencies installed again;
    - build test-first with the `tdd` skill, at seams agreed before the first test;
@@ -43,15 +43,15 @@ Run at most **3 Implementers at once**, counting every Implementer that is worki
    - before reporting, merge the Spec branch tip into its Ticket branch (a merge, never a rebase) and rerun the tests;
    - report its evidence: the tests that fail before and pass after, the typecheck or the repo's checks, screenshots for anything visual (or "not visual"), and its one-way-door call (would reverting its commits undo everything the change did, including anything outside git?).
 
-Keep that same Implementer for every later fix and merge conflict on its ticket: continue it by message. If it can no longer be reached, start a new one on the same tier with a handoff (ticket, worktree, branch, what is done, what is open), and tell the user you did. If the machine was reclaimed, the worktree and its unpushed work are gone: redo the ticket from step 3.1.
+You run no `git checkout`, `switch` or `reset` in a ticket worktree either, because they move the checkout under its Implementer; read its Ticket branch with `git show` or `git diff`, or from a `git archive` copy. Keep that same Implementer for every later fix and merge conflict on its ticket: continue it by message. If it can no longer be reached, start a new one on the same tier with a handoff (ticket, worktree, branch, what is done, what is open), and tell the user you did. If the worktree is gone (for example the machine was reclaimed), its unpushed work is gone too: redo the ticket from step 3.1.
 
 ## 4. Check the evidence
 
-Read the Implementer's report against the ticket's acceptance criteria and rerun the checks in its worktree (a cheap subagent can). Anything missing or failing goes back to the Implementer. Done when every acceptance criterion has evidence and the checks pass on the Ticket branch's head, or, when the repo has no checks, the evidence says what was checked instead. A check that fails only because a number is still a placeholder (or a version is not yet bumped) is expected until step 8.
+Read the Implementer's report against the ticket's acceptance criteria and rerun the checks in its worktree (a cheap subagent can, running no git command that moves the checkout). Anything missing or failing goes back to the Implementer. Done when every acceptance criterion has evidence and the checks pass on the Ticket branch's head, or, when the repo has no checks, the evidence says what was checked instead. A check that fails only because a number is still a placeholder (or a version is not yet bumped) is expected until step 8.
 
 ## 5. Run the ticket check
 
-Run the `agentic-review` skill yourself, from the ticket's worktree, as a Ticket check: Quick depth, over the Ticket branch's diff against the Spec branch. Its rules for ids, the comment and already-raised Findings are in [agentic-review's ROUNDS.md](../agentic-review/ROUNDS.md#ticket-checks). Record each check as a comment on the Spec pull request; until the draft opens (step 6), keep the comments and post them once it does.
+Run the `agentic-review` skill yourself against the ticket's worktree, running your own git commands there as `git -C <path> ...` (your shell may start in your own checkout) and telling its Finders and Verifiers that path to run theirs in, as a Ticket check: Quick depth, over the Ticket branch's diff against the Spec branch. Its rules for ids, the comment and already-raised Findings are in [agentic-review's ROUNDS.md](../agentic-review/ROUNDS.md#ticket-checks). Record each check as a comment on the Spec pull request; until the draft opens (step 6), keep the comments and post them once it does.
 
 Send the check's Important Findings and "fix" Nits to the ticket's Implementer (on a Ticket that changes design, put its design Findings to the user first and send only the agreed answers, as [agentic-review's ROUNDS.md](../agentic-review/ROUNDS.md#design-findings-go-to-the-user) says); it fixes and commits, and you rerun step 4 and then a new check with brand-new reviewers. "Skip" Nits are dropped; Pre-existing ones wait for step 7.
 
@@ -101,4 +101,4 @@ Remove any worktrees left (`git worktree list`, `git worktree remove`, `git work
 
 ## 10. Run the retro
 
-Whether the Spec pull request was merged or handed to the user, run the `retro` skill on this thread. If it finds a repeated Bug class to turn into a check, a regular-tier Implementer builds the check on a branch off main (you still write no code), and you open its pull request with `pr` and run the `agentic-review` Rounds. That pull request is a lone one off main, so merge it as `implement` does (squash-merge, or bring it to the user). A check that changes `REVIEW.md` goes to the user, not merged by you. Add the retro's outcome to your report.
+Whether the Spec pull request was merged or handed to the user, run the `retro` skill on this thread. If it finds a repeated Bug class to turn into a check, a regular-tier Implementer builds the check on a branch off main, in its own worktree made as in step 3.1 but off `origin/<default-branch>` (you still write no code), and you brief it as `implement` step 3 briefs one ([implement](../implement/SKILL.md)), not as in step 3.2: the branch is a lone one off main and is pushed, because the pull request needs it, and you open its pull request with `pr` and run the `agentic-review` Rounds. That pull request is a lone one off main, so merge it as `implement` does (squash-merge, or bring it to the user). A check that changes `REVIEW.md` goes to the user, not merged by you. Add the retro's outcome to your report.
