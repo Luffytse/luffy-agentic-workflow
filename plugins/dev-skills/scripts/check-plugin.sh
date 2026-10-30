@@ -303,5 +303,16 @@ for f in "$repo/GLOSSARY.md" "$repo/docs/adr/0003-code-review-runs-find-verify-r
   done
 done
 
+# 23. ask-matt's tracker and routing text matches the skills it routes to (issue #32): blocking edges are
+# native links or a "Blocked by" line, the local path names the spec file and the ticket files, the
+# wayfinder shortcut writes a lone ticket first, and the triage on-ramp sends an issue under a Spec to implement-spec
+if [ -f "$am" ]; then
+  grep -qF 'become native blocking links' "$am" && bad "ask-matt/SKILL.md still says the edges become native blocking links"
+  grep -qF '"Blocked by" line' "$am" || bad "ask-matt/SKILL.md does not give the \"Blocked by\" line fallback for blocking edges"
+  grep -qF '.scratch/<feature-slug>/spec.md' "$am" || bad "ask-matt/SKILL.md does not name the local spec file"
+  grep -qF 'write one lone ticket' "$am" || bad "ask-matt/SKILL.md wayfinder shortcut does not say to write a lone ticket first"
+  grep -F 'Bugs and requests piling up' "$am" | grep -qF '`/implement-spec`' || bad "ask-matt/SKILL.md triage on-ramp does not send an issue under a Spec to /implement-spec"
+fi
+
 [ "$fail" -eq 0 ] && echo "OK: dev-skills plugin checks passed ($count skills)"
 exit "$fail"

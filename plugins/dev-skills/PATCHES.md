@@ -390,6 +390,20 @@ What (Upstream-derived text changed):
 
 Merging an Upstream update: of Patch 5's Upstream-moved text, this Patch edits only the shared brief list at the top of `FINDERS.md` (the untracked new files) and `SKILL.md` step 1 (the fixed-point diff), both listed above; the smell baseline, the standards and spec briefs and the step-2 source lookup are untouched. Carry Upstream changes over as Patch 5 says and re-apply the lines above.
 
+## Patch 20: `ask-matt`'s tracker and routing text matches the skills it routes to (`ask-matt/`)
+
+Why: issue #32, Pre-existing Findings from the review of PR #31. Three sentences in `ask-matt` (four points; blocking edges and the local path share one) said more, or less, than `to-tickets`, `implement`, `implement-spec` and the local issue-tracker setup do.
+
+What:
+
+- `ask-matt/SKILL.md`, step 3's Yes-branch: "On a local tracker that's one file per ticket under `.scratch/<feature>/issues/`; on a real tracker the edges become native blocking links." is now "On a local tracker the spec is `.scratch/<feature-slug>/spec.md` and the tickets are one file per ticket under `.scratch/<feature-slug>/issues/`, each with a "Blocked by" line; on a real tracker the edges are native blocking links where the tracker has them, and a "Blocked by" line otherwise."
+- `ask-matt/SKILL.md`, triage on-ramp: "which **`/implement`** later picks up" is now "which **`/implement-spec`** (for an issue under a Spec) or **`/implement`** (for a lone one) later picks up".
+- `ask-matt/SKILL.md`, wayfinder on-ramp: "go straight to `/implement` only when the effort turned out genuinely small." now continues ": write one lone ticket first (for example with `/to-tickets`), then run `/implement` on it."
+- `scripts/check-plugin.sh`: new check 23 (`ask-matt/SKILL.md` no longer says "become native blocking links", and names the "Blocked by" line, `.scratch/<feature-slug>/spec.md`, "write one lone ticket", and `/implement-spec` in the triage bullet).
+- `.claude-plugin/plugin.json`: version 0.10.0 to 0.11.0.
+
+Merging an Upstream update: carry Upstream's changes to step 3, the triage on-ramp and the wayfinder on-ramp over by hand and re-apply the lines above.
+
 ## Vendor model names in Upstream text
 
 None in the kept skills at the Base commit, so no Patch was needed for ADR 0002 (checked for ticket #4: grep for `haiku`, `sonnet`, `opus`, `claude-`, `gpt-`, `gemini` over `upstream-skills/`). Some kept skills start subagents (for example `grilling`, `wayfinder`, `code-review`, `implement-spec`), but none picks a model for them. Spec #1 adds tiers in later tickets (the `code-review` Finders and Verifiers, and the `implement` and `implement-spec` Implementers; the tier on each ticket from `to-tickets` is Patch 7, the `implement` Implementer's tier is Patch 8, and the `implement-spec` Implementers' tiers are Patch 11); each of those edits gets its own Patch here.
