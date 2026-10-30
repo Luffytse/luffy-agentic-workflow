@@ -17,7 +17,7 @@ Record "none yet" for anything that does not exist, and carry on with the links 
 
 ## 2. Grill
 
-Run `grilling` to settle how this project's threads work. On a re-run the existing text already answers what it covers: grill only the change the user wants and what depends on it. This overrides its "whole frontier per round": ask at most 3 questions per round; the rest of the frontier goes first in the next round. Keep its end gate: drafting starts once the user confirms you share an understanding.
+Run `grilling` to settle how this project's threads work. On a re-run the existing text already answers what it covers: grill only the change the user wants and what depends on it. Keep its end gate: drafting starts once the user confirms you share an understanding.
 
 Settle each of these, skipping what exploration already answered:
 

@@ -10,7 +10,7 @@ Everything under `upstream-skills/` is copied from Matt Pocock's `mattpocock/ski
 - Upstream layout: skills sit in `skills/engineering/` and `skills/productivity/`; here they are flat in `upstream-skills/<name>/`.
 - Kept: 22 skills (ADR 0001). Dropped, not copied: `teach`, `to-questionnaire`, `grill-me`, `wait-what`. Upstream's `setup-matt-pocock-skills` was copied at first and later moved out as our own `setup-dev-skills` (Patch 22).
 - Copied whole, including each skill's helper files (`agents/openai.yaml`, `scripts/`, other `.md`). Not copied: Upstream's `in-progress`, `misc` and `deprecated` skills, and its `README.md`, `CHANGELOG.md` and changesets.
-- The copy in luffydev's `.claude/skills/` was Upstream `5beb35b`, 10 days behind; we copied from `a496f55` instead. That copy's one local edit (at most 3 questions per round in `grilling`) is not carried over; it is a separate Patch for a later ticket.
+- The copy in luffydev's `.claude/skills/` was Upstream `5beb35b`, 10 days behind; we copied from `a496f55` instead. That copy's one local edit (at most 3 questions per round in `grilling`) was not in the copy we took; Patch 23 applies it.
 
 ## How to merge an Upstream update
 
@@ -451,6 +451,20 @@ Our own, not Upstream. `skills/retro-planning/SKILL.md` now snapshots the backlo
 
 - `scripts/check-plugin.sh`: new check 25 (the record template keeps its Snapshot, Cap, Spun off, Spun off, waiting, Arrived during this planning, Held back by the cap, plannings-without-a-new-vote and Waiting on open Tickets sections; the skill files the record as an **open** issue, walks one at a time, and has the spin-off comment and the "Running a spun-off planning" section).
 - `.claude-plugin/plugin.json`: version 0.13.0 to 0.14.0.
+
+## Patch 23: `grilling` asks at most 3 questions per round (`grilling/`)
+
+Why: issue #34. The base note above deferred the 3-question rule "for a later ticket" that was never filed, while ADR 0001 and ADR 0004 assume `grilling` already follows it and only `setup-project` overrode Upstream's "whole frontier" rule.
+
+What:
+
+- `grilling/SKILL.md`: "Ask the whole frontier in one round: number each question and give your recommended answer." is now "Ask at most **3** frontier questions in a round: number each question and give your recommended answer. When the frontier holds more than 3, ask the 3 whose answers unblock the most other decisions, and keep the rest for later rounds; they go first in the next round, ahead of questions the user's answers newly unblock." Later in the file, "ask the rest of the frontier now" is now "ask the rest of this round's questions now". The recommended answers and the round format are unchanged.
+- `setup-project/SKILL.md` (our own skill, not Upstream text): drops its override of "whole frontier per round", since `grilling` now carries the rule. `grill-with-docs` and the other skills built on `grilling` inherit it and needed no edit.
+- `scripts/check-plugin.sh`: new check 26 (`grilling/SKILL.md` says at most 3 questions and keeps the rest for later rounds, and no longer says "whole frontier"; `setup-project/SKILL.md` no longer says it overrides).
+- New file (ours, not Upstream text): `evals/implement/RESULTS.md`, one entry per build-flow check of `implement`, listed in `docs/index.md`.
+- `.claude-plugin/plugin.json`: version 0.14.0 to 0.15.0.
+
+Merging an Upstream update: take Upstream's `grilling` text, then re-apply the two edits above.
 
 ## Vendor model names in Upstream text
 

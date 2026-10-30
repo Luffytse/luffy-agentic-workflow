@@ -349,5 +349,16 @@ if [ -f "$rp" ]; then
   done
 fi
 
+# 26. grilling asks at most 3 questions per round (issue #34): the cap and what happens to the rest of the
+# frontier are in grilling itself, and setup-project relies on it instead of overriding it
+gr="$forked/grilling/SKILL.md"
+sp="$root/skills/setup-project/SKILL.md"
+if [ -f "$gr" ]; then
+  grep -qF 'at most **3**' "$gr" || bad "grilling/SKILL.md does not cap a round at 3 questions"
+  grep -qF 'keep the rest for later rounds' "$gr" || bad "grilling/SKILL.md does not say what happens to the rest of the frontier"
+  grep -qF 'whole frontier' "$gr" && bad "grilling/SKILL.md still says to ask the whole frontier"
+fi
+[ -f "$sp" ] && grep -qF 'This overrides' "$sp" && bad "setup-project/SKILL.md still overrides grilling's round size"
+
 [ "$fail" -eq 0 ] && echo "OK: dev-skills plugin checks passed ($count skills)"
 exit "$fail"
