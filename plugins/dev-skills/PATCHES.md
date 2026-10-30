@@ -370,6 +370,10 @@ Merging an Upstream update: carry Upstream's changes to the `/retro` item over b
 
 Our own, not Upstream: `.github/workflows/plugin-checks.yml` (issue #39) runs `scripts/check-plugin.sh` and `claude plugin validate .` on pull requests and pushes to main. `scripts/check-plugin.sh` gets check 19 (the workflow exists, triggers on `pull_request` and pushes to main, installs `@anthropic-ai/claude-code`, and runs both commands). No Upstream text changed. `.claude-plugin/plugin.json`: no bump of its own; covered by Patch 16's 0.9.2 to 0.9.3.
 
+## Not a Patch: check 21 (PATCHES.md and the script agree on check numbers)
+
+Our own, not Upstream. `scripts/check-plugin.sh` gets check 21, from the retro of PR #56 (PATCHES.md describing a change wrongly after renumbering came up 5 times): every "new check N" in this file names a check whose `# N.` header is in the script, no N is claimed as "new check" twice, and every check from 9 up is named as "check N" somewhere in this file (case-insensitive). No Upstream text changed. `.claude-plugin/plugin.json`: 0.9.3 to 0.9.4.
+
 ## Vendor model names in Upstream text
 
 None in the kept skills at the Base commit, so no Patch was needed for ADR 0002 (checked for ticket #4: grep for `haiku`, `sonnet`, `opus`, `claude-`, `gpt-`, `gemini` over `upstream-skills/`). Some kept skills start subagents (for example `grilling`, `wayfinder`, `code-review`, `implement-spec`), but none picks a model for them. Spec #1 adds tiers in later tickets (the `code-review` Finders and Verifiers, and the `implement` and `implement-spec` Implementers; the tier on each ticket from `to-tickets` is Patch 7, the `implement` Implementer's tier is Patch 8, and the `implement-spec` Implementers' tiers are Patch 11); each of those edits gets its own Patch here.

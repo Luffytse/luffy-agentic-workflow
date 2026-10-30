@@ -260,5 +260,27 @@ else
 fi
 grep -qF '`/retro-planning`' "$forked/ask-matt/SKILL.md" || bad "ask-matt/SKILL.md does not route to \`/retro-planning\`"
 
+# 21. PATCHES.md and this script agree on check numbers (retro of PR #56): every "new check N" in
+# PATCHES.md names a check whose "# N." header is in this script, no N is claimed as new twice, and
+# every check from 9 up is named as "check N" somewhere in PATCHES.md.
+self="$root/scripts/check-plugin.sh"
+patches="$root/PATCHES.md"
+if [ ! -f "$patches" ]; then bad "missing PATCHES.md"
+else
+  headers=$(grep -E '^# [0-9]+b?\.' "$self" | sed -E 's/^# ([0-9]+).*/\1/' | sort -u)
+  claimed=$(grep -oiE 'new check [0-9]+' "$patches" | sed -E 's/.* //')
+  for n in $claimed; do
+    printf '%s\n' "$headers" | grep -qx "$n" || bad "PATCHES.md says \"new check $n\" but check-plugin.sh has no check $n"
+  done
+  for n in $(printf '%s\n' "$claimed" | sort | uniq -d); do
+    bad "PATCHES.md claims \"new check $n\" more than once"
+  done
+  mentioned=$(grep -oiE 'check [0-9]+' "$patches" | sed -E 's/.* //' | sort -u)
+  for n in $headers; do
+    [ "$n" -ge 9 ] || continue
+    printf '%s\n' "$mentioned" | grep -qx "$n" || bad "PATCHES.md never names check $n"
+  done
+fi
+
 [ "$fail" -eq 0 ] && echo "OK: dev-skills plugin checks passed ($count skills)"
 exit "$fail"
