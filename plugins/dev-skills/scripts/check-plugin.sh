@@ -197,5 +197,14 @@ if grep -rniE --include='*.md' --include='*.yaml' 'luffydev|luffytse|luffy-dev|l
   bad "skill text names a particular project, repo or person"
 fi
 
+# 16. implement and implement-spec end with a retro step (issue #42): their last step, after the report,
+# runs `retro` on the thread, so each build feeds the Retro backlog
+for s in implement implement-spec; do
+  [ -f "$forked/$s/SKILL.md" ] || continue
+  last="$(awk '/^## /{buf=""} {buf=buf"\n"$0} END{print buf}' "$forked/$s/SKILL.md")"
+  printf '%s' "$last" | grep -qF '`retro`' || bad "$s/SKILL.md: the last step does not run \`retro\`"
+  printf '%s' "$last" | grep -qF 'REVIEW.md' || bad "$s/SKILL.md: the last step does not say a retro check that changes REVIEW.md goes to the user"
+done
+
 [ "$fail" -eq 0 ] && echo "OK: dev-skills plugin checks passed ($count skills)"
 exit "$fail"

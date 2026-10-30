@@ -95,3 +95,7 @@ The user then merges, or tells you to. Otherwise merge it yourself once the Revi
 ## 9. Clean up and report
 
 Remove any worktrees left (`git worktree list`, `git worktree remove`, `git worktree prune`) and their local Ticket branches. Tell the user (or the coordinator) the pull request link and the outcome: merged with its merge commit, or waiting for the user and why, plus any ticket brought to the user in step 5.
+
+## 10. Run the retro
+
+Whether the Spec pull request was merged or handed to the user, run the `retro` skill on this thread. If it finds a repeated Bug class to turn into a check, a regular-tier Implementer builds the check on a branch off main (you still write no code), and you open its pull request with `pr` and run the `code-review` Rounds. That pull request is a lone one off main, so merge it as `implement` does (squash-merge, or bring it to the user). A check that changes `REVIEW.md` goes to the user, not merged by you. Add the retro's outcome to your report.
