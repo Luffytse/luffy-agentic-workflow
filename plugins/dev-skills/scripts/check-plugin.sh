@@ -453,5 +453,18 @@ for g in 'By default, save the handoff as an issue on the tracker' \
 done
 grep -qF 'Save to the temporary directory of the user' "$ho" && bad "handoff/SKILL.md still makes the temporary directory the default"
 
+# 32. grilling states a rule's purpose, checks a recommendation's facts, and counts its fact-finding
+# sub-agent as asked for (issue #108); grill-with-docs gathers what other skills expect of a reworked skill
+# first. Prose rules that no other check can see, so each sentence is pinned by a distinctive phrase.
+gwd="$forked/grill-with-docs/SKILL.md"
+if [ -f "$gr" ]; then
+  grep -qF 'what the rule does today and why it exists' "$gr" || bad "grilling/SKILL.md does not have the rule-purpose line"
+  grep -qF 'citing the ADR or doc' "$gr" || bad "grilling/SKILL.md does not tell the question to cite the ADR or doc"
+  grep -qF 'waits for that fact, or is marked as a guess' "$gr" || bad "grilling/SKILL.md does not have the checked-fact-or-marked-guess rule"
+  grep -qF 'counts as this skill asking for a sub-agent' "$gr" || bad "grilling/SKILL.md does not say its fact-finding sub-agent counts as asked for"
+  grep -qF 'a few greps do not replace it' "$gr" || bad "grilling/SKILL.md does not say a few greps do not replace the sub-agent"
+fi
+[ -f "$gwd" ] && { grep -qF 'what every other skill expects of that skill' "$gwd" || bad "grill-with-docs/SKILL.md does not have the first fact for a skill rename or rework"; }
+
 [ "$fail" -eq 0 ] && echo "OK: dev-skills plugin checks passed ($count skills)"
 exit "$fail"

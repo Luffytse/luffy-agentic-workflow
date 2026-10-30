@@ -23,8 +23,12 @@ Format a round like so:
 
 Word each question so "yes" accepts your recommended answer.
 
+A question that changes or extends an existing rule opens, before the options, with one line saying what the rule does today and why it exists, citing the ADR or doc. The user should never have to ask what a rule is for.
+
+A recommendation that rests on a fact nobody has checked waits for that fact, or is marked as a guess.
+
 Each round the user answers reshapes the tree: settled decisions push the frontier outward and unblock questions that depended on them. Recompute the frontier and ask the next round. A question whose answer depends on another question still open in this round belongs to a _later_ round, not this one.
 
-Finding _facts_ is your job, never the user's. When a frontier question needs a fact from the environment (filesystem, tools, etc.), dispatch a sub-agent with a fresh context window to find it; don't ask the user for anything you could look up yourself. Don't block on it: a running exploration is an unsettled prerequisite, so only the questions downstream of it wait for the sub-agent to report; ask the rest of this round's questions now. The _decisions_ are the user's: put each to them and wait.
+Finding _facts_ is your job, never the user's. When a frontier question needs a fact from the environment (filesystem, tools, etc.), dispatch a sub-agent with a fresh context window to find it; don't ask the user for anything you could look up yourself. A fact-finding sub-agent counts as this skill asking for a sub-agent, however light the lookup looks; a few greps do not replace it. Don't block on it: a running exploration is an unsettled prerequisite, so only the questions downstream of it wait for the sub-agent to report; ask the rest of this round's questions now. The _decisions_ are the user's: put each to them and wait.
 
 The session is done when the frontier is empty: every branch of the design tree visited, nothing left silently assumed. Do not act on it until the user confirms you have reached a shared understanding.

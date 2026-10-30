@@ -530,6 +530,19 @@ What:
 
 Merging an Upstream update: take Upstream's `handoff`, `ask-matt/SKILL.md` and `ask-matt/PHASE-BOUNDARIES.md` text, then re-apply the save-location rule above (check 31 lists its phrases) and the `ask-matt` and `PHASE-BOUNDARIES` wording edits listed above.
 
+## Patch 28: `grilling` states a rule's purpose and checks a recommendation's facts; `grill-with-docs` gathers what other skills expect (`grilling/`, `grill-with-docs/`)
+
+Why: issue #108, absorbing Retro issues #80 and #81. A question about a rule went out without saying what the rule is for, a recommendation went out on unchecked facts, and `grilling`'s fact-finding line was read as too soft to count as the skill asking for a subagent.
+
+What:
+
+- `grilling/SKILL.md`: after "Word each question so "yes" accepts your recommended answer." two paragraphs are added: a question that changes or extends an existing rule opens, before the options, with one line saying what the rule does today and why it exists, citing the ADR or doc; and a recommendation that rests on a fact nobody has checked waits for that fact, or is marked as a guess. After "don't ask the user for anything you could look up yourself." a sentence says a fact-finding sub-agent counts as this skill asking for a sub-agent, however light the lookup looks; a few greps do not replace it. The 3-question round format is unchanged.
+- `grill-with-docs/SKILL.md`: a closing paragraph says that when the plan renames or reworks a skill, the first fact to gather is what every other skill expects of that skill.
+- `scripts/check-plugin.sh`: new check 32 (one distinctive phrase per new sentence plus two clause pins, so a revert fails: five on `grilling` for the rule purpose, citing the ADR or doc, the checked-fact-or-marked-guess rule, the sub-agent counting as asked for, and a few greps not replacing it; one on `grill-with-docs`).
+- `.claude-plugin/plugin.json`: version 0.20.0 to 0.21.0.
+
+Merging an Upstream update: take Upstream's `grilling` and `grill-with-docs` text, then re-apply the edits above.
+
 ## Vendor model names in Upstream text
 
 None in the kept skills at the Base commit, so no Patch was needed for ADR 0002 (checked for ticket #4: grep for `haiku`, `sonnet`, `opus`, `claude-`, `gpt-`, `gemini` over `upstream-skills/`). Some kept skills start subagents (for example `grilling`, `wayfinder`, `code-review`, `implement-spec`), but none picks a model for them. Spec #1 adds tiers in later tickets (the `code-review` Finders and Verifiers, and the `implement` and `implement-spec` Implementers; the tier on each ticket from `to-tickets` is Patch 7, the `implement` Implementer's tier is Patch 8, and the `implement-spec` Implementers' tiers are Patch 11); each of those edits gets its own Patch here.
