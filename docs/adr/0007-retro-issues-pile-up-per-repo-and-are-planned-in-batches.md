@@ -4,7 +4,7 @@
 
 ## Filing (what `retro` does)
 
-- A repeated Bug class from `code-review` still becomes a check or a `REVIEW.md` line straight away, in the retro's own pull request ([ADR 0003](0003-code-review-runs-find-verify-rank-in-rounds.md)). Every other suggestion becomes a Retro issue: label `retro`, title starting `Retro:`, and **no** `needs-triage`, so build threads ignore it and `triage` skips it (see Consequences). Its body names the source thread, what went wrong, and the suggested fix. `retro` creates the `retro` label if the repo lacks it.
+- A repeated Bug class from `agentic-review` still becomes a check or a `REVIEW.md` line straight away, in the retro's own pull request ([ADR 0003](0003-code-review-runs-find-verify-rank-in-rounds.md)). Every other suggestion becomes a Retro issue: label `retro`, title starting `Retro:`, and **no** `needs-triage`, so build threads ignore it and `triage` skips it (see Consequences). Its body names the source thread, what went wrong, and the suggested fix. `retro` creates the `retro` label if the repo lacks it.
 - **Routing follows where the fix lands.** A problem with a skill or the workflow (skill text, review rules, how threads run) goes to the `dev-skills` repo, from any project. A problem only one project has (its CI, its docs, its `CLAUDE.md`) goes to that project's repo. No suggestion goes to both. A project that wants a skill of its own builds it in its own repo or `CLAUDE.md`; it may still suggest a `dev-skills` change, which `dev-skills`' Retro planning accepts or closes as won't do, with a reason.
 - `retro` finds the `dev-skills` repo from the `repository` field of the plugin's manifest (`plugins/dev-skills/.claude-plugin/plugin.json`), and the project's tracker from its `docs/agents/issue-tracker.md`. When the thread cannot write to the `dev-skills` repo, `retro` puts the issue text in its report so the coordinator can file it.
 - **Votes.** When an open Retro issue already covers a suggestion, `retro` comments "seen again in <thread>" on it instead of opening a duplicate.
@@ -24,7 +24,7 @@ It runs per repo and reads only that repo's Retro issues; the `dev-skills` repo 
 7. Recheck whether the problem behind an earlier fix has come back. If it has, the fix did not work, and that group goes first.
 8. End by filing a **closed** record issue titled `Retro planning <yyyy-mm-dd>`, label `retro-planning`, listing every verdict and vote count. `retro` reads the newest record for its 2-week clock.
 
-The thresholds (10, 2 weeks with 4, at most 3 groups, 2 plannings) are Lufei's choices, not taken from a source.
+The thresholds (10, 2 weeks with 4, at most 3 groups, 2 plannings) are the user's choices, not taken from a source.
 
 ## Considered options
 

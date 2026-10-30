@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Builds the code-review eval fixture as a scratch git repo.
+# Builds the agentic-review eval fixture as a scratch git repo.
 # Usage: setup.sh <new-empty-dir>
 # Result: branch `main` holds base/, branch `planted` adds one commit with the change in after/.
 set -eu

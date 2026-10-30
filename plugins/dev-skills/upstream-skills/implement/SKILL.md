@@ -1,6 +1,6 @@
 ---
 name: implement
-description: "Build one lone Ticket as its Ticket thread: an Implementer subagent builds it test-first and shows evidence, you open the pull request with pr, run the code-review Rounds, then merge or bring the pull request to the user. Use when you are handed a lone Ticket (a bug fix, chore or small feature under no Spec) to build and ship."
+description: "Build one lone Ticket as its Ticket thread: an Implementer subagent builds it test-first and shows evidence, you open the pull request with pr, run the agentic-review Rounds, then merge or bring the pull request to the user. Use when you are handed a lone Ticket (a bug fix, chore or small feature under no Spec) to build and ship."
 ---
 
 You are the **Ticket thread**: you coordinate one lone Ticket from issue to merged pull request (ADR 0004). **Implementers write the code.** You brief them, check their evidence, open the pull request, run the Review, talk to the user and merge. You never write or edit code yourself, not even to resolve a merge conflict.
@@ -45,11 +45,11 @@ Write the body with the `pr` skill: it closes the ticket, carries the evidence i
 
 ## 6. Review in Rounds
 
-Run the `code-review` skill on the pull request yourself, in this thread: its Finders and Verifiers are subagents, and a subagent cannot start them. Its rules set the Review depth (a depth in your brief wins), the Rounds, the stop rule and the 5-Round cap.
+Run the `agentic-review` skill on the pull request yourself, in this thread: its Finders and Verifiers are subagents, and a subagent cannot start them. Its rules set the Review depth (a depth in your brief wins), the Rounds, the stop rule and the 5-Round cap.
 
 Before each Round, fetch main. If it moved, have the Implementer merge main into the Ticket branch (a merge, never a rebase), resolve any conflicts and push, so the Round reviews the resolutions.
 
-After each Round, send its Important Findings and "fix" Nits to the Implementer by message; it fixes, commits and pushes, then the next Round runs. On a clean Round 2 to 5, the Implementer makes the final "fix" Nits commit before you post that Round's comment; no further Round reviews it. After the last Round, file Pre-existing Findings as `code-review` says.
+After each Round, send its Important Findings and "fix" Nits to the Implementer by message; it fixes, commits and pushes, then the next Round runs. On a clean Round 2 to 5, the Implementer makes the final "fix" Nits commit before you post that Round's comment; no further Round reviews it. After the last Round, file Pre-existing Findings as `agentic-review` says.
 
 Done when a Round 2 to 5 is clean, or the 5-Round cap is hit.
 
@@ -59,7 +59,7 @@ Bring the pull request to the user, and do not merge it, if any of these holds:
 
 - the Review ran at Deep depth;
 - its Door is one-way;
-- it changes an ADR, the glossary, a `CLAUDE.md`, a `REVIEW.md` or the `code-review` skill;
+- it changes an ADR, the glossary, a `CLAUDE.md`, a `REVIEW.md` or the `agentic-review` skill;
 - the Review hit the 5-Round cap.
 
 The user then merges, or tells you to. Otherwise merge it yourself once the Review is clean and CI is green (or the repo has no CI):
@@ -73,4 +73,4 @@ Tell the user (or the coordinator) the pull request link and the outcome: merged
 
 ## 9. Run the retro
 
-Whether the pull request was merged or handed to the user, run the `retro` skill on this thread. If it finds a repeated Bug class to turn into a check, a regular-tier Implementer builds the check on a branch off main (you still write no code), and you open its pull request with `pr` and run the `code-review` Rounds as in steps 5 to 7. A check that changes `REVIEW.md` goes to the user, not merged by you. Add the retro's outcome to your report.
+Whether the pull request was merged or handed to the user, run the `retro` skill on this thread. If it finds a repeated Bug class to turn into a check, a regular-tier Implementer builds the check on a branch off main (you still write no code), and you open its pull request with `pr` and run the `agentic-review` Rounds as in steps 5 to 7. A check that changes `REVIEW.md` goes to the user, not merged by you. Add the retro's outcome to your report.

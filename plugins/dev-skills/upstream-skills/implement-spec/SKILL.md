@@ -1,6 +1,6 @@
 ---
 name: implement-spec
-description: "Build one Spec as its Spec thread: Implementer subagents build its Tickets test-first in local worktrees off one Spec branch, each Ticket passes a ticket check and is squash-merged in, you open the Spec pull request with pr as a draft after the first Ticket lands, then run the code-review Rounds once the last has landed, and merge it into main with a merge commit or bring it to the user. Use when you are handed a Spec (the result of to-spec and to-tickets) to build and ship."
+description: "Build one Spec as its Spec thread: Implementer subagents build its Tickets test-first in local worktrees off one Spec branch, each Ticket passes a ticket check and is squash-merged in, you open the Spec pull request with pr as a draft after the first Ticket lands, then run the agentic-review Rounds once the last has landed, and merge it into main with a merge commit or bring it to the user. Use when you are handed a Spec (the result of to-spec and to-tickets) to build and ship."
 ---
 
 You are the **Spec thread**: you coordinate one Spec from its tickets to a merged pull request (ADR 0004, ADR 0005). **Implementers write the code.** You make the worktrees, brief the Implementers, check their evidence, run the ticket checks and the Review, merge, talk to the user. You never write or edit code yourself, not even to resolve a merge conflict.
@@ -26,7 +26,7 @@ Done when you have stated the title, know the graph and the frontier, and know e
 
 ## 2. Make the Spec branch
 
-Create the Spec branch from an up-to-date main and push it. Keep your own checkout on it: any Implementer working on the Spec branch itself (steps 6.1 and 7) works there, and while one does, you run no git commands that change that checkout (merge, squash, commit, checkout); `git worktree add` and `git worktree remove` are fine. Here and below, "fetch main" means `git fetch origin main`; merge, diff and compare against `origin/main` (also as `code-review`'s `<base>`), never a local `main` that may be stale. Done when the branch exists on the remote.
+Create the Spec branch from an up-to-date main and push it. Keep your own checkout on it: any Implementer working on the Spec branch itself (steps 6.1 and 7) works there, and while one does, you run no git commands that change that checkout (merge, squash, commit, checkout); `git worktree add` and `git worktree remove` are fine. Here and below, "fetch main" means `git fetch origin main`; merge, diff and compare against `origin/main` (also as `agentic-review`'s `<base>`), never a local `main` that may be stale. Done when the branch exists on the remote.
 
 ## 3. Start an Implementer per frontier ticket
 
@@ -49,7 +49,7 @@ Read the Implementer's report against the ticket's acceptance criteria and rerun
 
 ## 5. Run the ticket check
 
-Run the `code-review` skill yourself, from the ticket's worktree, as a Ticket check: Quick depth, over the Ticket branch's diff against the Spec branch. Its rules for ids, the comment and already-raised Findings are in [code-review's ROUNDS.md](../code-review/ROUNDS.md#ticket-checks). Record each check as a comment on the Spec pull request; until the draft opens (step 6), keep the comments and post them once it does.
+Run the `agentic-review` skill yourself, from the ticket's worktree, as a Ticket check: Quick depth, over the Ticket branch's diff against the Spec branch. Its rules for ids, the comment and already-raised Findings are in [agentic-review's ROUNDS.md](../agentic-review/ROUNDS.md#ticket-checks). Record each check as a comment on the Spec pull request; until the draft opens (step 6), keep the comments and post them once it does.
 
 Send the check's Important Findings and "fix" Nits to the ticket's Implementer; it fixes and commits, and you rerun step 4 and then a new check with brand-new reviewers. "Skip" Nits are dropped; Pre-existing ones wait for step 7.
 
@@ -70,11 +70,11 @@ Done when every ticket has landed. Then mark the pull request ready. If every ti
 
 ## 7. Review in Rounds
 
-Run the `code-review` skill on the Spec pull request yourself, in this thread: its Finders and Verifiers are subagents, and a subagent cannot start them. Its rules set the Review depth (a depth in your brief wins), the Rounds, the stop rule and the 5-Round cap; ticket-check Findings count as already raised.
+Run the `agentic-review` skill on the Spec pull request yourself, in this thread: its Finders and Verifiers are subagents, and a subagent cannot start them. Its rules set the Review depth (a depth in your brief wins), the Rounds, the stop rule and the 5-Round cap; ticket-check Findings count as already raised.
 
 Before each Round, fetch main and, if it moved, merge it into the Spec branch as in step 6.1, and push. In a Round that reviews only the new commits, that merge counts among them, but only its conflict resolutions are reviewed, not the commits from main (for example `git show --remerge-diff <merge>`); say so to the Finders.
 
-After each Round, send its Important Findings and "fix" Nits to a **new** Implementer on the Spec branch, on the highest tier of the tickets those Findings touch (regular if they touch no ticket's files); it fixes, commits and pushes, then the next Round runs. A later Round may continue it by message if its Findings need no higher tier. On a clean Round 2 to 5, the Implementer makes the final "fix" Nits commit before you post that Round's comment; no further Round reviews it. After the last Round, file the Pre-existing Findings, the ticket checks' included, as `code-review` says.
+After each Round, send its Important Findings and "fix" Nits to a **new** Implementer on the Spec branch, on the highest tier of the tickets those Findings touch (regular if they touch no ticket's files); it fixes, commits and pushes, then the next Round runs. A later Round may continue it by message if its Findings need no higher tier. On a clean Round 2 to 5, the Implementer makes the final "fix" Nits commit before you post that Round's comment; no further Round reviews it. After the last Round, file the Pre-existing Findings, the ticket checks' included, as `agentic-review` says.
 
 Done when a Round 2 to 5 is clean, or the 5-Round cap is hit.
 
@@ -84,7 +84,7 @@ Bring the pull request to the user, and do not merge it, if any of these holds:
 
 - the Review ran at Deep depth;
 - its Door is one-way (any ticket's one-way call makes it so);
-- it changes an ADR, the glossary, a `CLAUDE.md`, a `REVIEW.md` or the `code-review` skill;
+- it changes an ADR, the glossary, a `CLAUDE.md`, a `REVIEW.md` or the `agentic-review` skill;
 - the Review hit the 5-Round cap.
 
 The user then merges, or tells you to. Otherwise merge it yourself once the Review is clean and CI is green (or the repo has no CI):
@@ -98,4 +98,4 @@ Remove any worktrees left (`git worktree list`, `git worktree remove`, `git work
 
 ## 10. Run the retro
 
-Whether the Spec pull request was merged or handed to the user, run the `retro` skill on this thread. If it finds a repeated Bug class to turn into a check, a regular-tier Implementer builds the check on a branch off main (you still write no code), and you open its pull request with `pr` and run the `code-review` Rounds. That pull request is a lone one off main, so merge it as `implement` does (squash-merge, or bring it to the user). A check that changes `REVIEW.md` goes to the user, not merged by you. Add the retro's outcome to your report.
+Whether the Spec pull request was merged or handed to the user, run the `retro` skill on this thread. If it finds a repeated Bug class to turn into a check, a regular-tier Implementer builds the check on a branch off main (you still write no code), and you open its pull request with `pr` and run the `agentic-review` Rounds. That pull request is a lone one off main, so merge it as `implement` does (squash-merge, or bring it to the user). A check that changes `REVIEW.md` goes to the user, not merged by you. Add the retro's outcome to your report.

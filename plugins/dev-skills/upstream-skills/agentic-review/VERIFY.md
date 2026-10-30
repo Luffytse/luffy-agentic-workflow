@@ -1,6 +1,6 @@
 # Verify
 
-The Verify stage of [`code-review`](SKILL.md). Verifiers are brand-new subagents on the regular tier.
+The Verify stage of [`agentic-review`](SKILL.md). Verifiers are brand-new subagents on the regular tier.
 
 - **Quick and Standard:** one Verifier checks every candidate Finding of the Review.
 - **Deep:** three Verifiers each check every candidate Finding, each with one stance (below), and their votes are combined by the rules at the end.

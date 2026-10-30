@@ -7,7 +7,7 @@ forked="$root/upstream-skills"
 fail=0
 bad() { echo "FAIL: $*"; fail=1; }
 
-kept="ask-matt wayfinder grill-with-docs grilling domain-modeling research prototype handoff to-spec to-tickets implement implement-spec tdd code-review pr retro diagnosing-bugs triage improve-codebase-architecture codebase-design setup-matt-pocock-skills wizard writing-for-agents"
+kept="ask-matt wayfinder grill-with-docs grilling domain-modeling research prototype handoff to-spec to-tickets implement implement-spec tdd agentic-review pr retro diagnosing-bugs triage improve-codebase-architecture codebase-design setup-matt-pocock-skills wizard writing-for-agents"
 dropped="teach to-questionnaire grill-me wait-what"
 
 # 1. exactly the 23 kept skills, each with a SKILL.md
@@ -94,7 +94,7 @@ fi
 
 # 7. docs index (ADR 0006): the rule file exists, writing skills link it, reading skills start at the index
 writers="domain-modeling/SKILL.md improve-codebase-architecture/SKILL.md triage/SKILL.md triage/OUT-OF-SCOPE.md retro/SKILL.md retro/BUG-CLASSES.md setup-matt-pocock-skills/SKILL.md research/SKILL.md grill-with-docs/SKILL.md"
-readers="tdd diagnosing-bugs improve-codebase-architecture pr to-spec to-tickets triage grill-with-docs wayfinder implement implement-spec code-review"
+readers="tdd diagnosing-bugs improve-codebase-architecture pr to-spec to-tickets triage grill-with-docs wayfinder implement implement-spec agentic-review"
 [ -f "$forked/domain-modeling/DOCS-INDEX.md" ] || bad "missing domain-modeling/DOCS-INDEX.md"
 for f in $writers; do
   grep -qF "DOCS-INDEX.md" "$forked/$f" || bad "writing skill file $f does not mention DOCS-INDEX.md"
@@ -105,22 +105,22 @@ for s in $readers; do
 done
 grep -qF 'docs/index.md' "$forked/setup-matt-pocock-skills/domain.md" || bad "domain.md template does not start at docs/index.md"
 
-# 8. code-review's reference files exist and SKILL.md links each one
+# 8. agentic-review's reference files exist and SKILL.md links each one
 for f in FINDERS.md VERIFY.md ROUNDS.md; do
-  if [ ! -f "$forked/code-review/$f" ]; then bad "missing code-review/$f"
-  elif ! grep -q "($f" "$forked/code-review/SKILL.md"; then bad "code-review/SKILL.md does not link $f"; fi
+  if [ ! -f "$forked/agentic-review/$f" ]; then bad "missing agentic-review/$f"
+  elif ! grep -q "($f" "$forked/agentic-review/SKILL.md"; then bad "agentic-review/SKILL.md does not link $f"; fi
 done
 
 # 9. retro turns repeated Bug classes into checks (ADR 0003): the procedure exists, SKILL.md links it,
-# and it reads the same Round and Ticket-check markers that code-review/ROUNDS.md writes
+# and it reads the same Round and Ticket-check markers that agentic-review/ROUNDS.md writes
 bc="$forked/retro/BUG-CLASSES.md"
-rounds="$forked/code-review/ROUNDS.md"
+rounds="$forked/agentic-review/ROUNDS.md"
 if [ ! -f "$bc" ]; then bad "missing retro/BUG-CLASSES.md"
 else
   grep -q "(BUG-CLASSES.md" "$forked/retro/SKILL.md" || bad "retro/SKILL.md does not link BUG-CLASSES.md"
   for m in '<!-- code-review kind=round' '<!-- code-review kind=ticket-check'; do
     grep -qF "$m" "$bc" || bad "BUG-CLASSES.md does not mention the marker $m"
-    grep -qF "$m" "$rounds" || bad "code-review/ROUNDS.md no longer has the marker $m that retro reads"
+    grep -qF "$m" "$rounds" || bad "agentic-review/ROUNDS.md no longer has the marker $m that retro reads"
   done
   grep -qF 'REVIEW.md' "$bc" || bad "BUG-CLASSES.md does not mention REVIEW.md"
 fi
@@ -136,41 +136,41 @@ for s in to-tickets wayfinder; do
 done
 
 # 11. implement is a Ticket thread's coordinator (ADR 0004): it hands the code to an Implementer,
-# builds through tdd, opens the pull request with pr, reviews with code-review, and squash-merges
+# builds through tdd, opens the pull request with pr, reviews with agentic-review, and squash-merges
 impl="$forked/implement/SKILL.md"
 if [ -f "$impl" ]; then
-  for s in tdd pr code-review; do
+  for s in tdd pr agentic-review; do
     grep -qF "\`$s\`" "$impl" || bad "implement/SKILL.md does not name the \`$s\` skill"
   done
   grep -qF 'Implementer' "$impl" || bad "implement/SKILL.md does not hand the work to an Implementer"
   grep -qiF 'squash' "$impl" || bad "implement/SKILL.md does not say lone tickets squash-merge"
 fi
 
-# 12. code-review applies REVIEW.md's Always check lines (issue #23): the standards Finder checks
+# 12. agentic-review applies REVIEW.md's Always check lines (issue #23): the standards Finder checks
 # each line against the diff, and SKILL.md and VERIFY.md say how those Findings are handled
 for f in FINDERS.md VERIFY.md SKILL.md; do
-  grep -qF 'Always check' "$forked/code-review/$f" || bad "code-review/$f does not mention REVIEW.md's Always check lines"
+  grep -qF 'Always check' "$forked/agentic-review/$f" || bad "agentic-review/$f does not mention REVIEW.md's Always check lines"
 done
-grep -qF '### `REVIEW.md` Always check' "$forked/code-review/FINDERS.md" || bad "code-review/FINDERS.md has no REVIEW.md Always check section for the standards Finder"
+grep -qF '### `REVIEW.md` Always check' "$forked/agentic-review/FINDERS.md" || bad "agentic-review/FINDERS.md has no REVIEW.md Always check section for the standards Finder"
 
-# 13. ask-matt describes implement as the lone-ticket coordinator, code-review as Rounds, and sends a
+# 13. ask-matt describes implement as the lone-ticket coordinator, agentic-review as Rounds, and sends a
 # Spec's tickets to implement-spec (issue #28), not as Upstream wrote them
 am="$forked/ask-matt/SKILL.md"
 if [ -f "$am" ]; then
   for w in 'same context window' 'two-axis'; do
     grep -qiF "$w" "$am" && bad "ask-matt/SKILL.md still says \"$w\""
   done
-  grep -qF 'Rounds' "$am" || bad "ask-matt/SKILL.md does not describe code-review's Rounds"
+  grep -qF 'Rounds' "$am" || bad "ask-matt/SKILL.md does not describe agentic-review's Rounds"
   # a Spec's tickets go to implement-spec, never one by one to implement (implement step 1)
   grep -qF '`/implement`** per ticket' "$am" && bad "ask-matt/SKILL.md still offers /implement per ticket for a Spec's tickets"
 fi
 
 # 14. implement-spec is a Spec thread's coordinator (ADR 0004, ADR 0005): Implementers build in
 # ticket worktrees made with git worktree add, through tdd; the Spec pull request is written with pr,
-# reviewed with code-review, and merged with a merge commit; no "integration branch" is left, here or in ask-matt
+# reviewed with agentic-review, and merged with a merge commit; no "integration branch" is left, here or in ask-matt
 spec="$forked/implement-spec/SKILL.md"
 if [ -f "$spec" ]; then
-  for s in tdd pr code-review; do
+  for s in tdd pr agentic-review; do
     grep -qF "\`$s\`" "$spec" || bad "implement-spec/SKILL.md does not name the \`$s\` skill"
   done
   grep -qF 'Implementer' "$spec" || bad "implement-spec/SKILL.md does not hand the work to Implementers"
@@ -180,7 +180,32 @@ if [ -f "$spec" ]; then
 fi
 grep -qiF 'integration branch' "$forked/ask-matt/SKILL.md" && bad "ask-matt/SKILL.md still says integration branch"
 
-# 15. retro files its suggestions as Retro issues (ADR 0007, "Filing"): the manifest names the dev-skills
+# 15. no skill tells an agent to run the built-in `code-review` (issue #50): our review skill is
+# `agentic-review`. Scoped to skill text (upstream-skills/ and skills/, *.md and *.yaml). The
+# `<!-- code-review kind=...` Round-comment markers are a data format, not a skill name, and
+# PATCHES.md, ADRs, evals and this script are outside the scope.
+if [ -d "$forked" ]; then
+  scan="$forked"; [ -d "$own" ] && scan="$scan $own"
+  # shellcheck disable=SC2086
+  if grep -rnE --include=*.md --include=*.yaml '`(dev-skills:)?code-review`|(^|[^a-z-])/code-review([^a-z-]|$)|dev-skills:code-review|^name:[[:space:]]*code-review|[Tt]he code-review skill' $scan; then
+    bad "a skill still tells an agent to run code-review; use agentic-review"
+  fi
+  [ -e "$forked/code-review" ] && bad "skill folder code-review still exists; it is agentic-review"
+fi
+
+# 16. no person's name in skill text (issue #49): text says "the user", never the maintainer's name.
+# The marketplace and repo names (luffy-dev, luffy-dev-skills), the GitHub owner Luffytse and the
+# project name luffydev are not people. Checks upstream-skills/, skills/ and the plugin README.
+# Paths are relative to $root (in a subshell, so cwd is unchanged), so a checkout under a path
+# such as ~/ cannot trip the check. awk keeps the script portable (no GNU-only flags).
+name_hits="$(cd "$root" && find upstream-skills skills README.md -type f -print0 2>/dev/null |
+  xargs -0 awk '{l=tolower($0); gsub(/luffy-dev-skills|luffy-dev|luffytse|luffydev/,"",l); if (l ~ /lufei|luffy/) print FILENAME ":" FNR ": " $0}' 2>/dev/null)"
+if [ -n "$name_hits" ]; then
+  echo "$name_hits"
+  bad "skill text names a person (Lufei or Luffy); say \"the user\""
+fi
+
+# 17. retro files its suggestions as Retro issues (ADR 0007, "Filing"): the manifest names the dev-skills
 # repo, retro/SKILL.md links the filing reference file, which names the label, title, vote and record,
 # triage skips Retro issues, and no skill text names a particular project, repo or person
 grep -qE '"repository"[[:space:]]*:[[:space:]]*"https://github.com/[^"/]+/[^"/]+"' "$root/.claude-plugin/plugin.json" || bad "plugin.json has no repository field with a GitHub URL"
@@ -197,7 +222,7 @@ if grep -rniE --include='*.md' --include='*.yaml' 'luffydev|luffytse|luffy-dev|l
   bad "skill text names a particular project, repo or person"
 fi
 
-# 16. implement and implement-spec end with a retro step (issue #42): their last step, after the report,
+# 18. implement and implement-spec end with a retro step (issue #42): their last step, after the report,
 # runs `retro` on the thread, so each build feeds the Retro backlog
 for s in implement implement-spec; do
   [ -f "$forked/$s/SKILL.md" ] || continue
@@ -206,7 +231,7 @@ for s in implement implement-spec; do
   printf '%s' "$last" | grep -qF 'REVIEW.md' || bad "$s/SKILL.md: the last step does not say a retro check that changes REVIEW.md goes to the user"
 done
 
-# 17. CI (issue #39, spec #38): a GitHub Actions workflow runs on pull requests and pushes to main,
+# 19. CI (issue #39, spec #38): a GitHub Actions workflow runs on pull requests and pushes to main,
 # installs Claude Code's CLI from npm, and runs this script and `claude plugin validate .`
 wf="$repo/.github/workflows/plugin-checks.yml"
 if [ ! -f "$wf" ]; then bad "missing .github/workflows/plugin-checks.yml"
@@ -218,7 +243,7 @@ else
   grep -qF 'claude plugin validate .' "$wf" || bad "plugin-checks.yml does not run claude plugin validate ."
 fi
 
-# 18. retro-planning works through one repo's Retro backlog (ADR 0007, "Retro planning"): our own skill
+# 20. retro-planning works through one repo's Retro backlog (ADR 0007, "Retro planning"): our own skill
 # exists, names the `retro-planning` record label, the cap of 3 and the labels its verdicts use, and
 # ask-matt routes a due Retro backlog to it. A presence check only: it does not test the rules' wording.
 rp="$root/skills/retro-planning/SKILL.md"

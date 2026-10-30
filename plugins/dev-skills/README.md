@@ -1,6 +1,6 @@
 # dev-skills
 
-Lufei's development skills as one Claude Code plugin: the path from `wayfinder` through specs, tickets and implementation to `code-review` and `retro`. It is a fork of [Matt Pocock's skills](https://github.com/mattpocock/skills) (23 of his 27) plus skills of our own. Every skill is model-invoked, so an agent in a project thread (where nobody types slash commands) can start any of them. See [ADR 0001](../../docs/adr/0001-dev-skills-is-one-plugin-forked-from-matt-pocock.md).
+The development skills as one Claude Code plugin: the path from `wayfinder` through specs, tickets and implementation to `agentic-review` and `retro`. It is a fork of [Matt Pocock's skills](https://github.com/mattpocock/skills) (23 of his 27) plus skills of our own. Every skill is model-invoked, so an agent in a project thread (where nobody types slash commands) can start any of them. See [ADR 0001](../../docs/adr/0001-dev-skills-is-one-plugin-forked-from-matt-pocock.md).
 
 ## Install
 
@@ -27,7 +27,7 @@ plugins/dev-skills/
 ├── .claude-plugin/plugin.json   # lists both skill folders below
 ├── upstream-skills/             # forked from Upstream; every change is in PATCHES.md
 ├── skills/                      # our own skills: setup-project, retro-planning
-├── evals/                       # our own skill evals, e.g. evals/code-review/ (planted-bugs fixture)
+├── evals/                       # our own skill evals, e.g. evals/agentic-review/ (planted-bugs fixture)
 ├── PATCHES.md                   # what we changed in Upstream text, and the Upstream commit
 ├── LICENSE-mattpocock-skills    # Upstream's MIT licence
 └── scripts/check-plugin.sh      # checks the layout and the Patches
@@ -37,7 +37,7 @@ Forked and own skills live in separate folders so it is always clear which text 
 
 ## Our own skills
 
-- `setup-project`: interviews Lufei with `grilling` and drafts the project instructions that tell the coordinator how to brief build threads. After approval the thread sends the text to the coordinator to save; it never edits project settings itself.
+- `setup-project`: interviews the user with `grilling` and drafts the project instructions that tell the coordinator how to brief build threads. After approval the thread sends the text to the coordinator to save; it never edits project settings itself.
 - `retro-planning`: works through one repo's Retro backlog in a batch (ADR 0007): groups the Retro issues by root cause, gets the user's approval of a verdict per group, turns the top groups into `ready-for-agent` Tickets, closes one-offs, expired issues and issues whose Ticket has closed, leaves held-back and declined groups open, and files a closed `retro-planning` record.
 
 ## Model tiers

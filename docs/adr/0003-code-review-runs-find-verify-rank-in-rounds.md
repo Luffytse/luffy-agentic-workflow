@@ -1,6 +1,6 @@
-# code-review runs Find, Verify and Rank, in rounds of 2 to 5
+# agentic-review runs Find, Verify and Rank, in rounds of 2 to 5
 
-Our `code-review` skill follows the shape of Claude Code's own Code Review (several Finders, then a verify step that drops false positives, then ranking by Severity), adapted to agents that review their own pull requests in a session. We kept Upstream's two Finders (standards and spec) and added cheap adversarial Finders, a regular-tier Verifier, and Rounds that stop early once nothing Important remains.
+Our `agentic-review` skill follows the shape of Claude Code's own Code Review (several Finders, then a verify step that drops false positives, then ranking by Severity), adapted to agents that review their own pull requests in a session. We kept Upstream's two Finders (standards and spec) and added cheap adversarial Finders, a regular-tier Verifier, and Rounds that stop early once nothing Important remains.
 
 ## How a Review runs
 
@@ -20,7 +20,7 @@ Every Round starts brand-new Finder and Verifier agents; none is reused from an 
 - **Standard (default):** all four Finders, one Verifier.
 - **Deep:** the Finders above plus a **security Finder** on the premium tier, and three Verifiers that each take a different stance: a **tracer** that follows the code path to show the bug happens, a **skeptic** that argues it is a false positive, and a **spec checker** that judges it against the spec, ADRs and tests. Every Finding, the security Finder's included, is kept only when at least two of the three agree.
 
-Deep is for risky pull requests (security, money, deleting data, or anything Lufei marks), Quick for docs-only or trivial ones, and Standard for the rest. The depth is chosen once per pull request and stays the same across its Rounds unless Lufei changes it.
+Deep is for risky pull requests (security, money, deleting data, or anything the user marks), Quick for docs-only or trivial ones, and Standard for the rest. The depth is chosen once per pull request and stays the same across its Rounds unless the user changes it.
 
 A repo can add a short `REVIEW.md` at its root saying what Important means there, what to skip, and what to always check.
 
@@ -33,7 +33,7 @@ A Round is **clean** when, after its Verify, no Important is open: it found no n
 - **Round 1** always leads to Round 2. Its fixes and its "fix" Nits are committed, and Round 2 reviews them.
 - **Round 2 to Round 4**, if not clean: the fixes and "fix" Nits are committed, and the next Round reviews them.
 - **Round 2 to Round 5**, if clean: its "fix" Nits go into one last commit that no further Round reviews, and the pull request is ready to merge.
-- **Round 5**, if not clean: the agent stops and tells Lufei what kept coming up, since the plan may need discussing.
+- **Round 5**, if not clean: the agent stops and tells the user what kept coming up, since the plan may need discussing.
 
 Once the pull request's last Round is done, each Pre-existing Bug class becomes one GitHub issue labelled `needs-triage`, so it is tracked without blocking the pull request. When a Bug class had more than one instance in a pull request (in one Finding or across Rounds), `retro` turns it into a deterministic check or a `REVIEW.md` line, so later Reviews do not have to catch it again.
 
@@ -41,5 +41,5 @@ Once the pull request's last Round is done, each Pre-existing Bug class becomes 
 
 - **Cheap Verifiers.** Cheaper, but verifying is a judgement task, and cheap Verifiers checking cheap Finders tend to share their blind spots. A Verifier reads one Finding and the files it cites, so the regular tier costs little extra.
 - **Two Verifiers that must both agree on Deep.** One wrong Verifier would drop a real bug. Three with a majority, each with a different stance, gives votes that are more independent than three copies of the same prompt.
-- **A separate premium whole-design review.** The Claude Code team's process (blog post "How the Claude Code team does code review", 2026-10-15) has no such reviewer: people keep direction and architecture. Design questions come to Lufei during grilling, the spec Finder and adversarial angles check ADRs, and Deep covers risky pull requests.
+- **A separate premium whole-design review.** The Claude Code team's process (blog post "How the Claude Code team does code review", 2026-10-15) has no such reviewer: people keep direction and architecture. Design questions come to the user during grilling, the spec Finder and adversarial angles check ADRs, and Deep covers risky pull requests.
 - **Claude Code's cap of 3 Rounds** (after three Rounds their reviewer asks the author to reconsider the approach, per the same post). Their review prompts and project history let most pull requests pass in one Round. We keep two full-PR Rounds and a cap of 5, with the later Rounds limited to new commits.

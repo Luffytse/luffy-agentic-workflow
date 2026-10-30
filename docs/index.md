@@ -24,17 +24,17 @@ Read this first, then open only the docs whose line fits your work. Specs and ti
 
 ## Building
 
-- [ADR 0004](adr/0004-build-threads-coordinate-and-subagents-code.md): build threads coordinate, Implementer subagents code, and when Lufei must review. Read when working on `implement`, `implement-spec`, `to-tickets` or `setup-project`.
+- [ADR 0004](adr/0004-build-threads-coordinate-and-subagents-code.md): build threads coordinate, Implementer subagents code, and when the user must review. Read when working on `implement`, `implement-spec`, `to-tickets` or `setup-project`.
 - [ADR 0005](adr/0005-a-spec-is-one-long-lived-branch.md): the spec branch model, ticket worktrees and merges. Read when working on `implement-spec` or anything about branches.
 - [implement-spec eval RESULTS.md](../plugins/dev-skills/evals/implement-spec/RESULTS.md): one entry per build-flow check of `implement-spec`. Read to see how `implement-spec` did in its build-flow check.
 
 ## Code review
 
-- [ADR 0003](adr/0003-code-review-runs-find-verify-rank-in-rounds.md): Find, Verify, Rank, depths and Rounds. Read when working on `code-review`, `retro` or `pr`.
-- [code-review eval README](../plugins/dev-skills/evals/code-review/README.md): the planted-bugs fixture pull request and how to rerun it. Read after changing `code-review`. The fixture's own files under `base/` and `after/` are test data and get no lines here.
-- [code-review eval SPEC.md](../plugins/dev-skills/evals/code-review/SPEC.md): the ticket the fixture pull request builds, given to the Review as its spec. Read when changing the fixture.
-- [code-review eval EXPECTED.md](../plugins/dev-skills/evals/code-review/EXPECTED.md): the planted Findings and false alarms a run is scored against. Read when scoring a run or changing the fixture; keep it away from the reviewing session.
-- [code-review eval RESULTS.md](../plugins/dev-skills/evals/code-review/RESULTS.md): one entry per eval run. Read to see how `code-review` did last time.
+- [ADR 0003](adr/0003-code-review-runs-find-verify-rank-in-rounds.md): Find, Verify, Rank, depths and Rounds. Read when working on `agentic-review`, `retro` or `pr`.
+- [agentic-review eval README](../plugins/dev-skills/evals/agentic-review/README.md): the planted-bugs fixture pull request and how to rerun it. Read after changing `agentic-review`. The fixture's own files under `base/` and `after/` are test data and get no lines here.
+- [agentic-review eval SPEC.md](../plugins/dev-skills/evals/agentic-review/SPEC.md): the ticket the fixture pull request builds, given to the Review as its spec. Read when changing the fixture.
+- [agentic-review eval EXPECTED.md](../plugins/dev-skills/evals/agentic-review/EXPECTED.md): the planted Findings and false alarms a run is scored against. Read when scoring a run or changing the fixture; keep it away from the reviewing session.
+- [agentic-review eval RESULTS.md](../plugins/dev-skills/evals/agentic-review/RESULTS.md): one entry per eval run. Read to see how `agentic-review` did last time.
 
 ## Retros
 

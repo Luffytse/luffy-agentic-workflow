@@ -1,6 +1,6 @@
 # luffy-dev-skills
 
-Lufei's plugin marketplace: the skills Lufei's coding agents use, packaged so every project and every agent session can load them.
+A plugin marketplace: the skills coding agents use, packaged so every project and every agent session can load them.
 
 ## Packaging
 
@@ -87,7 +87,7 @@ _Avoid_: section, module
 ## Code review
 
 **Review**:
-One run of the `code-review` skill over a pull request (or, for a Ticket check, over a Ticket branch's diff), in three stages: find candidate Findings, verify them, then rank the survivors.
+One run of the `agentic-review` skill over a pull request (or, for a Ticket check, over a Ticket branch's diff), in three stages: find candidate Findings, verify them, then rank the survivors.
 
 **Round**:
 One Review plus the fix commits that follow it (the final commit of "fix" Nits is not reviewed by another Round). Rounds 1 and 2 are **full-PR rounds**; rounds 3 to 5 are **commit rounds**, which review only the commits added since the last Round.

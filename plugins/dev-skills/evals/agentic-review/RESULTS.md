@@ -1,6 +1,6 @@
 # Results
 
-One entry per run, newest first. Rerun when `code-review` changes, and record the plugin version from `.claude-plugin/plugin.json`.
+One entry per run, newest first. Rerun when `agentic-review` changes, and record the plugin version from `.claude-plugin/plugin.json`.
 
 ## Template
 
@@ -18,7 +18,7 @@ One entry per run, newest first. Rerun when `code-review` changes, and record th
 | F2 | dropped? | | | |
 
 Extras: <each other Finding, real or false>
-Pass: yes | no. <one line on what to change in code-review, if anything>
+Pass: yes | no. <one line on what to change in agentic-review, if anything>
 ```
 
 ## Runs
@@ -55,4 +55,4 @@ Pass: yes. F1 and F2 tempted no Finder, so this run did not test Verify dropping
 Extras (all real): duplicate names collapse shares, so they no longer add up to the total (`split.py:9-11`; Important 2 to 1, not planted but a fair reading of the spec's "add up to exactly the total"); payer not in the people list (Nit, skip 2 to 1); CLI tracebacks (Nit, skip); tests (Nit, fix); `settle` parameter shadowing and bare tuples (kept 2 to 1 over the skeptic, Nit, skip). Duplicated render loops dropped 3 to 0. Five Nits reported, the "fix" one first.
 Pass: yes. Same gap on F1 and F2.
 
-What these runs changed in `code-review`: the first attempt ran the Review inside a subagent, which cannot start subagents of its own and stopped, so `SKILL.md` now says the Review runs in the top-level session. Cheap Finders quoted wrong line numbers (from a concatenated listing); the Verifier corrected them, as its brief asks.
+What these runs changed in `agentic-review`: the first attempt ran the Review inside a subagent, which cannot start subagents of its own and stopped, so `SKILL.md` now says the Review runs in the top-level session. Cheap Finders quoted wrong line numbers (from a concatenated listing); the Verifier corrected them, as its brief asks.
