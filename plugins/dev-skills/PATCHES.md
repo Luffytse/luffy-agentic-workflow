@@ -561,6 +561,19 @@ What:
 
 Merging an Upstream update: take Upstream's text, then re-append the section to `ROUNDS.md`, re-add the two pointer sentences to its Round loop (after the fixes paragraph and on the clean "Round 2 to Round 5" bullet), the "user kept the design" clauses (Rank step 2, the clean test, Nit status, the Round 1 bullet, Ticket checks, and `SKILL.md` step 1), and in `implement` and `implement-spec` the three parentheses and the two "one more Round instead" sentences. Check 33 fails if the section heading or one of its key phrases is missing, if `ROUNDS.md` has fewer than 3 links to the section, or if `implement` has fewer than 1 or `implement-spec` fewer than 2; it does not check the "user kept the design" clauses.
 
+## Patch 30: `to-tickets` and `wayfinder` offer `setup-project` only for a new repo, kind of thread or standing rule (`to-tickets/`, `wayfinder/`)
+
+Why: issue #142 (absorbs #120 and #121). `setup-project` now writes how the project works and never the state of its work (open specs, the map), so a new spec or map is no reason to offer it.
+
+What:
+
+- `to-tickets/SKILL.md` (step 6) and `wayfinder/SKILL.md` ("Offer `setup-project`"): the list of what counts as a change to what threads need drops "a new spec or map to point at" (wayfinder: "a new map to point at" and "(when the way to the destination is now clear) build threads to start"); it is now only a new repo, a new kind of thread or a new standing rule. Both still name `` `setup-project` `` (check 10).
+- `scripts/check-plugin.sh`: new check 34 (`setup-project/SKILL.md` tells the coordinator to find open specs, plannings and tickets on the tracker, asks for the tier-to-model map, carries the rule to start each thread on its tier's model, no longer links the map or open specs or says "pointers stay current", and names no vendor model; `to-tickets` and `wayfinder` no longer offer it for a new spec or map).
+- Our own text, not Upstream: `setup-project/SKILL.md`, `setup-dev-skills/SKILL.md` (offers `setup-project` only if the project's instructions do not yet cover the repo), the plugin `README.md` and ADR 0004.
+- `.claude-plugin/plugin.json`: version 0.22.1 to 0.22.2.
+
+Merging an Upstream update: carry Upstream's changes to both files over by hand and re-apply the narrowed list above.
+
 ## Not a Patch: `setup-dev-skills` seed text (issue #144)
 
 Our own, not Upstream. The `setup-dev-skills` skill's `SKILL.md` step 1 names both remote URL forms, the GitHub seed gives REST routes for pull requests and open blockers, and the seed files name skills without a leading slash.

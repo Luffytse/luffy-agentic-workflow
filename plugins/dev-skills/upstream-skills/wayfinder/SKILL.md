@@ -131,4 +131,4 @@ The user may run unblocked tickets in parallel, so expect other sessions to be e
 
 ## Offer `setup-project`
 
-At the end of either mode, decide whether this session changed what the project's threads need: a new map to point at, a new repo, a new kind of thread, a new standing rule, or (when the way to the destination is now clear) build threads to start. If so, offer the user `setup-project` in one line naming what changed. Only offer: call the Skill tool with "setup-project" only after the user says yes. If nothing changed, say nothing about it.
+At the end of either mode, decide whether this session changed what the project's threads need: a new repo, a new kind of thread, or a new standing rule. If so, offer the user `setup-project` in one line naming what changed. Only offer: call the Skill tool with "setup-project" only after the user says yes. If nothing changed, say nothing about it.

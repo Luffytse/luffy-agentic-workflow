@@ -106,4 +106,4 @@ Done when each row is "ok", a failure with its effect, or "not checked" with the
 
 ### 6. Done
 
-Tell the user the setup is complete, which files changed, which labels were created, and the settings report. Mention they can edit `docs/agents/*.md` directly; re-run this skill to bring the files up to date after the plugin changes them, or to switch to other label names. Then offer `setup-project`, which drafts the project instructions for the coordinator.
+Tell the user the setup is complete, which files changed, which labels were created, and the settings report. Mention they can edit `docs/agents/*.md` directly; re-run this skill to bring the files up to date after the plugin changes them, or to switch to other label names. Then, if the project's instructions do not yet cover this repo, offer `setup-project`, which drafts them for the coordinator.

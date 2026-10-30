@@ -487,5 +487,22 @@ for fm in implement:1 implement-spec:2; do
   n=$(grep -oF 'ROUNDS.md#design-findings-go-to-the-user' "$f" | wc -l | tr -d ' ')
   [ "$n" -ge "$want" ] || bad "${fm%%:*}/SKILL.md has $n pointers sending design Findings to the user; expected at least $want"
 done
+# 34. setup-project writes how the project works, not the state of its work, and maps tiers to models
+# (issue #142, absorbs #120 and #121): it no longer gathers open specs or the map as state, tells the
+# coordinator to look them up on the tracker, asks for the tier-to-model map and writes it with the
+# coordinator rule; skill text names no vendor model; no skill offers it to keep pointers current.
+if [ -f "$sp" ]; then
+  grep -qF 'open specs, plannings and tickets' "$sp" || bad "setup-project/SKILL.md does not tell the coordinator to find open specs, plannings and tickets on the tracker"
+  grep -qF 'docs/agents/issue-tracker.md' "$sp" || bad "setup-project/SKILL.md does not point the coordinator at docs/agents/issue-tracker.md"
+  grep -qF 'tier-to-model map' "$sp" || bad "setup-project/SKILL.md does not ask for the tier-to-model map"
+  grep -qF "start each thread on the model mapped to its brief's Model tier" "$sp" || bad "setup-project/SKILL.md has no coordinator rule to start each thread on its tier's model"
+  grep -qF 'pointers stay current' "$sp" && bad "setup-project/SKILL.md description still says pointers stay current"
+  grep -qiE 'wayfinder map and the open specs|Link the wayfinder map|each open spec' "$sp" && bad "setup-project/SKILL.md still gathers or links open specs or the map as state"
+  grep -qiE 'haiku|sonnet|opus|claude-|gpt-|gemini' "$sp" && bad "setup-project/SKILL.md names a vendor model"
+fi
+for s in to-tickets wayfinder; do
+  grep -qiE 'a new (spec or map|spec|map) to point at' "$forked/$s/SKILL.md" && bad "$s still offers setup-project for a new spec or map to point at"
+  grep -qF 'build threads to start' "$forked/$s/SKILL.md" && bad "$s still offers setup-project because build threads are ready to start"
+done
 [ "$fail" -eq 0 ] && echo "OK: dev-skills plugin checks passed ($count skills)"
 exit "$fail"

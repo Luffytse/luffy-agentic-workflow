@@ -1,9 +1,9 @@
 ---
 name: setup-project
-description: Drafts a project's instructions for its coordinator. Use when the user wants to write or update a project's instructions, or when wayfinder or to-tickets offers it at their end.
+description: Drafts a project's instructions for its coordinator: how its threads work, never the state of its work. Use when the user wants to write or update a project's instructions, or when a new repo, kind of thread or standing rule means they are out of date.
 ---
 
-Draft the **project instructions**: the short text a project's coordinator reads before it starts a thread. It says how threads work and what every brief contains, and points at the map, specs and docs. The draft lives in the conversation until the coordinator saves it; this thread writes no file (repo `CLAUDE.md` included) and changes no project setting.
+Draft the **project instructions**: the short text a project's coordinator reads before it starts a thread. It says how threads work and what every brief contains, and points at the docs. It never holds the state of the work (the map, open specs, plannings or tickets): those change faster than the instructions, so it tells the coordinator where to look them up. The draft lives in the conversation until the coordinator saves it; this thread writes no file (repo `CLAUDE.md` included) and changes no project setting.
 
 ## 1. Explore
 
@@ -11,7 +11,7 @@ Facts are your job. Gather:
 
 - The existing project instructions. If your context does not show them, ask the user (or the coordinator) for the current text; a re-run starts from it and proposes the full new text with a diff.
 - Each repo's `CLAUDE.md` / `AGENTS.md` and `docs/index.md`.
-- The tracker (`docs/agents/issue-tracker.md` names it; if absent, ask the user where it is): the wayfinder map issue and the open specs.
+- Which tracker the project uses (`docs/agents/issue-tracker.md` names it; if absent, ask the user where it is). Do not gather the map, open specs or tickets: they are state, and the coordinator looks them up.
 
 Record "none yet" for anything that does not exist, and carry on with the links you have. Done when each of the above is a link, a text, or "none yet".
 
@@ -24,6 +24,7 @@ Settle each of these, skipping what exploration already answered:
 - **Phases**: the coordinator's project threads, the Build threads (Spec threads run `implement-spec`, Ticket threads run `implement`), and planning threads if the project has them.
 - **Skill per thread kind**: which skill each runs (`wayfinder`, `to-spec`, `to-tickets`, `implement-spec`, `implement`).
 - **Brief contents**: what every brief carries. Default: skill, Model tier, repo(s), Review depth, link to the ticket or spec.
+- **Tier-to-model map**: ask the user which model each Model tier (cheap, regular, premium) maps to in their harness. Vendor model names go only into the user's drafted instructions, never into skill text (the README table is the plugin default; the user's map overrides it). If the user has no map yet, record "not needed" and draft the rule without the map.
 - **Standing rules**: how many questions a thread asks the user at once, review Rounds, who merges, how many Build threads run at once, and any rule of the user's own.
 
 Done when every item has an answer or a recorded "not needed".
@@ -32,11 +33,12 @@ Done when every item has an answer or a recorded "not needed".
 
 Write the full instructions as pointer-style text:
 
-- Link the wayfinder map, each open spec and `docs/index.md` (Build threads start there; if it is "none yet", say the index is still to be created), and leave their contents in those pages.
-- Name Model tiers (cheap, regular, premium).
+- Link `docs/index.md` (Build threads start there; if it is "none yet", say the index is still to be created), and leave its contents in that page.
+- Tell the coordinator to find open specs, plannings and tickets on the tracker when it needs them: name the tracker (and the repo, if the project has several) and say `docs/agents/issue-tracker.md` is where it is documented, so the coordinator is not sent to a file that may be absent or unreadable. Link no map, spec or ticket as state.
+- Name Model tiers (cheap, regular, premium), write the user's tier-to-model map, and add the rule: "start each thread on the model mapped to its brief's Model tier".
 - Keep it short enough to read in one minute, and cut what the skills already do by default.
 
-On a re-run, the draft is the full new text; show it with the diff against the existing text.
+On a re-run, the draft is the full new text; show it with the diff against the existing text. A re-run also removes any state lines the existing text holds (open specs, plannings, the map).
 
 ## 4. Approve
 

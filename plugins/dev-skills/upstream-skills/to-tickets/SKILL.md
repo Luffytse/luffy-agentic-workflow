@@ -113,4 +113,4 @@ In either form, avoid specific file paths or code snippets: they go stale fast. 
 
 ### 6. Offer `setup-project`
 
-Once the tickets are published, decide whether they changed what the project's threads need: a new spec or map to point at, a new repo, a new kind of thread, or a new standing rule. If so, offer the user `setup-project` in one line naming what changed. Only offer: call the Skill tool with "setup-project" only after the user says yes. If nothing changed, say nothing about it.
+Once the tickets are published, decide whether they changed what the project's threads need: a new repo, a new kind of thread, or a new standing rule. If so, offer the user `setup-project` in one line naming what changed. Only offer: call the Skill tool with "setup-project" only after the user says yes. If nothing changed, say nothing about it.
