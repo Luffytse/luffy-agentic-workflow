@@ -193,5 +193,17 @@ if [ -d "$forked" ]; then
   [ -e "$forked/code-review" ] && bad "skill folder code-review still exists; it is agentic-review"
 fi
 
+# 16. no person's name in skill text (issue #49): text says "the user", never the maintainer's name.
+# The marketplace and repo names (luffy-dev, luffy-dev-skills), the GitHub owner Luffytse and the
+# project name luffydev are not people. Checks upstream-skills/, skills/ and the plugin README.
+# Paths are relative to $root (in a subshell, so cwd is unchanged), so a checkout under a path
+# such as ~/ cannot trip the check. awk keeps the script portable (no GNU-only flags).
+name_hits="$(cd "$root" && find upstream-skills skills README.md -type f -print0 2>/dev/null |
+  xargs -0 awk '{l=tolower($0); gsub(/luffy-dev-skills|luffy-dev|luffytse|luffydev/,"",l); if (l ~ /lufei|luffy/) print FILENAME ":" FNR ": " $0}' 2>/dev/null)"
+if [ -n "$name_hits" ]; then
+  echo "$name_hits"
+  bad "skill text names a person (Lufei or Luffy); say \"the user\""
+fi
+
 [ "$fail" -eq 0 ] && echo "OK: dev-skills plugin checks passed ($count skills)"
 exit "$fail"

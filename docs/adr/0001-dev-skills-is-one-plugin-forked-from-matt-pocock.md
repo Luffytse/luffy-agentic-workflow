@@ -1,6 +1,6 @@
 # dev-skills is one plugin, forked from Matt Pocock's skills
 
-Our development skills ship as one plugin, `dev-skills`, in this repo's `luffy-dev` marketplace. It is a fork of Matt Pocock's skills (`mattpocock/skills`), not his own plugin installed as-is, plus skills of our own. We forked because Lufei mostly works through Claude project threads, where a coordinator starts each thread and nobody types slash commands, and 16 of Upstream's 27 skills set `disable-model-invocation: true`, so a thread could never start them. In the fork every skill is model-invoked, at the cost of one description line per skill in each session.
+Our development skills ship as one plugin, `dev-skills`, in this repo's `luffy-dev` marketplace. It is a fork of Matt Pocock's skills (`mattpocock/skills`), not his own plugin installed as-is, plus skills of our own. We forked because the user mostly works through Claude project threads, where a coordinator starts each thread and nobody types slash commands, and 16 of Upstream's 27 skills set `disable-model-invocation: true`, so a thread could never start them. In the fork every skill is model-invoked, at the cost of one description line per skill in each session.
 
 ## Considered options
 

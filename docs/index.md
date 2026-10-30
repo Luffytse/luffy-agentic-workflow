@@ -24,7 +24,7 @@ Read this first, then open only the docs whose line fits your work. Specs and ti
 
 ## Building
 
-- [ADR 0004](adr/0004-build-threads-coordinate-and-subagents-code.md): build threads coordinate, Implementer subagents code, and when Lufei must review. Read when working on `implement`, `implement-spec`, `to-tickets` or `setup-project`.
+- [ADR 0004](adr/0004-build-threads-coordinate-and-subagents-code.md): build threads coordinate, Implementer subagents code, and when the user must review. Read when working on `implement`, `implement-spec`, `to-tickets` or `setup-project`.
 - [ADR 0005](adr/0005-a-spec-is-one-long-lived-branch.md): the spec branch model, ticket worktrees and merges. Read when working on `implement-spec` or anything about branches.
 - [implement-spec eval RESULTS.md](../plugins/dev-skills/evals/implement-spec/RESULTS.md): one entry per build-flow check of `implement-spec`. Read to see how `implement-spec` did in its build-flow check.
 

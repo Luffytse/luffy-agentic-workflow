@@ -307,6 +307,16 @@ What (Upstream text changed):
 
 Merging an Upstream update: Upstream's skill is still `code-review`. Merge its text into `agentic-review/` and keep the name `agentic-review`.
 
+## Patch 14: no person's name in skill text (no Upstream text changed)
+
+Why: issue #49. The plugin will be shared, so skill and doc text says "the user", never the maintainer's name.
+
+What:
+
+- No text under `upstream-skills/` changed: it contained no person's name, so there is nothing to re-apply when merging an Upstream update.
+- `scripts/check-plugin.sh`: new check 16 fails if `upstream-skills/`, `skills/` or the plugin `README.md` contains "Lufei" or "Luffy" (case-insensitive), after removing `luffy-dev-skills`, `luffy-dev`, `Luffytse` and `luffydev`. It matches file contents only, not paths.
+- `.claude-plugin/plugin.json`: version 0.9.0 to 0.9.1, and the description no longer says whose skills they are.
+
 ## Vendor model names in Upstream text
 
 None in the kept skills at the Base commit, so no Patch was needed for ADR 0002 (checked for ticket #4: grep for `haiku`, `sonnet`, `opus`, `claude-`, `gpt-`, `gemini` over `upstream-skills/`). Some kept skills start subagents (for example `grilling`, `wayfinder`, `code-review`, `implement-spec`), but none picks a model for them. Spec #1 adds tiers in later tickets (the `code-review` Finders and Verifiers, and the `implement` and `implement-spec` Implementers; the tier on each ticket from `to-tickets` is Patch 7, the `implement` Implementer's tier is Patch 8, and the `implement-spec` Implementers' tiers are Patch 11); each of those edits gets its own Patch here.

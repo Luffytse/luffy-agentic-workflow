@@ -1,6 +1,6 @@
 # dev-skills
 
-Lufei's development skills as one Claude Code plugin: the path from `wayfinder` through specs, tickets and implementation to `agentic-review` and `retro`. It is a fork of [Matt Pocock's skills](https://github.com/mattpocock/skills) (23 of his 27) plus skills of our own. Every skill is model-invoked, so an agent in a project thread (where nobody types slash commands) can start any of them. See [ADR 0001](../../docs/adr/0001-dev-skills-is-one-plugin-forked-from-matt-pocock.md).
+The development skills as one Claude Code plugin: the path from `wayfinder` through specs, tickets and implementation to `agentic-review` and `retro`. It is a fork of [Matt Pocock's skills](https://github.com/mattpocock/skills) (23 of his 27) plus skills of our own. Every skill is model-invoked, so an agent in a project thread (where nobody types slash commands) can start any of them. See [ADR 0001](../../docs/adr/0001-dev-skills-is-one-plugin-forked-from-matt-pocock.md).
 
 ## Install
 
@@ -37,7 +37,7 @@ Forked and own skills live in separate folders so it is always clear which text 
 
 ## Our own skills
 
-- `setup-project`: interviews Lufei with `grilling` and drafts the project instructions that tell the coordinator how to brief build threads. After approval the thread sends the text to the coordinator to save; it never edits project settings itself.
+- `setup-project`: interviews the user with `grilling` and drafts the project instructions that tell the coordinator how to brief build threads. After approval the thread sends the text to the coordinator to save; it never edits project settings itself.
 
 ## Model tiers
 

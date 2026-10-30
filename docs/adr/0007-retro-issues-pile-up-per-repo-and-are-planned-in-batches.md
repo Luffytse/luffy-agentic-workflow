@@ -24,7 +24,7 @@ It runs per repo and reads only that repo's Retro issues; the `dev-skills` repo 
 7. Recheck whether the problem behind an earlier fix has come back. If it has, the fix did not work, and that group goes first.
 8. End by filing a **closed** record issue titled `Retro planning <yyyy-mm-dd>`, label `retro-planning`, listing every verdict and vote count. `retro` reads the newest record for its 2-week clock.
 
-The thresholds (10, 2 weeks with 4, at most 3 groups, 2 plannings) are Lufei's choices, not taken from a source.
+The thresholds (10, 2 weeks with 4, at most 3 groups, 2 plannings) are the user's choices, not taken from a source.
 
 ## Considered options
 

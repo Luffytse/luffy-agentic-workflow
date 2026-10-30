@@ -14,7 +14,7 @@
     {
       "name": "dev-skills",
       "source": "./plugins/dev-skills",
-      "description": "Lufei's development skills: a fork of Matt Pocock's skills (wayfinder, grilling, specs, tickets, TDD, code review) made model-invocable, plus our own."
+      "description": "Development skills: a fork of Matt Pocock's skills (wayfinder, grilling, specs, tickets, TDD, code review) made model-invocable, plus our own."
     }
   ]
 }

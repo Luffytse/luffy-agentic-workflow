@@ -1,6 +1,6 @@
 # luffy-dev-skills
 
-Lufei's plugin marketplace: the skills Lufei's coding agents use, packaged so every project and every agent session can load them.
+A plugin marketplace: the skills coding agents use, packaged so every project and every agent session can load them.
 
 ## Packaging
 
