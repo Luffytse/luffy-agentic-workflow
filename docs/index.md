@@ -42,6 +42,10 @@ Read this first, then open only the docs whose line fits your work. Specs and ti
 
 - [ADR 0007](adr/0007-retro-issues-pile-up-per-repo-and-are-planned-in-batches.md): how `retro` files Retro issues, routes them to the repo where the fix lands, and how `retro-planning` works through a repo's Retro backlog. Read when working on `retro`, `retro-planning`, or the end of `implement` and `implement-spec`.
 
+## Out of scope
+
+- [.out-of-scope/architecture-report-location.md](../.out-of-scope/architecture-report-location.md): why `improve-codebase-architecture` keeps its report in the OS temp directory. Read when triaging a request to move or share that report.
+
 ## Docs
 
 - [ADR 0006](adr/0006-docs-are-found-through-one-index.md): this index, glossary pages per area, and which skills keep the index up to date. Read when a skill writes or reads docs.
