@@ -238,8 +238,8 @@ What:
   - "closes out with **`/code-review`**, a two-axis review (Standards + Spec) of the diff. `/implement` runs both per ticket;": now describes Finders, a Verifier and ranking by Severity, run in Rounds on a pull request, and says that in `/implement` the Implementer drives `/tdd` and the thread runs `/code-review`.
   - "Each `/implement` then starts fresh, working from the ticket." (Context hygiene): now "starts in its own fresh thread".
 - Left as Upstream wrote them, for ticket #11: the `/implement-spec` bullet ("integration branch"), and the clause "`/implement-spec`'s implementers each drive `/tdd`, and it runs one `/code-review` over the integration branch". Patch 11 (ticket #11) has since rewritten both.
-- Still open, and not part of Patch 11: the Yes-branch's routing of a Spec's tickets to `/implement` (the bullet's wording is edited above, but `implement` step 1 now sends Spec tickets to `implement-spec`). It is tracked in #28.
-- Checked and kept as they are, because they still fit: Context hygiene's `/clear` before `/retro` (it is about clearing a session, not about `/implement`); the wayfinder on-ramp's "`/to-tickets` and `/implement` as usual" and "go straight to `/implement`"; the triage line ("which **`/implement`** later picks up").
+- The Yes-branch's routing of a Spec's tickets to `/implement` was left open here; Patch 12 fixed it.
+- Checked and kept as they are, because they still fit: Context hygiene's `/clear` before `/retro` (it is about clearing a session, not about `/implement`); the wayfinder on-ramp's "go straight to `/implement`" (its "`/to-tickets` and `/implement` as usual" was later changed to `/implement-spec` by Patch 12); the triage line ("which **`/implement`** later picks up").
 - `scripts/check-plugin.sh`: new check 13 (`ask-matt/SKILL.md` must not say "same context window" or "two-axis", and must mention Rounds).
 - `.claude-plugin/plugin.json`: version 0.7.1 to 0.7.2.
 
@@ -270,11 +270,27 @@ What:
 - `agents/openai.yaml`: `short_description` now "Coordinate one spec: worktree Implementers, ticket checks, spec PR, Rounds".
 - After the build-flow check: step 2 says "fetch main" means `git fetch origin main` and comparing against `origin/main`, never a stale local `main`; step 6.2 says conflict resolutions from the ticket's re-merge are reviewed by the Spec pull request's Rounds 1 and 2, with no new ticket check.
 - New file (ours, not Upstream text): `evals/implement-spec/RESULTS.md`, one entry per build-flow check of `implement-spec`.
-- `ask-matt/SKILL.md` (the `/implement-spec` bullet under "Is this a multi-session build?" and the paragraph after it): "integration branch" becomes "spec branch"; the bullet now says Implementers work in their own worktrees, each ticket gets a Quick ticket check and is squash-merged into the spec branch, whose pull request gets the full review and a merge commit into main; the next paragraph says `/implement-spec` runs `/code-review` as a ticket check per ticket and in Rounds over the spec branch's pull request. No other text in `ask-matt` changed. These are the two lines Patch 10 left as Upstream wrote them for this ticket; Patch 10's rewording of the rest of step 3 is kept, and its open point on the Yes-branch routing a Spec's tickets to `/implement` is still open, not part of this Patch, and tracked in #28.
+- `ask-matt/SKILL.md` (the `/implement-spec` bullet under "Is this a multi-session build?" and the paragraph after it): "integration branch" becomes "spec branch"; the bullet now says Implementers work in their own worktrees, each ticket gets a Quick ticket check and is squash-merged into the spec branch, whose pull request gets the full review and a merge commit into main; the next paragraph says `/implement-spec` runs `/code-review` as a ticket check per ticket and in Rounds over the spec branch's pull request. No other text in `ask-matt` changed. These are the two lines Patch 10 left as Upstream wrote them for this ticket; Patch 10's rewording of the rest of step 3 is kept, and its open point on the Yes-branch routing a Spec's tickets to `/implement` was not part of this Patch; Patch 12 fixed it.
 - `scripts/check-plugin.sh`: new check 14 (`implement-spec/SKILL.md` names `` `tdd` ``, `` `pr` `` and `` `code-review` ``, says Implementer, `git worktree add` and merge commit, and does not say "integration branch"; `ask-matt/SKILL.md` does not say "integration branch").
 - `.claude-plugin/plugin.json`: version 0.7.2 to 0.8.0.
 
 Merging an Upstream update: Upstream's `implement-spec/SKILL.md` is replaced whole, so diff Upstream's old and new text and carry any change over by hand into the step it maps to above (reading the spec and the task graph into step 1, worktree and building advice into step 3, merging into step 6, review into steps 5 and 7, cleanup into step 9). Keep Patch 4's reader line and the words check 14 looks for. Upstream changes to the `/implement-spec` lines in `ask-matt` are merged the same way, keeping "spec branch".
+
+## Patch 12: `ask-matt` sends a Spec's tickets to `implement-spec` (`ask-matt/`)
+
+Why: issue #28. After Patch 11, `implement` step 1 sends a Ticket under a Spec to `implement-spec` (ADR 0004), but `ask-matt` still offered `/implement` per ticket for a Spec's tickets.
+
+What:
+
+- `SKILL.md`. Lines as they stood after Patches 10 and 11, and what became of each:
+  - The Yes-branch's two bullets ("Then work the tickets one of two ways:", "**`/implement`** per ticket, **each in its own fresh thread**. On a local tracker that's one file per ticket ... the last one's context is disposable." and "**`/implement-spec`** for the whole spec in one run. ... Reach for it when you'd rather orchestrate the build than drive each ticket yourself."): merged into one. The local-tracker and native-links sentence moves up beside the blocking edges; `/implement-spec` runs in its own fresh thread, with Patch 11's description of it kept, minus its last sentence; and a closing sentence says not to hand a spec's tickets to `/implement` one by one. Dropped with the two bullets: "worked blockers-first by hand", "so any ticket whose blockers are done can be grabbed", "Each ticket is self-contained, so the last one's context is disposable.", and "Reach for it when you'd rather orchestrate the build than drive each ticket yourself."
+  - "Each `/implement` then starts in its own fresh thread, working from the ticket." (Context hygiene): now "The build then starts in its own fresh thread: `/implement-spec` for a spec, `/implement` for a lone ticket, each working from the tickets."
+  - "then `/to-tickets` and `/implement` as usual." (wayfinder on-ramp): now `/implement-spec`. Its "go straight to `/implement` only when the effort turned out genuinely small" stays, since a small effort is a lone ticket.
+  - The "Either way" paragraph and the triage line (issues `/implement` later picks up) still fit and are unchanged.
+- `scripts/check-plugin.sh`: check 13 now also fails if `ask-matt/SKILL.md` contains "`/implement`** per ticket".
+- `.claude-plugin/plugin.json`: version 0.8.0 to 0.8.1.
+
+Merging an Upstream update: carry Upstream's changes to step 3, Context hygiene and the wayfinder on-ramp over by hand and re-apply the lines above.
 
 ## Vendor model names in Upstream text
 

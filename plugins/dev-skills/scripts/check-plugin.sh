@@ -153,14 +153,16 @@ for f in FINDERS.md VERIFY.md SKILL.md; do
 done
 grep -qF '### `REVIEW.md` Always check' "$forked/code-review/FINDERS.md" || bad "code-review/FINDERS.md has no REVIEW.md Always check section for the standards Finder"
 
-# 13. ask-matt describes implement as the lone-ticket coordinator and code-review as Rounds (issue #28),
-# not as Upstream wrote them
+# 13. ask-matt describes implement as the lone-ticket coordinator, code-review as Rounds, and sends a
+# Spec's tickets to implement-spec (issue #28), not as Upstream wrote them
 am="$forked/ask-matt/SKILL.md"
 if [ -f "$am" ]; then
   for w in 'same context window' 'two-axis'; do
     grep -qiF "$w" "$am" && bad "ask-matt/SKILL.md still says \"$w\""
   done
   grep -qF 'Rounds' "$am" || bad "ask-matt/SKILL.md does not describe code-review's Rounds"
+  # a Spec's tickets go to implement-spec, never one by one to implement (implement step 1)
+  grep -qF '`/implement`** per ticket' "$am" && bad "ask-matt/SKILL.md still offers /implement per ticket for a Spec's tickets"
 fi
 
 # 14. implement-spec is a Spec thread's coordinator (ADR 0004, ADR 0005): Implementers build in
