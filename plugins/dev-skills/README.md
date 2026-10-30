@@ -38,7 +38,7 @@ Forked and own skills live in separate folders so it is always clear which text 
 ## Our own skills
 
 - `setup-project`: interviews Lufei with `grilling` and drafts the project instructions that tell the coordinator how to brief build threads. After approval the thread sends the text to the coordinator to save; it never edits project settings itself.
-- `retro-planning`: works through one repo's Retro backlog in a batch (ADR 0007): groups the Retro issues by root cause, gets the user's approval of a verdict per group, turns the top groups into `ready-for-agent` Tickets, closes the rest, and files a closed `retro-planning` record.
+- `retro-planning`: works through one repo's Retro backlog in a batch (ADR 0007): groups the Retro issues by root cause, gets the user's approval of a verdict per group, turns the top groups into `ready-for-agent` Tickets, closes one-offs, expired issues and issues whose Ticket has closed, leaves held-back and declined groups open, and files a closed `retro-planning` record.
 
 ## Model tiers
 
