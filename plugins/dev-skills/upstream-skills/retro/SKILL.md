@@ -1,6 +1,6 @@
 ---
 name: retro
-description: "Conduct a retrospective on a coding session."
+description: "Review a finished coding session or pull request and propose improvements to the agent's environment (navigation pointers, automated checks, coding standards, docs). Use when the user asks for a retro or retrospective on a session or pull request, or what went wrong in it and how to stop it recurring; the Retro backlog is retro-planning."
 ---
 
 The user has asked for a **retrospective**. You are suggesting improvements to the coding agent's **environment** to improve future runs.
