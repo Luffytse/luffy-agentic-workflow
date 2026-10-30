@@ -438,5 +438,20 @@ for f in FINDERS.md VERIFY.md; do
   done
 done
 
+# 31. handoff saves where the next agent can read it (issue #109, absorbs #35): the temp directory is a
+# session's own container in a cloud or remote session, which no other thread can open. No script can see
+# where a thread saved a file, so this guards the wording against a revert: the tracker is the default, a
+# shared folder only when the user names one, the temp directory only when the next agent runs on the same
+# machine, and the skill ends by telling the user where the handoff is.
+ho="$forked/handoff/SKILL.md"
+for g in 'By default, save the handoff as an issue on the tracker' \
+         'Use a shared folder only when the user names one' \
+         'Use the temporary directory only when the next agent runs on the same machine' \
+         'End by telling the user where the handoff is' \
+         'ask the user where to save it'; do
+  grep -qF "$g" "$ho" || bad "handoff/SKILL.md has lost the save-location rule: $g"
+done
+grep -qF 'Save to the temporary directory of the user' "$ho" && bad "handoff/SKILL.md still makes the temporary directory the default"
+
 [ "$fail" -eq 0 ] && echo "OK: dev-skills plugin checks passed ($count skills)"
 exit "$fail"

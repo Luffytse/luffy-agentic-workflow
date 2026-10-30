@@ -517,6 +517,19 @@ What:
 
 Merging an Upstream update: take Upstream's `FINDERS.md`, `VERIFY.md`, `implement` and `implement-spec` text, then re-apply the bullets above.
 
+## Patch 27: `handoff` saves where the next agent can read it (`handoff/`)
+
+Why: issue #109 (absorbs #35). `handoff` wrote to the OS temp directory, which in a cloud or remote session is that session's own container; no other thread, session or project can open it. In two threads the handoff went to the tracker or the project's shared files instead.
+
+What:
+
+- `handoff/SKILL.md`: "Save to the temporary directory of the user's OS (`$TMPDIR`, else `/tmp`; `%TEMP%` on Windows) - not the current workspace." is now a save-location rule. By default the handoff is an issue on the tracker `docs/agents/issue-tracker.md` names, linked from the work it continues; with no tracker configured the skill says so and asks the user for a location. A shared folder is used only when the user names one; the temp directory only when the next agent runs on the same machine; the skill ends by telling the user where the handoff is (issue link or path). The suggested skills section, the no-duplication rule, redaction and arguments are unchanged. Patch 21's edit to the `description` needed no change.
+- `ask-matt/SKILL.md` and `ask-matt/PHASE-BOUNDARIES.md` (Upstream text): where they called a handoff a "portable markdown file" ("open a fresh session against that file", "a file that travels"), they now say it is a document the next agent can read (a tracker issue by default), a session that reads the handoff, and a document that travels. The portability point is unchanged.
+- `scripts/check-plugin.sh`: new check 31 (`handoff/SKILL.md` keeps the tracker default, shared folder only when the user names one, temp directory only when the next agent runs on the same machine, the ask when no tracker is configured and the closing report of the location, and no longer makes the temp directory the default).
+- `.claude-plugin/plugin.json`: version 0.19.0 to 0.20.0.
+
+Merging an Upstream update: take Upstream's `handoff`, `ask-matt/SKILL.md` and `ask-matt/PHASE-BOUNDARIES.md` text, then re-apply the save-location rule above (check 31 lists its phrases) and the `ask-matt` and `PHASE-BOUNDARIES` wording edits listed above.
+
 ## Vendor model names in Upstream text
 
 None in the kept skills at the Base commit, so no Patch was needed for ADR 0002 (checked for ticket #4: grep for `haiku`, `sonnet`, `opus`, `claude-`, `gpt-`, `gemini` over `upstream-skills/`). Some kept skills start subagents (for example `grilling`, `wayfinder`, `code-review`, `implement-spec`), but none picks a model for them. Spec #1 adds tiers in later tickets (the `code-review` Finders and Verifiers, and the `implement` and `implement-spec` Implementers; the tier on each ticket from `to-tickets` is Patch 7, the `implement` Implementer's tier is Patch 8, and the `implement-spec` Implementers' tiers are Patch 11); each of those edits gets its own Patch here.
