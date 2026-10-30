@@ -605,7 +605,7 @@ What (all in `scripts/check-plugin.sh` and this file; no skill text changed):
 - new check 35 (patch-heading-numbers): two `## Patch N` headings with the same number fail, naming the number. A `TBD-N` heading is not counted.
 - new check 36 (skill-name-matches-folder): for every skill under `upstream-skills/` and `skills/`, the `name:` in the `SKILL.md` frontmatter must equal the folder name.
 - new check 37 (openai-display-name): for every `agents/openai.yaml` under `upstream-skills/` and `skills/`, the `display_name`, lowercased with each run of other characters turned into one hyphen, must equal the skill's folder name ("Grill with Docs" is `grill-with-docs`, "PR" is `pr`). This is the rule the Ticket picked: it keeps a skill from taking another skill's or a built-in skill's name (`agentic-review` as "Code Review"), and all 22 current skills pass. A folder rename needs a new `display_name`.
-- `.claude-plugin/plugin.json`: version 0.22.2 to 0.22.3.
+- `.claude-plugin/plugin.json`: version 0.22.3 to 0.22.4.
 
 Merging an Upstream update: nothing to re-apply, since no Upstream text changed; if Upstream renames a skill or its `display_name`, the two checks fail until the folder, `name:` and `display_name` agree again.
 
