@@ -338,7 +338,7 @@ Why: issue #42. Each build thread knows its own Review, so it ends by running `r
 What:
 
 - `implement/SKILL.md`: new step 9, "Run the retro", after the report. `implement-spec/SKILL.md`: new step 10, "Run the retro", after "Clean up and report". Each says: run `retro` on the thread whether the pull request was merged or handed to the user; for a repeated Bug class, a regular-tier Implementer builds the check on a branch off main, and the thread opens the pull request with `pr`, runs the `agentic-review` Rounds and merges it as a lone pull request (squash-merge, or brings it to the user); a check that changes `REVIEW.md` goes to the user; add the outcome to the report. Every other line is as Patches 8 and 11 left it.
-- `scripts/check-plugin.sh`: new check 20 (the last step of both skills names `` `retro` `` and `REVIEW.md`).
+- `scripts/check-plugin.sh`: new check 18 (the last step of both skills names `` `retro` `` and `REVIEW.md`).
 - `.claude-plugin/plugin.json`: no bump of its own; covered by Patch 15's 0.9.1 to 0.9.2.
 
 Merging an Upstream update: both `SKILL.md` files are already replaced whole by Patches 8 and 11, so after carrying Upstream's changes over, re-append the final retro step and keep it last, since check 18 reads the last `## ` section.
