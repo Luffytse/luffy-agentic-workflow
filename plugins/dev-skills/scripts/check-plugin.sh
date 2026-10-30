@@ -163,5 +163,20 @@ if [ -f "$am" ]; then
   grep -qF 'Rounds' "$am" || bad "ask-matt/SKILL.md does not describe code-review's Rounds"
 fi
 
+# 14. implement-spec is a Spec thread's coordinator (ADR 0004, ADR 0005): Implementers build in
+# ticket worktrees made with git worktree add, through tdd; the Spec pull request is written with pr,
+# reviewed with code-review, and merged with a merge commit; no "integration branch" is left, here or in ask-matt
+spec="$forked/implement-spec/SKILL.md"
+if [ -f "$spec" ]; then
+  for s in tdd pr code-review; do
+    grep -qF "\`$s\`" "$spec" || bad "implement-spec/SKILL.md does not name the \`$s\` skill"
+  done
+  grep -qF 'Implementer' "$spec" || bad "implement-spec/SKILL.md does not hand the work to Implementers"
+  grep -qF 'git worktree add' "$spec" || bad "implement-spec/SKILL.md does not make ticket worktrees with git worktree add"
+  grep -qiF 'merge commit' "$spec" || bad "implement-spec/SKILL.md does not say the Spec pull request merges with a merge commit"
+  grep -qiF 'integration branch' "$spec" && bad "implement-spec/SKILL.md still says integration branch"
+fi
+grep -qiF 'integration branch' "$forked/ask-matt/SKILL.md" && bad "ask-matt/SKILL.md still says integration branch"
+
 [ "$fail" -eq 0 ] && echo "OK: dev-skills plugin checks passed ($count skills)"
 exit "$fail"
