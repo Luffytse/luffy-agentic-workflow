@@ -18,6 +18,8 @@ Every Verifier gets: all candidate Findings in the fixed format, each tagged wit
 
 Then, for each open Important from earlier Rounds or Ticket checks, check the current code and say **fixed** (cite the line that fixes it), **still open** (cite the line that still has the problem), or **dismissed** (it was never real; say why).
 
+To try something out (plant a line, run a check, test a commit), work in your own copy: `git archive <head> | tar -x -C <a new scratch directory>`, or a throwaway `git worktree`. Never run `git checkout`, `switch`, `stash` or `reset` in the shared tree, because an Implementer is working in it; leave it on its branch, clean.
+
 Answer per Finding: its title, the four calls with their reasons, and the corrected Locations, plus the corrected failure scenario when you corrected one. Under 600 words in all. Your last action is to return your full report."
 
 ## Deep: three stances

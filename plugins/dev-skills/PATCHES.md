@@ -502,6 +502,21 @@ This Patch was built before its own rule applied, so its numbers were written in
 
 Merging an Upstream update: `implement` and `implement-spec` are already replaced whole by Patches 8 and 11, so re-apply the lines above after carrying Upstream's changes over. For `agentic-review`, carry Upstream's "Depth and tiers", step 1 and `ROUNDS.md` changes over by hand and re-apply the exception, the step-1 clause, the `Reviewed:` form, the Depth bullet and the "Merge-only Rounds" section.
 
+## Patch 26: review subagents experiment only in their own copy; Implementers confirm each push (`agentic-review/`, `implement/`, `implement-spec/`)
+
+Why: issue #104 (absorbs Retro issues #60 and #63). A Finder that ran `git checkout <sha>` in the shared tree left it on a detached HEAD under the Implementer, and in two threads an Implementer's fix commit landed off the branch and its `git push` sent nothing.
+
+What:
+
+- `agentic-review/FINDERS.md`: the shared brief list gains a **copy rule** bullet, pasted into every Finder's brief: to try something out, work in your own copy (`git archive <head> | tar -x -C <a new scratch directory>` or a throwaway `git worktree`); never run `git checkout`, `switch`, `stash` or `reset` in the shared tree; leave it on its branch, clean.
+- `agentic-review/VERIFY.md`: the Verifier brief gains the same copy rule, in the same words, as the paragraph before its answer-format paragraph (check 28 needs the brief to end with the last-action line).
+- `implement/SKILL.md` (step 3): the Implementer brief gains a bullet: before each push, check `git status -sb` shows the Ticket branch; after it, report `git rev-parse origin/<branch>` equals `HEAD`. Step 4 checks that report.
+- `implement-spec/SKILL.md`: the Ticket-branch Implementer brief (step 3) gains a bullet to check `git status -sb` shows its Ticket branch before each commit (it never pushes); the Spec-branch Implementers (step 6.1's merge-and-resolve one and step 7's fix one) are briefed to run the same push check as `implement`.
+- `scripts/check-plugin.sh`: new check 30 (`FINDERS.md` and `VERIFY.md` keep the copy rule: own copy, `git archive`, `git worktree`, and the ban on `checkout`, `switch`, `stash` and `reset` in the shared tree, and leaving it on its branch). The Implementer's push check is not scripted.
+- `.claude-plugin/plugin.json`: version 0.18.0 to 0.19.0.
+
+Merging an Upstream update: take Upstream's `FINDERS.md`, `VERIFY.md`, `implement` and `implement-spec` text, then re-apply the bullets above.
+
 ## Vendor model names in Upstream text
 
 None in the kept skills at the Base commit, so no Patch was needed for ADR 0002 (checked for ticket #4: grep for `haiku`, `sonnet`, `opus`, `claude-`, `gpt-`, `gemini` over `upstream-skills/`). Some kept skills start subagents (for example `grilling`, `wayfinder`, `code-review`, `implement-spec`), but none picks a model for them. Spec #1 adds tiers in later tickets (the `code-review` Finders and Verifiers, and the `implement` and `implement-spec` Implementers; the tier on each ticket from `to-tickets` is Patch 7, the `implement` Implementer's tier is Patch 8, and the `implement-spec` Implementers' tiers are Patch 11); each of those edits gets its own Patch here.

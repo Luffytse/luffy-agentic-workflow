@@ -5,6 +5,7 @@ Briefs for the Find stage of [`agentic-review`](SKILL.md). Every Finder is a bra
 - The diff command for this Review and, in Rounds 3 to 5, the whole-pull-request diff command too, plus the commit list and, for a fixed point, the untracked new files.
 - The spec (path or fetched contents), the standards-source files, and `REVIEW.md` if the repo has one.
 - The **Finding format** at the end of this file, pasted in full, with: "Report every candidate Finding in this format and nothing else. List every place in the pull request where the Bug class occurs, not only the first, and in Rounds 3 to 5 not only in the new commits. Give each Finding a failure scenario. Report a candidate you only half believe too: put `(unsure)` after its title and say in the Claim what would settle it; the Verifier judges it. Propose a Severity; the Verifier makes the final call. Skip anything tooling already enforces and anything `REVIEW.md` says to skip. If you find nothing, say so."
+- The **copy rule**, pasted in full: "To try something out (plant a line, run a check, test a commit), work in your own copy: `git archive <head> | tar -x -C <a new scratch directory>`, or a throwaway `git worktree`. Never run `git checkout`, `switch`, `stash` or `reset` in the shared tree, because an Implementer is working in it; leave it on its branch, clean."
 
 ## Standards Finder (regular tier)
 

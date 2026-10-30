@@ -426,5 +426,17 @@ else
   done
 fi
 
+# 30. Review subagents experiment only in their own copy (issues #60, #63): a Finder or Verifier that runs
+# `git checkout <sha>` in the shared tree leaves it on a detached HEAD under the Implementer. Both briefs
+# must say to work in a copy (`git archive` or a throwaway `git worktree`) and forbid checkout, switch,
+# stash and reset in the shared tree. The Implementer's push check is a step it carries out; no script sees it.
+for f in FINDERS.md VERIFY.md; do
+  rb="$root/upstream-skills/agentic-review/$f"
+  [ -f "$rb" ] || continue
+  for w in 'own copy' 'git archive' 'git worktree' '`git checkout`' '`switch`' '`stash`' '`reset`' 'shared tree' 'on its branch'; do
+    grep -qF -- "$w" "$rb" || bad "agentic-review/$f does not carry the copy rule ($w)"
+  done
+done
+
 [ "$fail" -eq 0 ] && echo "OK: dev-skills plugin checks passed ($count skills)"
 exit "$fail"

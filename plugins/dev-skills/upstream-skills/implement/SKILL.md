@@ -29,6 +29,7 @@ Start **one Implementer** subagent on the ticket's tier. Brief it with pointers,
 - the ticket link and the Ticket branch, and that it commits there;
 - start at `docs/index.md`;
 - build test-first with the `tdd` skill, at seams agreed before the first test;
+- before each push, check that `git status -sb` shows the Ticket branch (never a detached HEAD), and after it, report that `git rev-parse origin/<branch>` equals `HEAD`, as evidence the push landed;
 - leave every number the repo's rules (its `CLAUDE.md`, the project instructions, its docs) say to take at merge time, such as a version or the number of a new numbered entry, as the placeholder `TBD-N`, or as it is on main where a placeholder would break the file (a manifest's version); the real numbers come in step 7;
 - report its evidence: the tests that fail before and pass after, the typecheck or the repo's checks, screenshots for anything visual (or "not visual"), and its one-way-door call (would reverting its commits undo everything the change did, including anything outside git?).
 
@@ -38,7 +39,7 @@ Keep this same Implementer for every later fix and merge conflict on the ticket:
 
 ## 4. Check the evidence
 
-Read the Implementer's report against the ticket's acceptance criteria and rerun the checks (a cheap subagent can). Anything missing or failing goes back to the Implementer. Done when every acceptance criterion has evidence and the checks pass on the branch's head, or, when the repo has no checks, the evidence says what was checked instead. A check that fails only because a number is still a placeholder (or a version is not yet bumped) is expected until step 7.
+Read the Implementer's report against the ticket's acceptance criteria and rerun the checks (a cheap subagent can). Check that it reports `origin/<branch>` equal to `HEAD` for every push. Anything missing or failing goes back to the Implementer. Done when every acceptance criterion has evidence and the checks pass on the branch's head, or, when the repo has no checks, the evidence says what was checked instead. A check that fails only because a number is still a placeholder (or a version is not yet bumped) is expected until step 7.
 
 ## 5. Open the pull request
 

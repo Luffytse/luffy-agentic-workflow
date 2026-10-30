@@ -38,6 +38,7 @@ Run at most **3 Implementers at once**, counting every Implementer that is worki
    - start at `docs/index.md`, plus the exploration notes if any;
    - the worktree is a fresh checkout and may need its dependencies installed again;
    - build test-first with the `tdd` skill, at seams agreed before the first test;
+   - it never pushes, but before each commit `git status -sb` must show its Ticket branch (never a detached HEAD), so no commit lands off the branch;
    - leave every number the repo's rules (its `CLAUDE.md`, the project instructions, its docs) say to take at merge time, such as a version or the number of a new numbered entry, as the placeholder `TBD-N`, or as it is on main where a placeholder would break the file (a manifest's version); the Spec thread has the real numbers taken once, in step 8, so parallel tickets never collide on them;
    - before reporting, merge the Spec branch tip into its Ticket branch (a merge, never a rebase) and rerun the tests;
    - report its evidence: the tests that fail before and pass after, the typecheck or the repo's checks, screenshots for anything visual (or "not visual"), and its one-way-door call (would reverting its commits undo everything the change did, including anything outside git?).
@@ -60,7 +61,7 @@ Done when a check leaves no Important open. At most 3 checks: if the third still
 
 Land one ticket at a time, and none while an Implementer is working on the Spec branch itself.
 
-1. Fetch main. If it moved, merge main into the Spec branch (a merge, never a rebase). If that conflicts, abort it and start a **new** Implementer on the Spec branch, on the highest tier of the tickets whose files conflict (regular if none), to merge and resolve.
+1. Fetch main. If it moved, merge main into the Spec branch (a merge, never a rebase). If that conflicts, abort it and start a **new** Implementer on the Spec branch, on the highest tier of the tickets whose files conflict (regular if none), to merge and resolve; brief it with the same push check as step 7's Implementer (`git status -sb` shows the Spec branch before each push; after it, report that `git rev-parse origin/<branch>` equals `HEAD`).
 2. If the Spec branch moved since the Implementer last merged it in, have it merge the tip in again and rerun its tests. Conflict resolutions from this re-merge need no new ticket check: the Spec pull request's Rounds 1 and 2 cover the whole pull request and review them.
 3. Squash-merge the Ticket branch into the Spec branch as one commit (no pull request), with a message that summarises the ticket and names it. **Push the Spec branch straight away.**
 4. Remove the worktree (`git worktree remove <path>`) and delete the local Ticket branch.
@@ -75,7 +76,7 @@ Run the `agentic-review` skill on the Spec pull request yourself, in this thread
 
 Before each Round, fetch main and, if it moved, merge it into the Spec branch as in step 6.1, and push. In a Round that reviews only the new commits, that merge counts among them, but only its conflict resolutions are reviewed, not the commits from main (for example `git show --remerge-diff <merge>`); say so to the Finders. A Round whose new commits are only that merge, with conflicts only in numbers or text, runs at Quick depth unless the resolutions touch logic ([agentic-review's ROUNDS.md](../agentic-review/ROUNDS.md#merge-only-rounds)).
 
-After each Round, send its Important Findings and "fix" Nits to a **new** Implementer on the Spec branch, on the highest tier of the tickets those Findings touch (regular if they touch no ticket's files); it fixes, commits and pushes, then the next Round runs. A later Round may continue it by message if its Findings need no higher tier. On a clean Round 2 to 5, the Implementer makes the final "fix" Nits commit before you post that Round's comment; no further Round reviews it. After the last Round, file the Pre-existing Findings, the ticket checks' included, as `agentic-review` says.
+After each Round, send its Important Findings and "fix" Nits to a **new** Implementer on the Spec branch (brief it to check, before each push, that `git status -sb` shows the Spec branch, and after it to report that `git rev-parse origin/<branch>` equals `HEAD`, as evidence the push landed), on the highest tier of the tickets those Findings touch (regular if they touch no ticket's files); it fixes, commits and pushes, then the next Round runs. A later Round may continue it by message if its Findings need no higher tier. On a clean Round 2 to 5, the Implementer makes the final "fix" Nits commit before you post that Round's comment; no further Round reviews it. After the last Round, file the Pre-existing Findings, the ticket checks' included, as `agentic-review` says.
 
 Done when a Round 2 to 5 is clean, or the 5-Round cap is hit.
 
