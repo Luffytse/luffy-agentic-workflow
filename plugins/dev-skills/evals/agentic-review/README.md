@@ -1,10 +1,10 @@
 # agentic-review eval
 
-A small fixture pull request with planted problems of known Bug classes, plus two plausible false alarms, to check that `agentic-review` reports the right Findings with the right Severity and drops the false ones. Rerun it whenever `agentic-review` changes, at Standard and at Deep depth.
+A small fixture pull request with planted problems of known Bug classes (one of them a break of the fixture's own `REVIEW.md` Always check line), plus two plausible false alarms, to check that `agentic-review` reports the right Findings with the right Severity and drops the false ones. Rerun it whenever `agentic-review` changes, at Standard and at Deep depth.
 
 ## Files
 
-- `base/`: the fixture repo before the change (a tiny Python cost splitter with its own `docs/index.md`).
+- `base/`: the fixture repo before the change (a tiny Python cost splitter with its own `docs/index.md` and a `REVIEW.md` holding one Always check line, which the change breaks once).
 - `after/`: the files the change adds or edits; `setup.sh` also deletes `docs/currency.md` (renamed to `docs/money.md`).
 - `SPEC.md`: the ticket the change builds; `setup.sh` copies it, untracked, to `.scratch/SPEC.md` in the scratch repo.
 - `EXPECTED.md`: the planted Findings (Bug class, Severity, every location), the false alarms, and how a run is scored.

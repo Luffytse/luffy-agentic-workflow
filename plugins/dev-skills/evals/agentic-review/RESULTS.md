@@ -14,6 +14,7 @@ One entry per run, newest first. Rerun when `agentic-review` changes, and record
 | P3 | | | n/a | |
 | P4 | | | n/a | |
 | P5 | | | | |
+| P6 | | | n/a | |
 | F1 | dropped? | | | |
 | F2 | dropped? | | | |
 
@@ -22,6 +23,40 @@ Pass: yes | no. <one line on what to change in agentic-review, if anything>
 ```
 
 ## Runs
+
+Both runs on 2026-10-30, dev-skills 0.12.1, driven by the Ticket thread of #27, the same way as the 0.10.0 runs below: the thread started the agents, passed the briefs from `FINDERS.md` and `VERIFY.md` word for word (written to brief files outside the repo, each agent told to read only its own brief and the scratch repo), merged duplicate candidates before Verify, and applied the Rank rules; it read `EXPECTED.md` only to score. Every Finder and Verifier was a fresh subagent; tiers were mapped to models by the README table. Angles as before: bugs and edge cases plus security and privacy (Standard), bugs and edge cases plus money, numbers and time (Deep). The fixed-point diff was `git diff --merge-base main`, with no untracked files (`.scratch/` is excluded). These are the first runs with the fixture's `REVIEW.md` (P6), and the first since `VERIFY.md`'s corrected-scenario rule: one gap-sweep Verifier gave a corrected failure scenario (G1). The Standard Verifier and one Deep Verifier (the skeptic) "corrected" Locations to line numbers counted across their own concatenated file listing (for example `report.py:50` and `:55` for `:11` and `:16`, `split.py:79` and `:95` for `:11` and `:27`), not the file's own lines; the thread kept the file lines when ranking. Filed as #98. Through 0.15.1, `agentic-review` differs from 0.12.1 only in its setup hint (`setup-dev-skills`, #84); no Find, Verify or Rank text changed.
+
+### 2026-10-30, dev-skills 0.12.1, Standard
+
+| id | Reported? | Severity given | All locations? | Notes |
+|----|-----------|----------------|----------------|-------|
+| P1 | yes | Important | n/a | spec, bugs and standards Finders (standards passed it on as `(unsure)`) |
+| P2 | yes | Important | yes | `report.py:11` and `:16`, raised by all four; the Verifier cited them as `:50` and `:55` (see above) |
+| P3 | yes | Important | n/a | spec, bugs, standards `(unsure)` |
+| P4 | yes | Pre-existing | n/a | bugs Finder; Verifier checked `main` |
+| P5 | yes | Important | yes | standards and spec proposed Important citing the spec line, bugs Nit; Verifier kept Important on the spec line |
+| P6 | yes | Nit (fix) | n/a | standards Finder under (d), and its Always check list named the Finding. The bugs Finder noticed the comment but judged `main` exempt as a CLI entry point and did not report it, so only the Always check step caught it |
+| F1 | never raised | | | |
+| F2 | never raised | | | |
+
+Extras (all real): unrequested rename `currency.md` to `money.md` (Nit, fix); payer outside the people list (Nit, fix; raised `(unsure)` as Important); thin tests (Nit, fix); CLI tracebacks on missing arguments and `inf`/`nan` (Nit, skip). Dropped by Verify: none. With P6 there are five Nits, all reported under Rank's cap.
+Pass: yes.
+
+### 2026-10-30, dev-skills 0.12.1, Deep
+
+| id | Reported? | Severity given | All locations? | Notes |
+|----|-----------|----------------|----------------|-------|
+| P1 | yes | Important | n/a | 3 of 3; raised by standards, spec, bugs and money Finders |
+| P2 | yes | Important | yes | 3 of 3; the premium security Finder traced `load_expenses` to both sinks |
+| P3 | yes | Important | n/a | 3 of 3 |
+| P4 | yes | Pre-existing | n/a | 3 of 3; bugs and money Finders |
+| P5 | yes | Important | yes | 3 of 3, spec line cited (standards Finder proposed Nit) |
+| P6 | yes | Nit (fix) | n/a | 3 of 3 fix; raised by standards (under (d), with the Always check list), spec and bugs Finders |
+| F1 | never raised | | | |
+| F2 | never raised | | | |
+
+Extras (all real): unrequested rename (Nit, fix, 3 of 3); payer outside the people list (Nit 3 of 3, fix 2 to 1; bugs and money Finders proposed Important `(unsure)`); tests (Nit, fix); CLI tracebacks (Nit, skip). Gap sweep (premium, after Verify): duplicate names collapse shares (Important 2 to 1, 3 of 3 keep; earlier runs kept it as a Nit) and `settle`'s parameter shadowing `balances()` (Nit, skip, 3 of 3). Neither repeated a kept Finding. Six Nits before Rank's 5-Nit cap: the four "fix" Nits and one "skip" Nit would be reported.
+Pass: yes. F1 and F2 still tempted no Finder, so Verify dropping them is still untested.
 
 Both runs on 2026-10-30, dev-skills 0.10.0, driven by the Ticket thread of #51, in the same way as the 0.2.0 runs below: the thread started the agents, passed the briefs from `FINDERS.md` and `VERIFY.md` word for word, merged duplicate candidates before Verify, and applied the Rank rules; it read `EXPECTED.md` only to score. Every Finder and Verifier was a fresh subagent. Tiers were mapped to models by the README table. Angles picked as in the 0.2.0 runs, so the two can be compared: bugs and edge cases plus security and privacy (Standard), bugs and edge cases plus money, numbers and time (Deep). The fixed-point diff was `git diff --merge-base main` with the untracked `.scratch/SPEC.md` listed as an untracked new file (it is also the spec); no Finder mistook it for part of the change. `VERIFY.md`'s rule to correct a wrong failure scenario instead of dropping (call 1) and the corrected-scenario answer field were added after these runs (commits 7628986 and 854f488), so the runs did not exercise them.
 
