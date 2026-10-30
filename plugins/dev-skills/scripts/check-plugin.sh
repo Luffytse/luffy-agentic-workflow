@@ -282,5 +282,26 @@ else
   done
 fi
 
+# 22. agentic-review takes the built-in review's strengths (issue #51): a fixed-point Review includes
+# uncommitted work, every Finding states a failure scenario, Finders pass on unsure candidates, the
+# new adversarial angles exist, the Verifier keeps realistic rare paths, and Deep runs a gap sweep
+ar="$forked/agentic-review"
+grep -qF 'untracked' "$ar/SKILL.md" || bad "agentic-review/SKILL.md does not include uncommitted and untracked work in a fixed-point Review"
+grep -qF -- '- Failure scenario:' "$ar/FINDERS.md" || bad "agentic-review/FINDERS.md Finding format has no Failure scenario line"
+grep -qF '(unsure)' "$ar/FINDERS.md" || bad "agentic-review/FINDERS.md does not have Finders pass on unsure candidates"
+for a in 'Removed behaviour' 'Cross-file callers' 'Language pitfalls' 'Wrappers and proxies' 'Altitude'; do
+  grep -qF "**$a**" "$ar/FINDERS.md" || bad "agentic-review/FINDERS.md has no adversarial angle $a"
+done
+grep -qF '## Gap sweep' "$ar/FINDERS.md" || bad "agentic-review/FINDERS.md has no Gap sweep section"
+grep -qiF 'gap sweep' "$ar/SKILL.md" || bad "agentic-review/SKILL.md depth table does not name the gap sweep"
+grep -qiF 'gap sweep' "$ar/VERIFY.md" || bad "agentic-review/VERIFY.md does not verify the gap sweep's Findings"
+grep -qF 'failure scenario' "$ar/VERIFY.md" || bad "agentic-review/VERIFY.md does not use the failure scenario"
+grep -qF 'rare' "$ar/VERIFY.md" || bad "agentic-review/VERIFY.md does not keep realistic rare paths"
+for f in "$repo/GLOSSARY.md" "$repo/docs/adr/0003-code-review-runs-find-verify-rank-in-rounds.md"; do
+  for w in 'Gap sweep' 'Failure scenario'; do
+    grep -qiF "$w" "$f" || bad "$(basename "$f") does not describe the $w"
+  done
+done
+
 [ "$fail" -eq 0 ] && echo "OK: dev-skills plugin checks passed ($count skills)"
 exit "$fail"

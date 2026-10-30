@@ -58,7 +58,7 @@ Each new Round starts at step 1 of [SKILL.md](SKILL.md#process) with brand-new F
 Once the pull request's last Round is done (clean, or the cap reached), gather every open Pre-existing Finding from all the Round and Ticket-check comments and group them by Bug class. For each Bug class:
 
 1. Look for an open issue already tracking it; if there is one, comment there with the new locations instead.
-2. Otherwise file one issue with the tracker workflow: title `<Bug class> (found in review of #<pr>)`, a body listing every location with its claim and evidence and linking the pull request, and the label the repo uses for `needs-triage` (from `docs/agents/triage-labels.md`; `needs-triage` if that file is missing).
+2. Otherwise file one issue with the tracker workflow: title `<Bug class> (found in review of #<pr>)`, a body listing every location with its claim, failure scenario and evidence and linking the pull request, and the label the repo uses for `needs-triage` (from `docs/agents/triage-labels.md`; `needs-triage` if that file is missing).
 
 Then post one short comment on the pull request, starting `<!-- code-review kind=pre-existing -->`, listing each Finding id with the issue it went to.
 

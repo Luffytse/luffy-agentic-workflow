@@ -2,9 +2,9 @@
 
 Briefs for the Find stage of [`agentic-review`](SKILL.md). Every Finder is a brand-new subagent on the tier given here, and every brief includes:
 
-- The diff command for this Review and, in Rounds 3 to 5, the whole-pull-request diff command too, plus the commit list.
+- The diff command for this Review and, in Rounds 3 to 5, the whole-pull-request diff command too, plus the commit list and, for a fixed point, the untracked new files.
 - The spec (path or fetched contents), the standards-source files, and `REVIEW.md` if the repo has one.
-- The **Finding format** at the end of this file, pasted in full, with: "Report every candidate Finding in this format and nothing else. List every place in the pull request where the Bug class occurs, not only the first, and in Rounds 3 to 5 not only in the new commits. Propose a Severity; the Verifier makes the final call. Skip anything tooling already enforces and anything `REVIEW.md` says to skip. If you find nothing, say so."
+- The **Finding format** at the end of this file, pasted in full, with: "Report every candidate Finding in this format and nothing else. List every place in the pull request where the Bug class occurs, not only the first, and in Rounds 3 to 5 not only in the new commits. Give each Finding a failure scenario. Report a candidate you only half believe too: put `(unsure)` after its title and say in the Claim what would settle it; the Verifier judges it. Propose a Severity; the Verifier makes the final call. Skip anything tooling already enforces and anything `REVIEW.md` says to skip. If you find nothing, say so."
 
 ## Standards Finder (regular tier)
 
@@ -61,7 +61,7 @@ Brief: "Report: (a) requirements the spec asked for that are missing or partial;
 
 Two Finders, each on one angle. Pick the 2 angles from the list that fit this change best, two different ones; when nothing stands out, take **bugs and edge cases** plus the best fit. Name the angle in the brief.
 
-Brief: "You are an adversarial reviewer on one angle: <angle>. Assume the change is wrong somewhere on this angle and hunt for it. Open the code around each hunk and follow calls into unchanged code where the angle leads there. Cite the input, path or sequence of events that makes each problem happen."
+Brief: "You are an adversarial reviewer on one angle: <angle>. Assume the change is wrong somewhere on this angle and hunt for it. Open the code around each hunk: unchanged lines inside a function the diff touches are in scope. Follow calls into unchanged code where the angle leads there."
 
 Angles:
 
@@ -74,12 +74,25 @@ Angles:
 - **Interfaces and compatibility**: a public API, config, file format or CLI changed in a way callers break on.
 - **Performance**: N+1 queries, unbounded loops or payloads, work repeated per item.
 - **Tests**: changed behaviour with no test, tests that cannot fail, tests that assert the bug.
+- **Removed behaviour**: a deleted check, rule or branch. Find where it is enforced now, if anywhere.
+- **Cross-file callers**: every caller of a changed function, type or config key, in files the diff does not touch, still gets what it expects.
+- **Language pitfalls**: falsy zero or empty string, mutable defaults, integer division, a missing `await`, shadowing, a regex that lost its anchor.
+- **Wrappers and proxies**: a call routed through a wrapper, proxy, decorator or middleware that drops, reorders or swallows arguments, options or errors.
+- **Altitude**: the change patches a symptom where the cause sits higher up, so other paths to the same cause still fail.
 
 ## Security Finder (premium tier, Deep only)
 
 Brief: "Review this change for security and privacy only, in depth. Trace every input an outside party controls from where it enters to where it is used (HTML, SQL, shell, file paths, URLs, logs, other services), and check authentication, authorisation, secrets, personal data, and new dependencies. Cite the source-to-sink path for each Finding."
 
 Its Findings go through Verify like every other Finding.
+
+## Gap sweep (premium tier, Deep only)
+
+Runs after Verify, as one brand-new Finder. Premium, because spotting what is absent is harder than checking what is there. Give it the shared brief above and the Findings Verify kept.
+
+Brief: "The Findings given are already known; report none of them again. Look only for what the change is missing: moved code that dropped a guard, a flipped default, setup with no matching teardown, a new case that a switch, validator or migration does not handle, a rename that some callers missed."
+
+Its Findings go through a second Verify ([VERIFY.md](VERIFY.md#gap-sweep)).
 
 ## Finding format
 
@@ -88,7 +101,8 @@ Its Findings go through Verify like every other Finding.
 - Severity (proposed): Important | Nit | Pre-existing
 - Bug class: <short noun phrase naming the kind of problem, e.g. "unescaped user input">
 - Locations: <every file:line or file:start-end in the pull request where this Bug class occurs>
-- Claim: <what is wrong and what happens because of it, in one or two sentences>
+- Claim: <what is wrong, in one or two sentences>
+- Failure scenario: <the inputs or state, then the wrong result; for a cleanup Finding (a smell, or a Nit with no wrong result), its cost instead>
 - Evidence: <the quoted code, spec line, standard or ADR rule, or the input that triggers it>
 ```
 

@@ -101,7 +101,7 @@ How thorough a Review is: **Quick**, **Standard** (the default), or **Deep**.
 _Avoid_: level, mode
 
 **Finder**:
-A reviewer agent that looks for problems and reports candidate Findings. The **standards Finder** and **spec Finder** come from Upstream; **adversarial Finders** each take one angle chosen for the pull request. On Deep, a **security Finder** is added.
+A reviewer agent that looks for problems and reports candidate Findings. The **standards Finder** and **spec Finder** come from Upstream; **adversarial Finders** each take one angle chosen for the pull request. On Deep, a **security Finder** is added, and a Gap sweep runs after Verify.
 _Avoid_: reviewer (too broad), scanner
 
 **Verifier**:
@@ -109,7 +109,7 @@ An agent that checks each candidate Finding against the code and makes the final
 _Avoid_: judge, triage agent
 
 **Finding**:
-One problem a Review reports, with a file and line, a Severity, and a Bug class.
+One problem a Review reports, with a file and line, a Severity, a Bug class, and a Failure scenario.
 _Avoid_: issue (that word means a GitHub issue), comment
 
 **Severity**:
@@ -119,6 +119,14 @@ _Avoid_: priority, blocker
 **Bug class**:
 The kind of problem a Finding is (for example "unescaped user input"), so every place it occurs is fixed together.
 _Avoid_: category, type
+
+**Failure scenario**:
+The part of a Finding that shows the problem happens: the inputs or state, then the wrong result. A cleanup Finding (a smell, or a Nit with no wrong result) states its cost instead.
+_Avoid_: repro, example
+
+**Gap sweep**:
+On Deep, one more Finder that runs after Verify, gets the kept Findings, and looks only for what the change is missing. Its Findings go through Verify too.
+_Avoid_: second pass, recheck
 
 ## Retros
 

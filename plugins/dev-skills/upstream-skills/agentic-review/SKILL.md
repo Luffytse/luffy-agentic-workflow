@@ -22,7 +22,7 @@ The **Review depth** sets which agents run. Agents name a **model tier**, never 
 |-------|---------|--------|
 | Quick | standards + spec (regular) | 1 Verifier (regular) |
 | Standard (default) | standards + spec (regular), 2 adversarial (cheap) | 1 Verifier (regular) |
-| Deep | Standard's four, plus a security Finder (premium) | 3 Verifiers (regular): tracer, skeptic, spec checker |
+| Deep | Standard's four, plus a security Finder (premium); after Verify, a gap sweep Finder (premium) | 3 Verifiers (regular): tracer, skeptic, spec checker; a second 3 for the gap sweep's Findings |
 
 Pick Deep for risky changes (security, money, deleting data, or anything the user marks), Quick for docs-only or trivial ones, Standard for the rest. A depth the user or the brief names wins. For a pull request the depth is chosen once, in Round 1, and carried in each Round comment; later Rounds reuse it unless the user changes it. A Ticket check is always Quick.
 
@@ -32,9 +32,9 @@ Pick Deep for risky changes (security, money, deleting data, or anything the use
 
 - **Pull request, Round 1 or 2:** the whole pull request, `git diff <base>...HEAD` (three-dot, against the merge-base), plus `git log <base>..HEAD --oneline`.
 - **Pull request, Round 3 to 5:** the commits since the last Round, `git diff <last-head>..HEAD`, where `<last-head>` is the `head` recorded in the last Round comment. Keep the whole-pull-request diff command too: Findings list every place their Bug class occurs in the pull request, not only in the new commits.
-- **Fixed point:** whatever the user said (a SHA, branch, tag, `main`, `HEAD~5`); ask if they gave none. `git diff <fixed-point>...HEAD`.
+- **Fixed point:** whatever the user said (a SHA, branch, tag, `main`, `HEAD~5`); ask if they gave none. `git diff --merge-base <fixed-point>` (the working tree, so staged and unstaged work counts), plus every untracked new file from `git ls-files --others --exclude-standard`, read whole, and `git log <fixed-point>..HEAD --oneline`. Pull-request Rounds review commits only.
 
-Record `git rev-parse HEAD` as this Review's head. Confirm every ref resolves (`git rev-parse`) and the diff is non-empty: a bad ref or empty diff fails here, not inside parallel subagents.
+Record `git rev-parse HEAD` as this Review's head. Confirm every ref resolves (`git rev-parse`) and the diff (with the untracked files) is non-empty: a bad ref or empty diff fails here, not inside parallel subagents.
 
 For a pull request, read every earlier comment by this skill on it (the `<!-- code-review` marker lines in [ROUNDS.md](ROUNDS.md#the-round-comment)): they give the Round number, the depth, the last head, and every Finding already raised, dismissed or open. Ticket-check comments count as already raised: their open Importants stay open until a Verifier confirms them fixed. For a Ticket check, read the earlier checks of the same Ticket the same way.
 
@@ -59,11 +59,13 @@ Brief and start the Finders for the depth, all in one parallel batch in the fore
 
 ### 4. Verify
 
-Start the Verifier(s) as brand-new subagents with every candidate Finding, every **open Important** from earlier Rounds and Ticket checks (to re-check against the current code), the spec, the standards list and `REVIEW.md`. Brief and voting rules: [VERIFY.md](VERIFY.md). The Verifier's calls are final: keep or drop, caused by this change or Pre-existing, Important or Nit, and "fix" or "skip" for a Nit.
+Start the Verifier(s) as brand-new subagents with every candidate Finding, every **open Important** from earlier Rounds and Ticket checks (to re-check against the current code), the spec, the standards list and `REVIEW.md`. Brief and voting rules: [VERIFY.md](VERIFY.md). The Verifier's calls are final: keep or drop, caused by this change or Pre-existing, Important or Nit, and "fix" or "skip" for a Nit. A failure scenario the Verifier corrected replaces the Finder's.
+
+On Deep, then run the **gap sweep**: one brand-new Finder gets the kept Findings and looks only for what the change is missing ([FINDERS.md](FINDERS.md#gap-sweep-premium-tier-deep-only)), and its Findings go through a second Deep Verify ([VERIFY.md](VERIFY.md#gap-sweep)).
 
 ### 5. Rank and report
 
-Rank the kept Findings yourself, by the rules in [ROUNDS.md](ROUNDS.md#rank). Report to the user under `## Important`, `## Nits` and `## Pre-existing`, each Finding with its Bug class, every location, the claim and which Finder raised it; then one line with the number dropped by Verify.
+Rank the kept Findings yourself, by the rules in [ROUNDS.md](ROUNDS.md#rank). Report to the user under `## Important`, `## Nits` and `## Pre-existing`, each Finding with its Bug class, every location, the claim, its failure scenario and which Finder raised it; then one line with the number dropped by Verify.
 
 For a pull request, post the Round comment and carry on with the Round loop and the stop rule in [ROUNDS.md](ROUNDS.md). For a fixed point, the report is the end; Pre-existing Findings are filed only if the user asks.
 
