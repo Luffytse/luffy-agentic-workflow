@@ -125,5 +125,15 @@ else
   grep -qF 'REVIEW.md' "$bc" || bad "BUG-CLASSES.md does not mention REVIEW.md"
 fi
 
+# 10. to-tickets' ticket templates carry a Model tier line, and to-tickets and wayfinder both name
+# setup-project (ADR 0004). A presence check only: it does not test the offer's wording.
+tt="$forked/to-tickets/SKILL.md"
+for t in local-ticket-template issue-template; do
+  sed -n "/^<$t>/,/^<\/$t>/p" "$tt" | grep -qF '**Model tier:**' || bad "to-tickets $t has no **Model tier:** line"
+done
+for s in to-tickets wayfinder; do
+  grep -qF '`setup-project`' "$forked/$s/SKILL.md" || bad "$s does not offer \`setup-project\`"
+done
+
 [ "$fail" -eq 0 ] && echo "OK: dev-skills plugin checks passed ($count skills)"
 exit "$fail"

@@ -114,7 +114,7 @@ User invokes with a loose idea.
 3. **Create the map** (label `wayfinder:map`): Destination and Notes filled in, Decisions-so-far empty, the fog sketched into **Not yet specified**.
 4. **Create the tickets you can specify now** as child issues of the map, then wire blocking edges in a **second pass** (issues need ids before they can reference each other). Write cross-references in that pass too, with real ids: a placeholder `#<n>` auto-links to an unrelated issue. Wiring sorts them into the frontier and the blocked; everything you can't yet specify stays in the fog: the **Not yet specified** section.
 5. **Fire the research subagents.** For each `research` ticket you just created, spin up a subagent with a fresh context window that calls the Skill tool with "research" to resolve it in parallel, capturing its findings on a throwaway `research/<name>` branch with a context pointer from the ticket. Push the branch but open no PR: it is never merged.
-6. Stop: charting is one session's work; it hand-resolves nothing.
+6. [Offer `setup-project`](#offer-setup-project), then stop: charting is one session's work; it hand-resolves nothing.
 
 ### Work through the map
 
@@ -125,5 +125,10 @@ User invokes with a map (URL or number). A ticket is **optional**: without one, 
 3. Resolve it as the type its `wayfinder:<type>` label names (see [Ticket Types](#ticket-types)). Read the label, not just the body: the body never states the type. **Zoom as needed**: fetch the full body of any related or closed ticket on demand; call the Skill tool for whichever skills the `## Notes` block names. If in doubt, call the Skill tool twice, for "grilling" and "domain-modeling".
 4. Record the resolution: post the answer as a **resolution comment**, **close** the issue, and **append a context pointer** to the map's Decisions-so-far.
 5. Add newly-surfaced tickets (create-then-wire); graduate any fog the answer has made specifiable, clearing each graduated patch from **Not yet specified** so it lives only as its new ticket. If the answer reveals that a ticket (this one or another) sits beyond the destination, **rule it out of scope** rather than resolving it on the route. If the decision invalidates other parts of the map, update or delete those tickets.
+6. [Offer `setup-project`](#offer-setup-project).
 
 The user may run unblocked tickets in parallel, so expect other sessions to be editing the tracker concurrently.
+
+## Offer `setup-project`
+
+At the end of either mode, decide whether this session changed what the project's threads need: a new map to point at, a new repo, a new kind of thread, a new standing rule, or (when the way to the destination is now clear) build threads to start. If so, offer the user `setup-project` in one line naming what changed. Only offer: call the Skill tool with "setup-project" only after the user says yes. If nothing changed, say nothing about it.

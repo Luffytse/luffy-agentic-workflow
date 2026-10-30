@@ -36,6 +36,8 @@ Break the work into **tracer bullet** tickets.
 
 Give each ticket its **blocking edges**: the other tickets that must complete before it can start. A ticket with no blockers can start immediately.
 
+Give each ticket a **model tier**, the tier its Implementer runs on: **regular** by default, **premium** for heavy or tricky work (a subtle design call, wide-reaching changes, concurrency, security or money logic). Name the tier, never a vendor's model.
+
 **Wide refactors are the exception to vertical slicing.** A **wide refactor** is one mechanical change (rename a column, retype a shared symbol) whose **blast radius** fans across the whole codebase, so a single edit breaks thousands of call sites at once and no vertical slice can land green. Don't force it into a tracer bullet; sequence it as **expand–contract**. First expand: add the new form beside the old so nothing breaks. Then migrate the call sites over in batches sized by blast radius (per package, per directory), each batch its own ticket blocked by the expand, keeping CI green batch to batch because the old form still exists. Finally contract: delete the old form once no caller remains, in a ticket blocked by every migrate batch. When even the batches can't stay green alone, keep the sequence but let them share an integration branch that all block a final integrate-and-verify ticket; green is promised only there.
 
 ### 4. Quiz the user
@@ -44,6 +46,7 @@ Present the proposed breakdown as a numbered list. For each ticket, show:
 
 - **Title**: short descriptive name
 - **Blocked by**: which other tickets (if any) must complete first
+- **Model tier**: regular or premium, and for premium one line on why
 - **What it delivers**: the end-to-end behaviour this ticket makes work
 
 Ask the user:
@@ -51,6 +54,7 @@ Ask the user:
 - Does the granularity feel right? (too coarse / too fine)
 - Are the blocking edges correct: does each ticket only depend on tickets that genuinely gate it?
 - Should any tickets be merged or split further?
+- Does each ticket's model tier fit its difficulty?
 
 Iterate until the user approves the breakdown.
 
@@ -73,6 +77,8 @@ Do NOT close or modify any parent issue.
 
 **Blocked by:** the numbers/titles of the tickets that gate this one, or "None (can start immediately)".
 
+**Model tier:** this ticket's tier as agreed with the user: `regular` or `premium`.
+
 **Status:** ready-for-agent
 
 - [ ] Acceptance criterion 1
@@ -90,6 +96,8 @@ A reference to the parent issue on the tracker (if the source was an existing is
 
 The end-to-end behaviour this ticket makes work, from the user's perspective, not layer-by-layer implementation.
 
+**Model tier:** this ticket's tier as agreed with the user: `regular` or `premium`.
+
 ## Acceptance criteria
 
 - [ ] Criterion 1
@@ -102,3 +110,7 @@ The end-to-end behaviour this ticket makes work, from the user's perspective, no
 </issue-template>
 
 In either form, avoid specific file paths or code snippets: they go stale fast. Exception: if a prototype produced a snippet that encodes a decision more precisely than prose can (state machine, reducer, schema, type shape), inline it and note briefly that it came from a prototype. Trim to the decision-rich parts, not a working demo, just the important bits.
+
+### 6. Offer `setup-project`
+
+Once the tickets are published, decide whether they changed what the project's threads need: a new spec or map to point at, a new repo, a new kind of thread, or a new standing rule. If so, offer the user `setup-project` in one line naming what changed. Only offer: call the Skill tool with "setup-project" only after the user says yes. If nothing changed, say nothing about it.

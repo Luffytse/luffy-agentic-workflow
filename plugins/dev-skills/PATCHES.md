@@ -173,8 +173,26 @@ What:
 
 Merging an Upstream update: carry Upstream's `retro/SKILL.md` changes over by hand and re-apply the step 3 insertion and the step 5 sentence.
 
+## Patch 7: `to-tickets` gives each ticket a Model tier; `to-tickets` and `wayfinder` offer `setup-project` (ADR 0004)
+
+Why: ADR 0004. Each ticket's Implementer runs on the tier `to-tickets` gave it, and the project instructions `setup-project` writes must keep up when planning changes what threads need. Upstream has neither.
+
+What:
+
+- `to-tickets/SKILL.md`:
+  - Step 3, after the blocking-edges paragraph: new paragraph "Give each ticket a **model tier**, the tier its Implementer runs on: **regular** by default, **premium** for heavy or tricky work (a subtle design call, wide-reaching changes, concurrency, security or money logic). Name the tier, never a vendor's model."
+  - Step 4: the per-ticket list gains "**Model tier**: regular or premium, and for premium one line on why" after **Blocked by**; the questions gain "Does each ticket's model tier fit its difficulty?".
+  - `<local-ticket-template>`: a "**Model tier:** this ticket's tier as agreed with the user: `regular` or `premium`." line after **Blocked by**.
+  - `<issue-template>`: a "**Model tier:** this ticket's tier as agreed with the user: `regular` or `premium`." line at the end of `## What to build`.
+  - New step 6, "Offer `setup-project`": once published, if the tickets changed what threads need (a new spec or map to point at, a new repo, a new kind of thread, a new standing rule), offer `setup-project` in one line; run it only after the user says yes; say nothing if nothing changed.
+- `wayfinder/SKILL.md`: new section "Offer `setup-project`" at the end (same rule, with "build threads to start" once the way is clear); "Chart the map" step 6 becomes "Offer `setup-project`, then stop: ..."; "Work through the map" gains step 6, "Offer `setup-project`".
+- `scripts/check-plugin.sh`: new check 10 (both `to-tickets` templates carry a `**Model tier:**` line; `to-tickets` and `wayfinder` both name `` `setup-project` ``).
+- `.claude-plugin/plugin.json`: version 0.5.0 to 0.6.0.
+
+Merging an Upstream update: carry Upstream's changes to both files over by hand and re-apply the lines above.
+
 ## Vendor model names in Upstream text
 
-None in the kept skills at the Base commit, so no Patch was needed for ADR 0002 (checked for ticket #4: grep for `haiku`, `sonnet`, `opus`, `claude-`, `gpt-`, `gemini` over `upstream-skills/`). Some kept skills start subagents (for example `grilling`, `wayfinder`, `code-review`, `implement-spec`), but none picks a model for them. Spec #1 adds tiers in later tickets (the `code-review` Finders and Verifiers, the `implement` and `implement-spec` Implementers, and a tier on each ticket from `to-tickets`); each of those edits gets its own Patch here.
+None in the kept skills at the Base commit, so no Patch was needed for ADR 0002 (checked for ticket #4: grep for `haiku`, `sonnet`, `opus`, `claude-`, `gpt-`, `gemini` over `upstream-skills/`). Some kept skills start subagents (for example `grilling`, `wayfinder`, `code-review`, `implement-spec`), but none picks a model for them. Spec #1 adds tiers in later tickets (the `code-review` Finders and Verifiers, and the `implement` and `implement-spec` Implementers; the tier on each ticket from `to-tickets` is Patch 7); each of those edits gets its own Patch here.
 
 `scripts/check-plugin.sh` now runs the vendor-name grep over `upstream-skills/` too, so an Upstream merge that brings in a model name fails the check and must be patched to a tier.
