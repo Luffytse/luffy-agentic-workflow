@@ -5,7 +5,7 @@ description: "Configure a GitHub repo for the dev-skills plugin: write its issue
 
 # Set up dev-skills
 
-Our own skill, derived from Upstream's setup skill; the seed files in this folder are mostly Upstream text (MIT, see `LICENSE-mattpocock-skills` in the plugin folder). Scaffold the per-repo configuration the other skills read:
+Derived from Matt Pocock's setup skill; the seed files in this folder are mostly his text (MIT, see `LICENSE-mattpocock-skills` in the plugin folder). Scaffold the per-repo configuration the other skills read:
 
 - **Issue tracker**: GitHub Issues, in `docs/agents/issue-tracker.md`.
 - **Labels**: the 5 state roles and 2 category roles that `triage` uses, and the `wayfinder:*` labels, in `docs/agents/triage-labels.md` and on the repo.

@@ -63,7 +63,7 @@ Do this only in a repo with a single root `GLOSSARY.md`, when you are adding a t
 3. Write `GLOSSARY-MAP.md` at the repo root, listing one page per Area (format in [GLOSSARY-FORMAT.md](./GLOSSARY-FORMAT.md)). Skills that already read `GLOSSARY-MAP.md` find the pages from it.
 4. Replace the `GLOSSARY.md` line in the docs index with a line linking `GLOSSARY-MAP.md`, and fix any other doc that links `GLOSSARY.md`. If there is no `docs/index.md` yet, create it now ([DOCS-INDEX.md](./DOCS-INDEX.md)).
 
-If `GLOSSARY-MAP.md` already exists (split per Area, or Upstream's multi-context layout), add the term to the page the map points to for its Area or context; never create a root `GLOSSARY.md` or split again just because a map exists. A page that grows past about 10 KB splits again by sub-area, and the map gets the new page.
+If `GLOSSARY-MAP.md` already exists (split per Area, or a multi-context layout), add the term to the page the map points to for its Area or context; never create a root `GLOSSARY.md` or split again just because a map exists. A page that grows past about 10 KB splits again by sub-area, and the map gets the new page.
 
 ## Keeping the docs index current
 

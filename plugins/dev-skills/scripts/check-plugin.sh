@@ -347,7 +347,7 @@ if [ -f "$am" ]; then
 fi
 
 # 24. setup-dev-skills: setup-dev-skills is our own skill (issue #77), not a fork of Upstream's setup skill: the forked
-# folder is gone, the own skill exists with its seeds and no openai.yaml, credits Upstream and its
+# folder is gone, the own skill exists with its seeds and no openai.yaml, credits Matt Pocock's skills and its
 # licence file, is GitHub only, creates the wayfinder labels, and reports (never changes) GitHub settings
 sd="$own/setup-dev-skills"
 # the old name is built from two halves so that grep for it finds only PATCHES.md history
@@ -359,7 +359,7 @@ else
     [ -f "$sd/$f" ] || bad "missing skills/setup-dev-skills/$f"
   done
   [ -e "$sd/agents/openai.yaml" ] && bad "setup-dev-skills/agents/openai.yaml exists; our own skills have none"
-  grep -qF 'LICENSE-mattpocock-skills' "$sd/SKILL.md" || bad "setup-dev-skills/SKILL.md does not credit Upstream and LICENSE-mattpocock-skills"
+  grep -qF 'LICENSE-mattpocock-skills' "$sd/SKILL.md" || bad "setup-dev-skills/SKILL.md does not credit Matt Pocock's skills and LICENSE-mattpocock-skills"
   grep -qF 'wayfinder:map' "$sd/SKILL.md" || bad "setup-dev-skills/SKILL.md does not create the wayfinder labels"
   grep -qiF 'never change' "$sd/SKILL.md" || bad "setup-dev-skills/SKILL.md does not say the settings check never changes settings"
   [ -e "$sd/issue-tracker-gitlab.md" ] || [ -e "$sd/issue-tracker-local.md" ] && bad "setup-dev-skills still carries a GitLab or local tracker seed"
@@ -573,6 +573,17 @@ done < <(grep '^Brief: "' "$ar/FINDERS.md")
 vl="$(grep -F 'Answer per Finding:' "$ar/VERIFY.md")"
 [ "$(printf '%s\n' "$vl" | grep -c .)" -eq 1 ] || bad "agentic-review/VERIFY.md has no single line holding the Verifier brief's 'Answer per Finding:'"
 case "$vl" in *"$closing\"") ;; *) bad "agentic-review/VERIFY.md Verifier brief does not end with the closing line" ;; esac
+
+# 39. repo-free-skill-text: skill text leans on nothing that exists only in this repo (issue #177), because every
+# project that loads the plugin reads it. Under upstream-skills/ and skills/ (*.md and *.yaml), no "ADR NNNN" (this
+# repo's ADR numbers mean another decision, or nothing, elsewhere) and no "Upstream" (this repo's glossary word for
+# Matt Pocock's repo). Lowercase "upstream" (a fork's parent repo) is fine, and so is an example docs index line that
+# links its own ADR file ("[ADR 0003](adr/0003-...").
+hits="$(grep -rnE --include='*.md' --include='*.yaml' 'ADR [0-9]{4}|\bUpstream\b' "$forked" "$own" | grep -vE '\[ADR [0-9]{4}\]\(adr/')"
+if [ -n "$hits" ]; then
+  echo "$hits"
+  bad "skill text names this repo's ADR numbers or says \"Upstream\""
+fi
 
 [ "$fail" -eq 0 ] && echo "OK: dev-skills plugin checks passed ($count skills)"
 exit "$fail"

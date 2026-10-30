@@ -33,7 +33,7 @@ _Avoid_: Client, buyer, account
 
 A repo starts with one root `GLOSSARY.md`. When it passes about 10 KB, `domain-modeling` splits it into one page per Area at `docs/glossary/<area>.md`, with a root `GLOSSARY-MAP.md` listing the pages (see "Splitting the glossary" in [SKILL.md](./SKILL.md)). The root `GLOSSARY.md` is removed. A page uses the same structure as above, with the Area as its title. The docs index links `GLOSSARY.md` or `GLOSSARY-MAP.md`, whichever exists ([DOCS-INDEX.md](./DOCS-INDEX.md)).
 
-A map that points at `docs/glossary/` lists Area pages of one glossary. The map format below also covers Upstream's multi-context repos, where the map points into `src/` and the pages live next to the code.
+A map that points at `docs/glossary/` lists Area pages of one glossary. The map format below also covers multi-context repos, where the map points into `src/` and the pages live next to the code.
 
 ## Single vs multi-context repos
 
@@ -57,7 +57,7 @@ A map that points at `docs/glossary/` lists Area pages of one glossary. The map 
 - **Ordering ↔ Billing**: Shared types for `CustomerId` and `Money`
 ```
 
-(In an Upstream multi-context repo the links point at `./src/<context>/GLOSSARY.md` instead.)
+(In a multi-context repo the links point at `./src/<context>/GLOSSARY.md` instead.)
 
 The skill infers which structure applies:
 

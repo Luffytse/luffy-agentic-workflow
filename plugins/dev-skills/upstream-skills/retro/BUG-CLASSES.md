@@ -1,6 +1,6 @@
 # Repeated Bug classes
 
-A **Bug class** that comes up more than once in a pull request becomes a check, so later Reviews need not catch it again (ADR 0003). The record is the Round comments that `agentic-review` posts ([ROUNDS.md](../agentic-review/ROUNDS.md)).
+A **Bug class** that comes up more than once in a pull request becomes a check, so later Reviews need not catch it again. The record is the Round comments that `agentic-review` posts ([ROUNDS.md](../agentic-review/ROUNDS.md)).
 
 ## Procedure
 

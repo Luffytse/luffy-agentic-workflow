@@ -599,6 +599,22 @@ What:
 
 Merging an Upstream update: re-apply the repeat sentence at the end of the "Take the numbers" step in both skills.
 
+## Patch 34: skill text cites no ADR number of this repo, does not say "Upstream", and leaves this repo's own merge rule to its `CLAUDE.md` (`implement/`, `implement-spec/`, `retro/`, `domain-modeling/`)
+
+Why: issue #177. Every project that loads the plugin reads its skill text, and in another repo "ADR 0004" names another decision or nothing, and "Upstream" is a word only this repo's glossary defines. The merge list in `implement` and `implement-spec` likewise named the `agentic-review` skill, whose source is changed only in this repo; the user chose to move that rule to this repo's `CLAUDE.md`.
+
+What:
+
+- `implement/SKILL.md` and `implement-spec/SKILL.md` (opening paragraph): drop "(ADR 0004)" and "(ADR 0004, ADR 0005)".
+- `retro/BUG-CLASSES.md` (opening paragraph): drop "(ADR 0003)".
+- `domain-modeling/SKILL.md` ("Splitting the glossary") and `domain-modeling/GLOSSARY-FORMAT.md` (two places): "Upstream's multi-context layout" / "repos" and "an Upstream multi-context repo" become "a multi-context layout", "multi-context repos" and "a multi-context repo".
+- Our own text, not Upstream: `setup-dev-skills/SKILL.md` says it is derived from Matt Pocock's setup skill instead of "Our own skill, derived from Upstream's setup skill".
+- `scripts/check-plugin.sh`: new check 39 (repo-free-skill-text: no `ADR NNNN` and no capitalised `Upstream` in `*.md` and `*.yaml` under `upstream-skills/` and `skills/`; an example docs index line linking its own ADR file is exempt).
+- `implement/SKILL.md` (step 7) and `implement-spec/SKILL.md` (step 8): the list of when the pull request goes to the user drops "or the `agentic-review` skill", whose source is changed only in this repo, and gains "or anything else the repo's own rules (its `CLAUDE.md`, the project instructions, its docs) say a person merges". Not Upstream text: this repo's `CLAUDE.md` gains the `agentic-review` rule, and ADR 0004 says the same in the paragraph after its list.
+- `.claude-plugin/plugin.json`: version 0.22.7 to 0.22.8.
+
+Merging an Upstream update: take Upstream's text, then drop any ADR citation it adds (Upstream's own ADR numbers mean nothing here either); check 39 fails until it is gone.
+
 ## Not a Patch: `setup-dev-skills` seed text (issue #144)
 
 Our own, not Upstream. The `setup-dev-skills` skill's `SKILL.md` step 1 names both remote URL forms, the GitHub seed gives REST routes for pull requests and open blockers, and the seed files name skills without a leading slash.
