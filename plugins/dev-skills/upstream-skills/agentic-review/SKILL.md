@@ -12,7 +12,7 @@ Every Finder and Verifier is a **brand-new subagent** each Review: never reuse o
 
 Run the Review (Find, Verify, Rank and the Round loop) in the **top-level session**, the one that can start subagents. A subagent cannot start subagents of its own, so never hand the whole Review to one subagent: it stops at Find. If subagents cannot be started at all, stop and tell the user; do not do the Finders' or Verifier's work yourself.
 
-The issue tracker should have been provided to you. If not, tell the user to run `/setup-matt-pocock-skills`.
+The issue tracker should have been provided to you. If not, tell the user to run `setup-dev-skills`.
 
 ## Depth and tiers
 

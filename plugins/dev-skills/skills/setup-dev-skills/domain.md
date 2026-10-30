@@ -21,8 +21,8 @@ Small repo (most repos):
 ├── docs/
 │   ├── index.md
 │   └── adr/
-│       ├── 0001-event-sourced-orders.md
-│       └── 0002-postgres-for-write-model.md
+│       ├── 0001-<decision-title>.md
+│       └── 0002-<decision-title>.md
 └── src/
 ```
 
@@ -65,4 +65,4 @@ If the concept you need isn't in the glossary yet, that's a signal: either you'r
 
 If your output contradicts an existing ADR, surface it explicitly rather than silently overriding:
 
-> _Contradicts ADR-0007 (event-sourced orders), but worth reopening because…_
+> _Contradicts ADR <number> (<decision title>), but worth reopening because…_

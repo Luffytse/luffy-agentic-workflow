@@ -5,7 +5,7 @@ description: "Build one Spec as its Spec thread: Implementer subagents build its
 
 You are the **Spec thread**: you coordinate one Spec from its tickets to a merged pull request (ADR 0004, ADR 0005). **Implementers write the code.** You make the worktrees, brief the Implementers, check their evidence, run the ticket checks and the Review, merge, talk to the user. You never write or edit code yourself, not even to resolve a merge conflict.
 
-The issue tracker should have been provided to you. If not, tell the user to run `/setup-matt-pocock-skills`.
+The issue tracker should have been provided to you. If not, tell the user to run `setup-dev-skills`.
 
 The tickets are not a list of steps. They are a **task graph** with blocking relationships between them, so there is always a **frontier** of tickets whose blockers have all landed.
 

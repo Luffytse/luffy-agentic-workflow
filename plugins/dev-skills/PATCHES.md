@@ -8,7 +8,7 @@ Everything under `upstream-skills/` is copied from Matt Pocock's `mattpocock/ski
 - Upstream commit: `a496f55` ("implement-spec: a fresh implementer subagent per ticket (#1342)", 2026-10-29)
 - Upstream plugin: `mattpocock-skills` version `1.3.2`
 - Upstream layout: skills sit in `skills/engineering/` and `skills/productivity/`; here they are flat in `upstream-skills/<name>/`.
-- Kept: 23 skills (ADR 0001). Dropped, not copied: `teach`, `to-questionnaire`, `grill-me`, `wait-what`.
+- Kept: 22 skills (ADR 0001). Dropped, not copied: `teach`, `to-questionnaire`, `grill-me`, `wait-what`. Upstream's `setup-matt-pocock-skills` was copied at first and later moved out as our own `setup-dev-skills` (Patch 22).
 - Copied whole, including each skill's helper files (`agents/openai.yaml`, `scripts/`, other `.md`). Not copied: Upstream's `in-progress`, `misc` and `deprecated` skills, and its `README.md`, `CHANGELOG.md` and changesets.
 - The copy in luffydev's `.claude/skills/` was Upstream `5beb35b`, 10 days behind; we copied from `a496f55` instead. That copy's one local edit (at most 3 questions per round in `grilling`) is not carried over; it is a separate Patch for a later ticket.
 
@@ -22,7 +22,7 @@ Everything under `upstream-skills/` is copied from Matt Pocock's `mattpocock/ski
 
 Why: project threads have no slash commands, and a skill with `disable-model-invocation: true` can never be started by an agent (ADR 0001).
 
-What: delete the `disable-model-invocation: true` line from the frontmatter. Upstream sets it on these 12 of the 23 kept skills, all changed:
+What: delete the `disable-model-invocation: true` line from the frontmatter. Upstream sets it on these 12 of the 23 skills first kept (11 of the 22 kept now: `setup-matt-pocock-skills` left `upstream-skills/` in Patch 22), all changed:
 
 - `ask-matt`
 - `grill-with-docs`
@@ -31,7 +31,7 @@ What: delete the `disable-model-invocation: true` line from the frontmatter. Ups
 - `implement-spec`
 - `improve-codebase-architecture`
 - `retro`
-- `setup-matt-pocock-skills`
+- `setup-matt-pocock-skills` (removed in Patch 22)
 - `to-spec`
 - `to-tickets`
 - `triage`
@@ -115,8 +115,8 @@ Changed Upstream files, by skill:
 - `pr/SKILL.md`: "domain language from `GLOSSARY.md`" replaced by the shared phrase.
 - `research/SKILL.md`: new step 4, add the note's line to `docs/index.md` if it is committed to a branch that will merge; no line for a throwaway branch.
 - `retro/SKILL.md` ("Files" list): new "Index" bullet, update `docs/index.md` in the same commit when adding or editing `REVIEW.md`, `CODING_STANDARDS.md` or any other doc.
-- `setup-matt-pocock-skills/SKILL.md`: the "Domain docs" summary mentions `docs/index.md`; exploring also looks for `docs/index.md` and the docs it should list; Section C notes the later glossary split; the draft includes the index; a final write step creates `docs/index.md` if missing, or updates it, listing every `docs/agents/` file written and every doc found.
-- `setup-matt-pocock-skills/domain.md` (becomes `docs/agents/domain.md`): "Before exploring" starts at `docs/index.md`, with the old glossary and ADR reads as the fallback; "Single-context repo" is relabelled "Small repo" and its tree adds `docs/index.md`; a new tree for the per-Area split; multi-context means a map that points into `src/`; "use the term as defined in the glossary"; one sentence says any skill that writes a doc adds or fixes its line in `docs/index.md` in the same commit (no link, since the rule file is not reachable from a consumer repo).
+- `setup-matt-pocock-skills/SKILL.md` (removed in Patch 22; the work carried over to `skills/setup-dev-skills/SKILL.md`): the "Domain docs" summary mentions `docs/index.md`; exploring also looks for `docs/index.md` and the docs it should list; the later glossary split is noted in the `domain.md` seed; the draft includes the index; a final write step creates `docs/index.md` if missing, or updates it, listing every `docs/agents/` file written and every doc found.
+- `setup-matt-pocock-skills/domain.md` (removed in Patch 22; carried over to `skills/setup-dev-skills/domain.md`; becomes `docs/agents/domain.md`): "Before exploring" starts at `docs/index.md`, with the old glossary and ADR reads as the fallback; "Single-context repo" is relabelled "Small repo" and its tree adds `docs/index.md`; a new tree for the per-Area split; multi-context means a map that points into `src/`; "use the term as defined in the glossary"; one sentence says any skill that writes a doc adds or fixes its line in `docs/index.md` in the same commit (no link, since the rule file is not reachable from a consumer repo).
 - `tdd/SKILL.md`: "read `GLOSSARY.md` (if it exists) ... respect ADRs" replaced by the shared phrase.
 - `to-spec/SKILL.md` (step 1): adds the shared phrase before the glossary-vocabulary sentence.
 - `to-tickets/SKILL.md`: adds the shared phrase before the glossary-vocabulary sentence.
@@ -127,7 +127,7 @@ Changed Upstream files, by skill:
 Also in this Patch:
 
 - `.claude-plugin/plugin.json`: version 0.1.2 to 0.2.0.
-- `scripts/check-plugin.sh` check 7: `domain-modeling/DOCS-INDEX.md` exists; each writer file mentions `DOCS-INDEX.md` (`SKILL.md` of `domain-modeling`, `improve-codebase-architecture`, `triage`, `retro`, `setup-matt-pocock-skills`, `research` and `grill-with-docs`, plus `triage/OUT-OF-SCOPE.md`); each of the 12 readers' `SKILL.md` contains "start at `docs/index.md`" (case-insensitive) and `GLOSSARY-MAP.md` (readers: `tdd`, `diagnosing-bugs`, `improve-codebase-architecture`, `pr`, `to-spec`, `to-tickets`, `triage`, `grill-with-docs`, `wayfinder`, `implement`, `implement-spec`, `code-review`); `domain.md` mentions `docs/index.md`.
+- `scripts/check-plugin.sh` check 7: `domain-modeling/DOCS-INDEX.md` exists; each writer file mentions `DOCS-INDEX.md` (`SKILL.md` of `domain-modeling`, `improve-codebase-architecture`, `triage`, `retro`, `setup-matt-pocock-skills` (removed in Patch 22; now `setup-dev-skills`), `research` and `grill-with-docs`, plus `triage/OUT-OF-SCOPE.md`); each of the 12 readers' `SKILL.md` contains "start at `docs/index.md`" (case-insensitive) and `GLOSSARY-MAP.md` (readers: `tdd`, `diagnosing-bugs`, `improve-codebase-architecture`, `pr`, `to-spec`, `to-tickets`, `triage`, `grill-with-docs`, `wayfinder`, `implement`, `implement-spec`, `code-review`); `domain.md` mentions `docs/index.md`.
 
 Not changed here: the drift check in `code-review` (ADR 0006's last bullet) came with Patch 5.
 
@@ -424,6 +424,27 @@ What (Upstream-derived text changed; only the `description:` frontmatter line of
 - `.claude-plugin/plugin.json`: version 0.11.0 to 0.12.0.
 
 Merging an Upstream update: keep our description line for each skill above and take Upstream's body changes; keep the template script executable.
+
+## Patch 22: `setup-matt-pocock-skills` becomes our own `setup-dev-skills` (`skills/setup-dev-skills/`)
+
+Why: issue #77. The forked setup skill was never reworked for our skill set (GitHub only, the labels the skills use, GitHub settings the build skills rely on, cloud sessions without GraphQL `gh`). It is now our own skill, derived from Upstream's, in `skills/` where our own skills live. ADR 0001 keeps 22 Upstream skills.
+
+Removed from Upstream text: the whole folder `upstream-skills/setup-matt-pocock-skills/` (`SKILL.md`, `domain.md`, `issue-tracker-github.md`, `issue-tracker-gitlab.md`, `issue-tracker-local.md`, `triage-labels.md`, `agents/openai.yaml`). It is now `skills/setup-dev-skills/`, which keeps Patch 1 (model-invoked) and Patch 4 (the docs index and the index-first `domain.md`), drops `agents/openai.yaml`, the GitLab and local seeds and the "Other" tracker option, and credits Upstream and `LICENSE-mattpocock-skills`. Its description gains a "Use when ..." trigger in the style of Patch 21's descriptions. The note about `domain-modeling` splitting a large glossary now lives only in the `domain.md` seed, not in `SKILL.md` Section C. Merging an Upstream update to the setup skill: diff Upstream's folder against `skills/setup-dev-skills/` and take over by hand what still fits.
+
+Upstream text changed in other skills:
+
+- `ask-matt/SKILL.md`: "run `/setup-matt-pocock-skills`" in the setup entry becomes `setup-dev-skills`, and "Custom issue trackers also work." becomes "It supports GitHub repos only for now."
+- `wayfinder/SKILL.md` (tracker paragraph): the rename, with "and stop" added, and the sentence "If no tracker has been provided, default to the local-markdown tracker." deleted.
+- `implement/SKILL.md`, `implement-spec/SKILL.md`, `agentic-review/SKILL.md`, `to-spec/SKILL.md`, `triage/SKILL.md`: `/setup-matt-pocock-skills` becomes `setup-dev-skills`.
+- `to-tickets/SKILL.md`: the same rename in both places (the opening line and step 5's "depends on the tracker ... configured").
+
+Left as Upstream wrote them: the local and GitLab mentions in `to-tickets`, `agentic-review`, `implement-spec` and `ask-matt` (its local-tracker line, which Patch 20 reworded but left about a local tracker).
+
+Also in this Patch:
+
+- `scripts/check-plugin.sh`: check 1 expects 22 skills (the kept list drops `setup-matt-pocock-skills`); check 7 takes `setup-dev-skills/SKILL.md` and `setup-dev-skills/domain.md` from `skills/`; new check 24 (the old folder is gone; the own skill has `SKILL.md`, the seeds, no `agents/openai.yaml` and no GitLab or local seed; `SKILL.md` credits `LICENSE-mattpocock-skills`, names `wayfinder:map` and says settings are never changed).
+- ADR 0001 and ADR 0006 and the plugin `README.md` name `setup-dev-skills`; this repo's `docs/agents/` and `CLAUDE.md` match what a re-run writes, apart from repo-specific examples (real ADR names, the ADR 0007 link).
+- `.claude-plugin/plugin.json`: version 0.12.0 to 0.13.0 (a skill name was removed).
 
 ## Vendor model names in Upstream text
 

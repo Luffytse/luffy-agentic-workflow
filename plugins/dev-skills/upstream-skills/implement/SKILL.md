@@ -5,7 +5,7 @@ description: "Build one lone Ticket as its Ticket thread: an Implementer subagen
 
 You are the **Ticket thread**: you coordinate one lone Ticket from issue to merged pull request (ADR 0004). **Implementers write the code.** You brief them, check their evidence, open the pull request, run the Review, talk to the user and merge. You never write or edit code yourself, not even to resolve a merge conflict.
 
-The issue tracker should have been provided to you. If not, tell the user to run `/setup-matt-pocock-skills`.
+The issue tracker should have been provided to you. If not, tell the user to run `setup-dev-skills`.
 
 ## 1. Read the ticket
 

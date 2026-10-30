@@ -7,15 +7,15 @@ forked="$root/upstream-skills"
 fail=0
 bad() { echo "FAIL: $*"; fail=1; }
 
-kept="ask-matt wayfinder grill-with-docs grilling domain-modeling research prototype handoff to-spec to-tickets implement implement-spec tdd agentic-review pr retro diagnosing-bugs triage improve-codebase-architecture codebase-design setup-matt-pocock-skills wizard writing-for-agents"
+kept="ask-matt wayfinder grill-with-docs grilling domain-modeling research prototype handoff to-spec to-tickets implement implement-spec tdd agentic-review pr retro diagnosing-bugs triage improve-codebase-architecture codebase-design wizard writing-for-agents"
 dropped="teach to-questionnaire grill-me wait-what"
 
-# 1. exactly the 23 kept skills, each with a SKILL.md
+# 1. exactly the 22 kept skills, each with a SKILL.md
 count=0
 for s in $kept; do
   [ -f "$forked/$s/SKILL.md" ] && count=$((count + 1)) || bad "missing $forked/$s/SKILL.md"
 done
-[ "$count" -eq 23 ] || bad "expected 23 skills, found $count"
+[ "$count" -eq 22 ] || bad "expected 22 skills, found $count"
 for s in $dropped; do
   [ -e "$forked/$s" ] && bad "dropped skill present: $s"
 done
@@ -93,7 +93,7 @@ if [ -n "$hits" ]; then
 fi
 
 # 7. docs index (ADR 0006): the rule file exists, writing skills link it, reading skills start at the index
-writers="domain-modeling/SKILL.md improve-codebase-architecture/SKILL.md triage/SKILL.md triage/OUT-OF-SCOPE.md retro/SKILL.md retro/BUG-CLASSES.md setup-matt-pocock-skills/SKILL.md research/SKILL.md grill-with-docs/SKILL.md"
+writers="domain-modeling/SKILL.md improve-codebase-architecture/SKILL.md triage/SKILL.md triage/OUT-OF-SCOPE.md retro/SKILL.md retro/BUG-CLASSES.md research/SKILL.md grill-with-docs/SKILL.md"
 readers="tdd diagnosing-bugs improve-codebase-architecture pr to-spec to-tickets triage grill-with-docs wayfinder implement implement-spec agentic-review"
 [ -f "$forked/domain-modeling/DOCS-INDEX.md" ] || bad "missing domain-modeling/DOCS-INDEX.md"
 for f in $writers; do
@@ -103,7 +103,8 @@ for s in $readers; do
   grep -qiF 'start at `docs/index.md`' "$forked/$s/SKILL.md" || bad "reading skill $s does not say to start at \`docs/index.md\`"
   grep -qF 'GLOSSARY-MAP.md' "$forked/$s/SKILL.md" || bad "reading skill $s does not name GLOSSARY-MAP.md in its fallback"
 done
-grep -qF 'docs/index.md' "$forked/setup-matt-pocock-skills/domain.md" || bad "domain.md template does not start at docs/index.md"
+grep -qF 'docs/index.md' "$own/setup-dev-skills/domain.md" || bad "domain.md template does not start at docs/index.md"
+grep -qF "DOCS-INDEX.md" "$own/setup-dev-skills/SKILL.md" || bad "writing skill file setup-dev-skills/SKILL.md does not mention DOCS-INDEX.md"
 
 # 8. agentic-review's reference files exist and SKILL.md links each one
 for f in FINDERS.md VERIFY.md ROUNDS.md; do
@@ -312,6 +313,25 @@ if [ -f "$am" ]; then
   grep -qF '.scratch/<feature-slug>/spec.md' "$am" || bad "ask-matt/SKILL.md does not name the local spec file"
   grep -qF 'write one lone ticket' "$am" || bad "ask-matt/SKILL.md wayfinder shortcut does not say to write a lone ticket first"
   grep -F 'Bugs and requests piling up' "$am" | grep -qF '`/implement-spec`' || bad "ask-matt/SKILL.md triage on-ramp does not send an issue under a Spec to /implement-spec"
+fi
+
+# 24. setup-dev-skills is our own skill (issue #77), not a fork of Upstream's setup skill: the forked
+# folder is gone, the own skill exists with its seeds and no openai.yaml, credits Upstream and its
+# licence file, is GitHub only, creates the wayfinder labels, and reports (never changes) GitHub settings
+sd="$own/setup-dev-skills"
+# the old name is built from two halves so that grep for it finds only PATCHES.md history
+old="setup-matt-""pocock-skills"
+[ -e "$forked/$old" ] && bad "upstream-skills/$old is back; the skill is skills/setup-dev-skills"
+if [ ! -f "$sd/SKILL.md" ]; then bad "missing skills/setup-dev-skills/SKILL.md"
+else
+  for f in issue-tracker-github.md triage-labels.md domain.md; do
+    [ -f "$sd/$f" ] || bad "missing skills/setup-dev-skills/$f"
+  done
+  [ -e "$sd/agents/openai.yaml" ] && bad "setup-dev-skills/agents/openai.yaml exists; our own skills have none"
+  grep -qF 'LICENSE-mattpocock-skills' "$sd/SKILL.md" || bad "setup-dev-skills/SKILL.md does not credit Upstream and LICENSE-mattpocock-skills"
+  grep -qF 'wayfinder:map' "$sd/SKILL.md" || bad "setup-dev-skills/SKILL.md does not create the wayfinder labels"
+  grep -qiF 'never change' "$sd/SKILL.md" || bad "setup-dev-skills/SKILL.md does not say the settings check never changes settings"
+  [ -e "$sd/issue-tracker-gitlab.md" ] || [ -e "$sd/issue-tracker-local.md" ] && bad "setup-dev-skills still carries a GitLab or local tracker seed"
 fi
 
 [ "$fail" -eq 0 ] && echo "OK: dev-skills plugin checks passed ($count skills)"

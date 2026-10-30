@@ -15,13 +15,15 @@ Words used here (Finder, Verifier, Finding, Bug class, Review depth, Model tier 
 
 ## Agent skills
 
+Start at `docs/index.md`; it says which doc to read for what.
+
 ### Issue tracker
 
 Issues and specs live in this repo's GitHub Issues. See `docs/agents/issue-tracker.md`.
 
 ### Triage labels
 
-The five default labels: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. See `docs/agents/triage-labels.md`.
+5 state roles + 2 category roles: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`, `bug`, `enhancement`. See `docs/agents/triage-labels.md`.
 
 ### Domain docs
 
