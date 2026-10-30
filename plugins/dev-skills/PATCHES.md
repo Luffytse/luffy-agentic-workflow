@@ -166,12 +166,12 @@ Why: ADR 0003. A Bug class that comes up more than once in a pull request should
 
 What:
 
-- `retro/SKILL.md`: new step 3, "If the session reviewed or built a pull request with `code-review` Rounds (or the user names one), turn its repeated Bug classes into checks: [BUG-CLASSES.md](BUG-CLASSES.md)."; Upstream's steps 3 and 4 become 4 and 5; the new step 5 (step 6 since Patch 15; Upstream's "Present these candidates to the user, in order of severity.") gains the sentence "Report repeated Bug classes as done, with the link to the retro's pull request." Every other line is Upstream's.
+- `retro/SKILL.md`: new step 3, "If the session reviewed or built a pull request with `code-review` Rounds (or the user names one), turn its repeated Bug classes into checks: [BUG-CLASSES.md](BUG-CLASSES.md)."; Upstream's steps 3 and 4 become 4 and 5; the new step 5 (step 6 since Patch 16; Upstream's "Present these candidates to the user, in order of severity.") gains the sentence "Report repeated Bug classes as done, with the link to the retro's pull request." Every other line is Upstream's.
 - New `retro/BUG-CLASSES.md` (ours, not Upstream): reads every Round and Ticket-check comment of a pull request, merges them into one row per Finding id, groups by Bug class, and for each repeated class repairs an existing guardrail, adds a deterministic check, or adds a `REVIEW.md` Always-check line; the changes go in their own pull request, which a person merges when it touches `REVIEW.md`.
 - `scripts/check-plugin.sh`: `retro/BUG-CLASSES.md` joins the `writers` list of check 7; new check 9 (`BUG-CLASSES.md` exists, `retro/SKILL.md` links it, `BUG-CLASSES.md` and `code-review/ROUNDS.md` both contain the `<!-- code-review kind=round` and `<!-- code-review kind=ticket-check` markers, `BUG-CLASSES.md` mentions `REVIEW.md`).
 - `.claude-plugin/plugin.json`: version 0.4.0 to 0.5.0.
 
-Merging an Upstream update: carry Upstream's `retro/SKILL.md` changes over by hand and re-apply the step 3 insertion and the step 6 sentence (step 5 before Patch 15).
+Merging an Upstream update: carry Upstream's `retro/SKILL.md` changes over by hand and re-apply the step 3 insertion and the step 6 sentence (step 5 before Patch 16).
 
 ## Patch 7: `to-tickets` gives each ticket a Model tier; `to-tickets` and `wayfinder` offer `setup-project` (ADR 0004)
 
@@ -317,7 +317,17 @@ What:
 - `scripts/check-plugin.sh`: new check 16 fails if `upstream-skills/`, `skills/` or the plugin `README.md` contains "Lufei" or "Luffy" (case-insensitive), after removing `luffy-dev-skills`, `luffy-dev`, `Luffytse` and `luffydev`. It matches file contents only, not paths.
 - `.claude-plugin/plugin.json`: version 0.9.0 to 0.9.1, and the description no longer says whose skills they are.
 
-## Patch 15: `retro` files its suggestions as Retro issues; `triage` skips them (ADR 0007)
+## Patch 15: check 16 also scans the repo's doc text (no Upstream text changed)
+
+Why: retro of the issue #49 pull request. "A person's name left in doc text" came up twice in review (`CLAUDE.md` and ADR 0001), and check 16 only looked at skill text.
+
+What:
+
+- No text under `upstream-skills/` changed.
+- `scripts/check-plugin.sh`: check 16 now also scans the repo's `CLAUDE.md`, `GLOSSARY.md` and all of `docs/` (including `adr/` and `agents/`), with the same exemptions and the same relative `file:line` output. The manifests (author fields) and `dai-portal-data` stay out of scope.
+- `.claude-plugin/plugin.json`: version 0.9.1 to 0.9.2.
+
+## Patch 16: `retro` files its suggestions as Retro issues; `triage` skips them (ADR 0007)
 
 Why: ADR 0007 and issue #40. Upstream's `retro` hands every suggestion to the user in its report, where it is read once and lost. Suggestions that are not repeated Bug classes now become Retro issues, or "seen again" votes on open ones, so a backlog can show which problems repeat. `triage` must skip them, since they carry no `needs-triage` label and would look untriaged.
 
@@ -327,11 +337,11 @@ What:
 - New `retro/FILING.md` (ours, not Upstream): routing (skill or workflow problems to the repo in the plugin manifest's `repository` field, a project's own problems to its tracker from `docs/agents/issue-tracker.md`, else the `origin` remote), votes (`Seen again in <thread link>`), the `retro` label and `Retro:` title, the can't-write fallback, the thresholds (10 open; 2 weeks with at least 4 open) and the trigger clock from the newest closed `retro-planning` record, and what the report lists. Since one retro can file into both repos, the due check runs once per repo that was filed or voted into, and the report's due notice names each repo that is due.
 - `triage/SKILL.md`: in "Show what needs attention", a sentence after the three buckets, "Skip issues labelled `retro`: they are Retro issues, planned in batches, not untriaged work."; in "Triage a specific issue or PR" step 1, a leading sentence "If the issue is labelled `retro`, stop: it is a Retro issue, planned in batches, so skip it." before "Read the full", which becomes "Otherwise read the full". Every other line is Upstream's.
 - `scripts/check-plugin.sh`: new check 17 (`plugin.json` has a `repository` GitHub URL; `retro/FILING.md` exists, `retro/SKILL.md` links it, and it names `retro`, `Retro:`, "seen again" and `retro-planning`; `triage/SKILL.md` skips `retro`; no forked or own skill text names a project, repo or person).
-- `.claude-plugin/plugin.json`: a new `repository` field, and version 0.9.1 to 0.9.2, one bump shared by Patches 15 to 17 and the CI workflow below, which shipped together (spec #38).
+- `.claude-plugin/plugin.json`: a new `repository` field, and version 0.9.2 to 0.9.3, one bump shared by Patches 16 to 18 and the CI workflow below, which shipped together (spec #38).
 
 Merging an Upstream update: carry Upstream's `retro/SKILL.md` and `triage/SKILL.md` changes over by hand and re-apply the lines above.
 
-## Patch 16: `implement` and `implement-spec` end by running `retro` (ADR 0004, ADR 0007)
+## Patch 17: `implement` and `implement-spec` end by running `retro` (ADR 0004, ADR 0007)
 
 Why: issue #42. Each build thread knows its own Review, so it ends by running `retro` on itself and every build feeds the Retro backlog. The build thread still writes no code: a check the retro proposes is built by an Implementer.
 
@@ -339,11 +349,11 @@ What:
 
 - `implement/SKILL.md`: new step 9, "Run the retro", after the report. `implement-spec/SKILL.md`: new step 10, "Run the retro", after "Clean up and report". Each says: run `retro` on the thread whether the pull request was merged or handed to the user; for a repeated Bug class, a regular-tier Implementer builds the check on a branch off main, and the thread opens the pull request with `pr`, runs the `agentic-review` Rounds and merges it as a lone pull request (squash-merge, or brings it to the user); a check that changes `REVIEW.md` goes to the user; add the outcome to the report. Every other line is as Patches 8 and 11 left it.
 - `scripts/check-plugin.sh`: new check 18 (the last step of both skills names `` `retro` `` and `REVIEW.md`).
-- `.claude-plugin/plugin.json`: no bump of its own; covered by Patch 15's 0.9.1 to 0.9.2.
+- `.claude-plugin/plugin.json`: no bump of its own; covered by Patch 16's 0.9.2 to 0.9.3.
 
 Merging an Upstream update: both `SKILL.md` files are already replaced whole by Patches 8 and 11, so after carrying Upstream's changes over, re-append the final retro step and keep it last, since check 18 reads the last `## ` section.
 
-## Patch 17: `ask-matt` routes a due Retro backlog to `retro-planning` (ADR 0007)
+## Patch 18: `ask-matt` routes a due Retro backlog to `retro-planning` (ADR 0007)
 
 Why: ADR 0007 and issue #41. `retro` now files Retro issues and says when Retro planning is due; the new skill of our own, `retro-planning` (under `skills/`, not Upstream), works through the backlog, and `ask-matt` must route to it.
 
@@ -352,13 +362,13 @@ What:
 - `ask-matt/SKILL.md`: step 4 (the `/retro` item, as Patch 10 left it) gains a closing sentence: "Suggestions it doesn't act on straight away pile up as Retro issues; when its report says your Retro backlog is due, start a thread for **`/retro-planning`**, which groups the backlog by root cause, closes one-offs, and turns the most repeated problems into tickets." Every other word of the item is unchanged.
 - New `skills/retro-planning/SKILL.md` (ours, not Upstream): ADR 0007's Retro planning steps and the record format.
 - `scripts/check-plugin.sh`: new check 20 (`skills/retro-planning/SKILL.md` exists and names `retro-planning`, `Retro planning <yyyy-mm-dd>`, "at most 3", `wontfix` and `ready-for-agent`; `ask-matt/SKILL.md` names `/retro-planning`).
-- `.claude-plugin/plugin.json`: no bump of its own; covered by Patch 15's 0.9.1 to 0.9.2.
+- `.claude-plugin/plugin.json`: no bump of its own; covered by Patch 16's 0.9.2 to 0.9.3.
 
 Merging an Upstream update: carry Upstream's changes to the `/retro` item over by hand and re-append the sentence above.
 
 ## Not a Patch: CI workflow and check 19
 
-Our own, not Upstream: `.github/workflows/plugin-checks.yml` (issue #39) runs `scripts/check-plugin.sh` and `claude plugin validate .` on pull requests and pushes to main. `scripts/check-plugin.sh` gets check 19 (the workflow exists, triggers on `pull_request` and pushes to main, installs `@anthropic-ai/claude-code`, and runs both commands). No Upstream text changed. `.claude-plugin/plugin.json`: no bump of its own; covered by Patch 15's 0.9.1 to 0.9.2.
+Our own, not Upstream: `.github/workflows/plugin-checks.yml` (issue #39) runs `scripts/check-plugin.sh` and `claude plugin validate .` on pull requests and pushes to main. `scripts/check-plugin.sh` gets check 19 (the workflow exists, triggers on `pull_request` and pushes to main, installs `@anthropic-ai/claude-code`, and runs both commands). No Upstream text changed. `.claude-plugin/plugin.json`: no bump of its own; covered by Patch 16's 0.9.2 to 0.9.3.
 
 ## Vendor model names in Upstream text
 
