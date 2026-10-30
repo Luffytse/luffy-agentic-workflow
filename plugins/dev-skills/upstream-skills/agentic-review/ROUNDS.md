@@ -30,7 +30,7 @@ Finders: standards, spec, adversarial (bugs and edge cases), adversarial (securi
 | R2-2 | Nit (fix) | mysterious name | src/split.ts:8 | open | standards Finder: `tmp` holds the shares |
 | R2-3 | Nit (skip) | duplicated code | src/a.ts:3, src/b.ts:9 | dismissed | Verifier: two lines, extracting adds churn |
 | R2-4 | Important | null dereference | src/load.ts:30 | dismissed | Verifier: dropped, the guard at src/load.ts:22 covers it |
-| R2-5 | Pre-existing | float money math | src/money.ts:4 | open | to be filed after the last Round |
+| R2-5 | Pre-existing | float money math | src/money.ts:4 | open | adversarial Finder: shares summed as floats; a 0.10 bill split three ways loses a cent |
 | R1-1 | Important | off-by-one | src/settle.ts:12 | fixed | fixed in <sha>, confirmed by Verifier |
 ```
 
@@ -38,7 +38,7 @@ Finders: standards, spec, adversarial (bugs and edge cases), adversarial (securi
 - **Ids** are `R<round>-<n>` and never change; a Ticket check uses `T<ticket number>.<check>-<n>`, so the 3 checks of one Ticket never reuse an id. A Finding keeps its first id in every later comment.
 - **Rows:** every Finding this Round raised or dismissed (a dropped Finding shows the Finder's proposed Severity), plus every earlier Finding whose status or locations changed in this Round.
 - **Status** is `open`, `fixed` or `dismissed`. The latest comment that names an id holds its current status. `fixed` needs the fixing commit in the Note.
-- **Note** names the Finder and gives the one-line reason (the Verifier's, for a dismissal).
+- **Note** names the Finder and gives the one-line reason (the Verifier's, for a dismissal). A Pre-existing row's Note gives its claim and failure scenario in short, because filing it may fall to a fresh session that has only the comments ([Filing Pre-existing Findings](#filing-pre-existing-findings)).
 - **Nit status.** Every Round posts its "skip" Nits as `dismissed` and its "fix" Nits as `open`. A "fix" Nit becomes `fixed` in the next Round's comment once its fix commit lands (that Round's Verifier may confirm it; otherwise you mark it with the commit). On a clean Round 2 to 5, make the final "fix" Nits commit before posting, and post those Nits as `fixed` with that commit in the Note. Round 1 always leads to Round 2, so its "fix" Nits stay `open` until Round 2's comment. A design "fix" Nit is `dismissed` once the user keeps the design, not `fixed` ([Design Findings go to the user](#design-findings-go-to-the-user)).
 
 ## The Round loop
@@ -67,11 +67,11 @@ Waiting on the user's answers is not a Round. An agreed answer that changes the 
 
 ## Merge-only Rounds
 
-A **merge-only Round** is a Round 3 to 5 whose new commits since the last Round are only a merge from main, plus any commit that takes the version or other numbers after it (`implement` step 7, `implement-spec` step 8). When that merge's conflicts were only in numbers or text (version and entry numbers, cross-references to them, wording), it runs at **Quick** depth (standards and spec Finders, one Verifier), not the carried depth: it reviews only the conflict resolutions (for example `git show --remerge-diff <merge>`) and that commit. If any resolution touches logic (code behaviour, a check, or what a rule means), it runs at the carried depth instead. Its comment's marker and heading say the depth it ran at; its `Reviewed:` line says merge-only Round, and the Round after it takes the carried depth from the latest comment that is not a merge-only Round's. A merge-only Round is a Round like any other: it counts toward the 5-Round cap and follows the Round loop above.
+A **merge-only Round** is a Round 3 to 5 whose new commits since the last Round are only a merge from main, plus any commit that takes the version or other numbers after it (`implement` step 7, `implement-spec` step 8). When that merge's conflicts were only in numbers or text (version and entry numbers, cross-references to them, wording), it runs at **Quick** depth (standards and spec Finders, one Verifier), not the carried depth: it reviews only what the merge changed in the pull request (its conflict resolutions) and that commit, with the diff command in [SKILL.md step 1](SKILL.md#1-pin-the-diff). If any resolution touches logic (code behaviour, a check, or what a rule means), it runs at the carried depth instead. Its comment's marker and heading say the depth it ran at; its `Reviewed:` line says merge-only Round, and the Round after it takes the carried depth from the latest comment that is not a merge-only Round's. A merge-only Round is a Round like any other: it counts toward the 5-Round cap and follows the Round loop above.
 
 ## Filing Pre-existing Findings
 
-Once the pull request's last Round is done (clean, or the cap reached), gather every open Pre-existing Finding from all the Round and Ticket-check comments and group them by Bug class. For each Bug class:
+Once the pull request's last Round is done (clean, or the cap reached), gather every open Pre-existing Finding from all the Round and Ticket-check comments and group them by Bug class. For each Finding, take its claim, failure scenario and evidence from the Review's own Findings when this session still has them; otherwise take the claim and failure scenario from its Note, and the evidence by quoting the code at its locations. For each Bug class:
 
 1. Look for an open issue already tracking it; if there is one, comment there with the new locations instead.
 2. Otherwise file one issue with the tracker workflow: title `<Bug class> (found in review of #<pr>)`, a body listing every location with its claim, failure scenario and evidence and linking the pull request, and the label the repo uses for `needs-triage` (from `docs/agents/triage-labels.md`; `needs-triage` if that file is missing).

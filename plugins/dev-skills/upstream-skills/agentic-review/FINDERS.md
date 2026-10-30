@@ -2,7 +2,7 @@
 
 Briefs for the Find stage of [`agentic-review`](SKILL.md). Every Finder is a brand-new subagent on the tier given here, and every brief includes:
 
-- The diff command for this Review and, in Rounds 3 to 5, the whole-pull-request diff command too, plus the commit list and, for a fixed point, the untracked new files.
+- The diff command for this Review and, in Rounds 3 to 5, the whole-pull-request diff command too, plus the commit list and, for a fixed point, the untracked new files. When a Round's new commits include a merge from main, add: "The new commits include a merge from main. Review every new commit as the diff command shows it, and for the merge only what it changed in the pull request; the commits that came in from main are not part of this pull request."
 - The spec (path or fetched contents), the standards-source files, and `REVIEW.md` if the repo has one.
 - The **Finding format** at the end of this file, pasted in full, with: "Report every candidate Finding in this format and nothing else. List every place in the pull request where the Bug class occurs, not only the first, and in Rounds 3 to 5 not only in the new commits. Give each Finding a failure scenario. Report a candidate you only half believe too: put `(unsure)` after its title and say in the Claim what would settle it; the Verifier judges it. Propose a Severity; the Verifier makes the final call. Skip anything tooling already enforces and anything `REVIEW.md` says to skip. If you find nothing, say so."
 - The **copy rule**, pasted in full: "To try something out (plant a line, run a check, test a commit), work in your own copy: `git archive <head> | tar -x -C <a new scratch directory>`, or a throwaway `git worktree`. Never run `git checkout`, `switch`, `stash` or `reset` in the shared tree, because an Implementer is working in it; leave it on its branch, clean."
@@ -101,7 +101,7 @@ Its Findings go through a second Verify ([VERIFY.md](VERIFY.md#gap-sweep)).
 ### <short title>
 - Severity (proposed): Important | Nit | Pre-existing
 - Bug class: <short noun phrase naming the kind of problem, e.g. "unescaped user input">
-- Locations: <every file:line or file:start-end in the pull request where this Bug class occurs>
+- Locations: <every file:line or file:start-end in the pull request where this Bug class occurs, each line counted within that file at this Review's head (as `grep -n` on the file gives it), never a position in the diff output or in a listing of several files>
 - Claim: <what is wrong, in one or two sentences>
 - Failure scenario: <the inputs or state, then the wrong result; for a cleanup Finding (a smell, or a Nit with no wrong result), its cost instead>
 - Evidence: <the quoted code, spec line, standard or ADR rule, or the input that triggers it>

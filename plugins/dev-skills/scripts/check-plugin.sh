@@ -599,5 +599,22 @@ for w in 'git worktree add' '`git checkout`, `switch` or `reset` in a ticket wor
   [ ! -f "$is" ] || grep -qF -- "$w" "$is" || bad "implement-spec/SKILL.md does not keep the thread out of the ticket worktrees ($w)"
 done
 
+# 41. review-diff-and-lines: a Round's diff and a Finding's lines match the pull request (issues #124, #98, #73).
+# A Round 3 to 5 after a merge from main reviews only what the merge changed, not main's commits, and the
+# Finders are told; implement and implement-spec point to agentic-review step 1 for the diff command and the
+# Finders' line. Finders and Verifiers count every line within its own file at the Review's head, never across
+# a listing. A Pre-existing row's Note carries what the filing step needs. This guards the wording against a revert.
+ar="$forked/agentic-review"
+for pair in 'SKILL.md|--remerge-diff' 'SKILL.md|not the commits that came in from main' \
+            'FINDERS.md|for the merge only what it changed' \
+            'FINDERS.md|counted within that file at this Review' 'VERIFY.md|counted within that file at this Review' \
+            'VERIFY.md|only when the Finder' 'ROUNDS.md|A Pre-existing row' 'ROUNDS.md|from its Note'; do
+  f="${pair%%|*}"; w="${pair#*|}"
+  grep -qF -- "$w" "$ar/$f" || bad "agentic-review/$f has lost the diff-and-lines rule: $w"
+done
+for f in implement implement-spec; do
+  grep -qF 'agentic-review/SKILL.md#1-pin-the-diff' "$forked/$f/SKILL.md" || bad "$f/SKILL.md does not point to agentic-review step 1 for the merge-from-main diff"
+done
+
 [ "$fail" -eq 0 ] && echo "OK: dev-skills plugin checks passed ($count skills)"
 exit "$fail"

@@ -5,7 +5,7 @@ description: "Review a pull request, or the changes since a fixed point (commit,
 
 A **Review** runs three stages over one diff: **Find** (fresh Finder subagents in parallel), **Verify** (a fresh Verifier checks every candidate Finding against the code), and **Rank** (you dedupe, drop repeats and sort). There are two entry points:
 
-- **Pull request.** Review it in **Rounds**: each Round is one Review plus the fix commits after it, and posts one comment on the pull request. Rounds 1 and 2 review the whole pull request; Rounds 3 to 5 review only the commits added since the last Round. Follow [ROUNDS.md](ROUNDS.md).
+- **Pull request.** Review it in **Rounds**: each Round is one Review plus the fix commits after it, and posts one comment on the pull request. Rounds 1 and 2 review the whole pull request; Rounds 3 to 5 review only the commits added since the last Round (for a merge from main, only what it changed in the pull request). Follow [ROUNDS.md](ROUNDS.md).
 - **A diff since a fixed point** (no pull request, or a **Ticket check**, which is one Quick Review over a Ticket branch's diff against its Spec branch). One Review, not a Round. Report it; for a Ticket check, also record it as described in [ROUNDS.md](ROUNDS.md#ticket-checks).
 
 Every Finder and Verifier is a **brand-new subagent** each Review: never reuse one from an earlier Round or check, so each Review reads the code with fresh eyes.
@@ -31,7 +31,7 @@ Pick Deep for risky changes (security, money, deleting data, or anything the use
 ### 1. Pin the diff
 
 - **Pull request, Round 1 or 2:** the whole pull request, `git diff <base>...HEAD` (three-dot, against the merge-base), plus `git log <base>..HEAD --oneline`.
-- **Pull request, Round 3 to 5:** the commits since the last Round, `git diff <last-head>..HEAD`, where `<last-head>` is the `head` recorded in the last Round comment. Keep the whole-pull-request diff command too: Findings list every place their Bug class occurs in the pull request, not only in the new commits.
+- **Pull request, Round 3 to 5:** the commits since the last Round, `git diff <last-head>..HEAD`, where `<last-head>` is the `head` recorded in the last Round comment. When those commits include a merge from main (`git log --merges --oneline <last-head>..HEAD` lists it), use `git log -p --first-parent --remerge-diff <last-head>..HEAD` instead: it shows each new commit of the pull request, and for the merge only what it changed in the pull request (its conflict resolutions), not the commits that came in from main. Tell the Finders so ([FINDERS.md](FINDERS.md)). Keep the whole-pull-request diff command too: Findings list every place their Bug class occurs in the pull request, not only in the new commits.
 - **Fixed point:** whatever the user said (a SHA, branch, tag, `main`, `HEAD~5`); ask if they gave none. `git diff --merge-base <fixed-point>` (the working tree, so staged and unstaged work counts), plus every untracked new file from `git ls-files --others --exclude-standard`, read whole, and `git log <fixed-point>..HEAD --oneline`. Pull-request Rounds review commits only.
 
 Record `git rev-parse HEAD` as this Review's head. Confirm every ref resolves (`git rev-parse`) and the diff (with the untracked files) is non-empty: a bad ref or empty diff fails here, not inside parallel subagents.
