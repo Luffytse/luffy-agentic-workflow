@@ -55,13 +55,15 @@ Start at `docs/index.md` and open only the docs whose line fits the change (with
 
 ### 3. Find
 
-Brief and start the Finders for the depth, all in one parallel batch in the foreground, each a brand-new subagent on its tier. The briefs, the adversarial angle list (pick 2 angles that fit this change) and the one fixed Finding format are in [FINDERS.md](FINDERS.md). Every Finder gets the diff commands, the commit list, the sources from step 2 and `REVIEW.md`. Tag each returned Finding with the Finder that raised it.
+Brief and start the Finders for the depth, all in one parallel batch in the foreground, each a brand-new subagent on its tier. The briefs, the adversarial angle list (pick 2 angles that fit this change) and the one fixed Finding format are in [FINDERS.md](FINDERS.md). Every Finder gets the diff commands, the commit list, the sources from step 2 and `REVIEW.md`. Before Verify starts, count the reports: you need one report from each Finder you started, a report that says "nothing found" included. A Finder that ended without returning its report is asked again for it; if it cannot be reached, start a new Finder on the same brief. Do not go on to Verify with a Finder missing. Tag each returned Finding with the Finder that raised it.
 
 ### 4. Verify
 
 Start the Verifier(s) as brand-new subagents with every candidate Finding, every **open Important** from earlier Rounds and Ticket checks (to re-check against the current code), the spec, the standards list and `REVIEW.md`. Brief and voting rules: [VERIFY.md](VERIFY.md). The Verifier's calls are final: keep or drop, caused by this change or Pre-existing, Important or Nit, and "fix" or "skip" for a Nit. A failure scenario the Verifier corrected replaces the Finder's.
 
-On Deep, then run the **gap sweep**: one brand-new Finder gets the kept Findings and looks only for what the change is missing ([FINDERS.md](FINDERS.md#gap-sweep-premium-tier-deep-only)), and its Findings go through a second Deep Verify ([VERIFY.md](VERIFY.md#gap-sweep)).
+Before the next step starts (Rank, or on Deep the gap sweep, whose input is the Findings they kept), count the Verifier reports: you need one report from each Verifier you started. A Verifier that ended without returning its report is asked again for it; if it cannot be reached, start a new Verifier on the same brief. Do not go on with a Verifier missing.
+
+On Deep, then run the **gap sweep**: one brand-new Finder gets the kept Findings and looks only for what the change is missing ([FINDERS.md](FINDERS.md#gap-sweep-premium-tier-deep-only)), and its Findings go through a second Deep Verify ([VERIFY.md](VERIFY.md#gap-sweep)). Count these reports the same way: you need one report from the gap sweep Finder before the second Verify starts, and one report from each second Verifier before Rank. A gap sweep Finder or second Verifier that ended without returning its report is asked again for it; if it cannot be reached, start a new Finder or Verifier on the same brief. Do not go on with one missing.
 
 ### 5. Rank and report
 

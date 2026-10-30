@@ -370,5 +370,23 @@ top="$(printf '%s\n' "$bumps" | sort -V | tail -1)"
 cur="$(sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$root/.claude-plugin/plugin.json" | head -1)"
 [ -n "$top" ] && [ "$top" = "$cur" ] || bad "plugin.json is version $cur but the highest version bump in PATCHES.md is to ${top:-none}"
 
+# 28. agentic-review counts reports (issue #102, absorbs #44): cheap-tier Finders ended without returning
+# their report in five threads and the Review went on without them. No script can see a subagent end
+# early, so the thread counts reports itself (SKILL.md: Find, Verify and the gap sweep), and every Finder
+# and Verifier brief ends with the last-action line. This check guards against either being reverted.
+last='Your last action is to return your full report.'
+n=$(grep -c '^Brief: "' "$ar/FINDERS.md")
+[ "$n" -ge 5 ] || bad "agentic-review/FINDERS.md has $n Finder briefs; expected at least 5"
+while IFS= read -r l; do
+  case "$l" in *"$last\"") ;; *) bad "agentic-review/FINDERS.md brief does not end with the last-action line: ${l:0:50}" ;; esac
+done < <(grep '^Brief: "' "$ar/FINDERS.md")
+grep -F 'Answer per Finding:' "$ar/VERIFY.md" | grep -qF "$last\"" || bad "agentic-review/VERIFY.md Verifier brief does not end with \"$last\""
+for g in 'you need one report from each Finder you started' \
+         'you need one report from each Verifier you started' \
+         'you need one report from the gap sweep Finder before the second Verify starts' \
+         'one report from each second Verifier before Rank'; do
+  grep -qF "$g" "$ar/SKILL.md" || bad "agentic-review/SKILL.md has lost the report-count gate: $g"
+done
+
 [ "$fail" -eq 0 ] && echo "OK: dev-skills plugin checks passed ($count skills)"
 exit "$fail"

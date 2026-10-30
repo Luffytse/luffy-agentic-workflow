@@ -470,6 +470,20 @@ Merging an Upstream update: take Upstream's `grilling` text, then re-apply the t
 
 Our own, not Upstream. `scripts/check-plugin.sh` gets check 27, from the retro of PR #91 (stale or duplicated version numbers after renumbering came up 4 times): no "version X to Y" bump in this file has the same target Y twice, and the highest Y is `plugin.json`'s version. A gap-free chain is not required, since history has gaps (0.2.0 to 0.3.0, 0.9.3 to 0.9.4). `REVIEW.md` gains an Always check line, "results entry out of date with its own PR". No Upstream text changed. `.claude-plugin/plugin.json`: version 0.15.1 to 0.16.0.
 
+## Patch 24: `agentic-review` counts reports before moving on (`agentic-review/`)
+
+Why: issue #102 (absorbs #44). In five threads a cheap-tier Finder ended without returning its report and the Review went on, or was caught only because the thread counted by hand. A brief line alone did not stop it, so the thread carries out a count.
+
+What:
+
+- `agentic-review/SKILL.md`: step 3 (Find), step 4 (Verify) and the gap sweep paragraph each have the thread count reports (one report from each Finder or Verifier started), ask again for a missing one, start a new agent on the same brief if it cannot be reached, and not go on without it. The counts gate the next step: Verify (after Find), then the gap sweep on Deep or Rank (after Verify), then the second Verify (after the sweep Finder) and Rank (after the second Verifiers).
+- `agentic-review/FINDERS.md`: each of the 5 briefs (standards, spec, adversarial, security, gap sweep) ends with "Your last action is to return your full report."
+- `agentic-review/VERIFY.md`: the Verifier brief ends with the same line.
+- `scripts/check-plugin.sh`: new check 28 (every Finder brief and the Verifier brief end with that line; `SKILL.md` keeps each of the four count gates as a literal phrase: Finders before Verify, Verifiers before the next step, the gap sweep Finder before the second Verify, the second Verifiers before Rank).
+- `.claude-plugin/plugin.json`: version 0.16.0 to 0.17.0.
+
+Merging an Upstream update: take Upstream's text, then re-apply the four count gates (check 28 lists their phrases) and the closing line on each brief.
+
 ## Vendor model names in Upstream text
 
 None in the kept skills at the Base commit, so no Patch was needed for ADR 0002 (checked for ticket #4: grep for `haiku`, `sonnet`, `opus`, `claude-`, `gpt-`, `gemini` over `upstream-skills/`). Some kept skills start subagents (for example `grilling`, `wayfinder`, `code-review`, `implement-spec`), but none picks a model for them. Spec #1 adds tiers in later tickets (the `code-review` Finders and Verifiers, and the `implement` and `implement-spec` Implementers; the tier on each ticket from `to-tickets` is Patch 7, the `implement` Implementer's tier is Patch 8, and the `implement-spec` Implementers' tiers are Patch 11); each of those edits gets its own Patch here.
