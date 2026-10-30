@@ -588,6 +588,17 @@ What:
 
 Merging an Upstream update: take Upstream's text, then drop "find deepening opportunities" from the `codebase-design` description again and re-apply the `ask-matt` wording.
 
+## Patch 33: the numbering step retakes numbers when main moves again (`implement/`, `implement-spec/`)
+
+Why: issue #154 (absorbs #67 and #127). After the first numbering pass no `TBD-N` is left, so "repeat steps 1 and 2" had nothing to replace and never said to move numbers already real; Implementers renumbered only when the thread messaged them the new numbers, and one pass left a stale cross-reference.
+
+What:
+
+- `implement/SKILL.md` step 7.2 and `implement-spec/SKILL.md` step 8.2: "If main moves again before the merge, repeat steps 1 and 2" now continues: on a repeat no `TBD-N` is left, so the Implementer retakes every number the branch took under the repo's rules (such as the version and the numbers of the new entries its diff against main adds) as if afresh on top of main's current numbers: each at the next free one in the same order, counting the ones it has just moved (a number already the next free one stays), and a version above main's; it rewrites the branch's own cross-references to a changed number from the old-to-new list (in the pull request body too); its report names each old and new number, or says none changed.
+- `.claude-plugin/plugin.json`: version 0.22.6 to 0.22.7.
+
+Merging an Upstream update: re-apply the repeat sentence at the end of the "Take the numbers" step in both skills.
+
 ## Not a Patch: `setup-dev-skills` seed text (issue #144)
 
 Our own, not Upstream. The `setup-dev-skills` skill's `SKILL.md` step 1 names both remote URL forms, the GitHub seed gives REST routes for pull requests and open blockers, and the seed files name skills without a leading slash.
