@@ -24,6 +24,10 @@ _Avoid_: original, source
 One change we made to text that came from Upstream, recorded in `PATCHES.md`.
 _Avoid_: customization, override
 
+**Placeholder number**:
+`TBD-N`, written where a version, Patch number or check number will go, until the numbering step takes the real one at merge time (after the last merge of main), so parallel branches do not collide.
+_Avoid_: dummy number, temp number
+
 **Model tier**:
 How strong a model a step needs: **cheap**, **regular**, or **premium**. Each agent maps the tiers to its own models, so a skill names a tier and never a vendor's model.
 _Avoid_: model size, model class
@@ -92,6 +96,9 @@ One run of the `agentic-review` skill over a pull request (or, for a Ticket chec
 **Round**:
 One Review plus the fix commits that follow it (the final commit of "fix" Nits is not reviewed by another Round). Rounds 1 and 2 are **full-PR rounds**; rounds 3 to 5 are **commit rounds**, which review only the commits added since the last Round.
 _Avoid_: pass, iteration
+
+**Merge-only Round**:
+A Round 3 to 5 whose new commits are only a merge from main, plus the commit that takes the numbers after it. When the merge's conflicts were only numbers or text, it runs at Quick depth, not the carried one, unless a resolution touches logic.
 
 **REVIEW.md**:
 A short file at a repo's root telling reviewers what Important means there, what to skip, and what to always check.

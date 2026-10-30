@@ -38,6 +38,7 @@ Run at most **3 Implementers at once**, counting every Implementer that is worki
    - start at `docs/index.md`, plus the exploration notes if any;
    - the worktree is a fresh checkout and may need its dependencies installed again;
    - build test-first with the `tdd` skill, at seams agreed before the first test;
+   - leave every number the repo's rules (its `CLAUDE.md`, the project instructions, its docs) say to take at merge time, such as a version or the number of a new numbered entry, as the placeholder `TBD-N`, or as it is on main where a placeholder would break the file (a manifest's version); the Spec thread has the real numbers taken once, in step 8, so parallel tickets never collide on them;
    - before reporting, merge the Spec branch tip into its Ticket branch (a merge, never a rebase) and rerun the tests;
    - report its evidence: the tests that fail before and pass after, the typecheck or the repo's checks, screenshots for anything visual (or "not visual"), and its one-way-door call (would reverting its commits undo everything the change did, including anything outside git?).
 
@@ -45,7 +46,7 @@ Keep that same Implementer for every later fix and merge conflict on its ticket:
 
 ## 4. Check the evidence
 
-Read the Implementer's report against the ticket's acceptance criteria and rerun the checks in its worktree (a cheap subagent can). Anything missing or failing goes back to the Implementer. Done when every acceptance criterion has evidence and the checks pass on the Ticket branch's head, or, when the repo has no checks, the evidence says what was checked instead.
+Read the Implementer's report against the ticket's acceptance criteria and rerun the checks in its worktree (a cheap subagent can). Anything missing or failing goes back to the Implementer. Done when every acceptance criterion has evidence and the checks pass on the Ticket branch's head, or, when the repo has no checks, the evidence says what was checked instead. A check that fails only because a number is still a placeholder (or a version is not yet bumped) is expected until step 8.
 
 ## 5. Run the ticket check
 
@@ -72,7 +73,7 @@ Done when every ticket has landed. Then mark the pull request ready. If every ti
 
 Run the `agentic-review` skill on the Spec pull request yourself, in this thread: its Finders and Verifiers are subagents, and a subagent cannot start them. Its rules set the Review depth (a depth in your brief wins), the Rounds, the stop rule and the 5-Round cap; ticket-check Findings count as already raised.
 
-Before each Round, fetch main and, if it moved, merge it into the Spec branch as in step 6.1, and push. In a Round that reviews only the new commits, that merge counts among them, but only its conflict resolutions are reviewed, not the commits from main (for example `git show --remerge-diff <merge>`); say so to the Finders.
+Before each Round, fetch main and, if it moved, merge it into the Spec branch as in step 6.1, and push. In a Round that reviews only the new commits, that merge counts among them, but only its conflict resolutions are reviewed, not the commits from main (for example `git show --remerge-diff <merge>`); say so to the Finders. A Round whose new commits are only that merge, with conflicts only in numbers or text, runs at Quick depth unless the resolutions touch logic ([agentic-review's ROUNDS.md](../agentic-review/ROUNDS.md#merge-only-rounds)).
 
 After each Round, send its Important Findings and "fix" Nits to a **new** Implementer on the Spec branch, on the highest tier of the tickets those Findings touch (regular if they touch no ticket's files); it fixes, commits and pushes, then the next Round runs. A later Round may continue it by message if its Findings need no higher tier. On a clean Round 2 to 5, the Implementer makes the final "fix" Nits commit before you post that Round's comment; no further Round reviews it. After the last Round, file the Pre-existing Findings, the ticket checks' included, as `agentic-review` says.
 
@@ -87,10 +88,11 @@ Bring the pull request to the user, and do not merge it, if any of these holds:
 - it changes an ADR, the glossary, a `CLAUDE.md`, a `REVIEW.md` or the `agentic-review` skill;
 - the Review hit the 5-Round cap.
 
-The user then merges, or tells you to. Otherwise merge it yourself once the Review is clean and CI is green (or the repo has no CI):
+The user then merges, or tells you to. Steps 1 and 2 below run last, just before the merge, on this path too: when the user tells you to merge, run them, then merge (step 3); when the user will merge it themselves, ask them to tell you first, so you can run them before they do. Otherwise merge it yourself once the Review is clean and CI is green (or the repo has no CI):
 
-1. Fetch main. If the Spec branch lacks commits from main, merge main in as in step 6.1. If that merge had conflicts, run one more Round over its conflict resolutions (step 7) if the 5-Round cap allows; otherwise bring the pull request to the user. Rerun the checks on the branch's head and wait for CI (if the repo has any).
-2. Merge into main with a **merge commit**, not a squash, so main keeps each ticket as its own commit. If the tracker does not close work through pull requests (local files), mark the spec and each ticket done.
+1. Fetch main. If the Spec branch lacks commits from main, merge main in as in step 6.1.
+2. **Take the numbers**, once for the whole Spec. Start a **new** regular-tier Implementer on the Spec branch (you write no code): it reads the repo's rules (its `CLAUDE.md`, the project instructions, its docs) for what a change must number or update when it merges, such as a version bump or the number of a new numbered entry, takes the next free ones as of main, and replaces every `TBD-N` placeholder the tickets left; it commits and pushes. A bump the rules require is never skipped. Update the pull request body if it names those numbers. If the merge in step 1 had conflicts, run one more Round over its conflict resolutions and this commit (step 7, Quick depth unless the resolutions touch logic) if the 5-Round cap allows; otherwise bring the pull request to the user. Rerun the checks on the branch's head and wait for CI (if the repo has any). If main moves again before the merge, repeat steps 1 and 2.
+3. Merge into main with a **merge commit**, not a squash, so main keeps each ticket as its own commit. If the tracker does not close work through pull requests (local files), mark the spec and each ticket done.
 
 ## 9. Clean up and report
 

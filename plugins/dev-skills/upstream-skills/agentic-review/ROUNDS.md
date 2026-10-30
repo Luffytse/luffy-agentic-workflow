@@ -20,7 +20,7 @@ Each Round posts exactly one comment on the pull request (`gh pr comment <number
 <!-- code-review kind=round round=2 depth=Standard head=<full sha> base=<sha reviewed from> -->
 ## Code review: Round 2 of at most 5 (Standard)
 
-Reviewed: the whole pull request | the commits <base>..<head>
+Reviewed: the whole pull request | the commits <base>..<head> | the merge from main <base>..<head> (merge-only Round)
 Result: clean | not clean, <n> Important open | 5-Round cap reached
 Finders: standards, spec, adversarial (bugs and edge cases), adversarial (security and privacy)
 
@@ -34,6 +34,7 @@ Finders: standards, spec, adversarial (bugs and edge cases), adversarial (securi
 | R1-1 | Important | off-by-one | src/settle.ts:12 | fixed | fixed in <sha>, confirmed by Verifier |
 ```
 
+- **Depth** in the marker and the heading is the depth this Round ran at: the carried depth, or Quick for a merge-only Round.
 - **Ids** are `R<round>-<n>` and never change; a Ticket check uses `T<ticket number>.<check>-<n>`, so the 3 checks of one Ticket never reuse an id. A Finding keeps its first id in every later comment.
 - **Rows:** every Finding this Round raised or dismissed (a dropped Finding shows the Finder's proposed Severity), plus every earlier Finding whose status or locations changed in this Round.
 - **Status** is `open`, `fixed` or `dismissed`. The latest comment that names an id holds its current status. `fixed` needs the fixing commit in the Note.
@@ -52,6 +53,10 @@ After each Round's report, the Important Findings and "fix" Nits are fixed and c
 - **Round 5**, if not clean: stop. No sixth Round. Tell the user which Bug classes and Findings kept coming up across the Rounds and why the fixes did not hold, and say the plan may need discussing before more fixes.
 
 Each new Round starts at step 1 of [SKILL.md](SKILL.md#process) with brand-new Finders and Verifiers.
+
+## Merge-only Rounds
+
+A **merge-only Round** is a Round 3 to 5 whose new commits since the last Round are only a merge from main, plus any commit that takes the version or other numbers after it (`implement` step 7, `implement-spec` step 8). When that merge's conflicts were only in numbers or text (version and entry numbers, cross-references to them, wording), it runs at **Quick** depth (standards and spec Finders, one Verifier), not the carried depth: it reviews only the conflict resolutions (for example `git show --remerge-diff <merge>`) and that commit. If any resolution touches logic (code behaviour, a check, or what a rule means), it runs at the carried depth instead. Its comment's marker and heading say the depth it ran at; its `Reviewed:` line says merge-only Round, and the Round after it takes the carried depth from the latest comment that is not a merge-only Round's. A merge-only Round is a Round like any other: it counts toward the 5-Round cap and follows the Round loop above.
 
 ## Filing Pre-existing Findings
 

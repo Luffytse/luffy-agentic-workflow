@@ -388,5 +388,43 @@ for g in 'you need one report from each Finder you started' \
   grep -qF "$g" "$ar/SKILL.md" || bad "agentic-review/SKILL.md has lost the report-count gate: $g"
 done
 
+# 29. numbers are taken at merge time, and every plugin change bumps its version (issue #106). (a) No
+# placeholder is left: a Patch, check or version written as the placeholder (bare, in backticks or in
+# parentheses), a placeholder check header in
+# this script, or a placeholder version in a manifest. The patterns write the N in brackets so they do not
+# match this script's own text. (b) Every plugin under plugins/ whose files differ from origin/main
+# (committed since the merge-base, staged, unstaged or untracked) has a plugin.json version strictly higher
+# than origin/main's. No origin/main (a shallow clone, no remote): (b) is skipped with a note. On main
+# itself HEAD is origin/main, so nothing differs and (b) passes.
+ph_hits="$(
+  (cd "$repo" && find plugins/*/PATCHES.md plugins/*/README.md README.md CLAUDE.md GLOSSARY.md docs -type f -print0 2>/dev/null |
+    xargs -0 grep -nE '(Patch|[Cc]heck|version|to) [`(]?TBD-[N]' 2>/dev/null)
+  grep -nE '^# TBD-[N]' "$self" | sed "s|^|$self:|"
+  (cd "$repo" && grep -nE '"version"[[:space:]]*:[[:space:]]*"TBD' .claude-plugin/marketplace.json plugins/*/.claude-plugin/plugin.json 2>/dev/null)
+)"
+if [ -n "$ph_hits" ]; then
+  echo "$ph_hits"
+  bad "a placeholder number is left; take the real numbers before merging"
+fi
+ver_of() { sed -nE 's/^[[:space:]]*"version"[[:space:]]*:[[:space:]]*"([^"]*)".*/\1/p' | head -n 1; }
+# prints 1 when version $1 is strictly higher than $2, comparing dot-separated fields as numbers
+ver_gt() { awk -v a="$1" -v b="$2" 'BEGIN{n=split(a,x,".");m=split(b,y,".");k=n>m?n:m;
+  for(i=1;i<=k;i++){if(x[i]+0>y[i]+0){print 1;exit} if(x[i]+0<y[i]+0){print 0;exit}} print 0}'; }
+if ! (cd "$repo" && git rev-parse --verify -q 'origin/main^{commit}' >/dev/null 2>&1); then
+  echo "NOTE: origin/main not found; skipped the version bump check (check 29b)"
+else
+  for pj in "$repo"/plugins/*/.claude-plugin/plugin.json; do
+    [ -f "$pj" ] || continue
+    pd="plugins/$(basename "$(dirname "$(dirname "$pj")")")"
+    changed="$(cd "$repo" && { git diff --name-only origin/main...HEAD -- "$pd"; git diff --name-only HEAD -- "$pd"
+      git ls-files --others --exclude-standard -- "$pd"; })"
+    [ -n "$changed" ] || continue
+    old_v="$(cd "$repo" && git show "origin/main:$pd/.claude-plugin/plugin.json" 2>/dev/null | ver_of)"
+    [ -n "$old_v" ] || continue # a new plugin: nothing to bump from
+    new_v="$(ver_of < "$pj")"
+    [ "$(ver_gt "$new_v" "$old_v")" = 1 ] || bad "$pd changed since origin/main but its version $new_v is not higher than origin/main's $old_v"
+  done
+fi
+
 [ "$fail" -eq 0 ] && echo "OK: dev-skills plugin checks passed ($count skills)"
 exit "$fail"

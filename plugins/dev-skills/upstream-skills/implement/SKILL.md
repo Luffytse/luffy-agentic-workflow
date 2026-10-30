@@ -29,6 +29,7 @@ Start **one Implementer** subagent on the ticket's tier. Brief it with pointers,
 - the ticket link and the Ticket branch, and that it commits there;
 - start at `docs/index.md`;
 - build test-first with the `tdd` skill, at seams agreed before the first test;
+- leave every number the repo's rules (its `CLAUDE.md`, the project instructions, its docs) say to take at merge time, such as a version or the number of a new numbered entry, as the placeholder `TBD-N`, or as it is on main where a placeholder would break the file (a manifest's version); the real numbers come in step 7;
 - report its evidence: the tests that fail before and pass after, the typecheck or the repo's checks, screenshots for anything visual (or "not visual"), and its one-way-door call (would reverting its commits undo everything the change did, including anything outside git?).
 
 Give trivial jobs, such as rerunning a test suite, to a cheap subagent.
@@ -37,7 +38,7 @@ Keep this same Implementer for every later fix and merge conflict on the ticket:
 
 ## 4. Check the evidence
 
-Read the Implementer's report against the ticket's acceptance criteria and rerun the checks (a cheap subagent can). Anything missing or failing goes back to the Implementer. Done when every acceptance criterion has evidence and the checks pass on the branch's head, or, when the repo has no checks, the evidence says what was checked instead.
+Read the Implementer's report against the ticket's acceptance criteria and rerun the checks (a cheap subagent can). Anything missing or failing goes back to the Implementer. Done when every acceptance criterion has evidence and the checks pass on the branch's head, or, when the repo has no checks, the evidence says what was checked instead. A check that fails only because a number is still a placeholder (or a version is not yet bumped) is expected until step 7.
 
 ## 5. Open the pull request
 
@@ -47,7 +48,7 @@ Write the body with the `pr` skill: it closes the ticket, carries the evidence i
 
 Run the `agentic-review` skill on the pull request yourself, in this thread: its Finders and Verifiers are subagents, and a subagent cannot start them. Its rules set the Review depth (a depth in your brief wins), the Rounds, the stop rule and the 5-Round cap.
 
-Before each Round, fetch main. If it moved, have the Implementer merge main into the Ticket branch (a merge, never a rebase), resolve any conflicts and push, so the Round reviews the resolutions.
+Before each Round, fetch main. If it moved, have the Implementer merge main into the Ticket branch (a merge, never a rebase), resolve any conflicts and push, so the Round reviews the resolutions. A Round whose new commits are only that merge, with conflicts only in numbers or text, runs at Quick depth unless the resolutions touch logic ([agentic-review's ROUNDS.md](../agentic-review/ROUNDS.md#merge-only-rounds)).
 
 After each Round, send its Important Findings and "fix" Nits to the Implementer by message; it fixes, commits and pushes, then the next Round runs. On a clean Round 2 to 5, the Implementer makes the final "fix" Nits commit before you post that Round's comment; no further Round reviews it. After the last Round, file Pre-existing Findings as `agentic-review` says.
 
@@ -62,10 +63,11 @@ Bring the pull request to the user, and do not merge it, if any of these holds:
 - it changes an ADR, the glossary, a `CLAUDE.md`, a `REVIEW.md` or the `agentic-review` skill;
 - the Review hit the 5-Round cap.
 
-The user then merges, or tells you to. Otherwise merge it yourself once the Review is clean and CI is green (or the repo has no CI):
+The user then merges, or tells you to. Steps 1 and 2 below run last, just before the merge, on this path too: when the user tells you to merge, run them, then merge (step 3); when the user will merge it themselves, ask them to tell you first, so you can run them before they do. Otherwise merge it yourself once the Review is clean and CI is green (or the repo has no CI):
 
-1. Fetch main. If the Ticket branch lacks commits from main, have the Implementer merge main in (a merge, never a rebase). If that merge had conflicts, run one more Round over the merge's conflict resolutions (step 6) if the 5-Round cap allows; otherwise bring the pull request to the user. Rerun the checks on the branch's head and wait for CI (if the repo has any).
-2. **Squash-merge** into main, with a commit message you write that summarises the final change and names the ticket, rather than the branch's commit messages joined together.
+1. Fetch main. If the Ticket branch lacks commits from main, have the Implementer merge main in (a merge, never a rebase).
+2. **Take the numbers.** Have the Implementer read the repo's rules (its `CLAUDE.md`, the project instructions, its docs) for what a change must number or update when it merges, such as a version bump or the number of a new numbered entry, take the next free ones as of main, and replace every `TBD-N` placeholder; it commits and pushes. A bump the rules require is never skipped. If the merge in step 1 had conflicts, run one more Round over its conflict resolutions and this commit (step 6, Quick depth unless the resolutions touch logic) if the 5-Round cap allows; otherwise bring the pull request to the user. Rerun the checks on the branch's head and wait for CI (if the repo has any). If main moves again before the merge, repeat steps 1 and 2.
+3. **Squash-merge** into main, with a commit message you write that summarises the final change and names the ticket, rather than the branch's commit messages joined together.
 
 ## 8. Report
 

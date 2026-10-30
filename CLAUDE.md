@@ -11,6 +11,7 @@ Words used here (Finder, Verifier, Finding, Bug class, Review depth, Model tier 
 
 - Skills name a **model tier** (cheap, regular, premium), never a vendor's model name, because other coding agents may load these plugins. See `docs/adr/0002-skills-name-model-tiers-not-models.md`.
 - Every change to text that came from Matt Pocock's upstream repo is listed in `plugins/dev-skills/PATCHES.md`, so upstream updates can be merged by hand.
+- Every change under `plugins/<name>/` bumps that plugin's `version` in `.claude-plugin/plugin.json` to a higher one; no plugin change merges without it. The version, the number of a new Patch in `PATCHES.md` and the number of a new check in `check-plugin.sh` are taken only at merge time, after the last merge of main (the numbering step of `implement` and `implement-spec`), so parallel branches do not collide. Until then write `TBD-N` where such a number goes (in a Patch heading, in a "new check" line, in the check's `#` header and in every cross-reference) and leave the version as it is on main; both are expected during review, not Findings. `check-plugin.sh` fails on a leftover placeholder and on an unbumped version.
 - Run `claude plugin validate .` (Claude Code's checker for plugin files) before pushing a change to a plugin or to `marketplace.json`.
 
 ## Agent skills
