@@ -43,7 +43,7 @@ Also, in the same 12 skills, `agents/openai.yaml` (metadata for other coding age
 
 Not changed: `writing-for-agents/SKILL-MECHANICS.md` mentions `disable-model-invocation` only to explain the setting. It stays as written.
 
-Open point: the 12 skills above have human-facing one-line descriptions with the trigger lists stripped (Upstream's rule for user-invoked skills). They are now model-invoked but their descriptions do not say when to fire. Rewriting them is not part of this Patch.
+Open point: the 12 skills above have human-facing one-line descriptions with the trigger lists stripped (Upstream's rule for user-invoked skills). They are now model-invoked but their descriptions do not say when to fire. Rewriting them is not part of this Patch. `implement` now has an agent-facing description that says when to use it (Patch 8); the other 11 still have Upstream's.
 
 ## Patch 2: trim the dropped skills out of `ask-matt` (`ask-matt/SKILL.md`)
 
@@ -110,7 +110,7 @@ Changed Upstream files, by skill:
 - `domain-modeling/SKILL.md`: "reading the glossary" instead of "reading `GLOSSARY.md`"; a third "File structure" tree for the per-Area split; multi-context now means a root `GLOSSARY-MAP.md` that points into `src/`; a root `GLOSSARY.md` is created only if neither it nor a map exists; frontmatter description says "the glossary (GLOSSARY.md, GLOSSARY-MAP.md or its pages)"; new sections "Splitting the glossary" (only from a single root `GLOSSARY.md` over about 10 KB, `git mv` into the first Area's page at `docs/glossary/<area>.md`, `GLOSSARY-MAP.md` at the root, index line swapped, `docs/index.md` created if missing, one `docs/adr/` kept; with any existing map a term goes to the page the map points to) and "Keeping the docs index current" (create a doc, or edit one whose subject changed: update its index line in the same commit); "challenge" and "update inline" sections say "the glossary" and "the Area page `GLOSSARY-MAP.md` points to".
 - `grill-with-docs/SKILL.md`: adds the shared phrase and says glossary and ADR edits follow `domain-modeling`, including updating `docs/index.md` in the same commit.
 - `implement-spec/SKILL.md` (step 1): adds the shared phrase.
-- `implement/SKILL.md`: adds the shared phrase (for the ticket) before the `tdd` line.
+- `implement/SKILL.md`: adds the shared phrase (for the ticket) before the `tdd` line (Patch 8 later rewrote the skill; the line is now in its step 1).
 - `improve-codebase-architecture/SKILL.md`: intro, vocabulary rule and grilling-loop bullets say "the glossary (`GLOSSARY.md`, or the Area page `GLOSSARY-MAP.md` points to)" and create a root `GLOSSARY.md` only if neither exists; the explore step uses the shared phrase; a new bullet says to update `docs/index.md` in the same commit after writing any doc.
 - `pr/SKILL.md`: "domain language from `GLOSSARY.md`" replaced by the shared phrase.
 - `research/SKILL.md`: new step 4, add the note's line to `docs/index.md` if it is committed to a branch that will merge; no line for a throwaway branch.
@@ -191,8 +191,29 @@ What:
 
 Merging an Upstream update: carry Upstream's changes to both files over by hand and re-apply the lines above.
 
+## Patch 8: `implement` coordinates one lone Ticket (`implement/`)
+
+Why: ADR 0004. Upstream's `implement` has the session build the work and commit to the current branch itself, with no pull request. A Ticket thread coordinates instead: one Implementer subagent builds test-first and fixes the Findings, the thread checks its evidence, opens the pull request with `pr`, runs the `code-review` Rounds, and merges or brings the pull request to the user. A lone ticket squash-merges into main (ADR 0005).
+
+What:
+
+- `SKILL.md` rewritten whole as eight steps (read the ticket, make the Ticket branch, start one Implementer, check the evidence, open the pull request, review in Rounds, merge or bring it to the user, report), with a new agent-facing description that says when to use it. Upstream lines, and what became of each:
+  - "Implement the work described by the user in the spec or tickets.": replaced by the coordinator paragraph; a Spec goes to `implement-spec` (step 1).
+  - "If the user passes a ticket reference, fetch it ... state its title before starting. If the reference is ambiguous, ask.": kept in step 1 as "Fetch the ticket from the issue tracker and state its title. If the reference is ambiguous, ask."
+  - Patch 4's reader line ("Start at `docs/index.md` and open only the docs that fit the ticket ..."): kept word for word in step 1.
+  - "Call the Skill tool with "tdd" where possible, at pre-agreed seams.": moved into the Implementer's brief (step 3) as "build test-first with the `tdd` skill, at seams agreed before the first test".
+  - "Run typechecking regularly, single test files regularly, and the full test suite once at the end.": dropped; the Implementer's evidence (step 3) and the thread's check (step 4) cover it.
+  - "Once done, call the Skill tool with "code-review" to review the work.": replaced by step 6, which runs `code-review` in Rounds from the thread and sends Findings to the Implementer.
+  - "Commit your work to the current branch.": replaced by the pushed Ticket branch from main (step 2), the Implementer committing there (step 3), and the squash-merge (step 7).
+  - Added: the issue-tracker line from `implement-spec` and `code-review`; blocking edges; Model tier (regular unless the issue says premium); cheap subagents for trivial jobs such as rerunning tests or the checks (steps 3 and 4); keeping one Implementer by message, or a new one with a handoff, telling the user you did; the fallback when a repo has no checks or no CI; a Review depth in the brief wins; fetching main before each Round and having the Implementer merge it in (never rebasing), so a Round reviews the conflict resolutions; the final "fix" Nits commit on a clean Round 2 to 5; filing Pre-existing Findings as `code-review` says; the self-merge rules of ADR 0004; at merge time, merging main in if the Ticket branch lacks its commits, running one more Round over that merge's conflict resolutions if it had conflicts and the 5-Round cap allows, otherwise bringing the pull request to the user, and rerunning the checks and CI on the final head; the summary squash-merge message; the final report.
+- `agents/openai.yaml`: `short_description` now "Coordinate one lone ticket: Implementer, PR, review Rounds, merge".
+- `scripts/check-plugin.sh`: new check 11 (`implement/SKILL.md` names `` `tdd` ``, `` `pr` `` and `` `code-review` ``, says Implementer, and says squash).
+- `.claude-plugin/plugin.json`: version 0.6.0 to 0.7.0.
+
+Merging an Upstream update: Upstream's `implement/SKILL.md` is replaced whole, so diff Upstream's old and new text and carry any change over by hand into the step it maps to above (ticket fetching into step 1, building advice into the Implementer's brief in step 3, review into step 6). Keep Patch 4's reader line and the words check 11 looks for.
+
 ## Vendor model names in Upstream text
 
-None in the kept skills at the Base commit, so no Patch was needed for ADR 0002 (checked for ticket #4: grep for `haiku`, `sonnet`, `opus`, `claude-`, `gpt-`, `gemini` over `upstream-skills/`). Some kept skills start subagents (for example `grilling`, `wayfinder`, `code-review`, `implement-spec`), but none picks a model for them. Spec #1 adds tiers in later tickets (the `code-review` Finders and Verifiers, and the `implement` and `implement-spec` Implementers; the tier on each ticket from `to-tickets` is Patch 7); each of those edits gets its own Patch here.
+None in the kept skills at the Base commit, so no Patch was needed for ADR 0002 (checked for ticket #4: grep for `haiku`, `sonnet`, `opus`, `claude-`, `gpt-`, `gemini` over `upstream-skills/`). Some kept skills start subagents (for example `grilling`, `wayfinder`, `code-review`, `implement-spec`), but none picks a model for them. Spec #1 adds tiers in later tickets (the `code-review` Finders and Verifiers, and the `implement` and `implement-spec` Implementers; the tier on each ticket from `to-tickets` is Patch 7, and the `implement` Implementer's tier is Patch 8); each of those edits gets its own Patch here.
 
 `scripts/check-plugin.sh` now runs the vendor-name grep over `upstream-skills/` too, so an Upstream merge that brings in a model name fails the check and must be patched to a tier.

@@ -135,5 +135,16 @@ for s in to-tickets wayfinder; do
   grep -qF '`setup-project`' "$forked/$s/SKILL.md" || bad "$s does not offer \`setup-project\`"
 done
 
+# 11. implement is a Ticket thread's coordinator (ADR 0004): it hands the code to an Implementer,
+# builds through tdd, opens the pull request with pr, reviews with code-review, and squash-merges
+impl="$forked/implement/SKILL.md"
+if [ -f "$impl" ]; then
+  for s in tdd pr code-review; do
+    grep -qF "\`$s\`" "$impl" || bad "implement/SKILL.md does not name the \`$s\` skill"
+  done
+  grep -qF 'Implementer' "$impl" || bad "implement/SKILL.md does not hand the work to an Implementer"
+  grep -qiF 'squash' "$impl" || bad "implement/SKILL.md does not say lone tickets squash-merge"
+fi
+
 [ "$fail" -eq 0 ] && echo "OK: dev-skills plugin checks passed ($count skills)"
 exit "$fail"

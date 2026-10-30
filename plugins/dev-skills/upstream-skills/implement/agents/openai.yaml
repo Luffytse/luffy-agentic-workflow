@@ -1,5 +1,5 @@
 interface:
   display_name: "Implement"
-  short_description: "Build work from a spec or tickets"
+  short_description: "Coordinate one lone ticket: Implementer, PR, review Rounds, merge"
 policy:
   allow_implicit_invocation: true
