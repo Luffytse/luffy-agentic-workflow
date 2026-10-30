@@ -93,7 +93,7 @@ if [ -n "$hits" ]; then
 fi
 
 # 7. docs index (ADR 0006): the rule file exists, writing skills link it, reading skills start at the index
-writers="domain-modeling/SKILL.md improve-codebase-architecture/SKILL.md triage/SKILL.md triage/OUT-OF-SCOPE.md retro/SKILL.md setup-matt-pocock-skills/SKILL.md research/SKILL.md grill-with-docs/SKILL.md"
+writers="domain-modeling/SKILL.md improve-codebase-architecture/SKILL.md triage/SKILL.md triage/OUT-OF-SCOPE.md retro/SKILL.md retro/BUG-CLASSES.md setup-matt-pocock-skills/SKILL.md research/SKILL.md grill-with-docs/SKILL.md"
 readers="tdd diagnosing-bugs improve-codebase-architecture pr to-spec to-tickets triage grill-with-docs wayfinder implement implement-spec code-review"
 [ -f "$forked/domain-modeling/DOCS-INDEX.md" ] || bad "missing domain-modeling/DOCS-INDEX.md"
 for f in $writers; do
@@ -110,6 +110,20 @@ for f in FINDERS.md VERIFY.md ROUNDS.md; do
   if [ ! -f "$forked/code-review/$f" ]; then bad "missing code-review/$f"
   elif ! grep -q "($f" "$forked/code-review/SKILL.md"; then bad "code-review/SKILL.md does not link $f"; fi
 done
+
+# 9. retro turns repeated Bug classes into checks (ADR 0003): the procedure exists, SKILL.md links it,
+# and it reads the same Round and Ticket-check markers that code-review/ROUNDS.md writes
+bc="$forked/retro/BUG-CLASSES.md"
+rounds="$forked/code-review/ROUNDS.md"
+if [ ! -f "$bc" ]; then bad "missing retro/BUG-CLASSES.md"
+else
+  grep -q "(BUG-CLASSES.md" "$forked/retro/SKILL.md" || bad "retro/SKILL.md does not link BUG-CLASSES.md"
+  for m in '<!-- code-review kind=round' '<!-- code-review kind=ticket-check'; do
+    grep -qF "$m" "$bc" || bad "BUG-CLASSES.md does not mention the marker $m"
+    grep -qF "$m" "$rounds" || bad "code-review/ROUNDS.md no longer has the marker $m that retro reads"
+  done
+  grep -qF 'REVIEW.md' "$bc" || bad "BUG-CLASSES.md does not mention REVIEW.md"
+fi
 
 [ "$fail" -eq 0 ] && echo "OK: dev-skills plugin checks passed ($count skills)"
 exit "$fail"

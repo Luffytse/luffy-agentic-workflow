@@ -160,6 +160,19 @@ Our own, not Upstream: `evals/code-review/` (the planted-bugs fixture, `EXPECTED
 
 Merging an Upstream update: Upstream's `code-review/SKILL.md` is replaced whole, so diff Upstream's old and new text and carry any change over by hand: smell-baseline edits go into `FINDERS.md`, spec- and standards-source lookup edits into `SKILL.md` step 2.
 
+## Patch 6: `retro` turns repeated Bug classes into checks (`retro/`)
+
+Why: ADR 0003. A Bug class that comes up more than once in a pull request should become a deterministic check or a `REVIEW.md` line, so later Reviews do not have to catch it again. Upstream's `retro` never reads Round comments.
+
+What:
+
+- `retro/SKILL.md`: new step 3, "If the session reviewed or built a pull request with `code-review` Rounds (or the user names one), turn its repeated Bug classes into checks: [BUG-CLASSES.md](BUG-CLASSES.md)."; Upstream's steps 3 and 4 become 4 and 5; the new step 5 (Upstream's "Present these candidates to the user, in order of severity.") gains the sentence "Report repeated Bug classes as done, with the link to the retro's pull request." Every other line is Upstream's.
+- New `retro/BUG-CLASSES.md` (ours, not Upstream): reads every Round and Ticket-check comment of a pull request, merges them into one row per Finding id, groups by Bug class, and for each repeated class repairs an existing guardrail, adds a deterministic check, or adds a `REVIEW.md` Always-check line; the changes go in their own pull request, which a person merges when it touches `REVIEW.md`.
+- `scripts/check-plugin.sh`: `retro/BUG-CLASSES.md` joins the `writers` list of check 7; new check 9 (`BUG-CLASSES.md` exists, `retro/SKILL.md` links it, `BUG-CLASSES.md` and `code-review/ROUNDS.md` both contain the `<!-- code-review kind=round` and `<!-- code-review kind=ticket-check` markers, `BUG-CLASSES.md` mentions `REVIEW.md`).
+- `.claude-plugin/plugin.json`: version 0.4.0 to 0.5.0.
+
+Merging an Upstream update: carry Upstream's `retro/SKILL.md` changes over by hand and re-apply the step 3 insertion and the step 5 sentence.
+
 ## Vendor model names in Upstream text
 
 None in the kept skills at the Base commit, so no Patch was needed for ADR 0002 (checked for ticket #4: grep for `haiku`, `sonnet`, `opus`, `claude-`, `gpt-`, `gemini` over `upstream-skills/`). Some kept skills start subagents (for example `grilling`, `wayfinder`, `code-review`, `implement-spec`), but none picks a model for them. Spec #1 adds tiers in later tickets (the `code-review` Finders and Verifiers, the `implement` and `implement-spec` Implementers, and a tier on each ticket from `to-tickets`); each of those edits gets its own Patch here.
