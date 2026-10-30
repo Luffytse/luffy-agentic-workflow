@@ -5,13 +5,13 @@ The Verify stage of [`code-review`](SKILL.md). Verifiers are brand-new subagents
 - **Quick and Standard:** one Verifier checks every candidate Finding of the Review.
 - **Deep:** three Verifiers each check every candidate Finding, each with one stance (below), and their votes are combined by the rules at the end.
 
-Every Verifier gets: all candidate Findings in the fixed format, each tagged with its Finder; the open Importants from earlier Rounds and Ticket checks, with their ids; the diff commands; the spec, the standards list and `REVIEW.md`; and the meaning of Important (`REVIEW.md`'s, or the default in [SKILL.md](SKILL.md#2-find-the-spec-and-standards-sources)).
+Every Verifier gets: all candidate Findings in the fixed format, each tagged with its Finder; the open Importants from earlier Rounds and Ticket checks, with their ids; the diff commands; the spec, the standards list and `REVIEW.md` (with its Always check lines); and the meaning of Important (`REVIEW.md`'s, or the default in [SKILL.md](SKILL.md#2-find-the-spec-and-standards-sources)).
 
 ## Verifier brief
 
 "For each candidate Finding, open every cited file and line at the current head and check the claim against the code itself, not against names, comments or the Finder's wording. Follow the code path as far as it takes to be sure. Then make four calls, each with one line of reasoning:
 
-1. **Real?** keep or drop. Drop it when the code does not do what the claim says, the problem cannot happen, or it is something `REVIEW.md` says to skip. Fix the Locations list when the Finder missed or misplaced instances of the Bug class.
+1. **Real?** keep or drop. Drop it when the code does not do what the claim says, the problem cannot happen, or it is something `REVIEW.md` says to skip. A Finding raised from a `REVIEW.md` Always check line is real when the code breaks that line as written. Fix the Locations list when the Finder missed or misplaced instances of the Bug class.
 2. **Caused by this change?** yes, or Pre-existing when the same problem is in the code before the change (check `git show <base>:<file>`) and the change neither adds nor widens it.
 3. **Important or Nit?** confirm or change the Finder's proposal, using the meaning of Important you were given. Not asked for Pre-existing Findings.
 4. **For a Nit: fix or skip?** fix when it is cheap and clearly makes the code better; skip when it is taste, churn, or out of proportion to the change.

@@ -146,5 +146,12 @@ if [ -f "$impl" ]; then
   grep -qiF 'squash' "$impl" || bad "implement/SKILL.md does not say lone tickets squash-merge"
 fi
 
+# 12. code-review applies REVIEW.md's Always check lines (issue #23): the standards Finder checks
+# each line against the diff, and SKILL.md and VERIFY.md say how those Findings are handled
+for f in FINDERS.md VERIFY.md SKILL.md; do
+  grep -qF 'Always check' "$forked/code-review/$f" || bad "code-review/$f does not mention REVIEW.md's Always check lines"
+done
+grep -qF '### `REVIEW.md` Always check' "$forked/code-review/FINDERS.md" || bad "code-review/FINDERS.md has no REVIEW.md Always check section for the standards Finder"
+
 [ "$fail" -eq 0 ] && echo "OK: dev-skills plugin checks passed ($count skills)"
 exit "$fail"

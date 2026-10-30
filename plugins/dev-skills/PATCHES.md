@@ -212,6 +212,20 @@ What:
 
 Merging an Upstream update: Upstream's `implement/SKILL.md` is replaced whole, so diff Upstream's old and new text and carry any change over by hand into the step it maps to above (ticket fetching into step 1, building advice into the Implementer's brief in step 3, review into step 6). Keep Patch 4's reader line and the words check 11 looks for.
 
+## Patch 9: `code-review` applies `REVIEW.md`'s Always check lines (`code-review/`)
+
+Why: issue #23. `retro` (Patch 6) turns repeated judgement Bug classes into Always check lines in `REVIEW.md`, but Patch 5's briefs only told Finders and Verifiers to apply `REVIEW.md`'s skip list, so nothing made a Review check those lines. The check goes to the standards Finder because it runs at every depth, a Ticket check included; the other Finders still get `REVIEW.md`.
+
+What:
+
+- `FINDERS.md`: the standards Finder is also given the new `REVIEW.md` Always check section when `REVIEW.md` has at least one Always check line (else (d) is dropped from the brief); its brief, the Upstream standards prompt as Patch 5 left it, gains "(d) every `REVIEW.md` Always check line the diff breaks, reported once under (d) and not again under (a)"; new section "`REVIEW.md` Always check" after "Docs index drift": check every line against the whole diff (the whole pull request in Rounds 3 to 5), one Finding per broken line under the Bug class the line names, and a closing `clear`-or-Finding list of every line.
+- `VERIFY.md`: the Verifier is told `REVIEW.md` comes with its Always check lines, and that a Finding raised from one is real when the code breaks that line as written.
+- `SKILL.md` step 2: "always-check list" became "Always check list", and the `REVIEW.md` paragraph says the standards Finder checks each Always check line, linking the new `FINDERS.md` section.
+- `scripts/check-plugin.sh`: new check 12 (`FINDERS.md`, `VERIFY.md` and `SKILL.md` mention Always check; `FINDERS.md` has the section).
+- `.claude-plugin/plugin.json`: version 0.7.0 to 0.7.1.
+
+Merging an Upstream update: the standards brief is Upstream text, so when Upstream changes its standards prompt, carry the change into `FINDERS.md` (Patch 5's note) and keep the "(d)" clause. The rest of this Patch edits text that is ours.
+
 ## Vendor model names in Upstream text
 
 None in the kept skills at the Base commit, so no Patch was needed for ADR 0002 (checked for ticket #4: grep for `haiku`, `sonnet`, `opus`, `claude-`, `gpt-`, `gemini` over `upstream-skills/`). Some kept skills start subagents (for example `grilling`, `wayfinder`, `code-review`, `implement-spec`), but none picks a model for them. Spec #1 adds tiers in later tickets (the `code-review` Finders and Verifiers, and the `implement` and `implement-spec` Implementers; the tier on each ticket from `to-tickets` is Patch 7, and the `implement` Implementer's tier is Patch 8); each of those edits gets its own Patch here.

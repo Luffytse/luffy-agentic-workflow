@@ -8,9 +8,9 @@ Briefs for the Find stage of [`code-review`](SKILL.md). Every Finder is a brand-
 
 ## Standards Finder (regular tier)
 
-Paste in the standards-source files and the **smell baseline** below in full (the subagent has no other access to it), plus the **docs index drift** check when the repo has `docs/index.md`.
+Paste in the standards-source files and the **smell baseline** below in full (the subagent has no other access to it), plus the **docs index drift** check when the repo has `docs/index.md`, and the **`REVIEW.md` Always check** section below when the repo's `REVIEW.md` has at least one Always check line; without one, drop (d) from the brief.
 
-Brief: "Report (a) every place the diff violates a documented standard: cite the standard (file and rule); (b) any baseline smell you spot: name it and quote the hunk; (c) any docs index drift. Documented-standard breaches can be hard; baseline smells are always judgement calls, and a documented repo standard overrides the baseline."
+Brief: "Report (a) every place the diff violates a documented standard: cite the standard (file and rule); (b) any baseline smell you spot: name it and quote the hunk; (c) any docs index drift; (d) every `REVIEW.md` Always check line the diff breaks, reported once under (d) and not again under (a). Documented-standard breaches can be hard; baseline smells are always judgement calls, and a documented repo standard overrides the baseline."
 
 ### Smell baseline
 
@@ -42,6 +42,14 @@ Only when the repo has `docs/index.md`. A doc is anything the index is meant to 
 - a line in `docs/index.md` whose link points at a file that does not exist at this Review's head.
 
 Propose Nit, unless `REVIEW.md` or an ADR makes the index a rule, then Important.
+
+### `REVIEW.md` Always check
+
+Only when the repo's `REVIEW.md` has at least one Always check line. Each line there names a Bug class that earlier Reviews had to catch more than once, and what to look for (`retro` adds them: [BUG-CLASSES.md](../retro/BUG-CLASSES.md)). The other Finders get `REVIEW.md` too, but this check is the standards Finder's job, so every depth runs it, a Ticket check included.
+
+- Check every Always check line against the whole diff you were given (in Rounds 3 to 5, the whole-pull-request diff, not only the new commits), one line at a time, even when the change looks unrelated to it.
+- For each line the diff breaks, report one Finding whose Bug class is the one the line names, listing every instance. Propose its Severity by the meaning of Important like any other Finding.
+- After the Findings, list every Always check line with `clear` or the title of its Finding, so the Review shows each line was checked. This list is the one addition to "this format and nothing else".
 
 ## Spec Finder (regular tier)
 

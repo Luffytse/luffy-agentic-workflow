@@ -51,7 +51,7 @@ Start at `docs/index.md` and open only the docs whose line fits the change (with
 
 **Standards:** search the repo for every file that documents how code should be written, including `CLAUDE.md`/`AGENTS.md`, which the index does not list. `CODING_STANDARDS.md` and `CONTRIBUTING.md` must be on the list when they exist. The standards Finder also carries the smell baseline in [FINDERS.md](FINDERS.md).
 
-**`REVIEW.md`** at the repo root, when present, overrides the default meaning of Important and adds a skip list and an always-check list. Pass it to every Finder and Verifier. Without it, **Important** means the change would break behaviour, lose or leak data, contradict the spec or an ADR, or make a rollback unsafe; anything else real is a **Nit**.
+**`REVIEW.md`** at the repo root, when present, overrides the default meaning of Important and adds a skip list and an Always check list. Pass it to every Finder and Verifier; the standards Finder checks each Always check line against the diff ([FINDERS.md](FINDERS.md#reviewmd-always-check)). Without it, **Important** means the change would break behaviour, lose or leak data, contradict the spec or an ADR, or make a rollback unsafe; anything else real is a **Nit**.
 
 ### 3. Find
 
