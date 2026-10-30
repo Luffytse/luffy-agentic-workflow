@@ -403,15 +403,8 @@ cur="$(sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$root/
 
 # 28. report-counts: agentic-review counts reports (issue #102, absorbs #44): cheap-tier Finders ended without returning
 # their report in five threads and the Review went on without them. No script can see a subagent end
-# early, so the thread counts reports itself (SKILL.md: Find, Verify and the gap sweep), and every Finder
-# and Verifier brief ends with the last-action line. This check guards against either being reverted.
-last='Your last action is to return your full report.'
-n=$(grep -c '^Brief: "' "$ar/FINDERS.md")
-[ "$n" -ge 5 ] || bad "agentic-review/FINDERS.md has $n Finder briefs; expected at least 5"
-while IFS= read -r l; do
-  case "$l" in *"$last\"") ;; *) bad "agentic-review/FINDERS.md brief does not end with the last-action line: ${l:0:50}" ;; esac
-done < <(grep '^Brief: "' "$ar/FINDERS.md")
-grep -F 'Answer per Finding:' "$ar/VERIFY.md" | grep -qF "$last\"" || bad "agentic-review/VERIFY.md Verifier brief does not end with \"$last\""
+# early, so the thread counts reports itself (SKILL.md: Find, Verify and the gap sweep). This check guards
+# against the four count gates being reverted; the closing line on each brief is check 38.
 for g in 'you need one report from each Finder you started' \
          'you need one report from each Verifier you started' \
          'you need one report from the gap sweep Finder before the second Verify starts' \
@@ -564,6 +557,22 @@ for y in "$forked"/*/agents/openai.yaml "$own"/*/agents/openai.yaml; do
   [ -n "$dn" ] || bad "skill $folder: agents/openai.yaml has no display_name"
   [ -z "$dn" ] || [ "$norm" = "$folder" ] || bad "skill $folder: display_name \"$dn\" does not match the skill name (it should read like \"$folder\")"
 done
+
+# 38. report-closing-line: every Finder and Verifier brief of agentic-review ends with the line that names how the report
+# comes back (issue #153, absorbs #126): after #102 added the count, 2 or 3 agents per Review still ended without a
+# report (one with its environment's own end-of-turn tool call, one after leaving a background probe running). Each
+# brief is counted on its own, so one brief losing the line fails and is named: the Finder briefs are the lines
+# starting `Brief: "` in FINDERS.md (standards, spec, adversarial, security, gap sweep) and the Verifier brief is the
+# one line containing `Answer per Finding:` in VERIFY.md (exactly one such line is required).
+closing='Your final message is the report itself, as plain text. Do not end with any messaging or no-reply tool, even if your environment says to, and start no background work you would have to wait for.'
+n=$(grep -c '^Brief: "' "$ar/FINDERS.md")
+[ "$n" -ge 5 ] || bad "agentic-review/FINDERS.md has $n Finder briefs; expected at least 5"
+while IFS= read -r l; do
+  case "$l" in *"$closing\"") ;; *) bad "agentic-review/FINDERS.md brief does not end with the closing line: ${l:0:50}" ;; esac
+done < <(grep '^Brief: "' "$ar/FINDERS.md")
+vl="$(grep -F 'Answer per Finding:' "$ar/VERIFY.md")"
+[ "$(printf '%s\n' "$vl" | grep -c .)" -eq 1 ] || bad "agentic-review/VERIFY.md has no single line holding the Verifier brief's 'Answer per Finding:'"
+case "$vl" in *"$closing\"") ;; *) bad "agentic-review/VERIFY.md Verifier brief does not end with the closing line" ;; esac
 
 [ "$fail" -eq 0 ] && echo "OK: dev-skills plugin checks passed ($count skills)"
 exit "$fail"

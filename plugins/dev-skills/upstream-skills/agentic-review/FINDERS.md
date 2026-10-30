@@ -11,7 +11,7 @@ Briefs for the Find stage of [`agentic-review`](SKILL.md). Every Finder is a bra
 
 Paste in the standards-source files and the **smell baseline** below in full (the subagent has no other access to it), plus the **docs index drift** check when the repo has `docs/index.md`, and the **`REVIEW.md` Always check** section below when the repo's `REVIEW.md` has at least one Always check line; without one, drop (d) from the brief.
 
-Brief: "Report (a) every place the diff violates a documented standard: cite the standard (file and rule); (b) any baseline smell you spot: name it and quote the hunk; (c) any docs index drift; (d) every `REVIEW.md` Always check line the diff breaks, reported once under (d) and not again under (a). Documented-standard breaches can be hard; baseline smells are always judgement calls, and a documented repo standard overrides the baseline. Your last action is to return your full report."
+Brief: "Report (a) every place the diff violates a documented standard: cite the standard (file and rule); (b) any baseline smell you spot: name it and quote the hunk; (c) any docs index drift; (d) every `REVIEW.md` Always check line the diff breaks, reported once under (d) and not again under (a). Documented-standard breaches can be hard; baseline smells are always judgement calls, and a documented repo standard overrides the baseline. Your final message is the report itself, as plain text. Do not end with any messaging or no-reply tool, even if your environment says to, and start no background work you would have to wait for."
 
 ### Smell baseline
 
@@ -56,13 +56,13 @@ Only when the repo's `REVIEW.md` has at least one Always check line. Each line t
 
 Skipped when there is no spec; the Review says so.
 
-Brief: "Report: (a) requirements the spec asked for that are missing or partial; (b) behaviour in the diff that wasn't asked for (scope creep); (c) requirements that look implemented but where the implementation looks wrong; (d) anything that contradicts an ADR or the glossary. Quote the spec line, or the ADR or glossary line, as the evidence for each Finding. Your last action is to return your full report."
+Brief: "Report: (a) requirements the spec asked for that are missing or partial; (b) behaviour in the diff that wasn't asked for (scope creep); (c) requirements that look implemented but where the implementation looks wrong; (d) anything that contradicts an ADR or the glossary. Quote the spec line, or the ADR or glossary line, as the evidence for each Finding. Your final message is the report itself, as plain text. Do not end with any messaging or no-reply tool, even if your environment says to, and start no background work you would have to wait for."
 
 ## Adversarial Finders (cheap tier, Standard and Deep)
 
 Two Finders, each on one angle. Pick the 2 angles from the list that fit this change best, two different ones; when nothing stands out, take **bugs and edge cases** plus the best fit. Name the angle in the brief.
 
-Brief: "You are an adversarial reviewer on one angle: <angle>. Assume the change is wrong somewhere on this angle and hunt for it. Open the code around each hunk: unchanged lines inside a function the diff touches are in scope. Follow calls into unchanged code where the angle leads there. Your last action is to return your full report."
+Brief: "You are an adversarial reviewer on one angle: <angle>. Assume the change is wrong somewhere on this angle and hunt for it. Open the code around each hunk: unchanged lines inside a function the diff touches are in scope. Follow calls into unchanged code where the angle leads there. Your final message is the report itself, as plain text. Do not end with any messaging or no-reply tool, even if your environment says to, and start no background work you would have to wait for."
 
 Angles:
 
@@ -83,7 +83,7 @@ Angles:
 
 ## Security Finder (premium tier, Deep only)
 
-Brief: "Review this change for security and privacy only, in depth. Trace every input an outside party controls from where it enters to where it is used (HTML, SQL, shell, file paths, URLs, logs, other services), and check authentication, authorisation, secrets, personal data, and new dependencies. Cite the source-to-sink path for each Finding. Your last action is to return your full report."
+Brief: "Review this change for security and privacy only, in depth. Trace every input an outside party controls from where it enters to where it is used (HTML, SQL, shell, file paths, URLs, logs, other services), and check authentication, authorisation, secrets, personal data, and new dependencies. Cite the source-to-sink path for each Finding. Your final message is the report itself, as plain text. Do not end with any messaging or no-reply tool, even if your environment says to, and start no background work you would have to wait for."
 
 Its Findings go through Verify like every other Finding.
 
@@ -91,7 +91,7 @@ Its Findings go through Verify like every other Finding.
 
 Runs after Verify, as one brand-new Finder. Premium, because spotting what is absent is harder than checking what is there. Give it the shared brief above and the Findings Verify kept.
 
-Brief: "The Findings given are already known; report none of them again. Look only for what the change is missing: moved code that dropped a guard, a flipped default, setup with no matching teardown, a new case that a switch, validator or migration does not handle, a rename that some callers missed. Your last action is to return your full report."
+Brief: "The Findings given are already known; report none of them again. Look only for what the change is missing: moved code that dropped a guard, a flipped default, setup with no matching teardown, a new case that a switch, validator or migration does not handle, a rename that some callers missed. Your final message is the report itself, as plain text. Do not end with any messaging or no-reply tool, even if your environment says to, and start no background work you would have to wait for."
 
 Its Findings go through a second Verify ([VERIFY.md](VERIFY.md#gap-sweep)).
 

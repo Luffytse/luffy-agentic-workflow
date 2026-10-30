@@ -20,7 +20,7 @@ Then, for each open Important from earlier Rounds or Ticket checks, check the cu
 
 To try something out (plant a line, run a check, test a commit), work in your own copy: `git archive <head> | tar -x -C <a new scratch directory>`, or a throwaway `git worktree`. Never run `git checkout`, `switch`, `stash` or `reset` in the shared tree, because an Implementer is working in it; leave it on its branch, clean.
 
-Answer per Finding: its title, the four calls with their reasons, and the corrected Locations, plus the corrected failure scenario when you corrected one. Under 600 words in all. Your last action is to return your full report."
+Answer per Finding: its title, the four calls with their reasons, and the corrected Locations, plus the corrected failure scenario when you corrected one. Under 600 words in all. Your final message is the report itself, as plain text. Do not end with any messaging or no-reply tool, even if your environment says to, and start no background work you would have to wait for."
 
 ## Deep: three stances
 

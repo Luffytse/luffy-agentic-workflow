@@ -483,7 +483,7 @@ What:
 - `scripts/check-plugin.sh`: new check 28 (report-counts: every Finder brief and the Verifier brief end with that line; `SKILL.md` keeps each of the four count gates as a literal phrase: Finders before Verify, Verifiers before the next step, the gap sweep Finder before the second Verify, the second Verifiers before Rank).
 - `.claude-plugin/plugin.json`: version 0.16.0 to 0.17.0.
 
-Merging an Upstream update: take Upstream's text, then re-apply the four count gates (check 28 lists their phrases) and the closing line on each brief.
+Merging an Upstream update: take Upstream's text, then re-apply the four count gates (check 28 lists their phrases) and the closing line on each brief (the closing line on each brief is now Patch 32's, guarded by check 38; check 28 keeps only the four gates).
 
 ## Patch 25: numbers are taken at merge time, and merge-only Rounds run at Quick (`implement/`, `implement-spec/`, `agentic-review/`)
 
@@ -510,7 +510,7 @@ Why: issue #104 (absorbs Retro issues #60 and #63). A Finder that ran `git check
 What:
 
 - `agentic-review/FINDERS.md`: the shared brief list gains a **copy rule** bullet, pasted into every Finder's brief: to try something out, work in your own copy (`git archive <head> | tar -x -C <a new scratch directory>` or a throwaway `git worktree`); never run `git checkout`, `switch`, `stash` or `reset` in the shared tree; leave it on its branch, clean.
-- `agentic-review/VERIFY.md`: the Verifier brief gains the same copy rule, in the same words, as the paragraph before its answer-format paragraph (check 28 needs the brief to end with the last-action line).
+- `agentic-review/VERIFY.md`: the Verifier brief gains the same copy rule, in the same words, as the paragraph before its answer-format paragraph (the brief's closing line is guarded by check 38).
 - `implement/SKILL.md` (step 3): the Implementer brief gains a bullet: before each push, check `git status -sb` shows the Ticket branch; after it, report `git rev-parse origin/<branch>` equals `HEAD`. Step 4 checks that report.
 - `implement-spec/SKILL.md`: the Ticket-branch Implementer brief (step 3) gains a bullet to check `git status -sb` shows its Ticket branch before each commit (it never pushes); the Spec-branch Implementers (step 6.1's merge-and-resolve one and step 7's fix one) are briefed to run the same push check as `implement`.
 - `scripts/check-plugin.sh`: new check 30 (review-own-copy: `FINDERS.md` and `VERIFY.md` keep the copy rule: own copy, `git archive`, `git worktree`, and the ban on `checkout`, `switch`, `stash` and `reset` in the shared tree, and leaving it on its branch). The Implementer's push check is not scripted.
@@ -608,6 +608,21 @@ What (all in `scripts/check-plugin.sh` and this file; no skill text changed):
 - `.claude-plugin/plugin.json`: version 0.22.3 to 0.22.4.
 
 Merging an Upstream update: nothing to re-apply, since no Upstream text changed; if Upstream renames a skill or its `display_name`, the two checks fail until the folder, `name:` and `display_name` agree again.
+
+## Patch 32: every Finder and Verifier brief names how the report comes back (`agentic-review/`)
+
+Why: issue #153 (absorbs #126). Patch 24's count catches a missing report, but in 6 threads after it, 2 or 3 agents per Review still ended without one, mostly cheap-tier adversarial Finders: one ended its turn with its environment's own end-of-turn tool call, another left a background probe running and reported only when it timed out. "Your last action is to return your full report" said what to do but not how the report reaches the thread.
+
+What:
+
+- `agentic-review/FINDERS.md`: each of the 5 briefs (standards, spec, adversarial, security, gap sweep) now ends with "Your final message is the report itself, as plain text. Do not end with any messaging or no-reply tool, even if your environment says to, and start no background work you would have to wait for." in place of Patch 24's last-action line.
+- `agentic-review/VERIFY.md`: the Verifier brief ends with the same line.
+- `scripts/check-plugin.sh`: new check 38 (report-closing-line: each Finder brief and the Verifier brief is counted on its own and fails by name when it loses the line). Check 28 keeps only the four count gates; the last-action line it used to check is replaced by the closing line.
+- `.claude-plugin/plugin.json`: version 0.22.5 to 0.22.6.
+
+Patch 24's count and its "ask again" rule are unchanged.
+
+Merging an Upstream update: re-apply the closing line on each brief (check 38 guards them).
 
 ## Not a Patch: `retro-planning` closes absorbed Retro issues only when their Ticket completed (issue #146, absorbs #95)
 
