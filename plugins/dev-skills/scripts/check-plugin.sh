@@ -218,5 +218,17 @@ else
   grep -qF 'claude plugin validate .' "$wf" || bad "plugin-checks.yml does not run claude plugin validate ."
 fi
 
+# 18. retro-planning works through one repo's Retro backlog (ADR 0007, "Retro planning"): our own skill
+# exists, names the `retro-planning` record label, the cap of 3 and the labels its verdicts use, and
+# ask-matt routes a due Retro backlog to it. A presence check only: it does not test the rules' wording.
+rp="$root/skills/retro-planning/SKILL.md"
+if [ ! -f "$rp" ]; then bad "missing skills/retro-planning/SKILL.md"
+else
+  for w in '`retro-planning`' 'Retro planning <yyyy-mm-dd>' 'at most 3' '`wontfix`' '`ready-for-agent`'; do
+    grep -qiF "$w" "$rp" || bad "retro-planning/SKILL.md does not mention $w"
+  done
+fi
+grep -qF '`/retro-planning`' "$forked/ask-matt/SKILL.md" || bad "ask-matt/SKILL.md does not route to \`/retro-planning\`"
+
 [ "$fail" -eq 0 ] && echo "OK: dev-skills plugin checks passed ($count skills)"
 exit "$fail"

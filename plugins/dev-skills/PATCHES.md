@@ -318,6 +318,19 @@ What:
 
 Merging an Upstream update: both `SKILL.md` files are already replaced whole by Patches 8 and 11, so after carrying Upstream's changes over, re-append the final retro step and keep it last, since check 16 reads the last `## ` section.
 
+## Patch 15: `ask-matt` routes a due Retro backlog to `retro-planning` (ADR 0007)
+
+Why: ADR 0007 and issue #41. `retro` now files Retro issues and says when Retro planning is due; the new skill of our own, `retro-planning` (under `skills/`, not Upstream), works through the backlog, and `ask-matt` must route to it.
+
+What:
+
+- `ask-matt/SKILL.md`: step 4 (the `/retro` item, as Patch 10 left it) gains a closing sentence: "Suggestions it doesn't act on straight away pile up as Retro issues; when its report says your Retro backlog is due, start a thread for **`/retro-planning`**, which groups the backlog by root cause, closes one-offs, and turns the most repeated problems into tickets." Every other word of the item is unchanged.
+- New `skills/retro-planning/SKILL.md` (ours, not Upstream): ADR 0007's Retro planning steps and the record format.
+- `scripts/check-plugin.sh`: new check 18 (`skills/retro-planning/SKILL.md` exists and names `retro-planning`, `Retro planning <yyyy-mm-dd>`, "at most 3", `wontfix` and `ready-for-agent`; `ask-matt/SKILL.md` names `/retro-planning`).
+- `.claude-plugin/plugin.json`: version 0.8.4 to 0.8.5.
+
+Merging an Upstream update: carry Upstream's changes to the `/retro` item over by hand and re-append the sentence above.
+
 ## Not a Patch: CI workflow and check 17
 
 Our own, not Upstream: `.github/workflows/plugin-checks.yml` (issue #39) runs `scripts/check-plugin.sh` and `claude plugin validate .` on pull requests and pushes to main. `scripts/check-plugin.sh` gets check 17 (the workflow exists, triggers on `pull_request` and pushes to main, installs `@anthropic-ai/claude-code`, and runs both commands). No Upstream text changed. `.claude-plugin/plugin.json`: version 0.8.3 to 0.8.4.

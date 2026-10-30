@@ -26,7 +26,7 @@ Skills are namespaced, for example `dev-skills:wayfinder`. For a Claude project,
 plugins/dev-skills/
 ├── .claude-plugin/plugin.json   # lists both skill folders below
 ├── upstream-skills/             # forked from Upstream; every change is in PATCHES.md
-├── skills/                      # our own skills: setup-project
+├── skills/                      # our own skills: setup-project, retro-planning
 ├── evals/                       # our own skill evals, e.g. evals/code-review/ (planted-bugs fixture)
 ├── PATCHES.md                   # what we changed in Upstream text, and the Upstream commit
 ├── LICENSE-mattpocock-skills    # Upstream's MIT licence
@@ -38,6 +38,7 @@ Forked and own skills live in separate folders so it is always clear which text 
 ## Our own skills
 
 - `setup-project`: interviews Lufei with `grilling` and drafts the project instructions that tell the coordinator how to brief build threads. After approval the thread sends the text to the coordinator to save; it never edits project settings itself.
+- `retro-planning`: works through one repo's Retro backlog in a batch (ADR 0007): groups the Retro issues by root cause, gets the user's approval of a verdict per group, turns the top groups into `ready-for-agent` Tickets, closes the rest, and files a closed `retro-planning` record.
 
 ## Model tiers
 
