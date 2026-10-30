@@ -51,7 +51,7 @@ Run the `agentic-review` skill on the pull request yourself, in this thread: its
 
 Before each Round, fetch main. If it moved, have the Implementer merge main into the Ticket branch (a merge, never a rebase), resolve any conflicts and push, so the Round reviews the resolutions. A Round whose new commits are only that merge, with conflicts only in numbers or text, runs at Quick depth unless the resolutions touch logic ([agentic-review's ROUNDS.md](../agentic-review/ROUNDS.md#merge-only-rounds)).
 
-After each Round, send its Important Findings and "fix" Nits to the Implementer by message; it fixes, commits and pushes, then the next Round runs. On a clean Round 2 to 5, the Implementer makes the final "fix" Nits commit before you post that Round's comment; no further Round reviews it. After the last Round, file Pre-existing Findings as `agentic-review` says.
+After each Round, send its Important Findings and "fix" Nits to the Implementer by message (on a pull request that changes design, put its design Findings to the user first and send only the agreed answers, as [agentic-review's ROUNDS.md](../agentic-review/ROUNDS.md#design-findings-go-to-the-user) says); it fixes, commits and pushes, then the next Round runs. On a clean Round 2 to 5, the Implementer makes the final "fix" Nits commit before you post that Round's comment; no further Round reviews it. An agreed answer to a design Finding that changes the pull request gets one more Round instead. After the last Round, file Pre-existing Findings as `agentic-review` says.
 
 Done when a Round 2 to 5 is clean, or the 5-Round cap is hit.
 

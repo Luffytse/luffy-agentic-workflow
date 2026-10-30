@@ -7,7 +7,7 @@ The Rank stage of [`agentic-review`](SKILL.md), the Round comment that records e
 You rank; no subagent. Over the Findings Verify kept:
 
 1. **Dedupe.** Findings with the same Bug class and overlapping locations are one Finding: merge their locations and keep every Finder's name.
-2. **Drop the dismissed.** A Finding already dismissed in an earlier Round or Ticket check (dropped by Verify, or a Nit marked "skip") is dropped, even if this Review's Verifier kept it.
+2. **Drop the dismissed.** A Finding already dismissed in an earlier Round or Ticket check (dropped by Verify, a Nit marked "skip", or a design Finding the user settled by keeping the design) is dropped, even if this Review's Verifier kept it.
 3. **Hold the already raised.** A Finding already raised earlier (same Bug class, overlapping locations) is not reported again. It keeps its earlier id and stays open until fixed; an unfixed Important still blocks the stop. If this Review found new instances of its Bug class, add them to its locations in this Round's comment.
 4. **Sort** by Severity: Important, then Nit, then Pre-existing.
 5. **Cap the Nits** at 5, "fix" Nits first. The Nits cut by the cap are not reported and not recorded.
@@ -39,20 +39,31 @@ Finders: standards, spec, adversarial (bugs and edge cases), adversarial (securi
 - **Rows:** every Finding this Round raised or dismissed (a dropped Finding shows the Finder's proposed Severity), plus every earlier Finding whose status or locations changed in this Round.
 - **Status** is `open`, `fixed` or `dismissed`. The latest comment that names an id holds its current status. `fixed` needs the fixing commit in the Note.
 - **Note** names the Finder and gives the one-line reason (the Verifier's, for a dismissal).
-- **Nit status.** Every Round posts its "skip" Nits as `dismissed` and its "fix" Nits as `open`. A "fix" Nit becomes `fixed` in the next Round's comment once its fix commit lands (that Round's Verifier may confirm it; otherwise you mark it with the commit). On a clean Round 2 to 5, make the final "fix" Nits commit before posting, and post those Nits as `fixed` with that commit in the Note. Round 1 always leads to Round 2, so its "fix" Nits stay `open` until Round 2's comment.
+- **Nit status.** Every Round posts its "skip" Nits as `dismissed` and its "fix" Nits as `open`. A "fix" Nit becomes `fixed` in the next Round's comment once its fix commit lands (that Round's Verifier may confirm it; otherwise you mark it with the commit). On a clean Round 2 to 5, make the final "fix" Nits commit before posting, and post those Nits as `fixed` with that commit in the Note. Round 1 always leads to Round 2, so its "fix" Nits stay `open` until Round 2's comment. A design "fix" Nit is `dismissed` once the user keeps the design, not `fixed` ([Design Findings go to the user](#design-findings-go-to-the-user)).
 
 ## The Round loop
 
-A Round is **clean** when, after its Verify, no Important is open: it found no new Important, and every earlier one is confirmed fixed.
+A Round is **clean** when, after its Verify, no Important is open: it found no new Important (a design Finding it raised that the user then kept counts as none), and every earlier one is confirmed fixed or dismissed because the user kept the design.
 
-After each Round's report, the Important Findings and "fix" Nits are fixed and committed by whoever owns the code (in a build thread, its Implementer); "skip" Nits are left alone. Then:
+After each Round's report, the Important Findings and "fix" Nits are fixed and committed by whoever owns the code (in a build thread, its Implementer); "skip" Nits are left alone. On a pull request that changes design, the Findings that question the design go to the user first ([Design Findings go to the user](#design-findings-go-to-the-user)). Then:
 
-- **Round 1** always leads to Round 2. Its fixes and its "fix" Nits are committed, and Round 2 reviews them.
+- **Round 1** always leads to Round 2, even when the user keeps the design on every design Finding. Its fixes and its "fix" Nits are committed, and Round 2 reviews them.
 - **Round 2 to Round 4**, if not clean: the fixes and "fix" Nits are committed, and the next Round reviews them.
-- **Round 2 to Round 5**, if clean: its "fix" Nits go into one last commit that no further Round reviews, and the pull request is ready to merge.
+- **Round 2 to Round 5**, if clean: its "fix" Nits go into one last commit that no further Round reviews, and the pull request is ready to merge. An agreed change to the design gets one more Round instead ([Design Findings go to the user](#design-findings-go-to-the-user)).
 - **Round 5**, if not clean: stop. No sixth Round. Tell the user which Bug classes and Findings kept coming up across the Rounds and why the fixes did not hold, and say the plan may need discussing before more fixes.
 
 Each new Round starts at step 1 of [SKILL.md](SKILL.md#process) with brand-new Finders and Verifiers.
+
+## Design Findings go to the user
+
+A pull request changes design when it adds or edits an ADR, the glossary, a spec or a design doc, a lone Ticket's pull request that edits one included. On such a pull request, sort each Important and "fix" Nit after Rank:
+
+- **Design:** a Finding that questions the design itself, such as a gap in the agreed behaviour, two rules that conflict, or a case the design leaves unsettled. Its fix would record a decision, and the decisions are the user's. When unsure, treat the Finding as design.
+- **Text:** every other Finding, wording, citations and index lines included. These are fixed as usual.
+
+Put the design Findings to the user as the `grilling` skill puts a round: each one a numbered grilling question with your recommended answer, at most 3 at a time. Ask the next ones once the user answers, with any new questions the answers raise, and go on until the user says nothing more is worth settling. Then the owner of the code commits only the agreed answer for each, with the text Findings' fixes, and the next Round reviews them. Once the user answers, edit that Round's own comment, which stays its one comment (`gh api -X PATCH repos/<owner>/<repo>/issues/comments/<id> -f body=...`, or the GitHub tool you have); a Ticket check's comment is edited the same way, and one not posted yet is posted with these rows already settled. Each row the user settled by keeping the design becomes `dismissed`, with "user keeps the design" in the Note. Then recount the `<n> Important open` in its `Result:`; from Round 2 on, if none is left, `Result:` becomes `clean`.
+
+Waiting on the user's answers is not a Round. An agreed answer that changes the pull request always gets one more Round, within the 5-Round cap, even after a clean Round: a "fix" Nit that questions the design goes to the user, not into the unreviewed last commit. When no Round is left (the answer comes at Round 5), commit it and bring the pull request to the user, saying plainly that the change is unreviewed. Extra Rounds for this are expected; what matters is that the user agrees at the end. When the user keeps the design on every open design Finding and no other Important is open, nothing is committed for them: they become `dismissed` ("user keeps the design"), and from Round 2 on the Round counts as clean and the pull request is ready to merge (Round 1 still leads to Round 2). A Ticket check of a Ticket that changes design follows the same rule before the next check.
 
 ## Merge-only Rounds
 
@@ -69,4 +80,4 @@ Then post one short comment on the pull request, starting `<!-- code-review kind
 
 ## Ticket checks
 
-A Ticket check is one Quick Review over a Ticket branch's diff, not a Round. Record its Findings as one comment on the Spec's pull request, in the Round comment shape with marker `<!-- code-review kind=ticket-check ticket=<number> check=<1-3> depth=Quick head=<sha> -->` and ids `T<ticket>.<check>-<n>`. If the Spec's pull request is not open yet, post it once it opens. Each later check of the same Ticket, and each of the Spec pull request's Rounds, treats these Findings as already raised: their open Importants go to Verify to be re-checked, and stay open until confirmed fixed. Pre-existing Findings from Ticket checks wait and are filed with the Spec pull request's, after its last Round.
+A Ticket check is one Quick Review over a Ticket branch's diff, not a Round. Record its Findings as one comment on the Spec's pull request, in the Round comment shape with marker `<!-- code-review kind=ticket-check ticket=<number> check=<1-3> depth=Quick head=<sha> -->` and ids `T<ticket>.<check>-<n>`. If the Spec's pull request is not open yet, post it once it opens. Each later check of the same Ticket, and each of the Spec pull request's Rounds, treats these Findings as already raised: their open Importants go to Verify to be re-checked, and stay open until confirmed fixed or dismissed because the user kept the design. Pre-existing Findings from Ticket checks wait and are filed with the Spec pull request's, after its last Round.

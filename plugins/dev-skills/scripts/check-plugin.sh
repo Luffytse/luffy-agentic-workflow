@@ -466,5 +466,26 @@ if [ -f "$gr" ]; then
 fi
 [ -f "$gwd" ] && { grep -qF 'what every other skill expects of that skill' "$gwd" || bad "grill-with-docs/SKILL.md does not have the first fact for a skill rename or rework"; }
 
+# 33. agentic-review returns design Findings to the user as grilling (issue #112, absorbs #43): on a pull
+# request that changes design, the thread fixed Findings about the design itself and wrote rules the user
+# never agreed into ADRs. Only judgment tells a design Finding from a wording one, so this guards the rule's
+# text: ROUNDS.md has the section and its key phrases, the Round loop points to it, and implement and
+# implement-spec send design Findings to the user, not straight to the Implementer.
+rd="$ar/ROUNDS.md"
+grep -qxF '## Design Findings go to the user' "$rd" || bad "agentic-review/ROUNDS.md has no section \"## Design Findings go to the user\""
+for w in 'a Finding that questions the design' 'grilling question' 'at most 3 at a time' 'recommended answer' \
+         'until the user says nothing more is worth settling' 'only the agreed answer' 'wording, citations and index lines' \
+         'saying plainly that the change is unreviewed' 'the Round counts as clean' "edit that Round's own comment"; do
+  grep -qF "$w" "$rd" || bad "agentic-review/ROUNDS.md design-Findings rule has lost: $w"
+done
+# three in-file links: the Nit status bullet, the Round loop's fixes paragraph and its clean "Round 2 to Round 5" bullet
+n=$(grep -oF '(#design-findings-go-to-the-user)' "$rd" | wc -l | tr -d ' ')
+[ "$n" -ge 3 ] || bad "agentic-review/ROUNDS.md has $n links to the design-Findings section; expected at least 3 (Nit status, Round loop, clean Round bullet)"
+# implement has one pointer (step 6); implement-spec has two (step 5's Ticket check and step 7's Rounds)
+for fm in implement:1 implement-spec:2; do
+  f="$forked/${fm%%:*}/SKILL.md"; want="${fm##*:}"
+  n=$(grep -oF 'ROUNDS.md#design-findings-go-to-the-user' "$f" | wc -l | tr -d ' ')
+  [ "$n" -ge "$want" ] || bad "${fm%%:*}/SKILL.md has $n pointers sending design Findings to the user; expected at least $want"
+done
 [ "$fail" -eq 0 ] && echo "OK: dev-skills plugin checks passed ($count skills)"
 exit "$fail"
