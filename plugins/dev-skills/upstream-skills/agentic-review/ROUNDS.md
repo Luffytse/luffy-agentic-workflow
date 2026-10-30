@@ -1,6 +1,6 @@
 # Rank, Rounds and the record
 
-The Rank stage of [`code-review`](SKILL.md), the Round comment that records each Review, the Round loop with its stop rule, and filing Pre-existing Findings.
+The Rank stage of [`agentic-review`](SKILL.md), the Round comment that records each Review, the Round loop with its stop rule, and filing Pre-existing Findings.
 
 ## Rank
 

@@ -1,5 +1,5 @@
 ---
-name: code-review
+name: agentic-review
 description: "Review a pull request, or the changes since a fixed point (commit, branch, tag, or merge-base): parallel Finders look for problems on the standards, spec and adversarial angles, a Verifier checks each candidate against the code, and the survivors are ranked by Severity. A pull request is reviewed in Rounds (2 to 5), each posting one comment. Use when the user wants to review a PR, a branch, work-in-progress changes, run a ticket check, or asks to \"review since X\"."
 ---
 

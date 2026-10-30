@@ -1,6 +1,6 @@
-# code-review runs Find, Verify and Rank, in rounds of 2 to 5
+# agentic-review runs Find, Verify and Rank, in rounds of 2 to 5
 
-Our `code-review` skill follows the shape of Claude Code's own Code Review (several Finders, then a verify step that drops false positives, then ranking by Severity), adapted to agents that review their own pull requests in a session. We kept Upstream's two Finders (standards and spec) and added cheap adversarial Finders, a regular-tier Verifier, and Rounds that stop early once nothing Important remains.
+Our `agentic-review` skill follows the shape of Claude Code's own Code Review (several Finders, then a verify step that drops false positives, then ranking by Severity), adapted to agents that review their own pull requests in a session. We kept Upstream's two Finders (standards and spec) and added cheap adversarial Finders, a regular-tier Verifier, and Rounds that stop early once nothing Important remains.
 
 ## How a Review runs
 

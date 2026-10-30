@@ -292,6 +292,21 @@ What:
 
 Merging an Upstream update: carry Upstream's changes to step 3, Context hygiene and the wayfinder on-ramp over by hand and re-apply the lines above.
 
+## Patch 13: the `code-review` skill is renamed `agentic-review` (`agentic-review/` and every skill that names it)
+
+Why: issue #50. Our skill shared its name with Claude Code's built-in `code-review`, so a plain `/code-review` or "run the `code-review` skill" reached the built-in, which has no Rounds, posts no Round comment and records no Ticket check. A rename only: the Review behaves as before. Patches 1 to 12 above still say `code-review`, as the skill was then named.
+
+What (Upstream text changed):
+
+- Folder `upstream-skills/code-review/` becomes `upstream-skills/agentic-review/` (git mv). Its `SKILL.md` frontmatter `name:` is now `agentic-review`; `agents/openai.yaml` `display_name` is now "Agentic Review"; the one-line links in `FINDERS.md`, `ROUNDS.md` and `VERIFY.md` name `agentic-review`.
+- Every other mention of the skill name in `implement`, `implement-spec`, `ask-matt`, `retro` (`SKILL.md`, `BUG-CLASSES.md`) and `tdd` is now `agentic-review`.
+- Not changed: the `<!-- code-review kind=round ... -->`, `kind=ticket-check` and `kind=pre-existing` marker lines. They are a data format that `retro` reads out of Round comments already posted on past pull requests, so renaming them would hide those Rounds.
+- Outside Upstream text: `evals/code-review/` becomes `evals/agentic-review/`; GLOSSARY.md, `docs/index.md`, READMEs, ADRs 0001, 0003, 0004, 0006 and 0007 and `plugin.json` keywords follow. ADR 0003 keeps its filename so existing links hold. ADR 0001 still says Upstream has a `code-review` skill, which is true.
+- `scripts/check-plugin.sh`: checks 7 to 14 use the new name; new check 15 fails if any skill file under `upstream-skills/` or `skills/` tells an agent to run `code-review` (`` `code-review` ``, `dev-skills:code-review`, `/code-review`, "the code-review skill", `name: code-review`) or the old folder exists.
+- `.claude-plugin/plugin.json`: version 0.8.1 to 0.9.0.
+
+Merging an Upstream update: Upstream's skill is still `code-review`. Merge its text into `agentic-review/` and keep the name `agentic-review`.
+
 ## Vendor model names in Upstream text
 
 None in the kept skills at the Base commit, so no Patch was needed for ADR 0002 (checked for ticket #4: grep for `haiku`, `sonnet`, `opus`, `claude-`, `gpt-`, `gemini` over `upstream-skills/`). Some kept skills start subagents (for example `grilling`, `wayfinder`, `code-review`, `implement-spec`), but none picks a model for them. Spec #1 adds tiers in later tickets (the `code-review` Finders and Verifiers, and the `implement` and `implement-spec` Implementers; the tier on each ticket from `to-tickets` is Patch 7, the `implement` Implementer's tier is Patch 8, and the `implement-spec` Implementers' tiers are Patch 11); each of those edits gets its own Patch here.

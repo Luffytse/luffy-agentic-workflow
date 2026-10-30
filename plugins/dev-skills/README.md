@@ -1,6 +1,6 @@
 # dev-skills
 
-Lufei's development skills as one Claude Code plugin: the path from `wayfinder` through specs, tickets and implementation to `code-review` and `retro`. It is a fork of [Matt Pocock's skills](https://github.com/mattpocock/skills) (23 of his 27) plus skills of our own. Every skill is model-invoked, so an agent in a project thread (where nobody types slash commands) can start any of them. See [ADR 0001](../../docs/adr/0001-dev-skills-is-one-plugin-forked-from-matt-pocock.md).
+Lufei's development skills as one Claude Code plugin: the path from `wayfinder` through specs, tickets and implementation to `agentic-review` and `retro`. It is a fork of [Matt Pocock's skills](https://github.com/mattpocock/skills) (23 of his 27) plus skills of our own. Every skill is model-invoked, so an agent in a project thread (where nobody types slash commands) can start any of them. See [ADR 0001](../../docs/adr/0001-dev-skills-is-one-plugin-forked-from-matt-pocock.md).
 
 ## Install
 
@@ -27,7 +27,7 @@ plugins/dev-skills/
 ├── .claude-plugin/plugin.json   # lists both skill folders below
 ├── upstream-skills/             # forked from Upstream; every change is in PATCHES.md
 ├── skills/                      # our own skills: setup-project
-├── evals/                       # our own skill evals, e.g. evals/code-review/ (planted-bugs fixture)
+├── evals/                       # our own skill evals, e.g. evals/agentic-review/ (planted-bugs fixture)
 ├── PATCHES.md                   # what we changed in Upstream text, and the Upstream commit
 ├── LICENSE-mattpocock-skills    # Upstream's MIT licence
 └── scripts/check-plugin.sh      # checks the layout and the Patches

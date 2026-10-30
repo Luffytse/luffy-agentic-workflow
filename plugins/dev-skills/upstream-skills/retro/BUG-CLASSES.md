@@ -1,6 +1,6 @@
 # Repeated Bug classes
 
-A **Bug class** that comes up more than once in a pull request becomes a check, so later Reviews need not catch it again (ADR 0003). The record is the Round comments that `code-review` posts ([ROUNDS.md](../code-review/ROUNDS.md)).
+A **Bug class** that comes up more than once in a pull request becomes a check, so later Reviews need not catch it again (ADR 0003). The record is the Round comments that `agentic-review` posts ([ROUNDS.md](../agentic-review/ROUNDS.md)).
 
 ## Procedure
 
@@ -11,7 +11,7 @@ A **Bug class** that comes up more than once in a pull request becomes a check, 
 5. **Otherwise classify** as the "Coding standards" category in [SKILL.md](SKILL.md) does:
    - **Mechanical**: a deterministic check, whichever of a rule in the repo's linter, a line in its check script, a pre-commit hook or a CI job is cheapest next to the existing guardrail.
    - **Judgement**: one line under "Always check" in `REVIEW.md` at the repo root, naming the Bug class and what to look for, in one sentence. With no `REVIEW.md`, create it with three short sections (what Important means here, Skip, Always check): the Always-check line, and a sentence that the default meaning of Important applies, unless the user says otherwise.
-6. **Run the new check on the current default branch.** If it fails anywhere on the default branch (Pre-existing places, or instances the reviewed pull request left unfixed), do not wire a failing check. Add those places to the open issue tracking that Bug class, or file one ([ROUNDS.md](../code-review/ROUNDS.md) "Filing Pre-existing Findings"), note there that the check lands with that fix, and use a `REVIEW.md` line meanwhile.
+6. **Run the new check on the current default branch.** If it fails anywhere on the default branch (Pre-existing places, or instances the reviewed pull request left unfixed), do not wire a failing check. Add those places to the open issue tracking that Bug class, or file one ([ROUNDS.md](../agentic-review/ROUNDS.md) "Filing Pre-existing Findings"), note there that the check lands with that fix, and use a `REVIEW.md` line meanwhile.
 7. **Make the changes on a new branch off the default branch**, as one pull request for this retro (the reviewed pull request is done; leave it as it is). Adding or editing `REVIEW.md`, `CODING_STANDARDS.md` or any doc updates `docs/index.md` in the same commit ([DOCS-INDEX.md](../domain-modeling/DOCS-INDEX.md)). The pull request is reviewed like any other. One that adds or changes `REVIEW.md` changes the review rules, so a person merges it, not the agent.
 8. **Report a table**, one row per Bug class. Classes with one instance read "not repeated" and need no change.
 

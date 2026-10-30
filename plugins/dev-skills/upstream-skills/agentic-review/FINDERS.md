@@ -1,6 +1,6 @@
 # Finders
 
-Briefs for the Find stage of [`code-review`](SKILL.md). Every Finder is a brand-new subagent on the tier given here, and every brief includes:
+Briefs for the Find stage of [`agentic-review`](SKILL.md). Every Finder is a brand-new subagent on the tier given here, and every brief includes:
 
 - The diff command for this Review and, in Rounds 3 to 5, the whole-pull-request diff command too, plus the commit list.
 - The spec (path or fetched contents), the standards-source files, and `REVIEW.md` if the repo has one.

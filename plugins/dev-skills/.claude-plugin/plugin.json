@@ -1,12 +1,12 @@
 {
   "name": "dev-skills",
   "description": "Lufei's development skills: a fork of Matt Pocock's skills (wayfinder, grilling, specs, tickets, TDD, code review and more), all model-invoked, plus our own skills.",
-  "version": "0.8.1",
+  "version": "0.9.0",
   "author": {
     "name": "lufei.xie",
     "email": "12742482+Luffytse@users.noreply.github.com"
   },
   "license": "MIT",
-  "keywords": ["skills", "tdd", "code-review", "grilling", "domain-modeling"],
+  "keywords": ["skills", "tdd", "agentic-review", "grilling", "domain-modeling"],
   "skills": ["./upstream-skills", "./skills"]
 }

@@ -1,6 +1,6 @@
 # Ticket #1: Even splitting, settle-up and the summary page
 
-Stands in for the ticket the fixture's pull request builds. Pass this file to `code-review` as the spec.
+Stands in for the ticket the fixture's pull request builds. Pass this file to `agentic-review` as the spec.
 
 Trip members type in who paid what. We want to split the total evenly and tell everyone who pays whom.
 

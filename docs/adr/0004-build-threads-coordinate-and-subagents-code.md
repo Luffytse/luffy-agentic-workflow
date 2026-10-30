@@ -16,7 +16,7 @@ The thread merges its own pull request once the review is clean and CI is green,
 
 - it ran at Deep depth (security, money, deleting data);
 - it is a **one-way door**: reverting the change would not undo it (a data migration, deleted data, a public interface others depend on, a message sent outside the project). Each Implementer says so with its evidence, the `pr` skill marks it on the pull request, and a spec's pull request is a one-way door if any of its tickets is;
-- it changes an ADR, the glossary, a `CLAUDE.md`, a `REVIEW.md` or the `code-review` skill;
+- it changes an ADR, the glossary, a `CLAUDE.md`, a `REVIEW.md` or the `agentic-review` skill;
 - the review hit the 5-Round cap.
 
 Lufei then merges, or tells the thread to. This follows the Claude Code team's practice of setting human review by the risk of the change, not by who wrote it.
