@@ -139,5 +139,9 @@ The open Retro issues of one repo.
 _Avoid_: retro queue, improvement list
 
 **Retro planning**:
-The batch review of one repo's Retro backlog, which merges duplicates, closes most one-offs and turns at most 3 groups into Tickets. Each planning leaves a closed record issue labelled `retro-planning`.
+The review of a snapshot of one repo's Retro backlog, which merges duplicates, closes most one-offs and turns at most 3 groups into Tickets. It walks the user through one group at a time and carries out each call at once. Its record issue, labelled `retro-planning`, is open while it runs and closed at its end; later plannings read only closed records.
 _Avoid_: retro triage, retro review
+
+**Spin-off**:
+A group of Retro issues the user wants to discuss further, moved out of a Retro planning into a planning thread of its own, which ends by giving each issue a Ticket or a close. It does not count toward the cap and cannot expire meanwhile.
+_Avoid_: deferral, parked group

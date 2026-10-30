@@ -334,5 +334,20 @@ else
   [ -e "$sd/issue-tracker-gitlab.md" ] || [ -e "$sd/issue-tracker-local.md" ] && bad "setup-dev-skills still carries a GitLab or local tracker seed"
 fi
 
+# 25. retro-planning's record carries its state from one planning to the next (issue #70): the next
+# planning reads only closed records, so a section dropped from the template silently breaks the chain.
+# The template must keep the snapshot, cap, spin-off and arrival sections, and the skill must file the
+# record open at the start, walk one group at a time, and give spun-off groups their own planning.
+if [ -f "$rp" ]; then
+  for h in '## Snapshot' '## Cap' '## Spun off' '## Spun off, waiting' '## Arrived during this planning' \
+           '## Held back by the cap' '## Open issues: plannings without a new vote' '## Waiting on open Tickets' \
+           '## Running a spun-off planning'; do
+    grep -qxF "$h" "$rp" || bad "retro-planning/SKILL.md has no heading line $h"
+  done
+  for w in '**open** issue' 'one at a time' 'Spun off to <thread link>'; do
+    grep -qF "$w" "$rp" || bad "retro-planning/SKILL.md does not have $w"
+  done
+fi
+
 [ "$fail" -eq 0 ] && echo "OK: dev-skills plugin checks passed ($count skills)"
 exit "$fail"

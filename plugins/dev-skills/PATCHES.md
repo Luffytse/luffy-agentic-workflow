@@ -445,6 +445,12 @@ Also in this Patch:
 - `scripts/check-plugin.sh`: check 1 expects 22 skills (the kept list drops `setup-matt-pocock-skills`); check 7 takes `setup-dev-skills/SKILL.md` and `setup-dev-skills/domain.md` from `skills/`; new check 24 (the old folder is gone; the own skill has `SKILL.md`, the seeds, no `agents/openai.yaml` and no GitLab or local seed; `SKILL.md` credits `LICENSE-mattpocock-skills`, names `wayfinder:map` and says settings are never changed).
 - ADR 0001 and ADR 0006 and the plugin `README.md` name `setup-dev-skills`; this repo's `docs/agents/` and `CLAUDE.md` match what a re-run writes, apart from repo-specific examples (real ADR names, the ADR 0007 link).
 - `.claude-plugin/plugin.json`: version 0.12.0 to 0.13.0 (a skill name was removed).
+## Not a Patch: `retro-planning` walks one item at a time (issue #70)
+
+Our own, not Upstream. `skills/retro-planning/SKILL.md` now snapshots the backlog at the start, files its record as an open issue then and closes it at the end (a planning whose record is open is resumed from it), walks the user through one group at a time and carries out each call at once, frees a cap slot when a proposed Ticket is closed or spun off, lets only the user raise the cap for one planning, and sends a group that needs more discussion to its own planning thread (via the coordinator, or the user). The record gains Snapshot, Cap, Spun off, Arrived during this planning and Spun off, waiting sections. ADR 0007's Retro planning steps, `GLOSSARY.md` (Retro planning, new Spin-off) and the plugin README match. No Upstream text changed. `ask-matt`'s routing sentence still holds. `retro/FILING.md` is unchanged, but its clock, which runs from the creation of the newest closed record, now runs from the start of the last planning rather than its end, since the record is filed at the start.
+
+- `scripts/check-plugin.sh`: new check 25 (the record template keeps its Snapshot, Cap, Spun off, Spun off, waiting, Arrived during this planning, Held back by the cap, plannings-without-a-new-vote and Waiting on open Tickets sections; the skill files the record as an **open** issue, walks one at a time, and has the spin-off comment and the "Running a spun-off planning" section).
+- `.claude-plugin/plugin.json`: version 0.13.0 to 0.14.0.
 
 ## Vendor model names in Upstream text
 

@@ -39,7 +39,7 @@ Forked and own skills live in separate folders so it is always clear which text 
 
 - `setup-dev-skills`: derived from Upstream's setup skill. Sets up a GitHub repo for the skills: writes `docs/agents/` (issue tracker, labels, domain docs), the `## Agent skills` block and `docs/index.md`, creates the labels the skills use, and reports the GitHub settings the build skills rely on without changing them. A re-run shows a diff first.
 - `setup-project`: interviews the user with `grilling` and drafts the project instructions that tell the coordinator how to brief build threads. After approval the thread sends the text to the coordinator to save; it never edits project settings itself.
-- `retro-planning`: works through one repo's Retro backlog in a batch (ADR 0007): groups the Retro issues by root cause, gets the user's approval of a verdict per group, turns the top groups into `ready-for-agent` Tickets, closes one-offs, expired issues and issues whose Ticket has closed, leaves held-back and declined groups open, and files a closed `retro-planning` record.
+- `retro-planning`: works through a snapshot of one repo's Retro backlog (ADR 0007): files an open `retro-planning` record, groups the Retro issues by root cause, walks the user through each group one at a time and carries out each call at once (a `ready-for-agent` Ticket up to the cap, a close, or a spin-off to its own planning thread), closes expired issues and issues whose Ticket has closed in one list at the end, and closes the record.
 
 ## Model tiers
 
