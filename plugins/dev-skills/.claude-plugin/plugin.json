@@ -1,7 +1,7 @@
 {
   "name": "dev-skills",
   "description": "Lufei's development skills: a fork of Matt Pocock's skills (wayfinder, grilling, specs, tickets, TDD, code review and more), all model-invoked, plus our own skills.",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "author": {
     "name": "lufei.xie",
     "email": "12742482+Luffytse@users.noreply.github.com"

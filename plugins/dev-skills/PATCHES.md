@@ -226,6 +226,25 @@ What:
 
 Merging an Upstream update: the standards brief is Upstream text, so when Upstream changes its standards prompt, carry the change into `FINDERS.md` (Patch 5's note) and keep the "(d)" clause. The rest of this Patch edits text that is ours.
 
+## Patch 10: `ask-matt` describes `implement` and `code-review` as they now work (`ask-matt/`)
+
+Why: issue #28. Patch 2 trimmed `ask-matt`, but its text still described `implement` and `code-review` as Upstream wrote them. Since Patches 5 and 8, `implement` coordinates one lone Ticket (ADR 0004) and `code-review` runs Find, Verify and Rank in Rounds (ADR 0003).
+
+What:
+
+- `SKILL.md`, step 3 of the main flow. Upstream lines, and what became of each:
+  - "**`/implement`** per ticket, **`/clear`ing context between each one**.": now "**each in its own fresh thread**", because each lone ticket gets its own Ticket thread.
+  - "**No** → **`/implement`** right here, in the same context window.": now says `/implement` runs a lone ticket: its thread starts an Implementer subagent, opens a pull request with `/pr`, runs the `/code-review` Rounds, then merges it or brings it to the user.
+  - "closes out with **`/code-review`**, a two-axis review (Standards + Spec) of the diff. `/implement` runs both per ticket;": now describes Finders, a Verifier and ranking by Severity, run in Rounds on a pull request, and says that in `/implement` the Implementer drives `/tdd` and the thread runs `/code-review`.
+  - "Each `/implement` then starts fresh, working from the ticket." (Context hygiene): now "starts in its own fresh thread".
+- Left as Upstream wrote them, for ticket #11 (which rewrites `implement-spec` and has not merged): the `/implement-spec` bullet ("integration branch"), and the clause "`/implement-spec`'s implementers each drive `/tdd`, and it runs one `/code-review` over the integration branch".
+- Also left for #11: the Yes-branch's routing of a Spec's tickets to `/implement` (the bullet's wording is edited above, but `implement` step 1 now sends Spec tickets to `implement-spec`).
+- Checked and kept as they are, because they still fit: Context hygiene's `/clear` before `/retro` (it is about clearing a session, not about `/implement`); the wayfinder on-ramp's "`/to-tickets` and `/implement` as usual" and "go straight to `/implement`"; the triage line ("which **`/implement`** later picks up").
+- `scripts/check-plugin.sh`: new check 13 (`ask-matt/SKILL.md` must not say "same context window" or "two-axis", and must mention Rounds).
+- `.claude-plugin/plugin.json`: version 0.7.1 to 0.7.2.
+
+Merging an Upstream update: carry Upstream's changes to step 3 and Context hygiene over by hand and re-apply the lines above. When ticket #11 lands, update the two `implement-spec` lines and this Patch.
+
 ## Vendor model names in Upstream text
 
 None in the kept skills at the Base commit, so no Patch was needed for ADR 0002 (checked for ticket #4: grep for `haiku`, `sonnet`, `opus`, `claude-`, `gpt-`, `gemini` over `upstream-skills/`). Some kept skills start subagents (for example `grilling`, `wayfinder`, `code-review`, `implement-spec`), but none picks a model for them. Spec #1 adds tiers in later tickets (the `code-review` Finders and Verifiers, and the `implement` and `implement-spec` Implementers; the tier on each ticket from `to-tickets` is Patch 7, and the `implement` Implementer's tier is Patch 8); each of those edits gets its own Patch here.

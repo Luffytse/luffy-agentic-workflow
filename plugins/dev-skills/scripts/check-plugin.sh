@@ -153,5 +153,15 @@ for f in FINDERS.md VERIFY.md SKILL.md; do
 done
 grep -qF '### `REVIEW.md` Always check' "$forked/code-review/FINDERS.md" || bad "code-review/FINDERS.md has no REVIEW.md Always check section for the standards Finder"
 
+# 13. ask-matt describes implement as the lone-ticket coordinator and code-review as Rounds (issue #28),
+# not as Upstream wrote them
+am="$forked/ask-matt/SKILL.md"
+if [ -f "$am" ]; then
+  for w in 'same context window' 'two-axis'; do
+    grep -qiF "$w" "$am" && bad "ask-matt/SKILL.md still says \"$w\""
+  done
+  grep -qF 'Rounds' "$am" || bad "ask-matt/SKILL.md does not describe code-review's Rounds"
+fi
+
 [ "$fail" -eq 0 ] && echo "OK: dev-skills plugin checks passed ($count skills)"
 exit "$fail"
