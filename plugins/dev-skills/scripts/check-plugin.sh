@@ -105,5 +105,11 @@ for s in $readers; do
 done
 grep -qF 'docs/index.md' "$forked/setup-matt-pocock-skills/domain.md" || bad "domain.md template does not start at docs/index.md"
 
+# 8. code-review's reference files exist and SKILL.md links each one
+for f in FINDERS.md VERIFY.md ROUNDS.md; do
+  if [ ! -f "$forked/code-review/$f" ]; then bad "missing code-review/$f"
+  elif ! grep -q "($f" "$forked/code-review/SKILL.md"; then bad "code-review/SKILL.md does not link $f"; fi
+done
+
 [ "$fail" -eq 0 ] && echo "OK: dev-skills plugin checks passed ($count skills)"
 exit "$fail"

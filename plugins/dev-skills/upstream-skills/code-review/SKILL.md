@@ -1,89 +1,77 @@
 ---
 name: code-review
-description: "Review the changes since a fixed point (commit, branch, tag, or merge-base) along two axes: Standards (does the code follow this repo's documented coding standards?) and Spec (does the code match what the originating issue/spec asked for?). Runs both reviews in parallel sub-agents and reports them side by side. Use when the user wants to review a branch, a PR, work-in-progress changes, or asks to \"review since X\"."
+description: "Review a pull request, or the changes since a fixed point (commit, branch, tag, or merge-base): parallel Finders look for problems on the standards, spec and adversarial angles, a Verifier checks each candidate against the code, and the survivors are ranked by Severity. A pull request is reviewed in Rounds (2 to 5), each posting one comment. Use when the user wants to review a PR, a branch, work-in-progress changes, run a ticket check, or asks to \"review since X\"."
 ---
 
-Two-axis review of the diff between `HEAD` and a fixed point the user supplies:
+A **Review** runs three stages over one diff: **Find** (fresh Finder subagents in parallel), **Verify** (a fresh Verifier checks every candidate Finding against the code), and **Rank** (you dedupe, drop repeats and sort). There are two entry points:
 
-- **Standards**: does the code conform to this repo's documented coding standards?
-- **Spec**: does the code faithfully implement the originating issue / spec?
+- **Pull request.** Review it in **Rounds**: each Round is one Review plus the fix commits after it, and posts one comment on the pull request. Rounds 1 and 2 review the whole pull request; Rounds 3 to 5 review only the commits added since the last Round. Follow [ROUNDS.md](ROUNDS.md).
+- **A diff since a fixed point** (no pull request, or a **Ticket check**, which is one Quick Review over a Ticket branch's diff against its Spec branch). One Review, not a Round. Report it; for a Ticket check, also record it as described in [ROUNDS.md](ROUNDS.md#ticket-checks).
 
-Both axes run as **parallel sub-agents** so they don't pollute each other's context, then this skill aggregates their findings. Start every sub-agent with a fresh context window.
+Every Finder and Verifier is a **brand-new subagent** each Review: never reuse one from an earlier Round or check, so each Review reads the code with fresh eyes.
+
+Run the Review (Find, Verify, Rank and the Round loop) in the **top-level session**, the one that can start subagents. A subagent cannot start subagents of its own, so never hand the whole Review to one subagent: it stops at Find. If subagents cannot be started at all, stop and tell the user; do not do the Finders' or Verifier's work yourself.
 
 The issue tracker should have been provided to you. If not, tell the user to run `/setup-matt-pocock-skills`.
 
+## Depth and tiers
+
+The **Review depth** sets which agents run. Agents name a **model tier**, never a model.
+
+| Depth | Finders | Verify |
+|-------|---------|--------|
+| Quick | standards + spec (regular) | 1 Verifier (regular) |
+| Standard (default) | standards + spec (regular), 2 adversarial (cheap) | 1 Verifier (regular) |
+| Deep | Standard's four, plus a security Finder (premium) | 3 Verifiers (regular): tracer, skeptic, spec checker |
+
+Pick Deep for risky changes (security, money, deleting data, or anything the user marks), Quick for docs-only or trivial ones, Standard for the rest. A depth the user or the brief names wins. For a pull request the depth is chosen once, in Round 1, and carried in each Round comment; later Rounds reuse it unless the user changes it. A Ticket check is always Quick.
+
 ## Process
 
-### 1. Pin the fixed point
+### 1. Pin the diff
 
-Whatever the user said is the fixed point (a commit SHA, branch name, tag, `main`, `HEAD~5`, etc.). If they didn't specify one, ask for it.
+- **Pull request, Round 1 or 2:** the whole pull request, `git diff <base>...HEAD` (three-dot, against the merge-base), plus `git log <base>..HEAD --oneline`.
+- **Pull request, Round 3 to 5:** the commits since the last Round, `git diff <last-head>..HEAD`, where `<last-head>` is the `head` recorded in the last Round comment. Keep the whole-pull-request diff command too: Findings list every place their Bug class occurs in the pull request, not only in the new commits.
+- **Fixed point:** whatever the user said (a SHA, branch, tag, `main`, `HEAD~5`); ask if they gave none. `git diff <fixed-point>...HEAD`.
 
-Capture the diff command once: `git diff <fixed-point>...HEAD` (three-dot, so the comparison is against the merge-base). Also note the list of commits via `git log <fixed-point>..HEAD --oneline`.
+Record `git rev-parse HEAD` as this Review's head. Confirm every ref resolves (`git rev-parse`) and the diff is non-empty: a bad ref or empty diff fails here, not inside parallel subagents.
 
-Before going further, confirm the fixed point resolves (`git rev-parse <fixed-point>`) and the diff is non-empty. A bad ref or empty diff should fail here, not inside two parallel sub-agents.
+For a pull request, read every earlier comment by this skill on it (the `<!-- code-review` marker lines in [ROUNDS.md](ROUNDS.md#the-round-comment)): they give the Round number, the depth, the last head, and every Finding already raised, dismissed or open. Ticket-check comments count as already raised: their open Importants stay open until a Verifier confirms them fixed. For a Ticket check, read the earlier checks of the same Ticket the same way.
 
-### 2. Identify the spec source
+### 2. Find the spec and standards sources
 
-Look for the originating spec, in this order:
+Start at `docs/index.md` and open only the docs whose line fits the change (with no index, fall back to `GLOSSARY.md` or `GLOSSARY-MAP.md`, and `docs/adr/`).
 
-1. Issue references in the commit messages (`#123`, `Closes #45`, GitLab `!67`, etc.), fetched via the workflow in the tracker doc.
+**Spec**, in this order:
+
+1. Issue references in the pull request body and commit messages (`#123`, `Closes #45`, GitLab `!67`), fetched via the workflow in the tracker doc.
 2. A path the user passed as an argument.
 3. A spec file under `docs/`, `specs/`, or `.scratch/` matching the branch name or feature.
-4. If nothing is found, ask the user where the spec is. If they say there isn't one, the **Spec** sub-agent will skip and report "no spec available".
+4. If nothing is found, ask the user where the spec is. If there isn't one, the spec Finder is skipped and the Review says "no spec available".
 
-### 3. Identify the standards sources
+**Standards:** search the repo for every file that documents how code should be written, including `CLAUDE.md`/`AGENTS.md`, which the index does not list. `CODING_STANDARDS.md` and `CONTRIBUTING.md` must be on the list when they exist. The standards Finder also carries the smell baseline in [FINDERS.md](FINDERS.md).
 
-Start at `docs/index.md` (with no index, fall back to `GLOSSARY.md` or `GLOSSARY-MAP.md`, and `docs/adr/`) and search the repo for every file that documents how code should be written, including `CLAUDE.md`/`AGENTS.md`, which the index does not list. When `CODING_STANDARDS.md` or `CONTRIBUTING.md` exists, it must be on the list.
+**`REVIEW.md`** at the repo root, when present, overrides the default meaning of Important and adds a skip list and an always-check list. Pass it to every Finder and Verifier. Without it, **Important** means the change would break behaviour, lose or leak data, contradict the spec or an ADR, or make a rollback unsafe; anything else real is a **Nit**.
 
-On top of whatever the repo documents, the Standards axis always carries the **smell baseline** below: a fixed set of Fowler code smells (_Refactoring_, ch.3) that applies even when a repo documents nothing. Two rules bind it:
+### 3. Find
 
-- **The repo overrides.** A documented repo standard always wins; where it endorses something the baseline would flag, suppress the smell.
-- **Always a judgement call.** Each smell is a labelled heuristic ("possible Feature Envy"), never a hard violation. Like any standard here, skip anything tooling already enforces.
+Brief and start the Finders for the depth, all in one parallel batch in the foreground, each a brand-new subagent on its tier. The briefs, the adversarial angle list (pick 2 angles that fit this change) and the one fixed Finding format are in [FINDERS.md](FINDERS.md). Every Finder gets the diff commands, the commit list, the sources from step 2 and `REVIEW.md`. Tag each returned Finding with the Finder that raised it.
 
-Each smell reads *what it is* → *how to fix*; match it against the diff:
+### 4. Verify
 
-- **Mysterious Name**: a function, variable, or type whose name doesn't reveal what it does or holds. → rename it; if no honest name comes, the design's murky.
-- **Duplicated Code**: the same logic shape appears in more than one hunk or file in the change. → extract the shared shape, call it from both.
-- **Feature Envy**: a method that reaches into another object's data more than its own. → move the method onto the data it envies.
-- **Data Clumps**: the same few fields or params keep travelling together (a type wanting to be born). → bundle them into one type, pass that.
-- **Primitive Obsession**: a primitive or string standing in for a domain concept that deserves its own type. → give the concept its own small type.
-- **Repeated Switches**: the same `switch`/`if`-cascade on the same type recurs across the change. → replace with polymorphism, or one map both sites share.
-- **Shotgun Surgery**: one logical change forces scattered edits across many files in the diff. → gather what changes together into one module.
-- **Divergent Change**: one file or module is edited for several unrelated reasons. → split so each module changes for one reason.
-- **Speculative Generality**: abstraction, parameters, or hooks added for needs the spec doesn't have. → delete it; inline back until a real need shows.
-- **Message Chains**: long `a.b().c().d()` navigation the caller shouldn't depend on. → hide the walk behind one method on the first object.
-- **Middle Man**: a class or function that mostly just delegates onward. → cut it, call the real target direct.
-- **Refused Bequest**: a subclass or implementer that ignores or overrides most of what it inherits. → drop the inheritance, use composition.
+Start the Verifier(s) as brand-new subagents with every candidate Finding, every **open Important** from earlier Rounds and Ticket checks (to re-check against the current code), the spec, the standards list and `REVIEW.md`. Brief and voting rules: [VERIFY.md](VERIFY.md). The Verifier's calls are final: keep or drop, caused by this change or Pre-existing, Important or Nit, and "fix" or "skip" for a Nit.
 
-### 4. Spawn both sub-agents in parallel
+### 5. Rank and report
 
-Issue both sub-agent calls together, in the foreground, and aggregate the reports they return.
+Rank the kept Findings yourself, by the rules in [ROUNDS.md](ROUNDS.md#rank). Report to the user under `## Important`, `## Nits` and `## Pre-existing`, each Finding with its Bug class, every location, the claim and which Finder raised it; then one line with the number dropped by Verify.
 
-**Standards sub-agent prompt** should include:
+For a pull request, post the Round comment and carry on with the Round loop and the stop rule in [ROUNDS.md](ROUNDS.md). For a fixed point, the report is the end; Pre-existing Findings are filed only if the user asks.
 
-- The full diff command and commit list.
-- The list of standards-source files you found in step 3, **plus the smell baseline from step 3** pasted in full (the sub-agent has no other access to it).
-- The brief: "Report, per file/hunk where relevant, (a) every place the diff violates a documented standard: cite the standard (file + the rule); and (b) any baseline smell you spot: name it and quote the hunk. Distinguish hard violations from judgement calls: documented-standard breaches can be hard, but baseline smells are always judgement calls, and a documented repo standard overrides the baseline. Skip anything tooling enforces. Under 400 words."
+## Why the Finders stay separate
 
-**Spec sub-agent prompt** should include:
+A change can pass one axis and fail another:
 
-- The diff command and commit list.
-- The path or fetched contents of the spec.
-- The brief: "Report: (a) requirements the spec asked for that are missing or partial; (b) behaviour in the diff that wasn't asked for (scope creep); (c) requirements that look implemented but where the implementation looks wrong. Quote the spec line for each finding. Under 400 words."
+- Code that follows every standard but implements the wrong thing: **standards pass, spec fail.**
+- Code that does exactly what the issue asked but breaks the project's conventions: **spec pass, standards fail.**
 
-If the spec is missing, skip the Spec sub-agent and note this in the final report.
-
-### 5. Aggregate
-
-Present the two reports under `## Standards` and `## Spec` headings, verbatim or lightly cleaned. Do **not** merge or rerank findings, because the two axes are deliberately separate (see _Why two axes_).
-
-End with a one-line summary: total findings per axis, and the worst issue _within each axis_ (if any). Don't pick a single winner across axes: that's the reranking the separation exists to prevent.
-
-## Why two axes
-
-A change can pass one axis and fail the other:
-
-- Code that follows every standard but implements the wrong thing → **Standards pass, Spec fail.**
-- Code that does exactly what the issue asked but breaks the project's conventions → **Spec pass, Standards fail.**
-
-Reporting them separately stops one axis from masking the other.
+Each Finder works in its own context so one axis cannot mask another. Their Findings meet only after Verify, which judges each on its own evidence, and every reported Finding keeps the name of the Finder that raised it.

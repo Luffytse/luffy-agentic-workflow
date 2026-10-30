@@ -27,6 +27,7 @@ plugins/dev-skills/
 ├── .claude-plugin/plugin.json   # lists both skill folders below
 ├── upstream-skills/             # forked from Upstream; every change is in PATCHES.md
 ├── skills/                      # our own skills: setup-project
+├── evals/                       # our own skill evals, e.g. evals/code-review/ (planted-bugs fixture)
 ├── PATCHES.md                   # what we changed in Upstream text, and the Upstream commit
 ├── LICENSE-mattpocock-skills    # Upstream's MIT licence
 └── scripts/check-plugin.sh      # checks the layout and the Patches

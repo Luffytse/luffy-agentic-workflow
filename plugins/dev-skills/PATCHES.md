@@ -104,7 +104,7 @@ Shared reader phrase, used by every reader below: "start at `docs/index.md` and 
 
 Changed Upstream files, by skill:
 
-- `code-review/SKILL.md` (step 3): the standards-sources search starts with the shared phrase, then searches for every file that documents how code should be written, including `CLAUDE.md`/`AGENTS.md`, which the index does not list.
+- `code-review/SKILL.md` (step 3; Patch 5 later rewrote the skill and carries this into its step 2): the standards-sources search starts with the shared phrase, then searches for every file that documents how code should be written, including `CLAUDE.md`/`AGENTS.md`, which the index does not list.
 - `diagnosing-bugs/SKILL.md`: "read `GLOSSARY.md` ... check ADRs" replaced by the shared phrase.
 - `domain-modeling/GLOSSARY-FORMAT.md`: new section "Single glossary, or one page per Area"; the map example links `docs/glossary/<area>.md` (with a note for Upstream's `src/<context>/` links); a map into `src/` is multi-context and a map at `docs/glossary/` lists Area pages; the "which context" question becomes "which Area (or, in a multi-context repo, which context)".
 - `domain-modeling/SKILL.md`: "reading the glossary" instead of "reading `GLOSSARY.md`"; a third "File structure" tree for the per-Area split; multi-context now means a root `GLOSSARY-MAP.md` that points into `src/`; a root `GLOSSARY.md` is created only if neither it nor a map exists; frontmatter description says "the glossary (GLOSSARY.md, GLOSSARY-MAP.md or its pages)"; new sections "Splitting the glossary" (only from a single root `GLOSSARY.md` over about 10 KB, `git mv` into the first Area's page at `docs/glossary/<area>.md`, `GLOSSARY-MAP.md` at the root, index line swapped, `docs/index.md` created if missing, one `docs/adr/` kept; with any existing map a term goes to the page the map points to) and "Keeping the docs index current" (create a doc, or edit one whose subject changed: update its index line in the same commit); "challenge" and "update inline" sections say "the glossary" and "the Area page `GLOSSARY-MAP.md` points to".
@@ -129,7 +129,36 @@ Also in this Patch:
 - `.claude-plugin/plugin.json`: version 0.1.2 to 0.2.0.
 - `scripts/check-plugin.sh` check 7: `domain-modeling/DOCS-INDEX.md` exists; each writer file mentions `DOCS-INDEX.md` (`SKILL.md` of `domain-modeling`, `improve-codebase-architecture`, `triage`, `retro`, `setup-matt-pocock-skills`, `research` and `grill-with-docs`, plus `triage/OUT-OF-SCOPE.md`); each of the 12 readers' `SKILL.md` contains "start at `docs/index.md`" (case-insensitive) and `GLOSSARY-MAP.md` (readers: `tdd`, `diagnosing-bugs`, `improve-codebase-architecture`, `pr`, `to-spec`, `to-tickets`, `triage`, `grill-with-docs`, `wayfinder`, `implement`, `implement-spec`, `code-review`); `domain.md` mentions `docs/index.md`.
 
-Not changed: the drift check in `code-review` (ADR 0006's last bullet) is a separate ticket.
+Not changed here: the drift check in `code-review` (ADR 0006's last bullet) came with Patch 5.
+
+## Patch 5: `code-review` runs Find, Verify and Rank in Rounds (`code-review/`)
+
+Why: ADR 0003. Upstream's two-axis review reports raw Findings side by side with no false-positive check, and runs once. We want parallel Finders, a Verifier that makes the final call on each Finding, ranking by Severity, Review depths, and pull-request Rounds that stop once nothing Important is open. ADR 0006 adds the docs index drift check, and ADR 0004 the Ticket check.
+
+What:
+
+- `SKILL.md` rewritten whole: new model-facing description; two entry points (a pull request reviewed in Rounds, or one Review over a diff since a fixed point, which also serves the Ticket check); a rule that the Review runs in the top-level session (a subagent cannot start the Finders and Verifiers; if no subagents can be started, stop and tell the user); the depth and tier table; process steps Pin the diff, Find the sources, Find, Verify, Rank and report. Upstream text kept, with these changes:
+  - The issue-tracker line: unchanged.
+  - Step 1 (pin the fixed point): reworded into "Pin the diff", with the Round 1-2 and Round 3-5 diffs added; the `git rev-parse` and non-empty-diff fail-early check kept in substance.
+  - Step 2 (spec source): item 1 also reads the pull request body; item 4 says "the spec Finder is skipped and the Review says" for "the **Spec** sub-agent will skip and report".
+  - Step 3 (standards sources, as Patch 4 left it): split over step 2 of the rewrite. Patch 4's shared reader phrase now opens step 2 for both spec and standards sources ("Start at `docs/index.md` and open only the docs whose line fits the change (with no index, fall back to ...)"); the standards line keeps "search the repo for every file that documents how code should be written, including `CLAUDE.md`/`AGENTS.md`, which the index does not list" and that `CODING_STANDARDS.md` and `CONTRIBUTING.md` must be on the list "when they exist"; `REVIEW.md` and the default meaning of Important added. The smell baseline moved to `FINDERS.md` (below).
+  - Step 4 (spawn both sub-agents): replaced by the Find step and the briefs in `FINDERS.md` (below).
+  - Step 5 (aggregate): dropped, with "do not merge or rerank" and the side-by-side `## Standards` / `## Spec` report, since Findings are now verified and ranked together, each tagged with its Finder.
+  - "Why two axes" became "Why the Finders stay separate": the two bullets kept with `→` replaced by `:` and "Standards pass, Spec fail" lowercased to "standards pass, spec fail" (likewise the second); the closing sentence "Reporting them separately stops one axis from masking the other" replaced by two sentences on separate contexts and Findings meeting only after Verify.
+- New `FINDERS.md`: the Finder briefs (standards, spec, two adversarial with an angle list, Deep's security Finder) and the one fixed Finding format. Upstream text moved here from `SKILL.md`, with these changes:
+  - Smell baseline (step 3): moved word for word except "the Standards axis always carries" became "the standards Finder always carries".
+  - Standards brief (step 4): "Report, per file/hunk where relevant, (a)" became "Report (a)"; "(file + the rule); and (b)" became "(file and rule); (b)"; added "(c) any docs index drift"; "Distinguish hard violations from judgement calls: documented-standard breaches can be hard, but baseline smells" became "Documented-standard breaches can be hard; baseline smells"; "Skip anything tooling enforces" moved into the instructions shared by every Finder; "Under 400 words" dropped (the Finding format bounds the output).
+  - Spec brief (step 4): added "(d) anything that contradicts an ADR or the glossary"; "Quote the spec line for each finding" became "Quote the spec line, or the ADR or glossary line, as the evidence for each Finding"; "Under 400 words" dropped.
+  - Each prompt's "should include" list (diff command, commit list, sources) became one shared list at the top of the file.
+  - Added: the docs index drift check, the adversarial and security Finders, the Finding format.
+- New `VERIFY.md`: the Verifier brief (four calls with one line of reasoning each, re-checking open Importants) and Deep's three stances with the 2-of-3 rule and the cautious tie-break.
+- New `ROUNDS.md`: the Rank rules, the Round comment format (a `<!-- code-review kind=round ... -->` marker line and a Findings table with ids and status), the Round loop and stop rule, the 5-Round cap, filing Pre-existing Findings as one `needs-triage` issue per Bug class, and the Ticket-check record.
+- `agents/openai.yaml`: `short_description` now "Find, verify and rank review Findings, in Rounds".
+- `.claude-plugin/plugin.json`: version 0.3.0 to 0.4.0.
+
+Our own, not Upstream: `evals/code-review/` (the planted-bugs fixture, `EXPECTED.md`, `RESULTS.md`) and the code-review check in `scripts/check-plugin.sh`.
+
+Merging an Upstream update: Upstream's `code-review/SKILL.md` is replaced whole, so diff Upstream's old and new text and carry any change over by hand: smell-baseline edits go into `FINDERS.md`, spec- and standards-source lookup edits into `SKILL.md` step 2.
 
 ## Vendor model names in Upstream text
 
