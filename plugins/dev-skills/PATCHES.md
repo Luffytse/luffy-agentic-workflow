@@ -561,6 +561,12 @@ What:
 
 Merging an Upstream update: take Upstream's text, then re-append the section to `ROUNDS.md`, re-add the two pointer sentences to its Round loop (after the fixes paragraph and on the clean "Round 2 to Round 5" bullet), the "user kept the design" clauses (Rank step 2, the clean test, Nit status, the Round 1 bullet, Ticket checks, and `SKILL.md` step 1), and in `implement` and `implement-spec` the three parentheses and the two "one more Round instead" sentences. Check 33 fails if the section heading or one of its key phrases is missing, if `ROUNDS.md` has fewer than 3 links to the section, or if `implement` has fewer than 1 or `implement-spec` fewer than 2; it does not check the "user kept the design" clauses.
 
+## Not a Patch: `setup-dev-skills` seed text (issue #144)
+
+Our own, not Upstream. The `setup-dev-skills` skill's `SKILL.md` step 1 names both remote URL forms, the GitHub seed gives REST routes for pull requests and open blockers, and the seed files name skills without a leading slash.
+
+- `.claude-plugin/plugin.json`: version 0.22.0 to 0.22.1.
+
 ## Vendor model names in Upstream text
 
 None in the kept skills at the Base commit, so no Patch was needed for ADR 0002 (checked for ticket #4: grep for `haiku`, `sonnet`, `opus`, `claude-`, `gpt-`, `gemini` over `upstream-skills/`). Some kept skills start subagents (for example `grilling`, `wayfinder`, `code-review`, `implement-spec`), but none picks a model for them. Spec #1 adds tiers in later tickets (the `code-review` Finders and Verifiers, and the `implement` and `implement-spec` Implementers; the tier on each ticket from `to-tickets` is Patch 7, the `implement` Implementer's tier is Patch 8, and the `implement-spec` Implementers' tiers are Patch 11); each of those edits gets its own Patch here.

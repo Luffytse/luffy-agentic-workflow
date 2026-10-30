@@ -20,7 +20,7 @@ This is a prompt-driven skill, not a deterministic script. Explore, present what
 
 Read whatever exists; assume nothing:
 
-- `git remote -v`: which host and which `<owner>/<repo>`? Only GitHub is supported. If the remote is not GitHub, tell the user the plugin does not support that tracker yet, and stop.
+- `git remote -v`: which host and which `<owner>/<repo>`? Take it from either URL form, `https://github.com/<owner>/<repo>(.git)` or `git@github.com:<owner>/<repo>(.git)`, and drop a trailing `.git`. Only GitHub is supported. If the remote is not GitHub, tell the user the plugin does not support that tracker yet, and stop.
 - Is the repo reachable? Run `gh api repos/<owner>/<repo>`. Use this REST call, not `gh repo view`: some cloud sessions have `gh` without GraphQL, and `gh repo view`, `gh issue view` and `gh label list` fail there with "GraphQL is not available", and so do the other `gh issue` subcommands (list, create, comment, edit, close): use the session's GitHub tools or the `gh api repos/<owner>/<repo>/issues...` REST routes. A session without `gh` uses the GitHub tools it has for the same reads and writes. If the repo cannot be reached, stop and tell the user what is missing.
 - `AGENTS.md` and `CLAUDE.md` at the repo root: does either exist? Is there already an `## Agent skills` section?
 - `GLOSSARY.md` and `GLOSSARY-MAP.md` at the repo root, and the legacy `CONTEXT.md` / `CONTEXT-MAP.md`. If a legacy file exists, offer to `git mv` it to its `GLOSSARY` name and rewrite those names in `docs/agents/domain.md`.
