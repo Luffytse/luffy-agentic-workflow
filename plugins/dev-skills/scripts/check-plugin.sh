@@ -180,5 +180,22 @@ if [ -f "$spec" ]; then
 fi
 grep -qiF 'integration branch' "$forked/ask-matt/SKILL.md" && bad "ask-matt/SKILL.md still says integration branch"
 
+# 15. retro files its suggestions as Retro issues (ADR 0007, "Filing"): the manifest names the dev-skills
+# repo, retro/SKILL.md links the filing reference file, which names the label, title, vote and record,
+# triage skips Retro issues, and no skill text names a particular project, repo or person
+grep -qE '"repository"[[:space:]]*:[[:space:]]*"https://github.com/[^"/]+/[^"/]+"' "$root/.claude-plugin/plugin.json" || bad "plugin.json has no repository field with a GitHub URL"
+fil="$forked/retro/FILING.md"
+if [ ! -f "$fil" ]; then bad "missing retro/FILING.md"
+else
+  grep -q "(FILING.md" "$forked/retro/SKILL.md" || bad "retro/SKILL.md does not link FILING.md"
+  for w in '`retro`' 'Retro:' 'seen again' '`retro-planning`'; do
+    grep -qiF "$w" "$fil" || bad "FILING.md does not mention $w"
+  done
+fi
+grep -qiE 'skip.*`retro`|`retro`.*skip' "$forked/triage/SKILL.md" || bad "triage/SKILL.md does not skip issues labelled retro"
+if grep -rniE --include='*.md' --include='*.yaml' 'luffydev|luffytse|luffy-dev|lufei' "$forked" "$root/skills"; then
+  bad "skill text names a particular project, repo or person"
+fi
+
 [ "$fail" -eq 0 ] && echo "OK: dev-skills plugin checks passed ($count skills)"
 exit "$fail"

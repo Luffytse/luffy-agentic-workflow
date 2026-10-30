@@ -292,6 +292,20 @@ What:
 
 Merging an Upstream update: carry Upstream's changes to step 3, Context hygiene and the wayfinder on-ramp over by hand and re-apply the lines above.
 
+## Patch 13: `retro` files its suggestions as Retro issues; `triage` skips them (ADR 0007)
+
+Why: ADR 0007 and issue #40. Upstream's `retro` hands every suggestion to the user in its report, where it is read once and lost. Suggestions that are not repeated Bug classes now become Retro issues, or "seen again" votes on open ones, so a backlog can show which problems repeat. `triage` must skip them, since they carry no `needs-triage` label and would look untriaged.
+
+What:
+
+- `retro/SKILL.md`: new step 5, "File every candidate that is not a repeated Bug class as a Retro issue, or vote on an open one that covers it, and check whether Retro planning is due: [FILING.md](FILING.md)."; Patch 6's step 5 (Upstream's "Present these candidates...") becomes step 6 and gains "For each other candidate, give the issue it went to; add the due notice from step 5 when it applies." Every other line is as Patch 6 left it.
+- New `retro/FILING.md` (ours, not Upstream): routing (skill or workflow problems to the repo in the plugin manifest's `repository` field, a project's own problems to its tracker from `docs/agents/issue-tracker.md`, else the `origin` remote), votes (`Seen again in <thread link>`), the `retro` label and `Retro:` title, the can't-write fallback, the thresholds (10 open; 2 weeks with at least 4 open) and the trigger clock from the newest closed `retro-planning` record, and what the report lists.
+- `triage/SKILL.md`: in "Show what needs attention", a sentence after the three buckets, "Skip issues labelled `retro`: they are Retro issues, planned in batches, not untriaged work."; in "Triage a specific issue or PR" step 1, a leading sentence "If the issue is labelled `retro`, stop: it is a Retro issue, planned in batches, so skip it." before "Read the full". Every other line is Upstream's.
+- `scripts/check-plugin.sh`: new check 15 (`plugin.json` has a `repository` GitHub URL; `retro/FILING.md` exists, `retro/SKILL.md` links it, and it names `retro`, `Retro:`, "seen again" and `retro-planning`; `triage/SKILL.md` skips `retro`; no forked or own skill text names a project, repo or person).
+- `.claude-plugin/plugin.json`: version 0.8.1 to 0.8.2, and a new `repository` field.
+
+Merging an Upstream update: carry Upstream's `retro/SKILL.md` and `triage/SKILL.md` changes over by hand and re-apply the lines above.
+
 ## Vendor model names in Upstream text
 
 None in the kept skills at the Base commit, so no Patch was needed for ADR 0002 (checked for ticket #4: grep for `haiku`, `sonnet`, `opus`, `claude-`, `gpt-`, `gemini` over `upstream-skills/`). Some kept skills start subagents (for example `grilling`, `wayfinder`, `code-review`, `implement-spec`), but none picks a model for them. Spec #1 adds tiers in later tickets (the `code-review` Finders and Verifiers, and the `implement` and `implement-spec` Implementers; the tier on each ticket from `to-tickets` is Patch 7, the `implement` Implementer's tier is Patch 8, and the `implement-spec` Implementers' tiers are Patch 11); each of those edits gets its own Patch here.
