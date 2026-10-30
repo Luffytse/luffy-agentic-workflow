@@ -360,5 +360,15 @@ if [ -f "$gr" ]; then
 fi
 [ -f "$sp" ] && grep -qF 'This overrides' "$sp" && bad "setup-project/SKILL.md still overrides grilling's round size"
 
+# 27. Version bumps in PATCHES.md agree with plugin.json (retro of PR #91: stale or duplicated version
+# numbers after renumbering came up 4 times): no "version X to Y" bump has the same target Y twice, and
+# the highest Y is plugin.json's version. A gap-free chain is not required (history has gaps).
+bumps="$(grep -oE 'version [0-9]+\.[0-9]+\.[0-9]+ to [0-9]+\.[0-9]+\.[0-9]+' "$root/PATCHES.md" | awk '{print $4}')"
+dup="$(printf '%s\n' "$bumps" | sort | uniq -d | tr '\n' ' ')"
+[ -z "$dup" ] || bad "PATCHES.md has more than one version bump to: $dup"
+top="$(printf '%s\n' "$bumps" | sort -V | tail -1)"
+cur="$(sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$root/.claude-plugin/plugin.json" | head -1)"
+[ -n "$top" ] && [ "$top" = "$cur" ] || bad "plugin.json is version $cur but the highest version bump in PATCHES.md is to ${top:-none}"
+
 [ "$fail" -eq 0 ] && echo "OK: dev-skills plugin checks passed ($count skills)"
 exit "$fail"

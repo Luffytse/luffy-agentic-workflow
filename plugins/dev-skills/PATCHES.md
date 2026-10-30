@@ -466,6 +466,10 @@ What:
 
 Merging an Upstream update: take Upstream's `grilling` text, then re-apply the two edits above.
 
+## Not a Patch: check 27 (version bumps in PATCHES.md agree with plugin.json)
+
+Our own, not Upstream. `scripts/check-plugin.sh` gets check 27, from the retro of PR #91 (stale or duplicated version numbers after renumbering came up 4 times): no "version X to Y" bump in this file has the same target Y twice, and the highest Y is `plugin.json`'s version. A gap-free chain is not required, since history has gaps (0.2.0 to 0.3.0, 0.9.3 to 0.9.4). `REVIEW.md` gains an Always check line, "results entry out of date with its own PR". No Upstream text changed. `.claude-plugin/plugin.json`: version 0.15.1 to 0.16.0.
+
 ## Vendor model names in Upstream text
 
 None in the kept skills at the Base commit, so no Patch was needed for ADR 0002 (checked for ticket #4: grep for `haiku`, `sonnet`, `opus`, `claude-`, `gpt-`, `gemini` over `upstream-skills/`). Some kept skills start subagents (for example `grilling`, `wayfinder`, `code-review`, `implement-spec`), but none picks a model for them. Spec #1 adds tiers in later tickets (the `code-review` Finders and Verifiers, and the `implement` and `implement-spec` Implementers; the tier on each ticket from `to-tickets` is Patch 7, the `implement` Implementer's tier is Patch 8, and the `implement-spec` Implementers' tiers are Patch 11); each of those edits gets its own Patch here.
