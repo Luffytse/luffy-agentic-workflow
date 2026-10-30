@@ -206,5 +206,17 @@ for s in implement implement-spec; do
   printf '%s' "$last" | grep -qF 'REVIEW.md' || bad "$s/SKILL.md: the last step does not say a retro check that changes REVIEW.md goes to the user"
 done
 
+# 17. CI (issue #39, spec #38): a GitHub Actions workflow runs on pull requests and pushes to main,
+# installs Claude Code's CLI from npm, and runs this script and `claude plugin validate .`
+wf="$repo/.github/workflows/plugin-checks.yml"
+if [ ! -f "$wf" ]; then bad "missing .github/workflows/plugin-checks.yml"
+else
+  grep -qE '^[[:space:]]*pull_request:' "$wf" || bad "plugin-checks.yml does not run on pull_request"
+  { grep -qE '^[[:space:]]*push:' "$wf" && grep -qE 'main' "$wf"; } || bad "plugin-checks.yml does not run on pushes to main"
+  grep -qF '@anthropic-ai/claude-code' "$wf" || bad "plugin-checks.yml does not install @anthropic-ai/claude-code from npm"
+  grep -qF 'plugins/dev-skills/scripts/check-plugin.sh' "$wf" || bad "plugin-checks.yml does not run check-plugin.sh"
+  grep -qF 'claude plugin validate .' "$wf" || bad "plugin-checks.yml does not run claude plugin validate ."
+fi
+
 [ "$fail" -eq 0 ] && echo "OK: dev-skills plugin checks passed ($count skills)"
 exit "$fail"

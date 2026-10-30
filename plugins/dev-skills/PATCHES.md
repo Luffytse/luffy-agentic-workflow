@@ -318,6 +318,10 @@ What:
 
 Merging an Upstream update: both `SKILL.md` files are already replaced whole by Patches 8 and 11, so after carrying Upstream's changes over, re-append the final retro step and keep it last, since check 16 reads the last `## ` section.
 
+## Not a Patch: CI workflow and check 17
+
+Our own, not Upstream: `.github/workflows/plugin-checks.yml` (issue #39) runs `scripts/check-plugin.sh` and `claude plugin validate .` on pull requests and pushes to main. `scripts/check-plugin.sh` gets check 17 (the workflow exists, triggers on `pull_request` and pushes to main, installs `@anthropic-ai/claude-code`, and runs both commands). No Upstream text changed. `.claude-plugin/plugin.json`: version 0.8.3 to 0.8.4.
+
 ## Vendor model names in Upstream text
 
 None in the kept skills at the Base commit, so no Patch was needed for ADR 0002 (checked for ticket #4: grep for `haiku`, `sonnet`, `opus`, `claude-`, `gpt-`, `gemini` over `upstream-skills/`). Some kept skills start subagents (for example `grilling`, `wayfinder`, `code-review`, `implement-spec`), but none picks a model for them. Spec #1 adds tiers in later tickets (the `code-review` Finders and Verifiers, and the `implement` and `implement-spec` Implementers; the tier on each ticket from `to-tickets` is Patch 7, the `implement` Implementer's tier is Patch 8, and the `implement-spec` Implementers' tiers are Patch 11); each of those edits gets its own Patch here.
