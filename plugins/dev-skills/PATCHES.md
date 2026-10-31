@@ -496,12 +496,14 @@ What (Upstream-derived text changed):
 - `agentic-review/SKILL.md`: "Depth and tiers" adds the exception after "later Rounds reuse it unless the user changes it": a merge-only Round runs at Quick unless the resolutions touch logic, and the Round after it goes back to the carried depth. Step 1's list of what earlier comments give says the carried depth is the one in the latest comment that is not a merge-only Round's.
 - `agentic-review/ROUNDS.md`: the Round comment's `Reviewed:` line gains a third form, `the merge from main <base>..<head> (merge-only Round)`; a new bullet says the marker's and heading's depth is the depth that Round ran at; new section "Merge-only Rounds" (what one is, Quick unless a resolution touches logic, its comment says so, the next Round takes the carried depth from the latest comment that is not merge-only, and it counts toward the cap). The `<!-- code-review kind=... -->` marker shape is unchanged, so `retro/BUG-CLASSES.md`, which keys on the marker prefix and not on its depth, needs no edit.
 - Outside Upstream text: `CLAUDE.md` gains the working rule (every plugin change bumps its version; version, Patch and check numbers are taken at merge time; `TBD-N` until then); `GLOSSARY.md` gains Placeholder number and Merge-only Round; ADR 0003 amended in place (the depth stays the same across Rounds except for a merge-only Round); `.github/workflows/plugin-checks.yml` checks out with `fetch-depth: 0` so `origin/main` exists in CI for check 29b (the user committed it to main in 8886bcf, since the agents' GitHub access cannot push workflow files).
-- `scripts/check-plugin.sh`: new check 29 (placeholders-and-bumps). (a) Fails on a leftover placeholder: `TBD-N` after Patch, check, version or "to" (bare, in backticks or in parentheses) in `PATCHES.md`, the plugin READMEs, `README.md`, `CLAUDE.md`, `GLOSSARY.md` and `docs/`, a `# TBD-N` header in the script, or a `"version": "TBD...` in a manifest. (b) For every plugin under `plugins/` with a `plugin.json`, if any file under it differs from `origin/main` (committed since the merge-base, `git diff --name-only origin/main...HEAD`, plus staged, unstaged and untracked work), its working-tree version must be strictly higher than `origin/main`'s (dot-separated fields compared as numbers); a plugin new on this branch is skipped, and without `origin/main` (b) is skipped with a note, not a failure. On a push to main, `HEAD` is `origin/main`, so (b) passes.
+- `scripts/check-plugin.sh`: check 29 (placeholders-and-bumps) added, and removed since by "Patch: no numbers taken at merge time". (a) Fails on a leftover placeholder: `TBD-N` after Patch, check, version or "to" (bare, in backticks or in parentheses) in `PATCHES.md`, the plugin READMEs, `README.md`, `CLAUDE.md`, `GLOSSARY.md` and `docs/`, a `# TBD-N` header in the script, or a `"version": "TBD...` in a manifest. (b) For every plugin under `plugins/` with a `plugin.json`, if any file under it differs from `origin/main` (committed since the merge-base, `git diff --name-only origin/main...HEAD`, plus staged, unstaged and untracked work), its working-tree version must be strictly higher than `origin/main`'s (dot-separated fields compared as numbers); a plugin new on this branch is skipped, and without `origin/main` (b) is skipped with a note, not a failure. On a push to main, `HEAD` is `origin/main`, so (b) passes.
 - `.claude-plugin/plugin.json`: version 0.17.0 to 0.18.0.
 
 This Patch was built before its own rule applied, so its numbers were written in place, then re-taken when main moved: #103 took check 27 and 0.16.0, then #105 took Patch 24, check 28 and 0.17.0, so this Patch is Patch 25, check 29 and 0.18.0.
 
 Merging an Upstream update: `implement` and `implement-spec` are already replaced whole by Patches 8 and 11, so re-apply the lines above after carrying Upstream's changes over. For `agentic-review`, carry Upstream's "Depth and tiers", step 1 and `ROUNDS.md` changes over by hand and re-apply the exception, the step-1 clause, the `Reviewed:` form, the Depth bullet and the "Merge-only Rounds" section.
+
+Partly undone by "Patch: no numbers taken at merge time" below: the placeholder bullets, the expected-failure sentences and the "Take the numbers" steps are gone, and a merge-only Round no longer includes a numbers commit; re-apply only what that Patch keeps.
 
 ## Patch 26: review subagents experiment only in their own copy; Implementers confirm each push (`agentic-review/`, `implement/`, `implement-spec/`)
 
@@ -614,6 +616,8 @@ What:
 
 Merging an Upstream update: re-apply the repeat sentence at the end of the "Take the numbers" step in both skills.
 
+Undone by "Patch: no numbers taken at merge time" below, which removes the "Take the numbers" step: nothing to re-apply.
+
 ## Patch 34: skill text cites no ADR number of this repo, does not say "Upstream", and leaves this repo's own merge rule to its `CLAUDE.md` (`implement/`, `implement-spec/`, `retro/`, `domain-modeling/`)
 
 Why: issue #177. Every project that loads the plugin reads its skill text, and in another repo "ADR 0004" names another decision or nothing, and "Upstream" is a word only this repo's glossary defines. The merge list in `implement` and `implement-spec` likewise named the `agentic-review` skill, whose source is changed only in this repo; the user chose to move that rule to this repo's `CLAUDE.md`.
@@ -643,8 +647,8 @@ Our own, not Upstream; no Upstream text changed. Why: issue #143 (absorbs #130, 
 What (all in `scripts/check-plugin.sh` and this file; no skill text changed):
 
 - The script sets `set +e` after `set -u`, so `bash -e` and `SHELLOPTS=errexit` give the same output and exit code as a plain run (every failure goes through `bad()`; a no-match `grep` is an answer, not an error). It resolves its own path with plain `readlink`, one symlink hop at a time (absolute or relative links, chains), not the GNU-only `readlink -f`; running by real path is unchanged.
-- Every check header now reads `# N. <name>: <description>`, and every "new check N" line in this file reads "new check N (<name>...". Check 21 compares the pairs: a "new check" line whose number and name match no header fails, even when that number is named elsewhere; a header without a name fails; a "new check" mention without a name fails; a pair claimed twice fails, and so does a number claimed twice under different names (two branches adding different checks with the same number) or two headers sharing a number (`2` and `2b` are different header numbers; for the pairs, `2b` is written as `2`). A `TBD-N` placeholder is exempt from those two number rules, since several new checks in one pull request share it, but a placeholder pair (same name) claimed twice still fails. Check 21 still requires every check from 9 up to be named as "check N" in this file. Placeholder numbers (`TBD-N`) pair the same way, by name. This file's existing "new check" lines gained their names.
-- new check 35 (patch-heading-numbers): two `## Patch N` headings with the same number fail, naming the number. A `TBD-N` heading is not counted.
+- Every check header now reads `# N. <name>: <description>`, and every "new check N" line in this file reads "new check N (<name>...". Check 21 compares the pairs: a "new check" line whose number and name match no header fails, even when that number is named elsewhere; a header without a name fails; a "new check" mention without a name fails; a pair claimed twice fails, and so does a number claimed twice under different names (two branches adding different checks with the same number) or two headers sharing a number (`2` and `2b` are different header numbers; for the pairs, `2b` is written as `2`). A `TBD-N` placeholder is exempt from those two number rules, since several new checks in one pull request share it, but a placeholder pair (same name) claimed twice still fails. Check 21 still requires every check from 9 up to be named as "check N" in this file. Placeholder numbers (`TBD-N`) pair the same way, by name. Undone by "Patch: no numbers taken at merge time" below: a named check has no number to pair, so these rules skip it. This file's existing "new check" lines gained their names.
+- new check 35 (patch-heading-numbers): two `## Patch N` headings with the same number fail, naming the number. A `TBD-N` heading is not counted. Undone by "Patch: no numbers taken at merge time" below: a named heading is the one not counted.
 - new check 36 (skill-name-matches-folder): for every skill under `upstream-skills/` and `skills/`, the `name:` in the `SKILL.md` frontmatter must equal the folder name.
 - new check 37 (openai-display-name): for every `agents/openai.yaml` under `upstream-skills/` and `skills/`, the `display_name`, lowercased with each run of other characters turned into one hyphen, must equal the skill's folder name ("Grill with Docs" is `grill-with-docs`, "PR" is `pr`). This is the rule the Ticket picked: it keeps a skill from taking another skill's or a built-in skill's name (`agentic-review` as "Code Review"), and all 22 current skills pass. A folder rename needs a new `display_name`.
 - `.claude-plugin/plugin.json`: version 0.22.3 to 0.22.4.
@@ -676,6 +680,8 @@ What:
 - `.claude-plugin/plugin.json`: version 0.22.11 to 0.22.12.
 
 Merging an Upstream update: re-apply the sentence in the "Take the numbers" step of both skills.
+
+Undone by "Patch: no numbers taken at merge time" below, which removes the "Take the numbers" step: nothing to re-apply.
 
 ## Not a Patch: `retro-planning` closes absorbed Retro issues only when their Ticket completed (issue #146, absorbs #95)
 
@@ -747,6 +753,8 @@ What:
 - `.claude-plugin/plugin.json`: version 0.22.18 to 0.22.19.
 
 Merging an Upstream update: `implement/SKILL.md` is replaced whole (Patch 8); carry nothing over, but keep this sentence in step 7.2 (and keep `implement-spec` step 8.2 in step).
+
+Undone by "Patch: no numbers taken at merge time" below, which removes the "Take the numbers" step: nothing to re-apply.
 
 ## Vendor model names in Upstream text
 
@@ -877,3 +885,18 @@ What:
 - `.claude-plugin/plugin.json`: version 0.22.26 to 0.22.27.
 
 Merging an Upstream update: take Upstream's text, then re-apply the "tracker doc's way of adding a line to an issue body" clauses in `to-tickets` step 5 (both failure sentences) and in `wayfinder`'s blocking paragraph.
+
+## Patch: no numbers taken at merge time (`implement/`, `implement-spec/`, `agentic-review/`)
+
+Why: issue #258 (Spec #257, absorbs Retro issues #171, #182, #227 and #239). A plugin's version now changes only in a Release's bump pull request, so no ordinary pull request takes a version, Patch or check number, and the numbering step, its placeholders, its retake-on-repeat rule and the Round over its commit have nothing left to do. This Patch is headed by a name, not a number, as `CLAUDE.md` now says every new Patch is.
+
+What (Upstream-derived text changed):
+
+- `implement/SKILL.md`: step 3's Implementer brief replaces the `TBD-N` placeholder bullet with "take no number the repo's rules (its `CLAUDE.md`, the project instructions, its docs) say is taken only at a release, such as a version: leave it as it is on main"; "for every later fix, merge of main and numbering" drops "and numbering"; step 4 drops the sentence that a check failing on a placeholder or an unbumped version is expected; step 6's merge-only sentence says "conflicts only in text" (was "in numbers or text"); step 7 drops step 2 "Take the numbers" (with its Round over the numbers commit, its repeat and its retake rule), so the squash-merge is step 2, and the user-merges sentence names step 1 alone. Step 1 keeps what step 2 did beyond numbering: after merging main in, push; if the merge had conflicts, one more merge-only Round over the resolutions (within the 5-Round cap, or the pull request goes to the user); rerun the checks and wait for CI; repeat if main moves again. This undoes the numbering parts of Patches 25, 33, 37 and 40.
+- `implement-spec/SKILL.md`: the same in step 3.2's brief, step 4, step 7's merge-only sentence and step 8 (step 1 keeps the same non-numbering parts; the merge commit is now step 2); step 2's list of Implementers on the Spec branch drops step 8.2.
+- `agentic-review/SKILL.md` ("Depth and tiers") and `agentic-review/ROUNDS.md` ("Merge-only Rounds"): a merge-only Round's new commits are only a merge from main, with no commit that takes the numbers after it, and its Quick case is conflicts only in text.
+- Outside Upstream text: `CLAUDE.md` replaces the per-pull-request bump and `TBD-N` rule with "a plugin's version changes only in a Release's bump pull request (ADR 0008)" and says a new Patch heading or check takes a name, not a number; its `evals/` rule drops "needs no version bump". `GLOSSARY.md` drops Placeholder number, and its Merge-only Round entry and ADR 0003 drop the numbers commit. `docs/index.md` and `REVIEW.md`'s "related text not updated" line no longer name the placeholder or version-bump rules.
+- `scripts/check-plugin.sh`: check 29 (placeholders-and-bumps) is removed, so a pull request that leaves the version as it is on main passes in review. Check 21 no longer pairs placeholder numbers, and check 35's comment says a named Patch heading is not counted. Check 27 (version-bumps) is kept: a version change with no matching "version X to Y" line in this file fails it.
+- `.claude-plugin/plugin.json`: version unchanged (0.22.27); it changes only in a Release's bump pull request.
+
+Merging an Upstream update: Upstream's `implement` and `implement-spec` are replaced whole (Patches 8 and 11), so carry over no numbering step or placeholder bullet; keep the "taken only at a release" brief bullet, and the merge-only Round wording without a numbers commit.

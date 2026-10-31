@@ -24,7 +24,7 @@ The **Review depth** sets which agents run. Agents name a **model tier**, never 
 | Standard (default) | standards + spec (regular), 2 adversarial (cheap) | 1 Verifier (regular) |
 | Deep | Standard's four, plus a security Finder (premium); after Verify, a gap sweep Finder (premium) | 3 Verifiers (regular): tracer, skeptic, spec checker; a second 3 for the gap sweep's Findings |
 
-Pick Deep for risky changes (security, money, deleting data, or anything the user marks), Quick for docs-only or trivial ones, Standard for the rest. A depth the user or the brief names wins. For a pull request the depth is chosen once, in Round 1, and carried in each Round comment; later Rounds reuse it unless the user changes it. One exception: a **merge-only Round** (a Round 3 to 5 whose new commits are only a merge from main, plus any commit that takes the numbers after it, with conflicts only in numbers or text) runs at Quick unless the resolutions touch logic, and the Round after it goes back to the carried depth ([ROUNDS.md](ROUNDS.md#merge-only-rounds)). A Ticket check is always Quick.
+Pick Deep for risky changes (security, money, deleting data, or anything the user marks), Quick for docs-only or trivial ones, Standard for the rest. A depth the user or the brief names wins. For a pull request the depth is chosen once, in Round 1, and carried in each Round comment; later Rounds reuse it unless the user changes it. One exception: a **merge-only Round** (a Round 3 to 5 whose new commits are only a merge from main, with conflicts only in text) runs at Quick unless the resolutions touch logic, and the Round after it goes back to the carried depth ([ROUNDS.md](ROUNDS.md#merge-only-rounds)). A Ticket check is always Quick.
 
 ## Process
 

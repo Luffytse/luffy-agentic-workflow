@@ -279,13 +279,13 @@ grep -qF '`/retro-planning`' "$forked/ask-matt/SKILL.md" || bad "ask-matt/SKILL.
 # elsewhere; no pair is claimed as new twice; and every check from 9 up is named as "check N" somewhere in
 # PATCHES.md. Two further rules work on numbers alone: a number claimed as new under two different names
 # fails, and so do two headers sharing a number (2 and 2b are different header numbers; for the pairs, 2b
-# is written as 2). A placeholder number (TBD- and a capital N) is exempt from those two number rules, since
-# several new checks in one pull request share it, but a placeholder pair (same name) claimed twice still fails.
+# is written as 2). A check added since the switch to Releases has a name and no number (CLAUDE.md): its
+# "# <name>: ..." header and a "new check `<name>`" line are not numbered, so these rules skip them.
 self="$repo/scripts/check-plugin.sh"
 patches="$root/PATCHES.md"
 if [ ! -f "$patches" ]; then bad "missing PATCHES.md"
 else
-  num='([0-9]+|TBD-[N])'
+  num='([0-9]+)'
   nameless=$(grep -E "^# ${num}b?\\." "$self" | grep -vE "^# ${num}b?\\. [a-z0-9-]+:" | sed -E "s/^# ${num}.*/\\1/")
   for n in $nameless; do bad "check-plugin.sh check $n has no name in its header (# $n. <name>: ...)"; done
   headers=$(grep -E "^# ${num}b?\\. [a-z0-9-]+:" "$self" | sed -E "s/^# ${num}b?\\. ([a-z0-9-]+):.*/\\1 \\2/" | sort -u)
@@ -301,7 +301,7 @@ else
     bad "PATCHES.md claims \"new check ${pair//\~/ }\" more than once"
   done
   # a number is claimed as new once, whatever the name, and is the number of one header only (2 and 2b are
-  # different headers); placeholders are skipped, since several new checks in one pull request share one
+  # different headers)
   for n in $(printf '%s\n' "$claimed" | awk '$1 ~ /^[0-9]+$/ {print $1}' | sort | uniq -d); do
     bad "PATCHES.md claims \"new check $n\" more than once (under different names)"
   done
@@ -395,7 +395,10 @@ fi
 
 # 27. version-bumps: Version bumps in PATCHES.md agree with plugin.json (retro of PR #91: stale or duplicated version
 # numbers after renumbering came up 4 times): no "version X to Y" bump has the same target Y twice, and
-# the highest Y is plugin.json's version. A gap-free chain is not required (history has gaps).
+# the highest Y is plugin.json's version. A gap-free chain is not required (history has gaps). Since the switch
+# to Releases (ADR 0008) no ordinary pull request changes the version, so a version change with no new
+# "version X to Y" line in PATCHES.md fails here; a Release's bump pull request adds that line while
+# PATCHES.md exists.
 bumps="$(grep -oE 'version [0-9]+\.[0-9]+\.[0-9]+ to [0-9]+\.[0-9]+\.[0-9]+' "$root/PATCHES.md" | awk '{print $4}')"
 dup="$(printf '%s\n' "$bumps" | sort | uniq -d | tr '\n' ' ')"
 [ -z "$dup" ] || bad "PATCHES.md has more than one version bump to: $dup"
@@ -413,52 +416,6 @@ for g in 'you need one report from each Finder you started' \
          'one report from each second Verifier before Rank'; do
   grep -qF "$g" "$ar/SKILL.md" || bad "agentic-review/SKILL.md has lost the report-count gate: $g"
 done
-
-# 29. placeholders-and-bumps: numbers are taken at merge time, and every plugin change bumps its version (issue #106). (a) No
-# placeholder is left: a Patch, check or version written as the placeholder (bare, in backticks or in
-# parentheses), a placeholder check header in
-# this script, or a placeholder version in a manifest. The patterns write the N in brackets so they do not
-# match this script's own text. (b) Every plugin under plugins/ whose files differ from origin/main
-# (committed since the merge-base, staged, unstaged or untracked) has a plugin.json version strictly higher
-# than origin/main's. No origin/main (a shallow clone, no remote): (b) is skipped with a note. On main
-# itself HEAD is origin/main, so nothing differs and (b) passes. When origin/main exists but `git diff
-# origin/main...HEAD` fails (for example no merge base), the plugin gets a FAIL, not a skip.
-ph_hits="$(
-  (cd "$repo" && find plugins/*/PATCHES.md plugins/*/README.md README.md CLAUDE.md GLOSSARY.md docs -type f -print0 2>/dev/null |
-    xargs -0 grep -nE '(Patch|[Cc]heck|version|to) [`(]?TBD-[N]' 2>/dev/null)
-  grep -nE '^# TBD-[N]' "$self" | sed "s|^|$self:|"
-  (cd "$repo" && grep -nE '"version"[[:space:]]*:[[:space:]]*"TBD' .claude-plugin/marketplace.json plugins/*/.claude-plugin/plugin.json 2>/dev/null)
-)"
-if [ -n "$ph_hits" ]; then
-  echo "$ph_hits"
-  bad "a placeholder number is left; take the real numbers before merging"
-fi
-ver_of() { sed -nE 's/^[[:space:]]*"version"[[:space:]]*:[[:space:]]*"([^"]*)".*/\1/p' | head -n 1; }
-# prints 1 when version $1 is strictly higher than $2, comparing dot-separated fields as numbers
-ver_gt() { awk -v a="$1" -v b="$2" 'BEGIN{n=split(a,x,".");m=split(b,y,".");k=n>m?n:m;
-  for(i=1;i<=k;i++){if(x[i]+0>y[i]+0){print 1;exit} if(x[i]+0<y[i]+0){print 0;exit}} print 0}'; }
-if ! (cd "$repo" && git rev-parse --verify -q 'origin/main^{commit}' >/dev/null 2>&1); then
-  echo "NOTE: origin/main not found; skipped the version bump check (check 29b)"
-else
-  for pj in "$repo"/plugins/*/.claude-plugin/plugin.json; do
-    [ -f "$pj" ] || continue
-    pd="plugins/$(basename "$(dirname "$(dirname "$pj")")")"
-    # a failing three-dot diff (no merge base, e.g. a shallow fetch of main plus an unrelated PR head) must fail
-    # loudly: an empty answer from a failed command would skip the plugin and pass an unbumped change
-    if ! committed="$(cd "$repo" && git diff --name-only origin/main...HEAD -- "$pd" 2>/dev/null)"; then
-      bad "$pd: git diff origin/main...HEAD failed (no merge base with origin/main?); fetch full history so the version bump can be checked"
-      continue
-    fi
-    changed="$(cd "$repo" && { printf '%s\n' "$committed"; git diff --name-only HEAD -- "$pd"
-      git ls-files --others --exclude-standard -- "$pd"; })"
-    changed="$(printf '%s' "$changed" | sed '/^$/d')"
-    [ -n "$changed" ] || continue
-    old_v="$(cd "$repo" && git show "origin/main:$pd/.claude-plugin/plugin.json" 2>/dev/null | ver_of)"
-    [ -n "$old_v" ] || continue # a new plugin: nothing to bump from
-    new_v="$(ver_of < "$pj")"
-    [ "$(ver_gt "$new_v" "$old_v")" = 1 ] || bad "$pd changed since origin/main but its version $new_v is not higher than origin/main's $old_v"
-  done
-fi
 
 # 30. review-own-copy: Review subagents experiment only in their own copy (issues #60, #63): a Finder or Verifier that runs
 # `git checkout <sha>` in the shared tree leaves it on a detached HEAD under the Implementer. Both briefs
@@ -539,8 +496,8 @@ for s in to-tickets wayfinder; do
   grep -qF 'build threads to start' "$forked/$s/SKILL.md" && bad "$s still offers setup-project because build threads are ready to start"
 done
 
-# 35. patch-heading-numbers: no two "## Patch N" headings in PATCHES.md share a number (issue #123). A heading
-# whose number is still a placeholder (TBD- and a capital N, CLAUDE.md) is skipped, since several can wait at once.
+# 35. patch-heading-numbers: no two "## Patch N" headings in PATCHES.md share a number (issue #123). A Patch added
+# since the switch to Releases is headed "## Patch: <name>" with no number (CLAUDE.md), so it is not counted.
 dup_patch="$(grep -oE '^## Patch [0-9]+' "$root/PATCHES.md" | awk '{print $3}' | sort | uniq -d)"
 for n in $dup_patch; do
   bad "PATCHES.md has more than one \"## Patch $n\" heading"
