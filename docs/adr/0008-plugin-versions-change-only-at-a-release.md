@@ -7,7 +7,7 @@ A plugin's version changes only when the user cuts a **Release**, never in an or
 - A Release has one release issue (its goal in one sentence, and later its notes) and a label, `release-X.Y.Z`, on every issue it ships. The label, not a sub-issue link, marks membership, because an issue has only one parent and a Spec's Tickets already have theirs. A Release holds at most 5 issues, a Spec counting as one, unless the user raises the cap.
 - Each issue in it is built as before, by its own Ticket or Spec thread, and merges to main with no version change. Installed copies of the plugin do not update until the version changes, so main can run ahead of the last Release.
 - The coordinator starts Build threads only on issues carrying the current release label. Issues filed during a Release (by `to-spec`, `to-tickets`, `triage` or `retro-planning`) wait for the next release planning, except Tickets split from a Spec already in the Release, which take its label.
-- Once every labelled issue is closed, a **Release thread** (premium tier) opens the bump pull request with a `CHANGELOG.md` entry; the user merges it. The same thread then runs the **release planning** for the next Release: it proposes a goal and a scope from the open `ready-for-agent` issues and anything carried over, and labels only what the user approves.
+- Once every labelled issue is closed, a **Release thread** (premium tier) opens the bump pull request with a `CHANGELOG.md` entry; the user merges it. The same thread then runs the **Release planning** for the next Release: it proposes a goal and a scope from the open `ready-for-agent` issues and anything carried over, and labels only what the user approves.
 - A fix that cannot wait gets its own patch Release, cut as soon as it merges.
 - The general flow lives in a `release` skill. Each repo's specifics (where its version lives, its changelog path, its label prefix) live in a repo doc that `setup-dev-skills` writes, so the skill names no project.
 
@@ -15,9 +15,9 @@ A plugin's version changes only when the user cuts a **Release**, never in an or
 
 Versions follow semantic versioning (semver.org), with "breaking" defined for skills:
 
-- **Patch (Z):** fixes only. A skill now does what it already promised, and no project using the plugin has to change anything.
-- **Minor (Y):** something new that breaks nothing, such as a new skill or a new step or option in one.
-- **Major (X):** a breaking change, meaning a project using the plugin must do something: a skill is renamed or removed, the format of a repo doc that `setup-dev-skills` writes changes, or a label the skills need changes.
+- **patch (Z):** fixes only. A skill now does what it already promised, and no project using the plugin has to change anything.
+- **minor (Y):** something new that breaks nothing, such as a new skill or a new step or option in one.
+- **major (X):** a breaking change, meaning a project using the plugin must do something: a skill is renamed or removed, the format of a repo doc that `setup-dev-skills` writes changes, or a label the skills need changes.
 - Typos, ADRs and repo-only changes ride along in the next Release and never decide its size.
 
 The Release thread picks the bump from the biggest change that shipped, and the user confirms it in the bump pull request. While the plugin is below 1.0.0, a breaking change bumps the minor part instead, and its `CHANGELOG.md` entry says what a project must do. 1.0.0 is cut only when the user declares the skills stable.
@@ -31,6 +31,6 @@ The Release thread picks the bump from the biggest change that shipped, and the 
 
 ## Consequences
 
-- `CLAUDE.md`'s bump and `TBD-N` rules, the numbering steps of `implement` and `implement-spec`, and the checks that enforce them go away.
+- `CLAUDE.md`'s bump and `TBD-N` rules, the numbering steps of `implement` and `implement-spec`, and the checks that enforce them go away in a switch-over Ticket. Until it merges, they still govern every pull request.
 - With the version gone from pull requests, the Patch and check numbers are the only counters left. The user decided in the same planning to make Upstream's skills our own (moving them into `skills/` and dropping `PATCHES.md`, changing ADR 0001) and to keep only structural checks in `check-plugin.sh`, so neither counter survives.
 - `CHANGELOG.md` becomes the record of what changed, shipped with the plugin.
