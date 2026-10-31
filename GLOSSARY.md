@@ -112,7 +112,7 @@ How thorough a Review is: **Quick**, **Standard** (the default), or **Deep**.
 _Avoid_: level, mode
 
 **Finder**:
-A reviewer agent that looks for problems and reports candidate Findings. The **standards Finder** and **spec Finder** come from Upstream; **adversarial Finders** each take one angle chosen for the pull request. On Deep, a **security Finder** is added, and a Gap sweep runs after Verify.
+A reviewer agent that looks for problems and reports candidate Findings. The **standards Finder** and **spec Finder** come from Upstream; **adversarial Finders** each take one angle chosen to fit the change under review. On Deep, a **security Finder** is added, and a Gap sweep runs after Verify.
 _Avoid_: reviewer (too broad), scanner
 
 **Verifier**:
@@ -124,8 +124,12 @@ One problem a Review reports, with a file and line, a Severity, a Bug class, and
 _Avoid_: issue (that word means a GitHub issue), comment
 
 **Severity**:
-How much a Finding matters. **Important** must be fixed before merge. **Nit** is small and optional. **Pre-existing** is real but not caused by this pull request.
+How much a Finding matters. **Important** must be fixed before the change is merged or accepted. **Nit** is small and optional. **Pre-existing** is real but not caused by the change under review.
 _Avoid_: priority, blocker
+
+**Door**:
+How hard a change is to walk back. A **one-way door** is a change that reverting its commits would not fully undo, including anything outside git (a data migration, deleted data, a public interface others depend on, a message sent outside the project, a published release); a **two-way door** is one a revert does undo. The `pr` skill records the call as `**Door:**` in the pull request body, and a pull request behind a one-way door is not self-merged.
+_Avoid_: risk level
 
 **Bug class**:
 The kind of problem a Finding is (for example "unescaped user input"), so every place it occurs is fixed together.

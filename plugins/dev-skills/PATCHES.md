@@ -712,6 +712,19 @@ Our own, not Upstream; no Upstream text changed. `skills/setup-dev-skills/issue-
 
 - `.claude-plugin/plugin.json`: version 0.22.13 to 0.22.14.
 
+## Patch 38: `ask-matt` routes to `setup-project`, `diagnosing-bugs` stops calling debug harnesses prototypes (`ask-matt/`, `diagnosing-bugs/`)
+
+Why: issues #164 and #167. `ask-matt` described `setup-dev-skills` but had no entry for `setup-project`, so a user asking which skill writes a project's instructions got no answer. `diagnosing-bugs`' cleanup checklist told the agent to delete "throwaway prototypes", while `prototype` keeps its code as a primary source on a throwaway branch.
+
+What:
+
+- `ask-matt/SKILL.md` (Precondition): a `setup-project` entry after the `setup-dev-skills` one, in the same style.
+- `diagnosing-bugs/SKILL.md` (Phase 6): "Throwaway prototypes deleted" becomes "Debug harnesses and scratch code deleted".
+- Not Upstream text: `GLOSSARY.md`'s **Finder** and **Severity** entries drop the pull-request wording, and a new **Door** entry is added.
+- `.claude-plugin/plugin.json`: version 0.22.14 to 0.22.15.
+
+Merging an Upstream update: re-apply the `setup-project` entry and the checklist wording.
+
 ## Vendor model names in Upstream text
 
 None in the kept skills at the Base commit, so no Patch was needed for ADR 0002 (checked for ticket #4: grep for `haiku`, `sonnet`, `opus`, `claude-`, `gpt-`, `gemini` over `upstream-skills/`). Some kept skills start subagents (for example `grilling`, `wayfinder`, `code-review`, `implement-spec`), but none picks a model for them. Spec #1 adds tiers in later tickets (the `code-review` Finders and Verifiers, and the `implement` and `implement-spec` Implementers; the tier on each ticket from `to-tickets` is Patch 7, the `implement` Implementer's tier is Patch 8, and the `implement-spec` Implementers' tiers are Patch 11); each of those edits gets its own Patch here.
