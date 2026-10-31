@@ -12,6 +12,7 @@ Read this first, then open only the docs whose line fits your work. Specs and ti
 - [docs/agents/triage-labels.md](agents/triage-labels.md): the label string for each triage role, and the labels that are not triage roles. Read when applying or filtering triage labels.
 - [docs/agents/domain.md](agents/domain.md): the single-context doc layout and how skills read the glossary and ADRs. Read when a skill looks for domain docs or flags an ADR conflict.
 - [docs/agents/release.md](agents/release.md): the release doc: `dev-skills`' version file, its `CHANGELOG.md` path, the `release-` label prefix and the extra steps of a bump pull request. Read when running the `release` skill or giving an issue a release label.
+- [docs/agents/upstream-watch.md](agents/upstream-watch.md): the prompt of the 2-week Upstream watch (reads `mattpocock/skills` since the README's last commit, files one `needs-triage` issue), the access it needs, how the commit is recorded, how to rerun it by hand and how to change or stop its schedule. Read when running, changing or stopping the watch.
 
 ## Packaging
 
