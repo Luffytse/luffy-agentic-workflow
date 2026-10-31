@@ -48,11 +48,11 @@ _Avoid_: task, story
 A project goal (for example "M3 Trip planning") that groups the Specs and Tickets needed to reach it.
 
 **Release**:
-One version of a plugin and the few issues it ships, each labelled `release-X.Y.Z`, with one release issue holding its goal and notes. Not a Milestone, which is a project goal.
+One version of a plugin and the few features it ships (at most 5 unless the user raises the cap for that Release; a feature is a Spec with its Tickets, a lone Ticket with the issues it absorbs, or a few related issues the user agrees to treat as one), every issue in them labelled `release-X.Y.Z`, with one release issue holding its goal and notes. Not a Milestone, which is a project goal.
 _Avoid_: sprint, version bump
 
 **Release planning**:
-The step that picks the next Release's goal and issues: the agent proposes, the user decides, and only approved issues get the label.
+The step that picks the next Release's goal and features: the agent proposes, the user decides, and only approved issues get the label.
 _Avoid_: release triage
 
 **Release thread**:

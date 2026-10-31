@@ -58,7 +58,7 @@ Not feature work, just upkeep.
 
 ## Releases
 
-For a repo that cuts versioned Releases (its release doc, `docs/agents/release.md`, says where the version lives), ordinary pull requests leave the version alone, and **`/release`** ships them a few issues at a time. Start a thread for it when every issue with the current release label has closed: it **cuts the Release** (picks the patch, minor or major bump from what shipped and opens the bump pull request with its changelog entry, which you merge), then runs the **Release planning** for the next one (proposes a goal and at most 5 issues, and labels only what you approve). A fix that cannot wait goes through it too, as a patch Release of one issue.
+For a repo that cuts versioned Releases (its release doc, `docs/agents/release.md`, says where the version lives), ordinary pull requests leave the version alone, and **`/release`** ships them a few features at a time. Start a thread for it when every issue with the current release label has closed: it **cuts the Release** (picks the patch, minor or major bump from what shipped and opens the bump pull request with its changelog entry, which you merge), then runs the **Release planning** for the next one (proposes a goal and at most 5 features, and labels only what you approve). A fix that cannot wait goes through it too, as a patch Release of one issue.
 
 ## Vocabulary underneath
 

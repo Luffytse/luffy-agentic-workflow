@@ -5,7 +5,7 @@ description: "Cut a Release and plan the next one: check every issue with the re
 
 # Release
 
-A **Release** is one version of the project and the few issues it ships. Each of those issues carries the Release's **release label**: the release doc's label prefix plus the version, for example `release-1.4.0`. One **release issue**, titled `Release X.Y.Z`, holds the Release's goal in one sentence, its label, its cap, its scope list and, once it is cut, its notes. The release issue itself carries no release label, so it is never counted among the issues the Release ships. Ordinary pull requests merge to main with no version change; only the Release's **bump pull request** changes the version, and the user merges it. Run this thread at the **premium** tier: the bump size and the next scope are judgement calls the user confirms.
+A **Release** is one version of the project and the few features it ships. A **feature** is one piece of work the user would name as one thing: a Spec with all its Tickets, a lone Ticket with the issues it absorbs, or a few related issues the user agrees to treat as one. Each issue in a feature carries the Release's **release label**: the release doc's label prefix plus the version, for example `release-1.4.0`. One **release issue**, titled `Release X.Y.Z`, holds the Release's goal in one sentence, its label, its cap on features, its scope list and, once it is cut, its notes. The release issue itself carries no release label, so it is never counted among the issues the Release ships. Ordinary pull requests merge to main with no version change; only the Release's **bump pull request** changes the version, and the user merges it. Run this thread at the **premium** tier: the bump size and the next scope are judgement calls the user confirms.
 
 ## Before you start
 
@@ -88,16 +88,16 @@ Done when the bump pull request is merged and the release issue is closed with i
 
 Propose the next Release; the user decides it.
 
-The candidates are every open issue labelled `ready-for-agent` (the label the triage label doc gives that role) that carries no release label (`gh api "repos/<owner>/<repo>/issues?labels=<ready-for-agent label>&state=open" --paginate --jq '.[] | select(.pull_request == null) | {number, title, labels: [.labels[].name]}'`, dropping every issue with a label that starts with the prefix), and every issue carried over in step 1. A Spec and its Tickets are one candidate. Issues in any other triage state belong to `triage`, not here.
+The candidates are every open issue labelled `ready-for-agent` (the label the triage label doc gives that role) that carries no release label (`gh api "repos/<owner>/<repo>/issues?labels=<ready-for-agent label>&state=open" --paginate --jq '.[] | select(.pull_request == null) | {number, title, labels: [.labels[].name]}'`, dropping every issue with a label that starts with the prefix), and every issue carried over in step 1. A Spec and its Tickets are one feature; so is a lone Ticket with the issues it absorbs. Issues in any other triage state belong to `triage`, not here.
 
 Put to the user:
 
 - a **goal** in one sentence, the thing this Release makes true;
-- a **scope** of at most 5 candidates (a Spec counting as one), each with one line on why it fits the goal, chosen so the Release takes days, not weeks;
+- a **scope** of at most 5 features (fewer is fine), each naming the feature, the issues in it and one line on why it fits the goal, chosen so the Release takes days, not weeks. Group related candidates into one feature only when the user would name them as one thing, and say so in the line;
 - the candidates left out, grouped, with one line each on why;
 - the **next version**: the highest of the version in the version file on main (the one just cut) and the open Releases' versions (step 1), with its patch part raised if the scope is fixes only, its minor part raised if anything in it is new or (below 1.0.0) breaking, or its major part raised if anything in it is breaking at 1.0.0 or later. Its label is the release doc's prefix plus that version; step 2 of that Release renames it if what ships turns out bigger or smaller.
 
-The cap is 5 unless the user raises it, and then only for this Release; the release issue records the cap and the user's reason. Iterate until the user approves a scope.
+The cap is 5 features unless the user raises it, and then only for this Release; the release issue records the cap and the user's reason, and the next Release goes back to 5. Iterate until the user approves a scope.
 
 Then create the label if the repo lacks it, apply it to each approved issue and to every open Ticket of an approved Spec (list the Spec's Tickets with the tracker doc's way of checking a sub-issue link: its sub-issues, `gh api --paginate repos/<owner>/<repo>/issues/<spec>/sub_issues --jq '.[] | {number, state}'`, plus any issue whose body has a `Part of #<spec>` line; keep only the open ones), and open the release issue, with no release label of its own:
 
@@ -108,11 +108,12 @@ Title: Release X.Y.Z
 
 **Label:** `<prefix>X.Y.Z`. Every issue in this Release carries it.
 
-**Cap:** <5, or the raised cap and the user's reason> (a Spec counts as one). Used: <n>.
+**Cap:** <5 features, or the raised cap and the user's reason>. Used: <n>.
 
 ## Scope
 
-- #<n> <title>
+- **<feature>**: <one line on why it fits the goal>
+  - #<n> <title>
 
 ## Notes
 
