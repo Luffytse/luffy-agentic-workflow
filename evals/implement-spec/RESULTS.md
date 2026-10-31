@@ -1,6 +1,6 @@
 # Results
 
-One entry per build-flow check of `implement-spec`, newest first. Rerun when `implement-spec` changes, and record the commit and the plugin version from `plugins/dev-skills/.claude-plugin/plugin.json`.
+One entry per build-flow check of `implement-spec`, newest first. Rerun when `implement-spec` changes, and record the commit and the plugin version from `plugins/dev-skills/.claude-plugin/plugin.json`. An entry written inside an open pull request names the commit and plugin version it ran on as its base; anything that happens after the entry's last commit (later Rounds, merges, the merge itself) is recorded on the pull request, not in the file.
 
 ## Template
 
