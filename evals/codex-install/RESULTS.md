@@ -2,7 +2,133 @@
 
 One entry per independent manual [Codex install check](README.md), newest first. These are real remote installs and model conversations, with an evaluator supplying simulated-user answers. Credentials and temporary runtime logs are not repository artifacts.
 
-Both runs below occurred on **2026-10-31, America/Los_Angeles (PDT)**, before Spec #340 merged. They verify the remote Spec ref, **not the default branch**; verification of the README's unqualified default-ref install remains pending merge. Neither run tests update or local-development behavior, implicit invocation, fact-finding subagents, or the other skills' execution.
+The two historical Spec-ref runs below occurred on **2026-10-31, America/Los_Angeles (PDT)**, before Spec #340 merged. They verify the remote Spec ref, **not the default branch**; the post-merge entry below now verifies the README's unqualified default-ref install separately. Neither run tests update or local-development behavior, implicit invocation, fact-finding subagents, or the other skills' execution.
+
+## 2026-10-31 — post-merge default-branch verification, dev-skills 0.24.1
+
+**Result: pass for the README's unqualified GitHub install, fresh discovery and completed interview.** Local date 2026-10-31, America/Los_Angeles (PDT). Codex CLI `0.166.0-alpha.5.1`; fetched main commit [`53da81976f9f61daffc07482af96187f5ba9bebc`](https://github.com/Luffytse/luffy-dev-skills/commit/53da81976f9f61daffc07482af96187f5ba9bebc), which contains merged PR #349. No `@ref` or `--ref` override was used. Runtime model exactly matched the **regular** tier in the unchanged Codex column of the [plugin README at the tested commit](https://github.com/Luffytse/luffy-dev-skills/blob/53da81976f9f61daffc07482af96187f5ba9bebc/plugins/dev-skills/README.md#model-tiers); provider `openai`, fallback explicitly disabled and returned model identity checked.
+
+Setup: new empty `<postmerge>/home` and `<postmerge>/fixture`; only existing account authentication copied securely with restrictive permissions. No live config, marketplace, plugin or skill cache copied; all commands and the runtime used the isolated home. Authentication succeeded. Commands executed:
+
+```sh
+CODEX_HOME=<postmerge>/home codex plugin marketplace add https://github.com/Luffytse/luffy-dev-skills --json
+CODEX_HOME=<postmerge>/home codex plugin add dev-skills@luffy-dev --json
+CODEX_HOME=<postmerge>/home codex plugin list --marketplace luffy-dev --json
+CODEX_HOME=<postmerge>/home codex plugin list --available --marketplace luffy-dev --json
+CODEX_HOME=<postmerge>/home codex --version
+git -C <postmerge>/home/.tmp/marketplaces/luffy-dev rev-parse HEAD
+```
+
+Install: `marketplaceName: luffy-dev`, `alreadyAdded: false`; installed catalog contained only `dev-skills@luffy-dev`, version `0.24.1`, installed and enabled, policies `AVAILABLE` / `ON_INSTALL`, `available: []` in both list calls. Git marketplace source was `https://github.com/Luffytse/luffy-dev-skills.git`; plugin source was its fetched local snapshot. No `dai-portal-data` offered.
+
+Discovery: a newly spawned `codex app-server --stdio`, initialized with experimental API capability, returned **26/26** plugin skills from `skills/list` with fixture cwd and `forceReload: true`. Compared with all skill folders at the fetched commit after normalizing `dev-skills:`: missing `[]`, unexpected `[]`, disabled `[]`, errors `[]`. Every plugin path belonged to `<postmerge>/home/plugins/cache/luffy-dev/dev-skills/0.24.1/skills/`. Full discovered set:
+
+```text
+dev-skills:agentic-review
+dev-skills:ask-matt
+dev-skills:codebase-design
+dev-skills:diagnosing-bugs
+dev-skills:domain-modeling
+dev-skills:grill-with-docs
+dev-skills:grilling
+dev-skills:handoff
+dev-skills:implement
+dev-skills:implement-spec
+dev-skills:improve-codebase-architecture
+dev-skills:pr
+dev-skills:prototype
+dev-skills:release
+dev-skills:research
+dev-skills:retro
+dev-skills:retro-planning
+dev-skills:setup-dev-skills
+dev-skills:setup-project
+dev-skills:tdd
+dev-skills:to-spec
+dev-skills:to-tickets
+dev-skills:triage
+dev-skills:wayfinder
+dev-skills:wizard
+dev-skills:writing-for-agents
+```
+
+Interview: a new ephemeral thread in the empty fixture, read-only sandbox, approvals `never`. First `turn/start` supplied the exact prompt below and the discovered `dev-skills:grilling` skill item with installed path; later answers used the same thread. All **4** turns completed with status `completed`, null error. The assistant asked focused questions with recommendations, waited for answers, carried decisions forward, requested and received explicit confirmation, then acknowledged closure. Completed item types were only user/assistant messages; no tool items or server input requests occurred, and fixture contents remained empty.
+
+Exact conversation (assistant messages preserved, adjacent messages retain order):
+
+```text
+USER:
+$grilling Interview me about this small sample plan only; do not write files or implement anything. I want a personal Saturday reading habit. This is a hypothetical plan with no external facts to research. Help me settle a realistic routine and how I will judge it. Ask questions and wait for my answers; reach shared understanding before acting.
+
+ASSISTANT:
+I’m using the grilling skill to work through the routine and how you’ll judge it. I’ll ask in rounds and wait for your answers; I won’t write files or implement anything.
+
+ASSISTANT:
+❓ **Q1** - **Purpose**: Should the main aim be enjoying a regular pocket of reading time? If you care more about learning, finishing books, or something else, tell me.
+
+➡️ I recommend enjoyment as the main aim, so the habit feels rewarding without a page quota.
+
+---
+
+❓ **Q2** - **Saturday commitment**: Should we design this around a small reading session on most Saturdays, allowing occasional misses? Or do you want every Saturday to be a firm commitment?
+
+➡️ I recommend most Saturdays, with a way to resume after a miss.
+
+---
+
+❓ **Q3** - **Reading material**: Should any book you feel like reading count, including rereading, or do you want a narrower selection?
+
+➡️ I recommend letting interest guide your choice and allowing rereading.
+
+USER:
+Q1 yes, quiet enjoyment; no learning, page or book-count target. Q2 most Saturdays at home, skipping away or disrupted Saturdays without catch-up. Q3 any enjoyable paper book or short story, including rereading; switching allowed. I live alone and control breakfast timing. I propose ten minutes immediately after Saturday breakfast at my kitchen table, book ready and phone silent in another room. No external facts need researching.
+
+ASSISTANT:
+Settled: quiet enjoyment, flexible reading choices, and most Saturdays at home, with no catch-up. Your proposed breakfast cue and setup are clear.
+
+❓ **Q4** - **Ten-minute commitment**: Should ten minutes be the usual session, with permission to stop early if it feels unpleasant and continue longer if you want?
+
+➡️ I recommend yes: ten minutes gives the routine shape while keeping enjoyment central.
+
+---
+
+❓ **Q5** - **Missed cue**: If you finish breakfast and forget to read, should reading later that Saturday be optional, then resume after breakfast the following Saturday?
+
+➡️ I recommend yes, with no obligation to recover the session.
+
+---
+
+❓ **Q6** - **Judging the trial**: Should you try this for four eligible Saturdays, then judge it by whether you usually started and found the time pleasant enough to want to repeat? An eligible Saturday means you’re home and the morning isn’t disrupted.
+
+➡️ I recommend yes, using a brief mental check after each session and no written tracking. At the review, adjust anything that repeatedly made starting difficult or reading less enjoyable.
+
+USER:
+Q4 yes, ten minutes usual, permission to stop early if unpleasant or continue longer. Q5 yes, later reading optional and resume next eligible Saturday without recovery obligation. Q6 yes, four eligible Saturdays excludes away or disrupted mornings; success means at least three starts and generally pleasant enough to repeat. Mental check only, no written tracker. If starting is hard reduce usual time to five minutes; if enjoyment low switch reading material. No reminders, budget, deadline or other constraints. Please summarize and ask me to confirm shared understanding before closing.
+
+ASSISTANT:
+Your routine is:
+
+- On eligible Saturdays—at home with an undisrupted morning—read immediately after breakfast at the kitchen table.
+- Have an enjoyable paper book or short story ready, with your phone silent in another room. Rereading and switching are welcome.
+- Aim for ten minutes. Stop early if unpleasant; continue longer if you wish.
+- Skips need no catch-up. If you forget after breakfast, reading later is optional; resume next eligible Saturday.
+- Try four eligible Saturdays. Success means at least three starts and an experience generally pleasant enough to repeat.
+- Use a mental check only. If starting is hard, reduce the usual time to five minutes. If enjoyment is low, switch material.
+
+The purpose is quiet enjoyment, with no learning, page, or book-count targets. There are no reminders, written tracking, budget, or deadline.
+
+❓ **Q7** - **Shared understanding**: Does this capture the routine and how you’ll judge it, with nothing left to settle?
+
+➡️ I recommend confirming if it matches your intent; otherwise, tell me what to change.
+
+USER:
+Yes, this captures the complete routine and how I will judge it, with nothing left to settle. I explicitly confirm we have reached shared understanding. Close the interview; do not write or implement anything.
+
+ASSISTANT:
+Shared understanding confirmed. The interview is closed. Nothing has been written or implemented.
+```
+
+Issues filed: none; no portability problem encountered. Limits: verifies this install/discovery/interview seam only, not updates, local development, implicit invocation, fact-finding subagents or other skills' execution. A second independent clean URL install also fetched the same main SHA and installed version; it was stopped before runtime discovery/interview and is not counted as another complete check. Both temporary homes' authentication and other runtime material were removed after retaining sanitized evidence; the live setup was unchanged. Repository checker, Claude plugin validation and diff whitespace check passed. No new automated tests were added for this evidence-only record. Follow-up: #356.
 
 ## 2026-10-31 — run 2, dev-skills 0.24.1
 
