@@ -16,9 +16,9 @@ Read this first, then open only the docs whose line fits your work. Specs and ti
 
 ## Packaging
 
-- [README.md](../README.md): how to add the marketplace and install its plugins. Read when changing install steps.
+- [README.md](../README.md): Claude Code and Codex marketplace install, update and local-development steps. Read when changing install steps.
 - [dai-portal-data README](../plugins/dai-portal-data/README.md): the DAI Portal database plugin. Read only when working on that plugin.
-- [dev-skills README](../plugins/dev-skills/README.md): what the plugin is, install steps, the model-tier table, the folder layout and the last Upstream commit looked at. Read when installing the plugin, adding a skill of our own, or mapping a tier to a model.
+- [dev-skills README](../plugins/dev-skills/README.md): what the plugin is, Claude Code and Codex install, update and local-development steps, the model-tier table, the folder layout and the last Upstream commit looked at. Read when installing the plugin, adding a skill of our own, or mapping a tier to a model.
 - [DOCS-INDEX.md](../plugins/dev-skills/skills/domain-modeling/DOCS-INDEX.md): the docs index format and update rule every writing skill follows. Read when changing how skills keep `docs/index.md` current.
 - [scripts/check-plugin.sh](../scripts/check-plugin.sh): this repo's own checker for the `dev-skills` layout and repo-wide rules (no vendor model names, no person names, no repo-only text in skill text, skill name matching its folder, Codex packaging matching Claude Code and sharing its skills tree); its header lists the checks, each identified by a name, never a number. A check tests structure, not a skill's wording. It lives outside the plugin so it does not ship to projects. Read when adding or changing a check, or before pushing a plugin change.
 - [ADR 0001](adr/0001-dev-skills-is-one-plugin-forked-from-matt-pocock.md): why `dev-skills` is one plugin that began as Matt Pocock's skills and is now our own, and which skills it keeps. Read when adding or dropping a skill, or when the Upstream watch finds an idea.
