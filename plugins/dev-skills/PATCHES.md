@@ -788,3 +788,14 @@ What:
 - `.claude-plugin/plugin.json`: version 0.22.19 to 0.22.20.
 
 Merging an Upstream update: take Upstream's text, then re-apply the step 5 sentence and the template note.
+
+## Patch 42: `retro` example table cites no repo-specific issue number (`retro/`)
+
+Why: issue #189 (found in the review of #179). The example table in `retro/BUG-CLASSES.md` named "Pre-existing issue #41", an issue of this repo. Every project that loads the plugin reads that text, and #41 there means some other issue, or nothing; an agent could take it as a pointer to its own #41.
+
+What:
+
+- `retro/BUG-CLASSES.md` (ours, not Upstream text) example table, "Hardcoded timezone" row: "Pre-existing issue #41" becomes "Pre-existing issue #<n>". The Round ids in the table (R1-2, R2-1 and so on) are generic Finding ids and stay.
+- `.claude-plugin/plugin.json`: version 0.22.20 to 0.22.21.
+
+Our own file (`retro/BUG-CLASSES.md` is ours, not Upstream text), so an Upstream update never touches it; nothing to re-apply when merging one.

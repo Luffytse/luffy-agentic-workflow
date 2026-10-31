@@ -20,5 +20,5 @@ A **Bug class** that comes up more than once in a pull request becomes a check, 
 | Unchecked null from the API client (merged with "missing null guard") | 3 | R1-2, R2-1 | New lint rule in `eslint.config.js` |
 | Error messages leak internals | 2 | R1-4 | `REVIEW.md` Always-check line |
 | Unused exports | 4 | R1-5, R2-3 | Existing `knip` job fixed: it skipped `src/lib` |
-| Hardcoded timezone | 2 | R2-2 | `REVIEW.md` line now; check lands with Pre-existing issue #41 |
+| Hardcoded timezone | 2 | R2-2 | `REVIEW.md` line now; check lands with Pre-existing issue #<n> |
 | Wrong default in config loader | 1 | R1-1 | Not repeated |
