@@ -706,6 +706,12 @@ Our own, not Upstream; no Upstream text changed and no skill text changed (no sk
 
 - `.claude-plugin/plugin.json`: version 0.22.12 to 0.22.13.
 
+## Not a Patch: the GitHub tracker seed gets REST routes (issues #160, #161)
+
+Our own, not Upstream; no Upstream text changed. `skills/setup-dev-skills/issue-tracker-github.md` writes a REST route (`gh api repos/<owner>/<repo>/...`) next to every `gh issue` command that lacked one (create, read, list, comment, labels, close, assign yourself, and the wayfinding map, Frontier query, Claim and Resolve), leads the fork check with the REST route, and tidies the opening paragraph so it no longer says both that the subcommands fail and that REST works. The blocker rule now says a ticket is unblocked when every blocker is closed by a merged change, with the by-hand check for a blocker closed without a merge. `implement` and `implement-spec` are unchanged.
+
+- `.claude-plugin/plugin.json`: version 0.22.13 to 0.22.14.
+
 ## Vendor model names in Upstream text
 
 None in the kept skills at the Base commit, so no Patch was needed for ADR 0002 (checked for ticket #4: grep for `haiku`, `sonnet`, `opus`, `claude-`, `gpt-`, `gemini` over `upstream-skills/`). Some kept skills start subagents (for example `grilling`, `wayfinder`, `code-review`, `implement-spec`), but none picks a model for them. Spec #1 adds tiers in later tickets (the `code-review` Finders and Verifiers, and the `implement` and `implement-spec` Implementers; the tier on each ticket from `to-tickets` is Patch 7, the `implement` Implementer's tier is Patch 8, and the `implement-spec` Implementers' tiers are Patch 11); each of those edits gets its own Patch here.
