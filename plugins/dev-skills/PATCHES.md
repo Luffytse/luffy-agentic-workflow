@@ -758,3 +758,9 @@ Our own, not Upstream; no Upstream text changed, so this is not numbered. `check
 - `scripts/check-plugin.sh` fixes, issues #168, #169, #170 and #184 (the script is no longer plugin text, so they bump nothing): the root is found with `cd -P` / `pwd -P`, so a symlinked parent directory works (#168); check 15 scans an array, so a path with a space does not split (#169); a failing `git diff origin/main...HEAD` in check 29b is a FAIL for that plugin, not a silent skip (#170); check 24 tests the credit text `Matt Pocock's` and the `LICENSE-mattpocock-skills` filename in two greps with two messages (#184).
 - `README.md`, `plugins/dev-skills/README.md`, `CLAUDE.md`, `REVIEW.md`, `docs/index.md` and ADR 0007 point to the new place.
 - `.claude-plugin/plugin.json`: version 0.22.16 to 0.22.17 (the plugin loses a file).
+
+## Not a Patch: the wayfinding Resolve step checks its pointer survived (issue #200)
+
+Our own, not Upstream; no Upstream text changed, so this is not numbered. `skills/setup-dev-skills/issue-tracker-github.md`, wayfinding **Resolve**: appending the context pointer writes the whole map body from a copy read earlier, so two sessions resolving tickets of one map at once can drop a line. The bullet now says to read the body back after writing and, while this session's pointer is missing (matched by its ticket link), read again, append only if it is still missing, and write; it stops and tells the user when the read fails or comes back empty.
+
+- `.claude-plugin/plugin.json`: version 0.22.17 to 0.22.18.
