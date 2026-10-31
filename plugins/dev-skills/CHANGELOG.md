@@ -2,6 +2,32 @@
 
 What each version of `dev-skills` brought, newest first. A version changes only when a Release is cut, and each Release adds one entry here: its goal, the issues it shipped, and what a project using the plugin must do when something breaks.
 
+## 0.24.0 (2026-10-31)
+
+The review, build and release skills do what they say: no false-clean Rounds, no Ticket started or left open by mistake, release cuts that cannot go wrong, and clearer history and planning.
+
+- ambiguous match across two open rows (#269)
+- partial fix of a Nit not covered (#270)
+- line shift undefined for renamed or deleted files (#271)
+- held open row has no report path (#272)
+- earlier row's lines not brought to this head before a check (#273)
+- parallel sentence not updated when the closing rule changed (#274)
+- A Spec pull request closes the Spec and every Ticket on merge (#289)
+- no command to test the state of a Blocked by body-line blocker (#253)
+- build-thread blocker steps name no Count open blockers (#254)
+- repo tracker doc lacks the merged-change test for an unblocked ticket (#255)
+- Open bump pull request not re-checked on rerun or urgent cut (#277)
+- Issue closed as completed read as "the fix has merged" (#278)
+- Release skill step 3 and the no-release-issue path disagree with other steps (#279)
+- Urgent fix cut can ship below main or jump above a planned Release (#280)
+- Release planning: the cap counts features, not issues (#287)
+- PR titles and merge commit titles use Conventional Commits prefixes (#288)
+- to-tickets: a Ticket that absorbs existing issues reads their comments, links them, and marks each one Absorbed by (#267)
+- Review subagents read the Implementer's branch without moving its worktree (#290)
+- Say whether a clean fifth Round counts as hitting the 5-Round cap (#291)
+
+Also merged: two `REVIEW.md` Always-check lines, on a command that decides a step but was never run on real data, and on a resume test that equality breaks (#307).
+
 ## 0.23.0 (2026-10-31)
 
 Plugin versions change only at a Release, and no pull request takes a number another one could take (ADR 0008).
