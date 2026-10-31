@@ -641,5 +641,11 @@ grep -qF '(./review.md)' "$sd/SKILL.md" || bad "setup-dev-skills/SKILL.md does n
 grep -qF 'is never drafted over' "$sd/SKILL.md" || bad "setup-dev-skills/SKILL.md does not say an existing REVIEW.md is never drafted over, first run or re-run"
 grep -qiF 'never go into skill text' "$sd/SKILL.md" || bad "setup-dev-skills/SKILL.md does not say the repo's own rules never go into skill text"
 
+# 43. to-tickets-blocked-by-form: to-tickets writes blockers in the form the tracker doc reads (issue #201): the
+# first-line `Blocked by: #<n>, #<n>` where GitHub has no native dependencies, and says the tracker doc's form wins
+tk="$forked/to-tickets/SKILL.md"
+grep -qF 'first line of the ticket body' "$tk" || bad "to-tickets/SKILL.md does not put the Blocked by line on the first line of the ticket body"
+grep -qF "tracker doc's form wins" "$tk" || bad "to-tickets/SKILL.md does not say the tracker doc's form wins over the issue template's Blocked by section"
+
 [ "$fail" -eq 0 ] && echo "OK: dev-skills plugin checks passed ($count skills)"
 exit "$fail"

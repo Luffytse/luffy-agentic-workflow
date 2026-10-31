@@ -775,3 +775,16 @@ Our own, not Upstream; no Upstream text changed, so this is not numbered. `check
 Our own, not Upstream; no Upstream text changed, so this is not numbered. `skills/setup-dev-skills/issue-tracker-github.md`, wayfinding **Resolve**: appending the context pointer writes the whole map body from a copy read earlier, so two sessions resolving tickets of one map at once can drop a line. The bullet now says to read the body back after writing and, while this session's pointer is missing (matched by its ticket link), read again, append only if it is still missing, and write; it stops and tells the user when the read fails or comes back empty.
 
 - `.claude-plugin/plugin.json`: version 0.22.17 to 0.22.18.
+
+## Patch 41: `to-tickets` writes blockers in the form the tracker doc reads (`to-tickets/`)
+
+Why: issue #201 (found in the review of #194). Step 5 said to set each ticket's "Blocked by" where the tracker has no native blocking, and the issue template ended in a `## Blocked by` section, but the GitHub tracker doc (Blocking, Count open blockers) reads only a `Blocked by: #<n>, #<n>` line at the top of the body, so such a child counted 0 blockers and was startable while its blocker was open.
+
+What:
+
+- `to-tickets/SKILL.md` step 5, tracker bullet: "set each ticket's "Blocked by" to the blocking issues" becomes: write the blockers in the form the tracker doc reads (for GitHub without native dependencies, a `Blocked by: #<n>, #<n>` line as the first line of the ticket body, above everything else, and no `## Blocked by` section), and the tracker doc's form wins over the issue template's section.
+- `to-tickets/SKILL.md` issue template: the "Omit this section" note also covers blockers set as the tracker doc's line.
+- `scripts/check-plugin.sh`: new check 43 (to-tickets-blocked-by-form: the skill names the first line of the ticket body and says the tracker doc's form wins).
+- `.claude-plugin/plugin.json`: version 0.22.19 to 0.22.20.
+
+Merging an Upstream update: take Upstream's text, then re-apply the step 5 sentence and the template note.
