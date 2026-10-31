@@ -616,5 +616,20 @@ for f in implement implement-spec; do
   grep -qF 'agentic-review/SKILL.md#1-pin-the-diff' "$forked/$f/SKILL.md" || bad "$f/SKILL.md does not point to agentic-review step 1 for the merge-from-main diff"
 done
 
+# 42. setup-review-seed: setup-dev-skills writes a starter REVIEW.md (issue #188): the seed review.md has the three
+# sections (Important, Skip, Always check) with an empty Always check list, SKILL.md links the seed, and it asks about
+# the repo's own rules for build threads and says they never go into skill text
+sd="$own/setup-dev-skills"
+if [ ! -f "$sd/review.md" ]; then bad "missing skills/setup-dev-skills/review.md"
+else
+  for h in '## Important' '## Skip' '## Always check'; do
+    grep -qxF "$h" "$sd/review.md" || bad "setup-dev-skills/review.md has no \"$h\" section"
+  done
+  grep -qE '^- ' "$sd/review.md" && bad "setup-dev-skills/review.md has a list item; the Always check list starts empty"
+fi
+grep -qF '(./review.md)' "$sd/SKILL.md" || bad "setup-dev-skills/SKILL.md does not link the review.md seed"
+grep -qF 'is never drafted over' "$sd/SKILL.md" || bad "setup-dev-skills/SKILL.md does not say an existing REVIEW.md is never drafted over, first run or re-run"
+grep -qiF 'never go into skill text' "$sd/SKILL.md" || bad "setup-dev-skills/SKILL.md does not say the repo's own rules never go into skill text"
+
 [ "$fail" -eq 0 ] && echo "OK: dev-skills plugin checks passed ($count skills)"
 exit "$fail"

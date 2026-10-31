@@ -694,3 +694,10 @@ Merging an Upstream update: take Upstream's text, then re-apply the step 1 merge
 None in the kept skills at the Base commit, so no Patch was needed for ADR 0002 (checked for ticket #4: grep for `haiku`, `sonnet`, `opus`, `claude-`, `gpt-`, `gemini` over `upstream-skills/`). Some kept skills start subagents (for example `grilling`, `wayfinder`, `code-review`, `implement-spec`), but none picks a model for them. Spec #1 adds tiers in later tickets (the `code-review` Finders and Verifiers, and the `implement` and `implement-spec` Implementers; the tier on each ticket from `to-tickets` is Patch 7, the `implement` Implementer's tier is Patch 8, and the `implement-spec` Implementers' tiers are Patch 11); each of those edits gets its own Patch here.
 
 `scripts/check-plugin.sh` now runs the vendor-name grep over `upstream-skills/` too, so an Upstream merge that brings in a model name fails the check and must be patched to a tier.
+
+## Not a Patch: `setup-dev-skills` writes a starter `REVIEW.md` (issue #188)
+
+Our own, not Upstream; no Upstream text changed. `skills/setup-dev-skills/` gains the seed `review.md` (the three sections `retro` creates: what Important means with the default applying, Skip, and an empty Always check list). `SKILL.md` explores for an existing `REVIEW.md`, asks whether the repo has rules of its own for the build threads (recorded in its `CLAUDE.md`, `AGENTS.md` or `REVIEW.md`, never in skill text), drafts the file in the draft-and-diff step, and, on a first run or a re-run alike, never drafts the seed over an existing one: nothing in it is removed or rewritten, and a missing section is offered alone as a diff. The `docs/index.md` it writes lists `REVIEW.md`. The plugin `README.md` line for the skill names the starter `REVIEW.md`.
+
+- `scripts/check-plugin.sh`: new check 42 (setup-review-seed: the seed has the three sections and an empty list, and `SKILL.md` links it and says the repo's own rules never go into skill text).
+- `.claude-plugin/plugin.json`: version 0.22.10 to 0.22.11.

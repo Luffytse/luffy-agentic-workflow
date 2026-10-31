@@ -10,6 +10,7 @@ Derived from Matt Pocock's setup skill; the seed files in this folder are mostly
 - **Issue tracker**: GitHub Issues, in `docs/agents/issue-tracker.md`.
 - **Labels**: the 5 state roles and 2 category roles that `triage` uses, and the `wayfinder:*` labels, in `docs/agents/triage-labels.md` and on the repo.
 - **Domain docs**: where `GLOSSARY.md` and ADRs live and how skills read them, in `docs/agents/domain.md`, plus the `docs/index.md` that lists the docs.
+- **Review rules**: a starter `REVIEW.md` at the repo root, where the repo's own review rules go.
 - **GitHub settings**: checked and reported, never changed.
 
 This is a prompt-driven skill, not a deterministic script. Explore, present what you found, confirm with the user, then write. It runs the same way on a fresh repo and on a re-run; a re-run shows a diff first (step 3).
@@ -26,6 +27,7 @@ Read whatever exists; assume nothing:
 - `GLOSSARY.md` and `GLOSSARY-MAP.md` at the repo root, and the legacy `CONTEXT.md` / `CONTEXT-MAP.md`. If a legacy file exists, offer to `git mv` it to its `GLOSSARY` name and rewrite those names in `docs/agents/domain.md`.
 - `docs/adr/` and any `src/*/docs/adr/` directories.
 - `docs/agents/`: do earlier output files exist? If so this is a re-run.
+- `REVIEW.md` at the repo root: does it exist, and which of its sections (Important, Skip, Always check) does it have? An existing one is left as it is (step 3).
 - `docs/index.md`: the docs index, if one exists, and the other docs it should list (`REVIEW.md`, `CODING_STANDARDS.md`, `CONTRIBUTING.md`, `.out-of-scope/`, README files).
 - The repo's labels: `gh api repos/<owner>/<repo>/labels --paginate --jq '.[].name'`.
 - Monorepo signals: a `pnpm-workspace.yaml`, a `workspaces` field in `package.json`, or a populated `packages/*` with its own `src/`. Their absence means single-context, which is almost every repo.
@@ -46,6 +48,12 @@ The defaults are the 5 state roles, `needs-triage`, `needs-info`, `ready-for-age
 
 **Section C: Domain docs.** Default to **single-context** (one `GLOSSARY.md` and `docs/adr/` at the repo root); write it without asking. Offer **multi-context** (a root `GLOSSARY-MAP.md` pointing to per-context `GLOSSARY.md` files) only when exploration found monorepo signals.
 
+**Section D: The repo's own rules for build threads.** Ask one question:
+
+> Does this repo have rules of its own for the build threads, such as who merges which pull requests, or which files are special? (recommended: **no**, add them later)
+
+On **yes**, ask the user for the rules' text, then record them in the repo's `CLAUDE.md` or `AGENTS.md` (the file step 4 picks) or, if they are about review, in `REVIEW.md`. Such rules never go into skill text: every project that loads the plugin reads the skills, so a rule that fits one repo belongs in that repo's own files.
+
 ### 3. Draft and diff
 
 Build every file from the seeds in this folder:
@@ -53,10 +61,11 @@ Build every file from the seeds in this folder:
 - [issue-tracker-github.md](./issue-tracker-github.md) becomes `docs/agents/issue-tracker.md`
 - [triage-labels.md](./triage-labels.md) becomes `docs/agents/triage-labels.md`
 - [domain.md](./domain.md) becomes `docs/agents/domain.md`
+- [review.md](./review.md) becomes `REVIEW.md` at the repo root, but only when the repo has none, first run or re-run. An existing `REVIEW.md` (one `retro` made, or the user's own) is never drafted over: nothing in it is removed or rewritten, and only a missing section of Important, Skip and Always check is offered, alone, as a diff; with all three present, report "no change".
 - the `## Agent skills` block (step 4)
-- `docs/index.md`, new or updated, listing every `docs/agents/` file and every doc found while exploring, in the format and under the rules of [DOCS-INDEX.md](../../upstream-skills/domain-modeling/DOCS-INDEX.md)
+- `docs/index.md`, new or updated, listing every `docs/agents/` file, `REVIEW.md` (with a "read when reviewing a change or adding an Always check line" line) and every other doc found while exploring, in the format and under the rules of [DOCS-INDEX.md](../../upstream-skills/domain-modeling/DOCS-INDEX.md)
 
-On a re-run, diff each draft against the file in the repo. Keep the values the earlier run filled in (the repo link, the label strings, the PR flag) and change only what drifted from the seeds. Show the user the diff, or "no change" per file. Let the user edit before anything is written.
+On a re-run, diff each draft against the file in the repo. Keep the values the earlier run filled in (the repo link, the label strings, the PR flag) and change only what drifted from the seeds. Show the user the diff, or "no change" per file. The rules the user gave in Section D are drafted into the diff of the file they go in (`CLAUDE.md` or `AGENTS.md`, or `REVIEW.md`) and shown before writing; adding a line to an existing `REVIEW.md` is an addition, not a rewrite. Let the user edit before anything is written.
 
 Done when the user has approved the drafts, or approved "no change".
 
