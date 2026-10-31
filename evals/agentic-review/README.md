@@ -12,7 +12,7 @@ A small fixture pull request with planted problems of known Bug classes (one of 
 
 ## How to run
 
-1. Build the fixture as a scratch repo outside this one: `plugins/dev-skills/evals/agentic-review/setup.sh <new-empty-dir>`. Branch `main` holds `base/`; branch `planted` adds one commit with the change.
+1. Build the fixture as a scratch repo outside this one: `evals/agentic-review/setup.sh <new-empty-dir>`. Branch `main` holds `base/`; branch `planted` adds one commit with the change.
 2. In a fresh session in that directory, ask for a Standard Review: "Run agentic-review at Standard depth on branch planted since main, spec at .scratch/SPEC.md". It is a single Review over a fixed point, so no pull request or Round comment is needed.
 3. Repeat in another fresh session at Deep depth.
 4. Compare each report with `EXPECTED.md` and add an entry to `RESULTS.md`. Keep `EXPECTED.md` away from the reviewing session: run it in the scratch repo, not in this one.

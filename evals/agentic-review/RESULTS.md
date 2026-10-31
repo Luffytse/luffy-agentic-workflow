@@ -1,6 +1,6 @@
 # Results
 
-One entry per run, newest first. Rerun when `agentic-review` changes, and record the plugin version from `.claude-plugin/plugin.json`.
+One entry per run, newest first. Rerun when `agentic-review` changes, and record the plugin version from `plugins/dev-skills/.claude-plugin/plugin.json`.
 
 ## Template
 

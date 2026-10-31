@@ -700,6 +700,12 @@ What:
 
 Merging an Upstream update: take Upstream's text, then re-apply the step 1 merge clause and the opening bullet's parenthesis, the Finder sentence, the two line-counting rules, the Note and filing sentences and the example Note, and in `implement` and `implement-spec` the pointer to `agentic-review` step 1. Check 41 lists the phrases.
 
+## Not a Patch: the skill evals move out of the plugin to `evals/` (issue #195)
+
+Our own, not Upstream; no Upstream text changed and no skill text changed (no skill points at the evals). The evals folder moves out of the plugin directory (`plugins/dev-skills/`) to `evals/` at the repo root, so the evals are no longer shipped in the plugin and only fit this repo. Older entries in this file that name `evals/<skill>/` mean that folder as it was inside the plugin directory; it is now at the repo root. `docs/index.md`, the plugin `README.md` folder tree and the fixture `README.md` follow. The repo's `CLAUDE.md` says a change that touches only `evals/` is not a plugin change. This move still bumps the plugin version, because `README.md` and this file are under `plugins/`.
+
+- `.claude-plugin/plugin.json`: version 0.22.12 to 0.22.13.
+
 ## Vendor model names in Upstream text
 
 None in the kept skills at the Base commit, so no Patch was needed for ADR 0002 (checked for ticket #4: grep for `haiku`, `sonnet`, `opus`, `claude-`, `gpt-`, `gemini` over `upstream-skills/`). Some kept skills start subagents (for example `grilling`, `wayfinder`, `code-review`, `implement-spec`), but none picks a model for them. Spec #1 adds tiers in later tickets (the `code-review` Finders and Verifiers, and the `implement` and `implement-spec` Implementers; the tier on each ticket from `to-tickets` is Patch 7, the `implement` Implementer's tier is Patch 8, and the `implement-spec` Implementers' tiers are Patch 11); each of those edits gets its own Patch here.

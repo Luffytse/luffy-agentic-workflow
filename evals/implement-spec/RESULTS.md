@@ -1,6 +1,6 @@
 # Results
 
-One entry per build-flow check of `implement-spec`, newest first. Rerun when `implement-spec` changes, and record the commit and the plugin version from `.claude-plugin/plugin.json`.
+One entry per build-flow check of `implement-spec`, newest first. Rerun when `implement-spec` changes, and record the commit and the plugin version from `plugins/dev-skills/.claude-plugin/plugin.json`.
 
 ## Template
 
