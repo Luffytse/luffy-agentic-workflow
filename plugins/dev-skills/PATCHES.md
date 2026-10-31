@@ -666,6 +666,17 @@ Patch 24's count and its "ask again" rule are unchanged.
 
 Merging an Upstream update: re-apply the closing line on each brief (check 38 guards them).
 
+## Patch 37: the numbering commit gets a Round when it is not trivial (`implement/`, `implement-spec/`)
+
+Why: issue #180. The commit that takes or retakes the numbers got a Round only when the merge in step 1 had conflicts. After a clean merge nothing reviewed it, though it can edit several files and rewrite cross-references; a missed reference could merge, because the checks compare headers and pairs, not prose.
+
+What:
+
+- `implement/SKILL.md` step 7.2 and `implement-spec/SKILL.md` step 8.2: "If the merge in step 1 had conflicts, run one more Round over its conflict resolutions and this commit" now also applies when the numbering commit (the first pass and every repeat) changes more than one file or rewrites a cross-reference; the Round covers this commit and any conflict resolutions: a merge-only Round if step 1 merged main (Quick depth, or the carried depth if a resolution touches logic), otherwise an ordinary Round at the carried depth over the commit alone; what it finds follows the normal Round rules. If the 5-Round cap leaves no Round, the pull request goes to the user, as the conflict case already did.
+- `.claude-plugin/plugin.json`: version 0.22.11 to 0.22.12.
+
+Merging an Upstream update: re-apply the sentence in the "Take the numbers" step of both skills.
+
 ## Not a Patch: `retro-planning` closes absorbed Retro issues only when their Ticket completed (issue #146, absorbs #95)
 
 Our own, not Upstream; no Upstream text changed. `skills/retro-planning/SKILL.md` treats an absorbed Retro issue as closing with its Ticket, or as a failed-fix candidate, only when the Ticket closed as completed; a Ticket closed any other way (not planned, duplicate, abandoned) leaves the issue in the backlog with its votes, and step 2 marks that Ticket "not fixed". ADR 0007 step 4 and the plugin README say the same.
