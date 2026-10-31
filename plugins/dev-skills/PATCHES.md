@@ -852,3 +852,14 @@ What:
 - `.claude-plugin/plugin.json`: version 0.22.24 to 0.22.25.
 
 Merging an Upstream update: take Upstream's text, then re-apply the fallback-and-check sentence in `wayfinder`'s blocking paragraph and the order clause and the sub-issue failure sentence in `to-tickets` step 5.
+
+## Patch 47: the docs index "Not listed" line names test fixtures (`domain-modeling/`, issue #241)
+
+Why: issue #241. The "Not listed" paragraph in `domain-modeling/DOCS-INDEX.md` did not say that test fixtures get no line, though `agentic-review/FINDERS.md` already does (docs index drift) and ADR 0006 now says the same (PR #240). Without it, an agent updating the index could add a line for every Markdown file in a fixture.
+
+What:
+
+- `domain-modeling/DOCS-INDEX.md` (ours, not Upstream text) "Not listed" paragraph: one new final sentence: "Test fixtures (data an eval or test runs against) are not listed either, even when they are Markdown files: the doc that describes a fixture gets a line, the fixture's own files get none."
+- `.claude-plugin/plugin.json`: version 0.22.25 to 0.22.26.
+
+Our own file (`domain-modeling/DOCS-INDEX.md` is ours, not Upstream text, Patch 4), so an Upstream update never touches it; nothing to re-apply when merging one.

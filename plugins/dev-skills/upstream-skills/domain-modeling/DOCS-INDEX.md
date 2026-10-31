@@ -30,7 +30,7 @@ Listed: glossary pages (or `GLOSSARY-MAP.md`), ADRs, `docs/agents/` setup files,
 
 In a multi-context repo, per-context glossaries and per-context ADR folders also get lines in the one root `docs/index.md`.
 
-Not listed: `CLAUDE.md` and `AGENTS.md` files, `SKILL.md` files, code, and specs, tickets and review comments that live on the issue tracker. Research findings on a throwaway branch that is never merged get no line; a note committed to a branch that merges does.
+Not listed: `CLAUDE.md` and `AGENTS.md` files, `SKILL.md` files, code, and specs, tickets and review comments that live on the issue tracker. Research findings on a throwaway branch that is never merged get no line; a note committed to a branch that merges does. Test fixtures (data an eval or test runs against) are not listed either, even when they are Markdown files: the doc that describes a fixture gets a line, the fixture's own files get none.
 
 ## How agents read it
 
