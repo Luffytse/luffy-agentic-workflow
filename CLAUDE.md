@@ -1,6 +1,6 @@
 # luffy-dev-skills
 
-A Claude Code plugin marketplace, named `luffy-dev`. Each plugin lives under `plugins/<name>/` and is listed in `.claude-plugin/marketplace.json`.
+A Claude Code and Codex plugin marketplace, named `luffy-dev`. Each plugin lives under `plugins/<name>/`. The Claude Code catalog, `.claude-plugin/marketplace.json`, lists both plugins; the Codex catalog, `.agents/plugins/marketplace.json`, lists only `dev-skills`.
 
 - `dai-portal-data`: tooling for the local DAI Portal Postgres database.
 - `dev-skills`: the development skill set used across projects, skills that began as Matt Pocock's, now our own, plus our own review pipeline. See `docs/adr/`.

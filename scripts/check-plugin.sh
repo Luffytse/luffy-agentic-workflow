@@ -127,7 +127,7 @@ except (AttributeError, KeyError, TypeError, ValueError, OSError) as error:
     sys.exit(1)
 PYCODE
 then
-  bad "codex-packaging mismatch (requires python3)"
+  bad "codex-packaging failed (see above; requires python3)"
 fi
 
 # release-files: the release skill and the release docs it reads exist (presence only; the skill's text is
