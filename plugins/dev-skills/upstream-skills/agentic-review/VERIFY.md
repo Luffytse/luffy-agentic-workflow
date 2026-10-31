@@ -18,7 +18,7 @@ Every Verifier gets: all candidate Findings in the fixed format, each tagged wit
 
 When a call drops a Finding, or marks a Nit skip, name in its line the `file:line` the reason rests on (a guard elsewhere, say), if any: the dismissal is recorded with them.
 
-Then, for each open Important from earlier Rounds or Ticket checks, check the current code and say **fixed** (cite the line that fixes it), **still open** (cite the line that still has the problem), or **dismissed** (it was never real; say why).
+Then, for each open Important from earlier Rounds or Ticket checks, check the current code and say **fixed** (cite the line that fixes it), **partly fixed** (name each fixed location, citing the line that fixes it, and the locations still open), **still open** (cite the line that still has the problem), or **dismissed** (it was never real; say why, naming the `file:line` the reason rests on, if any).
 
 To try something out (plant a line, run a check, test a commit), work in your own copy: `git archive <head> | tar -x -C <a new scratch directory>`, or a throwaway `git worktree`. Never run `git checkout`, `switch`, `stash` or `reset` in the shared tree, because an Implementer is working in it; leave it on its branch, clean.
 
@@ -40,7 +40,7 @@ Treat each call separately:
 2. The Verifiers who said it is real decide the other calls by majority.
 3. When those voters tie, the more cautious value wins: caused by this change over Pre-existing, Important over Nit, "fix" over "skip".
 
-An open Important from an earlier Round or Ticket check is closed as fixed, or dismissed, only when at least 2 of the 3 say so; otherwise it stays open.
+An open Important from an earlier Round or Ticket check is closed as fixed, or dismissed, only when at least 2 of the 3 say so, and loses a location as fixed only when 2 of the 3 call that location fixed; otherwise it stays open.
 
 ## Gap sweep
 
