@@ -11,6 +11,8 @@ cd "$dest"
 git init -q -b main
 git config user.name "eval"
 git config user.email "eval@example.invalid"
+# Build artifacts in base/ or after/ (a stray __pycache__ from running the fixture tests) are not fixture source.
+printf '%s\n' "__pycache__/" "*.pyc" >> .git/info/exclude
 cp -R "$here/base/." .
 git add -A
 git commit -q -m "splitter: money helpers and expenses"
