@@ -6,7 +6,7 @@ The default meaning of Important in `agentic-review` applies.
 
 ## Skip
 
-Nothing yet.
+- **wording edge case that needs a new clause**: in skill or doc text, an edge case whose fix adds a clause is a Nit (skip) unless an agent following the text literally would produce a wrong result. When the Ticket asks for a minimal change, weigh the clause's length against that.
 
 ## Always check
 
