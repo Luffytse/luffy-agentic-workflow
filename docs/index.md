@@ -32,6 +32,8 @@ Read this first, then open only the docs whose line fits your work. Specs and ti
 - [implement-spec eval RESULTS.md](../evals/implement-spec/RESULTS.md): one entry per build-flow check of `implement-spec`. Read to see how `implement-spec` did in its build-flow check.
 - [implement eval RESULTS.md](../evals/implement/RESULTS.md): one entry per build-flow check of `implement`. Read to see how `implement` did in its build-flow check.
 - [release eval RESULTS.md](../evals/release/RESULTS.md): one entry per dry run of `release` (a proposal only, nothing merged or labelled). Read to see how `release` did in its dry run.
+- [Codex install eval README](../evals/codex-install/README.md): the clean GitHub install, fresh-runtime skill discovery and interactive `grilling` check. Read when rerunning the Codex install check.
+- [Codex install eval RESULTS.md](../evals/codex-install/RESULTS.md): one dated entry per Codex install check, including source commit, discovered skills, exact interview turns and portability issues. Read to see what Codex support last verified.
 
 ## Code review
 
