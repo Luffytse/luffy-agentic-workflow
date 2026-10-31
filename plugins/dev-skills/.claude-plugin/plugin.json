@@ -1,6 +1,6 @@
 {
   "name": "dev-skills",
-  "description": "Development skills: a fork of Matt Pocock's skills (wayfinder, grilling, specs, tickets, TDD, code review and more), all model-invoked, plus our own skills.",
+  "description": "Development skills (wayfinder, grilling, specs, tickets, TDD, code review and more), all model-invoked. They began as Matt Pocock's skills and are now our own.",
   "version": "0.22.28",
   "author": {
     "name": "lufei.xie",
@@ -9,5 +9,5 @@
   "repository": "https://github.com/Luffytse/luffy-dev-skills",
   "license": "MIT",
   "keywords": ["skills", "tdd", "agentic-review", "grilling", "domain-modeling"],
-  "skills": ["./upstream-skills", "./skills"]
+  "skills": ["./skills"]
 }

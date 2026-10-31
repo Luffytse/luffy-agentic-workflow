@@ -10,5 +10,4 @@ Releases here cover the `dev-skills` plugin only. `dai-portal-data` has no relea
 
 ## Extra steps in the bump pull request
 
-- While `plugins/dev-skills/PATCHES.md` exists, add a "version X to Y" line for the bump to it, as `CLAUDE.md` says; `scripts/check-plugin.sh` compares that line with `plugin.json`.
 - Before pushing, run `bash scripts/check-plugin.sh` and `claude plugin validate .`.

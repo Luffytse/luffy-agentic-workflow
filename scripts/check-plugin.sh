@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Checks the dev-skills plugin layout and the Patches that ADR 0001 requires. This repo's own tooling: it lives
+# Checks the dev-skills plugin layout and its skills. This repo's own tooling: it lives
 # at the repo root, not in the plugin, so it does not ship in every project's plugin cache.
 # Run from anywhere: scripts/check-plugin.sh (or a symlink to it)
 # Same result however it runs: under `bash -e` or SHELLOPTS=errexit (this script reports every failure itself
@@ -17,25 +17,25 @@ done
 # -P / pwd -P: physical paths, so a symlinked parent directory (a linked scripts/ folder) does not make ".." the link's parent
 repo="$(CDPATH= cd -P "$(dirname "$src")/.." && pwd -P)"
 root="$repo/plugins/dev-skills" # the plugin tree
-forked="$root/upstream-skills"
+forked="$root/skills" # every skill lives here; $own below names the same folder
 fail=0
 bad() { echo "FAIL: $*"; fail=1; }
 
-kept="ask-matt wayfinder grill-with-docs grilling domain-modeling research prototype handoff to-spec to-tickets implement implement-spec tdd agentic-review pr retro diagnosing-bugs triage improve-codebase-architecture codebase-design wizard writing-for-agents"
+kept="ask-matt wayfinder grill-with-docs grilling domain-modeling research prototype handoff to-spec to-tickets implement implement-spec tdd agentic-review pr retro diagnosing-bugs triage improve-codebase-architecture codebase-design wizard writing-for-agents setup-dev-skills setup-project retro-planning release"
 dropped="teach to-questionnaire grill-me wait-what"
 
-# 1. kept-skills: exactly the 22 kept skills, each with a SKILL.md
+# 1. kept-skills: exactly the expected skills, each with a SKILL.md
 count=0
 for s in $kept; do
   [ -f "$forked/$s/SKILL.md" ] && count=$((count + 1)) || bad "missing $forked/$s/SKILL.md"
 done
-[ "$count" -eq 22 ] || bad "expected 22 skills, found $count"
+[ "$count" -eq 26 ] || bad "expected 26 skills, found $count"
 for s in $dropped; do
   [ -e "$forked/$s" ] && bad "dropped skill present: $s"
 done
 if [ -d "$forked" ]; then
   for f in "$forked"/* "$forked"/.[!.]*; do
-    [ -e "$f" ] && [ ! -d "$f" ] && bad "stray file in upstream-skills: $(basename "$f")"
+    [ -e "$f" ] && [ ! -d "$f" ] && bad "stray file in skills: $(basename "$f")"
   done
   for d in "$forked"/*/; do
     n="$(basename "$d")"
@@ -77,32 +77,27 @@ fi
 # 4. licence-manifest-docs: licence, manifest, docs
 [ -f "$root/LICENSE-mattpocock-skills" ] || bad "missing LICENSE-mattpocock-skills"
 [ -f "$root/.claude-plugin/plugin.json" ] || bad "missing .claude-plugin/plugin.json"
-[ -f "$root/PATCHES.md" ] || bad "missing PATCHES.md"
 [ -f "$root/README.md" ] || bad "missing README.md"
-if [ -f "$root/PATCHES.md" ]; then
-  grep -q "Upstream commit" "$root/PATCHES.md" || bad "PATCHES.md does not record the Upstream commit"
-  grep -q "disable-model-invocation" "$root/PATCHES.md" || bad "PATCHES.md does not record the model-invocation change"
-fi
+grep -q "Last Upstream commit looked at" "$root/README.md" || bad "README.md does not record the last Upstream commit looked at"
 
 # 5. codex-implicit-invocation: every skill is implicitly invocable in the Codex/OpenAI metadata too
 if [ -d "$forked" ] && grep -rn --include=openai.yaml 'allow_implicit_invocation: false' "$forked"; then
   bad "a skill's agents/openai.yaml still sets allow_implicit_invocation: false"
 fi
 
-# 6. vendor-model-names: no vendor model names in forked or own text (ADR 0002): skills name cheap,
-# regular or premium tiers. The README tier table, PATCHES.md (which describes this
-# grep), this script and ADR 0002 (which define the tiers by naming the models) are exempt.
+# 6. vendor-model-names: no vendor model names in skill text (ADR 0002): skills name cheap,
+# regular or premium tiers. The README tier table, this script and ADR 0002 (which define the tiers by naming the models) are exempt.
 plugin_rel="plugins/dev-skills"
 # NUL-separated file list and a check on grep's output (not xargs' exit code), so file
 # names with spaces and multi-batch xargs runs cannot hide a match.
 hits="$(cd "$repo" && find . -type f -not -path './.git/*' \
-  -not -path "./$plugin_rel/README.md" -not -path "./$plugin_rel/PATCHES.md" \
+  -not -path "./$plugin_rel/README.md" \
   -not -path './scripts/check-plugin.sh' -not -path './LICENSE*' \
   -not -path "./$plugin_rel/LICENSE-mattpocock-skills" -not -path './docs/adr/0002-*' -print0 |
   xargs -0 grep -nIiE '\b(haiku|sonnet|opus)\b|claude[-_]?(opus|sonnet|haiku|[0-9])|\bgpt-?[0-9]|\bgemini\b')"
 if [ -n "$hits" ]; then
   echo "$hits"
-  bad "forked or own text names a vendor model"
+  bad "skill text names a vendor model"
 fi
 
 # 7. docs-index: docs index (ADR 0006): the rule file exists, writing skills link it, reading skills start at the index
@@ -195,9 +190,9 @@ fi
 grep -qiF 'integration branch' "$forked/ask-matt/SKILL.md" && bad "ask-matt/SKILL.md still says integration branch"
 
 # 15. no-code-review-skill: no skill tells an agent to run the built-in `code-review` (issue #50): our review skill is
-# `agentic-review`. Scoped to skill text (upstream-skills/ and skills/, *.md and *.yaml). The
+# `agentic-review`. Scoped to skill text (skills/, *.md and *.yaml). The
 # `<!-- code-review kind=...` Round-comment markers are a data format, not a skill name, and
-# PATCHES.md, ADRs, evals and this script are outside the scope.
+# ADRs, evals and this script are outside the scope.
 if [ -d "$forked" ]; then
   scan=("$forked"); [ -d "$own" ] && scan+=("$own") # an array: a checkout path with a space must not split
   if grep -rnE --include=*.md --include=*.yaml '`(dev-skills:)?code-review`|(^|[^a-z-])/code-review([^a-z-]|$)|dev-skills:code-review|^name:[[:space:]]*code-review|[Tt]he code-review skill' "${scan[@]}"; then
@@ -208,14 +203,14 @@ fi
 
 # 16. no-person-names: no person's name in skill or doc text (issues #49, retro of PR #54): text says "the user", never
 # the maintainer's name. The marketplace and repo names (luffy-dev, luffy-dev-skills), the GitHub
-# owner Luffytse and the project name luffydev are not people. Checks upstream-skills/, skills/ and
+# owner Luffytse and the project name luffydev are not people. Checks skills/ and
 # the plugin README, and the repo's CLAUDE.md, GLOSSARY.md and docs/ (all of it). Not the manifests
 # (author fields) or dai-portal-data.
 # Paths are relative to each root (in a subshell, so cwd is unchanged), so a checkout under a path
 # such as ~/ cannot trip the check. awk keeps the script portable (no GNU-only flags).
 name_awk='{l=tolower($0); gsub(/luffy-dev-skills|luffy-dev|luffytse|luffydev/,"",l); if (l ~ /lufei|luffy/) print FILENAME ":" FNR ": " $0}'
 name_hits="$(
-  (cd "$root" && find upstream-skills skills README.md -type f -print0 2>/dev/null | xargs -0 awk "$name_awk" 2>/dev/null)
+  (cd "$root" && find skills README.md -type f -print0 2>/dev/null | xargs -0 awk "$name_awk" 2>/dev/null)
   (cd "$repo" && find CLAUDE.md GLOSSARY.md docs -type f -print0 2>/dev/null | xargs -0 awk "$name_awk" 2>/dev/null)
 )"
 if [ -n "$name_hits" ]; then
@@ -273,48 +268,6 @@ else
 fi
 grep -qF '`/retro-planning`' "$forked/ask-matt/SKILL.md" || bad "ask-matt/SKILL.md does not route to \`/retro-planning\`"
 
-# 21. patches-agree: PATCHES.md and this script agree on check numbers and names (retro of PR #56, #78): every
-# check header here reads "# N. <name>: ..." and every "new check N (<name>..." line in PATCHES.md must match
-# one header as a pair, so a line pointing at another check's number fails even when that number is named
-# elsewhere; no pair is claimed as new twice; and every check from 9 up is named as "check N" somewhere in
-# PATCHES.md. Two further rules work on numbers alone: a number claimed as new under two different names
-# fails, and so do two headers sharing a number (2 and 2b are different header numbers; for the pairs, 2b
-# is written as 2). A check added since the switch to Releases has a name and no number (CLAUDE.md): its
-# "# <name>: ..." header and a "new check `<name>`" line are not numbered, so these rules skip them.
-self="$repo/scripts/check-plugin.sh"
-patches="$root/PATCHES.md"
-if [ ! -f "$patches" ]; then bad "missing PATCHES.md"
-else
-  num='([0-9]+)'
-  nameless=$(grep -E "^# ${num}b?\\." "$self" | grep -vE "^# ${num}b?\\. [a-z0-9-]+:" | sed -E "s/^# ${num}.*/\\1/")
-  for n in $nameless; do bad "check-plugin.sh check $n has no name in its header (# $n. <name>: ...)"; done
-  headers=$(grep -E "^# ${num}b?\\. [a-z0-9-]+:" "$self" | sed -E "s/^# ${num}b?\\. ([a-z0-9-]+):.*/\\1 \\2/" | sort -u)
-  claimed=$(grep -oiE "new check ${num} \\([a-z0-9-]+[:)]" "$patches" | sed -E 's/^[^ ]+ [^ ]+ ([^ ]+) \(([a-z0-9-]+).$/\1 \2/')
-  # a "new check N" with no (<name>...) after it cannot be paired
-  unnamed=$(grep -oiE "new check ${num}( \\([a-z0-9-]+[:)])?" "$patches" | grep -v '(' | sed -E 's/^[^ ]+ [^ ]+ //')
-  for n in $unnamed; do bad "PATCHES.md says \"new check $n\" without the check's name; write new check $n (<name>)"; done
-  while IFS= read -r pair; do
-    [ -n "$pair" ] || continue
-    printf '%s\n' "$headers" | grep -qxF "$pair" || bad "PATCHES.md says \"new check ${pair% *} (${pair#* }\" but check-plugin.sh has no \"# ${pair% *}. ${pair#* }:\" check"
-  done <<< "$claimed"
-  for pair in $(printf '%s\n' "$claimed" | sort | uniq -d | tr ' ' '~'); do
-    bad "PATCHES.md claims \"new check ${pair//\~/ }\" more than once"
-  done
-  # a number is claimed as new once, whatever the name, and is the number of one header only (2 and 2b are
-  # different headers)
-  for n in $(printf '%s\n' "$claimed" | awk '$1 ~ /^[0-9]+$/ {print $1}' | sort | uniq -d); do
-    bad "PATCHES.md claims \"new check $n\" more than once (under different names)"
-  done
-  for n in $(grep -oE '^# [0-9]+b?\.' "$self" | sed -E 's/^# (.*)\.$/\1/' | sort | uniq -d); do
-    bad "check-plugin.sh has more than one \"# $n.\" header"
-  done
-  mentioned=$(grep -oiE 'check [0-9]+' "$patches" | sed -E 's/.* //' | sort -u)
-  for n in $(printf '%s\n' "$headers" | awk '$1 ~ /^[0-9]+$/ {print $1}' | sort -u); do
-    [ "$n" -ge 9 ] || continue
-    printf '%s\n' "$mentioned" | grep -qx "$n" || bad "PATCHES.md never names check $n"
-  done
-fi
-
 # 22. agentic-review-strengths: agentic-review takes the built-in review's strengths (issue #51): a fixed-point Review includes
 # uncommitted work, every Finding states a failure scenario, Finders pass on unsure candidates, the
 # new adversarial angles exist, the Verifier keeps realistic rare paths, and Deep runs a gap sweep
@@ -347,13 +300,13 @@ if [ -f "$am" ]; then
   grep -F 'Bugs and requests piling up' "$am" | grep -qF '`/implement-spec`' || bad "ask-matt/SKILL.md triage on-ramp does not send an issue under a Spec to /implement-spec"
 fi
 
-# 24. setup-dev-skills: setup-dev-skills is our own skill (issue #77), not a fork of Upstream's setup skill: the forked
+# 24. setup-dev-skills: setup-dev-skills is our own skill (issue #77), not a copy of Upstream's setup skill: the old
 # folder is gone, the own skill exists with its seeds and no openai.yaml, credits Matt Pocock's skills and its
 # licence file, is GitHub only, creates the wayfinder labels, and reports (never changes) GitHub settings
 sd="$own/setup-dev-skills"
-# the old name is built from two halves so that grep for it finds only PATCHES.md history
+# the old name is built from two halves so that grep for it finds nothing
 old="setup-matt-""pocock-skills"
-[ -e "$forked/$old" ] && bad "upstream-skills/$old is back; the skill is skills/setup-dev-skills"
+[ -e "$forked/$old" ] && bad "skills/$old is back; the skill is skills/setup-dev-skills"
 if [ ! -f "$sd/SKILL.md" ]; then bad "missing skills/setup-dev-skills/SKILL.md"
 else
   for f in issue-tracker-github.md triage-labels.md domain.md; do
@@ -393,19 +346,6 @@ if [ -f "$gr" ]; then
 fi
 [ -f "$sp" ] && grep -qF 'This overrides' "$sp" && bad "setup-project/SKILL.md still overrides grilling's round size"
 
-# 27. version-bumps: Version bumps in PATCHES.md agree with plugin.json (retro of PR #91: stale or duplicated version
-# numbers after renumbering came up 4 times): no "version X to Y" bump has the same target Y twice, and
-# the highest Y is plugin.json's version. A gap-free chain is not required (history has gaps). Since the switch
-# to Releases (ADR 0008) no ordinary pull request changes the version, so a version change with no new
-# "version X to Y" line in PATCHES.md fails here; a Release's bump pull request adds that line while
-# PATCHES.md exists.
-bumps="$(grep -oE 'version [0-9]+\.[0-9]+\.[0-9]+ to [0-9]+\.[0-9]+\.[0-9]+' "$root/PATCHES.md" | awk '{print $4}')"
-dup="$(printf '%s\n' "$bumps" | sort | uniq -d | tr '\n' ' ')"
-[ -z "$dup" ] || bad "PATCHES.md has more than one version bump to: $dup"
-top="$(printf '%s\n' "$bumps" | sort -V | tail -1)"
-cur="$(sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$root/.claude-plugin/plugin.json" | head -1)"
-[ -n "$top" ] && [ "$top" = "$cur" ] || bad "plugin.json is version $cur but the highest version bump in PATCHES.md is to ${top:-none}"
-
 # 28. report-counts: agentic-review counts reports (issue #102, absorbs #44): cheap-tier Finders ended without returning
 # their report in five threads and the Review went on without them. No script can see a subagent end
 # early, so the thread counts reports itself (SKILL.md: Find, Verify and the gap sweep). This check guards
@@ -422,7 +362,7 @@ done
 # must say to work in a copy (`git archive` or a throwaway `git worktree`) and forbid checkout, switch,
 # stash and reset in the shared tree. The Implementer's push check is a step it carries out; no script sees it.
 for f in FINDERS.md VERIFY.md; do
-  rb="$root/upstream-skills/agentic-review/$f"
+  rb="$root/skills/agentic-review/$f"
   [ -f "$rb" ] || continue
   for w in 'own copy' 'git archive' 'git worktree' '`git checkout`' '`switch`' '`stash`' '`reset`' 'shared tree' 'on its branch'; do
     grep -qF -- "$w" "$rb" || bad "agentic-review/$f does not carry the copy rule ($w)"
@@ -496,15 +436,8 @@ for s in to-tickets wayfinder; do
   grep -qF 'build threads to start' "$forked/$s/SKILL.md" && bad "$s still offers setup-project because build threads are ready to start"
 done
 
-# 35. patch-heading-numbers: no two "## Patch N" headings in PATCHES.md share a number (issue #123). A Patch added
-# since the switch to Releases is headed "## Patch: <name>" with no number (CLAUDE.md), so it is not counted.
-dup_patch="$(grep -oE '^## Patch [0-9]+' "$root/PATCHES.md" | awk '{print $3}' | sort | uniq -d)"
-for n in $dup_patch; do
-  bad "PATCHES.md has more than one \"## Patch $n\" heading"
-done
-
 # 36. skill-name-matches-folder: a skill's SKILL.md frontmatter name: equals its folder name (issue #61), for
-# upstream-skills/ and skills/. The frontmatter is the block between the first two --- lines; quotes are ignored.
+# skills/. The frontmatter is the block between the first two --- lines; quotes are ignored.
 for d in "$forked"/*/ "$own"/*/; do
   [ -f "${d}SKILL.md" ] || continue
   folder="$(basename "$d")"
@@ -542,7 +475,7 @@ vl="$(grep -F 'Answer per Finding:' "$ar/VERIFY.md")"
 case "$vl" in *"$closing\"") ;; *) bad "agentic-review/VERIFY.md Verifier brief does not end with the closing line" ;; esac
 
 # 39. repo-free-skill-text: skill text leans on nothing that exists only in this repo (issue #177), because every
-# project that loads the plugin reads it. Under upstream-skills/ and skills/ (*.md and *.yaml), no "ADR NNNN" (this
+# project that loads the plugin reads it. Under skills/ (*.md and *.yaml), no "ADR NNNN" (this
 # repo's ADR numbers mean another decision, or nothing, elsewhere) and no "Upstream" (this repo's glossary word for
 # Matt Pocock's repo). Lowercase "upstream" (a fork's parent repo) is fine, and so is an example docs index line that
 # links its own ADR file ("[ADR 0003](adr/0003-...").
@@ -627,7 +560,7 @@ if [ ! -f "$rl/SKILL.md" ]; then bad "missing skills/release/SKILL.md"
 else
   grep -qF 'release doc' "$rl/SKILL.md" || bad "release/SKILL.md does not read the repo's release doc"
   grep -qF 'setup-dev-skills' "$rl/SKILL.md" || bad "release/SKILL.md does not send the user to setup-dev-skills when the repo has no release doc"
-  hits="$(grep -rnE 'PATCHES\.md|check-plugin|plugin\.json|luffy|Luffytse|dai-portal|mattpocock' "$rl")"
+  hits="$(grep -rnE 'check-plugin|plugin\.json|luffy|Luffytse|dai-portal|mattpocock' "$rl")"
   if [ -n "$hits" ]; then echo "$hits"; bad "release skill text names a file, repo or project only this repo has"; fi
 fi
 for rd in "$own/setup-dev-skills/release.md" "$repo/docs/agents/release.md"; do

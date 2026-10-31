@@ -17,12 +17,8 @@ One instruction file (`SKILL.md` plus helper files) that an agent follows for on
 _Avoid_: command, prompt
 
 **Upstream**:
-Matt Pocock's public skills repo (`mattpocock/skills`), which `dev-skills` is forked from.
+Matt Pocock's public skills repo (`mattpocock/skills`), where the `dev-skills` skills began. They are our own now; we watch Upstream and take one idea at a time through triage (ADR 0001).
 _Avoid_: original, source
-
-**Patch**:
-One change we made to text that came from Upstream, recorded in `PATCHES.md`.
-_Avoid_: customization, override
 
 **Model tier**:
 How strong a model a step needs: **cheap**, **regular**, or **premium**. Each agent maps the tiers to its own models, so a skill names a tier and never a vendor's model.

@@ -4,7 +4,7 @@ Read this first, then open only the docs whose line fits your work. Specs and ti
 
 ## Whole repo
 
-- [GLOSSARY.md](../GLOSSARY.md): the words used here (Plugin, Patch, Model tier, Spec, Ticket, Release, Implementer, Finder, Verifier, Round, Retro issue...). Read when writing or reviewing any skill text.
+- [GLOSSARY.md](../GLOSSARY.md): the words used here (Plugin, Model tier, Spec, Ticket, Release, Implementer, Finder, Verifier, Round, Retro issue...). Read when writing or reviewing any skill text.
 
 ## Agent setup
 
@@ -17,11 +17,10 @@ Read this first, then open only the docs whose line fits your work. Specs and ti
 
 - [README.md](../README.md): how to add the marketplace and install its plugins. Read when changing install steps.
 - [dai-portal-data README](../plugins/dai-portal-data/README.md): the DAI Portal database plugin. Read only when working on that plugin.
-- [dev-skills README](../plugins/dev-skills/README.md): what the plugin is, install steps, the model-tier table and the forked/own folder layout. Read when installing the plugin, adding a skill of our own, or mapping a tier to a model.
-- [dev-skills PATCHES.md](../plugins/dev-skills/PATCHES.md): the Upstream commit and every change we made to Upstream text. Read before changing anything under `upstream-skills/` or merging an Upstream update.
-- [DOCS-INDEX.md](../plugins/dev-skills/upstream-skills/domain-modeling/DOCS-INDEX.md): the docs index format and update rule every writing skill follows. Read when changing how skills keep `docs/index.md` current.
-- [scripts/check-plugin.sh](../scripts/check-plugin.sh): this repo's own checker for the `dev-skills` layout and the Patches; it lives outside the plugin so it does not ship to projects. Read when adding or changing a check, or before pushing a plugin change.
-- [ADR 0001](adr/0001-dev-skills-is-one-plugin-forked-from-matt-pocock.md): why `dev-skills` is one plugin forked from Matt Pocock's skills, and which skills it keeps. Read when adding, dropping or patching a skill.
+- [dev-skills README](../plugins/dev-skills/README.md): what the plugin is, install steps, the model-tier table, the folder layout and the last Upstream commit looked at. Read when installing the plugin, adding a skill of our own, or mapping a tier to a model.
+- [DOCS-INDEX.md](../plugins/dev-skills/skills/domain-modeling/DOCS-INDEX.md): the docs index format and update rule every writing skill follows. Read when changing how skills keep `docs/index.md` current.
+- [scripts/check-plugin.sh](../scripts/check-plugin.sh): this repo's own checker for the `dev-skills` layout; it lives outside the plugin so it does not ship to projects. Read when adding or changing a check, or before pushing a plugin change.
+- [ADR 0001](adr/0001-dev-skills-is-one-plugin-forked-from-matt-pocock.md): why `dev-skills` is one plugin that began as Matt Pocock's skills and is now our own, and which skills it keeps. Read when adding or dropping a skill, or when the Upstream watch finds an idea.
 - [ADR 0002](adr/0002-skills-name-model-tiers-not-models.md): skills name cheap, regular or premium tiers, never models. Read when a skill picks a model.
 
 ## Building

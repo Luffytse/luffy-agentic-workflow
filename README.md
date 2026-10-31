@@ -7,7 +7,7 @@ Personal Claude Code plugin marketplace.
 | Plugin | Description |
 |--------|-------------|
 | [`dai-portal-data`](plugins/dai-portal-data/) | Local DAI Portal Postgres docker lifecycle + verified query cookbook for the `example_db` schema |
-| [`dev-skills`](plugins/dev-skills/) | Development skills: a model-invocable fork of Matt Pocock's skills plus our own (wayfinder, grilling, specs, tickets, TDD, code review) |
+| [`dev-skills`](plugins/dev-skills/) | Development skills: model-invocable skills that began as Matt Pocock's and are now our own (wayfinder, grilling, specs, tickets, TDD, code review) |
 
 ## Install
 
@@ -49,7 +49,7 @@ claude plugin install dai-portal-data@luffy-dev
 claude plugin install dev-skills@luffy-dev
 ```
 
-For `dev-skills`, run `scripts/check-plugin.sh` and `claude plugin validate .` before pushing, and record any change to Upstream text in `plugins/dev-skills/PATCHES.md`.
+For `dev-skills`, run `scripts/check-plugin.sh` and `claude plugin validate .` before pushing.
 
 ## Layout
 
@@ -67,8 +67,7 @@ luffy-dev-skills/
     └── dev-skills/
         ├── .claude-plugin/
         │   └── plugin.json     # plugin manifest
-        ├── upstream-skills/    # forked from Matt Pocock's skills
-        ├── skills/             # our own skills
+        ├── skills/             # the skills
         ├── CHANGELOG.md        # what each version brought
-        └── PATCHES.md          # changes to Upstream text
+        └── LICENSE-mattpocock-skills  # MIT notice for the skills that began as Matt Pocock's
 ```
