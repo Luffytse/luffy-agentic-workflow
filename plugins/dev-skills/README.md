@@ -30,7 +30,7 @@ plugins/dev-skills/
 └── LICENSE-mattpocock-skills    # Upstream's MIT notice
 ```
 
-To add a skill, create `skills/<name>/SKILL.md`; `plugin.json` already points at the folder.
+To add a skill, create `skills/<name>/SKILL.md` and `skills/<name>/agents/openai.yaml` with a readable `display_name` matching the folder name, a `short_description` and `policy.allow_implicit_invocation: true`; `plugin.json` already points at the folder.
 
 ## Skills added since the copy
 

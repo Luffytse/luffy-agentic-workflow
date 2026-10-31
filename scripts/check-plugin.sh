@@ -16,6 +16,7 @@
 #   plugin-manifest              plugin.json, README.md, CHANGELOG.md and the licence file exist; plugin.json names its repository
 #   codex-packaging              Codex marketplace exposes only dev-skills, with matching manifest identity and shared skills path
 #   release-files                the release skill, its release doc seed and this repo's release doc exist
+#   openai-metadata-present      every skill folder has agents/openai.yaml
 #   codex-implicit-invocation    no agents/openai.yaml turns implicit invocation off
 #   openai-display-name          each agents/openai.yaml display_name reads like its skill's folder name
 #   vendor-model-names           no vendor model name in the repo's text (ADR 0002)
@@ -133,6 +134,12 @@ fi
 # covered by repo-free-skill-text)
 for f in "$skills/release/SKILL.md" "$skills/setup-dev-skills/release.md" "$repo/docs/agents/release.md"; do
   [ -f "$f" ] || bad "missing ${f#"$repo"/}"
+done
+
+# openai-metadata-present: every skill folder carries Codex/OpenAI metadata
+for d in "$skills"/*/; do
+  [ -d "$d" ] || continue
+  [ -f "${d}agents/openai.yaml" ] || bad "skill $(basename "$d"): missing agents/openai.yaml"
 done
 
 # codex-implicit-invocation: every skill is implicitly invocable in the Codex/OpenAI metadata too
