@@ -1,6 +1,6 @@
 ---
 name: pr
-description: "Use when writing a PR body."
+description: "Use when writing a PR title and body."
 metadata:
   credits:
     skill: show-me
@@ -8,6 +8,14 @@ metadata:
     organisation: Humanlayer
     url: "https://github.com/humanlayer/skills/blob/main/plugins/show-me/skills/show-me/SKILL.md"
 ---
+
+## Title
+
+Write the title as `<type>: <summary>` (Conventional Commits). An optional scope goes after the type: `<type>(<scope>): <summary>`. The type is one of `feat`, `fix`, `docs`, `chore`, `refactor`, `test`. Pick it by what the change does: new behaviour `feat`, a fix `fix`, docs only `docs`, tooling and housekeeping `chore`, no behaviour change `refactor`, tests only `test`. A breaking change puts `!` after the type (or scope): `feat!: <summary>`. The summary is one short line in the imperative. The title becomes the commit title on main, so it must make sense read alone in the history.
+
+If the repo's own rules (its `CLAUDE.md`, `AGENTS.md` or docs) set another title convention, follow that one instead.
+
+## Body
 
 Use this template for writing the PR body:
 
