@@ -737,6 +737,17 @@ What:
 
 Merging an Upstream update: take Upstream's text, then re-apply the matching sentence in Rank step 2.
 
+## Patch 40: `implement` step 7.2 tells the Implementer to update the pull request body (`implement/`)
+
+Why: issue #198 (Finding R1-8 of the review of #193). Only `implement-spec` step 8.2 said "Update the pull request body if it names those numbers."; `implement` covered a repeat (cross-references rewritten "in the pull request body too") but not the first numbering pass, so a Ticket's pull request body quoting its version or Patch number kept the old number.
+
+What:
+
+- `implement/SKILL.md` step 7.2: adds "Update the pull request body if it names those numbers." after "A bump the rules require is never skipped.", as in `implement-spec/SKILL.md` step 8.2.
+- `.claude-plugin/plugin.json`: version 0.22.18 to 0.22.19.
+
+Merging an Upstream update: `implement/SKILL.md` is replaced whole (Patch 8); carry nothing over, but keep this sentence in step 7.2 (and keep `implement-spec` step 8.2 in step).
+
 ## Vendor model names in Upstream text
 
 None in the kept skills at the Base commit, so no Patch was needed for ADR 0002 (checked for ticket #4: grep for `haiku`, `sonnet`, `opus`, `claude-`, `gpt-`, `gemini` over `upstream-skills/`). Some kept skills start subagents (for example `grilling`, `wayfinder`, `code-review`, `implement-spec`), but none picks a model for them. Spec #1 adds tiers in later tickets (the `code-review` Finders and Verifiers, and the `implement` and `implement-spec` Implementers; the tier on each ticket from `to-tickets` is Patch 7, the `implement` Implementer's tier is Patch 8, and the `implement-spec` Implementers' tiers are Patch 11); each of those edits gets its own Patch here.
