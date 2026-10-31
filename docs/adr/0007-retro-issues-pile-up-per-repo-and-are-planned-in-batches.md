@@ -9,7 +9,7 @@
 - `retro` finds the `dev-skills` repo from the `repository` field of the plugin's manifest (`plugins/dev-skills/.claude-plugin/plugin.json`), and the project's tracker from its `docs/agents/issue-tracker.md`. When the thread cannot write to the `dev-skills` repo, `retro` puts the issue text in its report so the coordinator can file it.
 - **Votes.** When an open Retro issue already covers a suggestion, `retro` comments "seen again in <thread>" on it instead of opening a duplicate.
 - **Trigger.** After filing, `retro` counts the repo's open Retro issues and reads the newest closed Retro planning record. Its report says Retro planning is due when 10 or more are open, or when 2 weeks have passed since the last planning and at least 4 are open. The numbers live in one place in the skill. The person decides when to start; the coordinator offers a thread.
-- `implement` and `implement-spec` run `retro` on their own thread as their last step, once the pull request is merged or handed to the person. Planning threads keep their project's rule instead.
+- `implement` and `implement-spec` run `retro` on their own thread as their last step, once the pull request is merged and its issue is closed; a thread that handed its pull request to the person waits, and runs `retro` after the person merges it, or asks whether to run it if the person drops or closes the pull request unmerged, or the thread never opened one. Planning threads keep their project's rule instead.
 
 ## Retro planning (what `retro-planning` does)
 

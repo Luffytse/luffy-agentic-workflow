@@ -815,3 +815,15 @@ What:
 - `.claude-plugin/plugin.json`: version 0.22.21 to 0.22.22.
 
 Merging an Upstream update: take Upstream's text, then re-apply the matching in steps 1 and 3, the open-only condition in step 3 and the unchanged-code condition in step 2.
+
+## Patch 44: `implement` and `implement-spec` run `retro` after the merge, not when the pull request waits for the user (`implement/`, `implement-spec/`)
+
+Why: issue #232. Patch 17 ran `retro` "whether the pull request was merged or handed to the user", so a Build thread retroed as soon as its Review was clean and the pull request waited for the user, before the work was finished. The user wants the retro to look back on finished work.
+
+What:
+
+- `implement/SKILL.md` (step 9) and `implement-spec/SKILL.md` (step 10): `retro` runs once the pull request is merged and its issue is closed (the Spec and its tickets, for a Spec). A thread that handed its pull request to the user reports as before, stays open, and runs the retro after the user merges it or says it is merged; if the user drops it or closes it unmerged (or, for a Spec, no pull request was opened because no ticket landed), the thread asks whether they want a retro. The retro's outcome goes to the user (or the coordinator) as its own message, since the earlier report is already sent. The last step still names `retro` and `REVIEW.md`, so check 18 holds.
+- Not Upstream text: `docs/adr/0007-retro-issues-pile-up-per-repo-and-are-planned-in-batches.md`, Filing line on when the build skills run `retro`, says the same.
+- `.claude-plugin/plugin.json`: version 0.22.22 to 0.22.23.
+
+Merging an Upstream update: take Upstream's text, then re-apply the timing sentence at the start of the final retro step in both skills.
