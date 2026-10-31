@@ -2,9 +2,9 @@
 
 What each version of `dev-skills` brought, newest first. A version changes only when a Release is cut, and each Release adds one entry here: its goal, the issues it shipped, and what a project using the plugin must do when something breaks.
 
-## 0.22.27 and earlier
+## 0.22.28 and earlier
 
-Before Releases, every merged change to the plugin bumped its version, so the versions up to 0.22.27 have no entries of their own; the repo's git history records each change and its bump. The versions that brought something new:
+Before Releases, every merged change to the plugin bumped its version, so the versions up to 0.22.28 have no entries of their own; the repo's git history records each change and its bump. The versions that brought something new:
 
 - **0.2.0**: skills find docs through one docs index, `docs/index.md`. The plugin started as a fork of Matt Pocock's skills, every one model-invoked.
 - **0.4.0**: the review skill runs Find, Verify and Rank in Rounds.
@@ -24,4 +24,4 @@ Before Releases, every merged change to the plugin bumped its version, so the ve
 - **0.20.0**: `handoff` saves where the next agent can read it.
 - **0.21.0**: `grilling` states a rule's purpose and checks a recommendation's facts.
 - **0.22.0**: `agentic-review` returns design Findings to the user as grilling.
-- **0.22.1 to 0.22.27**: fixes and clarifications, among them `setup-dev-skills` writing a starter `REVIEW.md` (0.22.11) and the tracker doc's REST routes and fallback forms for blocking and sub-issues (0.22.14 to 0.22.27).
+- **0.22.1 to 0.22.28**: fixes and clarifications, among them `setup-dev-skills` writing a starter `REVIEW.md` (0.22.11) and the tracker doc's REST routes and fallback forms for blocking and sub-issues (0.22.14 to 0.22.27), and `agentic-review` Rank edge cases (matching per location at one head, raising held Findings, partly fixed rows, Verifier dismissals closing earlier Findings; 0.22.28).

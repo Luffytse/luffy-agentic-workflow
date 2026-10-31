@@ -26,7 +26,7 @@ Done when you have stated the title, know the graph and the frontier, and know e
 
 ## 2. Make the Spec branch
 
-Create the Spec branch from an up-to-date main and push it. Keep your own checkout on it: any Implementer working on the Spec branch itself (steps 6.1 and 7) works there, and while one does, you run no git commands that change that checkout (merge, squash, commit, checkout, switch, reset); `git worktree add` and `git worktree remove` are fine. To read a head, fetch and use `git show` or `git diff`, or `git archive` it into a scratch directory. Here and below, "fetch main" means `git fetch origin <default-branch>`; merge, diff and compare against `origin/<default-branch>` (also as `agentic-review`'s `<base>`), never a local `main` that may be stale. Done when the branch exists on the remote.
+Create the Spec branch from an up-to-date main and push it. Keep your own checkout on it: any Implementer working on the Spec branch itself (steps 6.1, 7 and 8.1) works there, and while one does, you run no git commands that change that checkout (merge, squash, commit, checkout, switch, reset); `git worktree add` and `git worktree remove` are fine. To read a head, fetch and use `git show` or `git diff`, or `git archive` it into a scratch directory. Here and below, "fetch main" means `git fetch origin <default-branch>`; merge, diff and compare against `origin/<default-branch>` (also as `agentic-review`'s `<base>`), never a local `main` that may be stale. Done when the branch exists on the remote.
 
 ## 3. Start an Implementer per frontier ticket
 
