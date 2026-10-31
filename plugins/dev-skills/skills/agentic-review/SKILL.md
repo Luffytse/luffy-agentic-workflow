@@ -36,7 +36,7 @@ Pick Deep for risky changes (security, money, deleting data, or anything the use
 
 Record `git rev-parse HEAD` as this Review's head. Confirm every ref resolves (`git rev-parse`) and the diff (with the untracked files) is non-empty: a bad ref or empty diff fails here, not inside parallel subagents.
 
-For a pull request, read every earlier comment by this skill on it (the `<!-- code-review` marker lines in [ROUNDS.md](ROUNDS.md#the-round-comment)): they give the Round number, the depth (the carried depth is the one in the latest comment that is not a merge-only Round's), the last head, and every Finding already raised, dismissed or open. Ticket-check comments count as already raised: their open Importants stay open until a Verifier confirms them fixed or dismisses them as never real, or until they are dismissed because the user kept the design or merged into another row ([ROUNDS.md](ROUNDS.md#rank) step 3). For a Ticket check, read the earlier checks of the same Ticket the same way.
+For a pull request, read every earlier comment by this skill on it (the `<!-- code-review` marker lines in [ROUNDS.md](ROUNDS.md#the-round-comment)): they give the Round number, the depth (the carried depth is the one in the latest Round comment that is not a merge-only Round's), the last head, and every Finding already raised, dismissed or open. Ticket-check comments count as already raised: their open Importants stay open until a Verifier confirms them fixed or dismisses them as never real, or until they are dismissed because the user kept the design or merged into another row ([ROUNDS.md](ROUNDS.md#rank) step 3). For a Ticket check, read the earlier checks of the same Ticket the same way.
 
 ### 2. Find the spec and standards sources
 
