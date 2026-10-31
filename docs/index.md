@@ -8,7 +8,7 @@ Read this first, then open only the docs whose line fits your work. Specs and ti
 
 ## Agent setup
 
-- [docs/agents/issue-tracker.md](agents/issue-tracker.md): this repo's issues live on GitHub, and the commands for issues, sub-issues and blocking. Read when a skill creates, reads, labels or closes an issue.
+- [docs/agents/issue-tracker.md](agents/issue-tracker.md): this repo's issues live on GitHub, and the commands for issues, sub-issues, blocking and adding a line to an existing issue body. Read when a skill creates, reads, edits the body of, labels or closes an issue.
 - [docs/agents/triage-labels.md](agents/triage-labels.md): the label string for each triage role, and the labels that are not triage roles. Read when applying or filtering triage labels.
 - [docs/agents/domain.md](agents/domain.md): the single-context doc layout and how skills read the glossary and ADRs. Read when a skill looks for domain docs or flags an ADR conflict.
 

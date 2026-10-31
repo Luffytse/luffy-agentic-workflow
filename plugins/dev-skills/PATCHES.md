@@ -863,3 +863,17 @@ What:
 - `.claude-plugin/plugin.json`: version 0.22.25 to 0.22.26.
 
 Our own file (`domain-modeling/DOCS-INDEX.md` is ours, not Upstream text, Patch 4), so an Upstream update never touches it; nothing to re-apply when merging one.
+
+## Patch 48: `to-tickets` and `wayfinder` point their fallback sentences at the tracker doc's way of adding a line to an issue body (`to-tickets/`, `wayfinder/`, issues #248 and #249)
+
+Why: issue #249. The fallback forms (`Blocked by:`, `Part of #<parent>`) are body lines written into an issue that already exists, but the tracker doc had no operation that edits a body, so an agent improvised `gh issue edit --body`, which replaces the whole body and loses the ticket text. Issue #248: Count open blockers read the `Blocked by:` line only when it was the first line, so a body written under older text (`Part of #<parent>` first) was counted as unblocked.
+
+What:
+
+- `to-tickets/SKILL.md` step 5, tracker bullet: in the blocker failure sentence, "write the tracker doc's fallback form for that ticket instead" gains ", using the tracker doc's way of adding a line to an issue body (the ticket already exists, and rewriting its body without reading it first loses its text)"; in the sub-issue failure sentence it gains ", again with the tracker doc's way of adding a line to an issue body".
+- `wayfinder/SKILL.md` blocking paragraph: "write the tracker doc's fallback form for that ticket instead" gains ", using the tracker doc's way of adding a line to an issue body (the ticket already exists)".
+- Not Upstream text: the tracker doc's new Add a line to an issue body operation (`skills/setup-dev-skills/issue-tracker-github.md`, with its REST route, and this repo's `docs/agents/issue-tracker.md`): read the body, put the line where the rules say, write the whole body back, read it back; the Sub-issue, Blocking and wayfinding Child ticket lines point at it. Count open blockers (and the Frontier query) read the `Blocked by:` line from the first or second line of the body; the writing rule is unchanged.
+- `scripts/check-plugin.sh`: new check 44 (tracker-doc-body-line-ops: both tracker docs have the operation, the first-or-second-line rule and the whole-body warning, and point three fallbacks at it; `to-tickets` and `wayfinder` point at it).
+- `.claude-plugin/plugin.json`: version 0.22.26 to 0.22.27.
+
+Merging an Upstream update: take Upstream's text, then re-apply the "tracker doc's way of adding a line to an issue body" clauses in `to-tickets` step 5 (both failure sentences) and in `wayfinder`'s blocking paragraph.

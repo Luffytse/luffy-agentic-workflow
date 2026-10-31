@@ -647,5 +647,19 @@ tk="$forked/to-tickets/SKILL.md"
 grep -qF 'first line of the ticket body' "$tk" || bad "to-tickets/SKILL.md does not put the Blocked by line on the first line of the ticket body"
 grep -qF "tracker doc's form wins" "$tk" || bad "to-tickets/SKILL.md does not say the tracker doc's form wins over the issue template's Blocked by section"
 
+# 44. tracker-doc-body-line-ops: both tracker docs (the seed and this repo's own) read a `Blocked by:` line on the
+# first or second line of the body (issue #248) and have an "Add a line to an issue body" operation that rewrites the
+# whole body and reads it back (issue #249); the fallback sentences point at that operation
+for td in "$own/setup-dev-skills/issue-tracker-github.md" "$repo/docs/agents/issue-tracker.md"; do
+  [ -f "$td" ] || { bad "missing tracker doc $td"; continue; }
+  tn="${td#"$repo"/}"
+  grep -qF '**Add a line to an issue body**' "$td" || bad "$tn has no \"Add a line to an issue body\" operation"
+  grep -qF 'first or second line of the issue body' "$td" || bad "$tn does not read the Blocked by line from the first or second line of the issue body"
+  grep -qF 'replaces the whole body' "$td" || bad "$tn does not warn that gh issue edit --body replaces the whole body"
+  [ "$(grep -cF 'see **Add a line to an issue body**' "$td")" -ge 3 ] || bad "$tn does not point its Sub-issue, Blocking and Child ticket fallbacks at Add a line to an issue body"
+done
+grep -qF "tracker doc's way of adding a line to an issue body" "$forked/to-tickets/SKILL.md" || bad "to-tickets/SKILL.md does not point its fallback sentences at the tracker doc's way of adding a line to an issue body"
+grep -qF "tracker doc's way of adding a line to an issue body" "$forked/wayfinder/SKILL.md" || bad "wayfinder/SKILL.md does not point its fallback at the tracker doc's way of adding a line to an issue body"
+
 [ "$fail" -eq 0 ] && echo "OK: dev-skills plugin checks passed ($count skills)"
 exit "$fail"
