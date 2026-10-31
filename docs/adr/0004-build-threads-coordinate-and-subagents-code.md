@@ -17,7 +17,8 @@ The thread merges its own pull request once the review is clean and CI is green,
 - it ran at Deep depth (security, money, deleting data);
 - it is a **one-way door**: reverting the change would not undo it (a data migration, deleted data, a public interface others depend on, a message sent outside the project). Each Implementer says so with its evidence, the `pr` skill marks it on the pull request, and a spec's pull request is a one-way door if any of its tickets is;
 - it changes an ADR, the glossary, a `CLAUDE.md` or a `REVIEW.md`, or anything else the repo's own rules (its `CLAUDE.md`, the project instructions, its docs) say a person merges;
-- the review hit the 5-Round cap.
+- the review ended with Result "5-Round cap reached" (Round 5 was not clean; a clean Round 5 is a clean Round like any other);
+- an agreed answer to a design Finding that changes the pull request came with no Round left to review it.
 
 In this repo, the rules add a change to the `agentic-review` skill (this repo's `CLAUDE.md`); the skills name only the general case, because a change to that skill is only ever made in this repo.
 

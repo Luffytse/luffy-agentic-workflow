@@ -56,7 +56,7 @@ Before each Round, fetch main. If it moved, have the Implementer merge main into
 
 After each Round, send its Important Findings and "fix" Nits to the Implementer by message (on a pull request that changes design, put its design Findings to the user first and send only the agreed answers, as [agentic-review's ROUNDS.md](../agentic-review/ROUNDS.md#design-findings-go-to-the-user) says); it fixes, commits and pushes, then the next Round runs. On a clean Round 2 to 5, the Implementer makes the final "fix" Nits commit before you post that Round's comment; no further Round reviews it. An agreed answer to a design Finding that changes the pull request gets one more Round instead. After the last Round, file Pre-existing Findings as `agentic-review` says.
 
-Done when a Round 2 to 5 is clean, or the 5-Round cap is hit.
+Done when a Round 2 to 5 is clean, or Round 5 is not clean (Result "5-Round cap reached").
 
 ## 7. Merge, or bring it to the user
 
@@ -65,7 +65,8 @@ Bring the pull request to the user, and do not merge it, if any of these holds:
 - the Review ran at Deep depth;
 - its Door is one-way;
 - it changes an ADR, the glossary, a `CLAUDE.md` or a `REVIEW.md`, or anything else the repo's own rules (its `CLAUDE.md`, the project instructions, its docs) say a person merges;
-- the Review hit the 5-Round cap.
+- the Review ended with Result "5-Round cap reached" (Round 5 was not clean; a clean Round 5 is a clean Round like any other);
+- an agreed answer to a design Finding that changes the pull request came with no Round left to review it.
 
 The user then merges, or tells you to. Step 1 below runs last, just before the merge, on this path too: when the user tells you to merge, run it, then merge (step 2); when the user will merge it themselves, ask them to tell you first, so you can run it before they do. Otherwise merge it yourself once the Review is clean and CI is green (or the repo has no CI):
 
