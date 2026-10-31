@@ -56,6 +56,10 @@ Not feature work, just upkeep.
 
 - **`/improve-codebase-architecture`** runs whenever you have a spare moment to keep the codebase good for agents to operate in. It surfaces **deepening opportunities**; picking one _generates an idea_ you can take into the main flow at `/grill-with-docs`. It's the survey that finds the candidates; **`/codebase-design`** (below) is the bench you design the chosen one on.
 
+## Releases
+
+For a repo that cuts versioned Releases (its release doc, `docs/agents/release.md`, says where the version lives), ordinary pull requests leave the version alone, and **`/release`** ships them a few issues at a time. Start a thread for it when every issue with the current release label has closed: it **cuts the Release** (picks the patch, minor or major bump from what shipped and opens the bump pull request with its changelog entry, which you merge), then runs the **Release planning** for the next one (proposes a goal and at most 5 issues, and labels only what you approve). A fix that cannot wait goes through it too, as a patch Release of one issue.
+
 ## Vocabulary underneath
 
 Two model-invoked references that run *beneath* the other skills, each the single source of truth for its vocabulary. Reach for them directly when the **words**, not the process, are the problem; or let the skills above pull them in.
@@ -87,6 +91,6 @@ Off the main flow entirely.
 
 ## Precondition
 
-**`setup-dev-skills`**: run before your first engineering flow to configure the issue tracker, triage labels, and doc layout the other skills assume. It supports GitHub repos only for now.
+**`setup-dev-skills`**: run before your first engineering flow to configure the issue tracker, triage labels, and doc layout the other skills assume, and the release doc `/release` reads. It supports GitHub repos only for now.
 
 **`setup-project`**: run to write or update a project's instructions, the short text its coordinator reads before it starts a thread (how its threads work and what every brief carries, never the state of its work). Use it when a new repo, kind of thread or standing rule means they are out of date.

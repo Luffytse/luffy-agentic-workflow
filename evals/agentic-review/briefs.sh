@@ -25,9 +25,8 @@ case "$depth" in
 esac
 
 skill=""
-for d in "$here"/../../plugins/dev-skills/upstream-skills/agentic-review "$here"/../../plugins/dev-skills/skills/agentic-review; do
-  [ -f "$d/FINDERS.md" ] && skill="$d" && break
-done
+d="$here/../../plugins/dev-skills/skills/agentic-review"
+[ -f "$d/FINDERS.md" ] && skill="$d"
 [ -n "$skill" ] || { echo "agentic-review skill not found under plugins/dev-skills" >&2; exit 1; }
 finders="$skill/FINDERS.md"
 verify="$skill/VERIFY.md"

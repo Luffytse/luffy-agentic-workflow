@@ -4,23 +4,24 @@ Read this first, then open only the docs whose line fits your work. Specs and ti
 
 ## Whole repo
 
-- [GLOSSARY.md](../GLOSSARY.md): the words used here (Plugin, Patch, Model tier, Spec, Ticket, Release, Implementer, Finder, Verifier, Round, Retro issue...). Read when writing or reviewing any skill text.
+- [GLOSSARY.md](../GLOSSARY.md): the words used here (Plugin, Model tier, Spec, Ticket, Release, Implementer, Finder, Verifier, Round, Retro issue...). Read when writing or reviewing any skill text.
 
 ## Agent setup
 
 - [docs/agents/issue-tracker.md](agents/issue-tracker.md): this repo's issues live on GitHub, and the commands for issues, sub-issues, blocking and adding a line to an existing issue body. Read when a skill creates, reads, edits the body of, labels or closes an issue.
 - [docs/agents/triage-labels.md](agents/triage-labels.md): the label string for each triage role, and the labels that are not triage roles. Read when applying or filtering triage labels.
 - [docs/agents/domain.md](agents/domain.md): the single-context doc layout and how skills read the glossary and ADRs. Read when a skill looks for domain docs or flags an ADR conflict.
+- [docs/agents/release.md](agents/release.md): the release doc: `dev-skills`' version file, its `CHANGELOG.md` path, the `release-` label prefix and the extra steps of a bump pull request. Read when running the `release` skill or giving an issue a release label.
+- [docs/agents/upstream-watch.md](agents/upstream-watch.md): the prompt of the 2-week Upstream watch (reads `mattpocock/skills` since the README's last commit, files one `needs-triage` issue), the access it needs, how the commit is recorded, how to rerun it by hand and how to change or stop its schedule. Read when running, changing or stopping the watch.
 
 ## Packaging
 
 - [README.md](../README.md): how to add the marketplace and install its plugins. Read when changing install steps.
 - [dai-portal-data README](../plugins/dai-portal-data/README.md): the DAI Portal database plugin. Read only when working on that plugin.
-- [dev-skills README](../plugins/dev-skills/README.md): what the plugin is, install steps, the model-tier table and the forked/own folder layout. Read when installing the plugin, adding a skill of our own, or mapping a tier to a model.
-- [dev-skills PATCHES.md](../plugins/dev-skills/PATCHES.md): the Upstream commit and every change we made to Upstream text. Read before changing anything under `upstream-skills/` or merging an Upstream update.
-- [DOCS-INDEX.md](../plugins/dev-skills/upstream-skills/domain-modeling/DOCS-INDEX.md): the docs index format and update rule every writing skill follows. Read when changing how skills keep `docs/index.md` current.
-- [scripts/check-plugin.sh](../scripts/check-plugin.sh): this repo's own checker for the `dev-skills` layout, the Patches and the placeholder and version-bump rules; it lives outside the plugin so it does not ship to projects. Read when adding or changing a check, or before pushing a plugin change.
-- [ADR 0001](adr/0001-dev-skills-is-one-plugin-forked-from-matt-pocock.md): why `dev-skills` is one plugin forked from Matt Pocock's skills, and which skills it keeps. Read when adding, dropping or patching a skill.
+- [dev-skills README](../plugins/dev-skills/README.md): what the plugin is, install steps, the model-tier table, the folder layout and the last Upstream commit looked at. Read when installing the plugin, adding a skill of our own, or mapping a tier to a model.
+- [DOCS-INDEX.md](../plugins/dev-skills/skills/domain-modeling/DOCS-INDEX.md): the docs index format and update rule every writing skill follows. Read when changing how skills keep `docs/index.md` current.
+- [scripts/check-plugin.sh](../scripts/check-plugin.sh): this repo's own checker for the `dev-skills` layout and repo-wide rules (no vendor model names, no person names, no repo-only text in skill text, skill name matching its folder); its header lists the checks, each identified by a name, never a number. A check tests structure, not a skill's wording. It lives outside the plugin so it does not ship to projects. Read when adding or changing a check, or before pushing a plugin change.
+- [ADR 0001](adr/0001-dev-skills-is-one-plugin-forked-from-matt-pocock.md): why `dev-skills` is one plugin that began as Matt Pocock's skills and is now our own, and which skills it keeps. Read when adding or dropping a skill, or when the Upstream watch finds an idea.
 - [ADR 0002](adr/0002-skills-name-model-tiers-not-models.md): skills name cheap, regular or premium tiers, never models. Read when a skill picks a model.
 
 ## Building
@@ -30,6 +31,7 @@ Read this first, then open only the docs whose line fits your work. Specs and ti
 - [ADR 0008](adr/0008-plugin-versions-change-only-at-a-release.md): plugin versions change only at a Release, what each part of X.Y.Z means, and how a Release is planned and cut. Read when working on versions, `CHANGELOG.md`, release labels or a Release thread.
 - [implement-spec eval RESULTS.md](../evals/implement-spec/RESULTS.md): one entry per build-flow check of `implement-spec`. Read to see how `implement-spec` did in its build-flow check.
 - [implement eval RESULTS.md](../evals/implement/RESULTS.md): one entry per build-flow check of `implement`. Read to see how `implement` did in its build-flow check.
+- [release eval RESULTS.md](../evals/release/RESULTS.md): one entry per dry run of `release` (a proposal only, nothing merged or labelled). Read to see how `release` did in its dry run.
 
 ## Code review
 
