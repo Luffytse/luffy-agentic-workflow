@@ -28,6 +28,14 @@ _Avoid_: model size, model class
 A Skill the agent may start by itself when a task fits its description. A **user-only skill** (`disable-model-invocation: true`) starts only when a person types its name.
 _Avoid_: auto skill, manual skill
 
+**Shared rule**:
+A rule two or more skills must follow the same way, such as a record contract, an invoked workflow's rule or a project configuration rule; independent rules may differ. ADR 0009 plans one owner for each; existing links and copies remain in force until their migration lands.
+_Avoid_: common rule, duplicated rule
+
+**Base skill**:
+A Skill holding a focused Shared rule that consumers load by name without loading a larger workflow for that rule alone. ADR 0009 plans these skills, with menu hiding preferred where supported; existing rules govern until their migration lands.
+_Avoid_: library skill, helper skill
+
 ## Where the skills run
 
 **Project thread**:
