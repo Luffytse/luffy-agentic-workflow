@@ -36,7 +36,7 @@ Pick Deep for risky changes (security, money, deleting data, or anything the use
 
 Record `git rev-parse HEAD` as this Review's head. Confirm every ref resolves (`git rev-parse`) and the diff (with the untracked files) is non-empty: a bad ref or empty diff fails here, not inside parallel subagents.
 
-For a pull request, read every earlier comment by this skill on it (the `<!-- code-review` marker lines in [ROUNDS.md](ROUNDS.md#the-round-comment)): they give the Round number, the depth (the carried depth is the one in the latest comment that is not a merge-only Round's), the last head, and every Finding already raised, dismissed or open. Ticket-check comments count as already raised: their open Importants stay open until a Verifier confirms them fixed or dismisses them as never real, or until they are dismissed because the user kept the design. For a Ticket check, read the earlier checks of the same Ticket the same way.
+For a pull request, read every earlier comment by this skill on it (the `<!-- code-review` marker lines in [ROUNDS.md](ROUNDS.md#the-round-comment)): they give the Round number, the depth (the carried depth is the one in the latest comment that is not a merge-only Round's), the last head, and every Finding already raised, dismissed or open. Ticket-check comments count as already raised: their open Importants stay open until a Verifier confirms them fixed or dismisses them as never real, or until they are dismissed because the user kept the design or merged into another row ([ROUNDS.md](ROUNDS.md#rank) step 3). For a Ticket check, read the earlier checks of the same Ticket the same way.
 
 ### 2. Find the spec and standards sources
 
@@ -59,7 +59,7 @@ Brief and start the Finders for the depth, all in one parallel batch in the fore
 
 ### 4. Verify
 
-Start the Verifier(s) as brand-new subagents with every candidate Finding, every **open Important** from earlier Rounds and Ticket checks (to re-check against the current code), the spec, the standards list and `REVIEW.md`. Brief and voting rules: [VERIFY.md](VERIFY.md). The Verifier's calls are final: keep or drop, caused by this change or Pre-existing, Important or Nit, and "fix" or "skip" for a Nit. A failure scenario the Verifier corrected replaces the Finder's.
+Start the Verifier(s) as brand-new subagents with every candidate Finding, every **open Important** from earlier Rounds and Ticket checks (to re-check against the current code, its locations first brought to this head as [ROUNDS.md](ROUNDS.md#rank) says), the spec, the standards list and `REVIEW.md`. Brief and voting rules: [VERIFY.md](VERIFY.md). The Verifier's calls are final: keep or drop, caused by this change or Pre-existing, Important or Nit, and "fix" or "skip" for a Nit. A failure scenario the Verifier corrected replaces the Finder's.
 
 Before the next step starts (Rank, or on Deep the gap sweep, whose input is the Findings they kept), count the Verifier reports: you need one report from each Verifier you started. A Verifier that ended without returning its report is asked again for it; if it cannot be reached, start a new Verifier on the same brief. Do not go on with a Verifier missing.
 
@@ -67,7 +67,7 @@ On Deep, then run the **gap sweep**: one brand-new Finder gets the kept Findings
 
 ### 5. Rank and report
 
-Rank the kept Findings yourself, by the rules in [ROUNDS.md](ROUNDS.md#rank). Report to the user under `## Important`, `## Nits` and `## Pre-existing`, each Finding with its Bug class, every location, the claim, its failure scenario and which Finder raised it; then one line with the number dropped by Verify.
+Rank the kept Findings yourself, by the rules in [ROUNDS.md](ROUNDS.md#rank). Report to the user under `## Important`, `## Nits` and `## Pre-existing`, each Finding with its Bug class, every location, the claim, its failure scenario and which Finder raised it, an earlier Important still open and a partly fixed "fix" Nit included under their ids ([ROUNDS.md](ROUNDS.md#rank) step 3), each with its live locations, the Verifier's still-open line when it has one and, when no Finding of this Review is held under it, the claim from its row's Note; then one line with the number dropped by Verify.
 
 For a pull request, post the Round comment and carry on with the Round loop and the stop rule in [ROUNDS.md](ROUNDS.md). For a fixed point, the report is the end; Pre-existing Findings are filed only if the user asks.
 

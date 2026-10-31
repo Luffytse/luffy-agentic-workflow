@@ -5,7 +5,7 @@ The Verify stage of [`agentic-review`](SKILL.md). Verifiers are brand-new subage
 - **Quick and Standard:** one Verifier checks every candidate Finding of the Review.
 - **Deep:** three Verifiers each check every candidate Finding, each with one stance (below), and their votes are combined by the rules at the end.
 
-Every Verifier gets: all candidate Findings in the fixed format, each tagged with its Finder; the open Importants from earlier Rounds and Ticket checks, with their ids; the diff commands; the spec, the standards list and `REVIEW.md` (with its Always check lines); and the meaning of Important (`REVIEW.md`'s, or the default in [SKILL.md](SKILL.md#2-find-the-spec-and-standards-sources)).
+Every Verifier gets: all candidate Findings in the fixed format, each tagged with its Finder; the open Importants from earlier Rounds and Ticket checks, with their ids, claims and locations, each location first brought to this Review's head as [ROUNDS.md](ROUNDS.md#rank) says (one in a file deleted since is given as recorded and marked deleted); the diff commands; the spec, the standards list and `REVIEW.md` (with its Always check lines); and the meaning of Important (`REVIEW.md`'s, or the default in [SKILL.md](SKILL.md#2-find-the-spec-and-standards-sources)).
 
 ## Verifier brief
 
@@ -18,7 +18,7 @@ Every Verifier gets: all candidate Findings in the fixed format, each tagged wit
 
 When a call drops a Finding, or marks a Nit skip, name in its line the `file:line` the reason rests on (a guard elsewhere, say), if any: the dismissal is recorded with them.
 
-Then, for each open Important from earlier Rounds or Ticket checks, check the current code and say **fixed** (cite the line that fixes it), **partly fixed** (name each fixed location, citing the line that fixes it, and the locations still open), **still open** (cite the line that still has the problem), or **dismissed** (it was never real; say why, naming the `file:line` the reason rests on, if any).
+Then, for each open Important from earlier Rounds or Ticket checks, find its code at the current head by its claim, not by line number alone: the locations given are already brought to this head, but a fix may have moved the code, and a location marked deleted means the file is gone, so look for where its code went. Check that code and say **fixed** (cite the line that fixes it), **partly fixed** (name each fixed location, citing the line that fixes it, and the locations still open), **still open** (cite the line that still has the problem), or **dismissed** (it was never real; say why, naming the `file:line` the reason rests on, if any).
 
 To try something out (plant a line, run a check, test a commit), work in your own copy: `git archive <head> | tar -x -C <a new scratch directory>`, or a throwaway `git worktree`. Never run `git checkout`, `switch`, `stash` or `reset` in the shared tree, because an Implementer is working in it; leave it on its branch, clean.
 
