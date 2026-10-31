@@ -46,7 +46,7 @@ Read the Implementer's report against the ticket's acceptance criteria and rerun
 
 ## 5. Open the pull request
 
-Write the body with the `pr` skill: it closes the ticket, carries the evidence in its Evidence section, and the Implementer's call as its Door. Open the pull request; the branch is already pushed, and the Implementer pushes any later commits.
+Write the body with the `pr` skill: it closes the ticket (and any other issue it lists, one `Closes #<n>` line each, as `pr` says), carries the evidence in its Evidence section, and the Implementer's call as its Door. Open the pull request; the branch is already pushed, and the Implementer pushes any later commits.
 
 ## 6. Review in Rounds
 
@@ -71,6 +71,7 @@ The user then merges, or tells you to. Step 1 below runs last, just before the m
 
 1. Fetch main. If the Ticket branch lacks commits from main, have the Implementer merge main in (a merge, never a rebase) and push. If that merge had conflicts, run one more Round over its conflict resolutions, a merge-only Round (step 6: Quick depth, or the carried depth if a resolution touches logic); what it finds follows that step's normal Round rules; if the 5-Round cap leaves no Round, bring the pull request to the user. Rerun the checks in the worktree, on the branch's head, and wait for CI (if the repo has any). If main moves again before the merge, repeat this step.
 2. **Squash-merge** into main, with a commit message you write that summarises the final change and names the ticket, rather than the branch's commit messages joined together.
+3. Once the pull request is merged (`gh api repos/<owner>/<repo>/pulls/<n> --jq .merged` prints `true`; when the user merged it, check once they tell you or you see it), read the issues its body lists with `Closes` (`gh api repos/<owner>/<repo>/pulls/<n> --jq .body`) and the state of each (`gh api repos/<owner>/<repo>/issues/<n> --jq .state`). For each one still `open`, comment naming the pull request (`gh issue comment <n> --body "..."`), then close it as completed (`gh issue close <n> --reason completed`). Where `gh issue` fails for lack of GraphQL, use `gh api --method POST repos/<owner>/<repo>/issues/<n>/comments -f body="..."` and `gh api --method PATCH repos/<owner>/<repo>/issues/<n> -f state=closed -f state_reason=completed`. If a read or a close fails, stop and tell the user; do not read it as closed.
 
 ## 8. Report
 

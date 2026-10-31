@@ -24,6 +24,10 @@ Use this template for writing the PR body:
 
 <a spec's PR: repeat these bullets per ticket, under the ticket's number; else delete this line>
 
+## Closes
+
+<one `Closes #<n>` per issue the pull request closes, one per line; delete this section if it closes none>
+
 ## Merge Danger
 
 **Door:** <one-way or two-way; a spec's PR: one-way (#a, #b) if any ticket is>
@@ -169,6 +173,18 @@ Execution-based evidence is A-tier. Test results, console output. Show the exact
 When something can't be shown (a docs-only change has no tests), say what was checked instead; never leave an Evidence line empty.
 
 A PR that collects several tickets (a spec's PR) carries each ticket's evidence into its body.
+
+### Closes
+
+GitHub's closing keyword applies only to the one issue number right after it, so `Closes #1, #2, #3` closes at most `#1`. Write one keyword per issue, one per line:
+
+```markdown
+Closes #1
+Closes #2
+Closes #3
+```
+
+A spec's PR lists the spec and every ticket; any other issue it absorbs (a Retro issue, say) gets its own line.
 
 ### Merge Danger
 
