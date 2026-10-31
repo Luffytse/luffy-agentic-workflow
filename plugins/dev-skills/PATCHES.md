@@ -839,3 +839,16 @@ What:
 - `.claude-plugin/plugin.json`: version 0.22.23 to 0.22.24.
 
 Merging an Upstream update: take Upstream's text, then re-apply the failed-write sentence and the no-blockers sentences in step 5 and the template note.
+
+## Patch 46: `wayfinder` and `to-tickets` agree with the tracker doc on fallback forms and on the order of the `Blocked by:` and `Part of` lines (`wayfinder/`, `to-tickets/`)
+
+Why: issues #242, #243 and #244. `wayfinder` said only a tracker that lacks native blocking falls back to a body line, while the tracker doc and `to-tickets` write it when the native write fails at run time, so a wayfinding child whose write failed counted 0 open blockers. `to-tickets` had no failure branch or check for the sub-issue link, unlike the blocker write (Patch 45). And `to-tickets` step 5 and the tracker doc each put their line (`Blocked by:`, `Part of`) at the top of the body, so a child needing both had two lines claiming the top.
+
+What:
+
+- `wayfinder/SKILL.md` (blocking paragraph): "Only a tracker that lacks native blocking falls back to a body convention" becomes: where native blocking is unavailable or the write fails at run time, write the tracker doc's fallback form for that ticket, listing every blocker, then check with the tracker doc's way of counting open blockers that every blocker is in place in one form or the other. It points at the tracker doc's Blocking operation.
+- `to-tickets/SKILL.md` step 5, tracker bullet: the `Blocked by:` line is the first line "above everything else including a `Part of #<parent>` line"; after the existing-issue sentence, if the sub-issue write fails at run time (for example a repo without sub-issues enabled) write the tracker doc's `Part of #<parent>` line on the line after the `Blocked by:` line, or as the first line if the ticket has none, check with the tracker doc's way of checking a sub-issue link that the ticket is linked in one form or the other, and do not report it published until it is.
+- Not Upstream text: the tracker doc's Sub-issue, Blocking, Count-open-blockers and wayfinding Child ticket lines (`skills/setup-dev-skills/issue-tracker-github.md` and this repo's `docs/agents/issue-tracker.md`) state one order: `Blocked by:` is the first line, `Part of #<parent>` the second (the first when there is no `Blocked by:` line), and Count open blockers reads the first line; a new Check a sub-issue link operation reads both the sub-issue edge and the `Part of` line.
+- `.claude-plugin/plugin.json`: version 0.22.24 to 0.22.25.
+
+Merging an Upstream update: take Upstream's text, then re-apply the fallback-and-check sentence in `wayfinder`'s blocking paragraph and the order clause and the sub-issue failure sentence in `to-tickets` step 5.
