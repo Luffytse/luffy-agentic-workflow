@@ -827,3 +827,15 @@ What:
 - `.claude-plugin/plugin.json`: version 0.22.22 to 0.22.23.
 
 Merging an Upstream update: take Upstream's text, then re-apply the timing sentence at the start of the final retro step in both skills.
+
+## Patch 45: `to-tickets` writes the fallback form when a native blocker write fails, and the no-blockers wording agrees (`to-tickets/`)
+
+Why: issue #220 (found in the review of #219). Step 5 said to use the native blocking relationship "where it has one", but whether it works is known only at run time; when the write failed, an agent following the step literally wrote neither the edge nor the `Blocked by:` line, and the child counted 0 blockers while its blocker was open. Separately, the issue template told a ticket with no blockers to write `## Blocked by` with "None (can start immediately)" while step 5 said a body has no such section.
+
+What:
+
+- `to-tickets/SKILL.md` step 5, tracker bullet: after "The tracker doc's form wins ...", new sentences: if a native write fails at run time (for example a server without the dependencies API), write the tracker doc's fallback form for that ticket instead, listing every blocker of that ticket; then check with the tracker doc's way of counting open blockers (it reads both forms) that every blocker is in place in one form or the other, and do not report the ticket published until they are. When blockers are written as the `Blocked by:` line or set as native edges, omit the `## Blocked by` section, including for a ticket with no blockers; "None (can start immediately)" goes only where the template section is kept (local files).
+- `to-tickets/SKILL.md` issue template, Blocked by note: omit the section when blockers were set as native edges or as a `Blocked by:` line, including for a ticket with no blockers; write "None (can start immediately)" only where the section is kept.
+- `.claude-plugin/plugin.json`: version 0.22.23 to 0.22.24.
+
+Merging an Upstream update: take Upstream's text, then re-apply the failed-write sentence and the no-blockers sentences in step 5 and the template note.
