@@ -20,6 +20,7 @@
 #   vendor-model-names           no vendor model name in the repo's text (ADR 0002)
 #   no-person-names              no person's name in skill or doc text
 #   repo-free-skill-text         skill text names nothing that exists only in this repo
+#   no-agent-label-strings       the plugin names no repo's agent-only label strings (a repo maps the role in its triage-labels.md)
 #
 # `claude plugin validate .` is not run here: CI runs it as its own step; the README says to run it before pushing.
 #
@@ -153,6 +154,15 @@ hits="$(printf '%s\n' "$hits" | grep .)"
 if [ -n "$hits" ]; then
   echo "$hits"
   bad "skill text names something only this repo has (an ADR number, \"Upstream\", a project, repo or person, or this repo's tooling)"
+fi
+
+# no-agent-label-strings: the plugin speaks of the "agent-only" label role, never of one repo's label strings for it
+# (those name particular coding agents and live in each repo's docs/agents/triage-labels.md). Checks the whole plugin tree
+# except CHANGELOG.md, which records releases in this repo's words.
+hits="$(grep -rnE --exclude=CHANGELOG.md '(claude|codex)-only' "$root")"
+if [ -n "$hits" ]; then
+  echo "$hits"
+  bad "plugin text names an agent-only label string (claude-only or codex-only); say the role and let the repo's triage-labels.md map it"
 fi
 
 [ "$fail" -eq 0 ] && echo "OK: dev-skills plugin checks passed"

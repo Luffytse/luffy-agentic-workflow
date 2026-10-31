@@ -40,7 +40,7 @@ The limit on this is the **[smart zone](https://www.aihero.dev/ai-coding-diction
 
 A starting situation that generates work, then merges onto the main flow.
 
-- **Bugs and requests piling up** → **`/triage`**. It moves issues through triage roles and produces agent-ready issues, which **`/implement-spec`** (for an issue under a Spec) or **`/implement`** (for a lone one) later picks up.
+- **Bugs and requests piling up** → **`/triage`**. It moves issues through triage roles (and can mark an issue for one coding agent only, when the repo has labels for that) and produces agent-ready issues, which **`/implement-spec`** (for an issue under a Spec) or **`/implement`** (for a lone one) later picks up.
 
   Triage is only for issues **you didn't create**: bug reports, incoming feature requests, anything that arrives raw. Tickets that `/to-tickets` produced are already agent-ready, so **don't triage them**.
 

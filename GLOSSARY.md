@@ -44,6 +44,10 @@ _Avoid_: PRD, design doc
 One small, end-to-end slice of work, built and reviewed on its own. Either part of a Spec (a sub-issue of it) or a **lone ticket** under no Spec.
 _Avoid_: task, story
 
+**Agent label**:
+The label of the optional agent-only triage role: it marks an issue for one coding agent only, and a repo maps the role to one label per agent in its `docs/agents/triage-labels.md` (this repo: `claude-only` and `codex-only`). It is neither a category nor a state role. An agent that sees another agent's label does not work the issue; an issue with none can be taken by any agent. `triage` may apply it, and `to-tickets` copies a Spec's onto each of its Tickets.
+_Avoid_: assignee, owner
+
 **Milestone**:
 A project goal (for example "M3 Trip planning") that groups the Specs and Tickets needed to reach it.
 

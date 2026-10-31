@@ -8,7 +8,7 @@ description: "Configure a GitHub repo for the dev-skills plugin: write its issue
 Derived from Matt Pocock's setup skill; the seed files in this folder are mostly his text (MIT, see `LICENSE-mattpocock-skills` in the plugin folder). Scaffold the per-repo configuration the other skills read:
 
 - **Issue tracker**: GitHub Issues, in `docs/agents/issue-tracker.md`.
-- **Labels**: the 5 state roles and 2 category roles that `triage` uses, and the `wayfinder:*` labels, in `docs/agents/triage-labels.md` and on the repo.
+- **Labels**: the 5 state roles and 2 category roles that `triage` uses, the optional agent-only role (one label per coding agent) when the user wants it, and the `wayfinder:*` labels, in `docs/agents/triage-labels.md` and on the repo.
 - **Domain docs**: where `GLOSSARY.md` and ADRs live and how skills read them, in `docs/agents/domain.md`, plus the `docs/index.md` that lists the docs.
 - **Review rules**: a starter `REVIEW.md` at the repo root, where the repo's own review rules go.
 - **Releases**: where the version lives, the changelog path and the release label prefix that `release` reads, in `docs/agents/release.md`, for a repo that cuts versioned Releases.
@@ -47,6 +47,12 @@ Summarise what is present and what is missing. Take the sections in order, one a
 > Do you want to keep the default labels? (recommended: **yes**)
 
 The defaults are the 5 state roles, `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`, and the 2 category roles, `bug` and `enhancement`, each label string equal to its role name. On **yes**, write them as they are. Only if the user says no, usually because the repo already uses other names (for example `bug:triage` for `needs-triage`), collect the overrides so `triage` applies the existing labels instead of creating duplicates.
+
+Then ask one more question:
+
+> Do you want labels that mark an issue for one coding agent only, so that the other agent leaves it alone? (recommended: **yes** when `docs/agents/triage-labels.md` already has agent rows or more than one coding agent works the repo, else **no**)
+
+On **no**, the seed's agent-only section is left out of `docs/agents/triage-labels.md`. On **yes**, ask the user for each agent's label string (suggest `<agent>-only`), and fill the seed's agent-only table with one row per agent. Never guess agent names.
 
 **Section C: Domain docs.** Default to **single-context** (one `GLOSSARY.md` and `docs/adr/` at the repo root); write it without asking. Offer **multi-context** (a root `GLOSSARY-MAP.md` pointing to per-context `GLOSSARY.md` files) only when exploration found monorepo signals.
 
@@ -95,7 +101,7 @@ Start at `docs/index.md`; it says which doc to read for what.
 
 ### Triage labels
 
-[one-line summary of the label vocabulary, for example "5 state roles + 2 category roles: ..."]. See `docs/agents/triage-labels.md`.
+[one-line summary of the label vocabulary, for example "5 state roles + 2 category roles: ...", plus the agent-only labels when the repo has them]. See `docs/agents/triage-labels.md`.
 
 ### Domain docs
 
@@ -110,7 +116,7 @@ Leave out the `### Releases` part when the repo has no release doc.
 
 Then write the approved files, and `docs/index.md` last.
 
-**Create the labels.** Create every label the skills use that the repo lacks, whether or not `triage` is installed: the label string of each of the 5 state roles, `bug` and `enhancement`, and `wayfinder:map`, `wayfinder:research`, `wayfinder:prototype`, `wayfinder:grilling` and `wayfinder:task`. Use `gh api --method POST repos/<owner>/<repo>/labels -f name=<label>` (or the session's GitHub tools); `gh label create` needs GraphQL. Leave `retro`, `retro-planning` and the release labels alone: `retro`, `retro-planning` and `release` create them when first needed.
+**Create the labels.** Create every label the skills use that the repo lacks, whether or not `triage` is installed: the label string of each of the 5 state roles, `bug` and `enhancement`, each agent-only label from the table (only when Section B was **yes**), and `wayfinder:map`, `wayfinder:research`, `wayfinder:prototype`, `wayfinder:grilling` and `wayfinder:task`. Use `gh api --method POST repos/<owner>/<repo>/labels -f name=<label>` (or the session's GitHub tools); `gh label create` needs GraphQL. Leave `retro`, `retro-planning` and the release labels alone: `retro`, `retro-planning` and `release` create them when first needed.
 
 ### 5. Check GitHub settings and report
 

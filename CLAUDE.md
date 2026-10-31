@@ -27,7 +27,7 @@ Issues and specs live in this repo's GitHub Issues. See `docs/agents/issue-track
 
 ### Triage labels
 
-5 state roles + 2 category roles: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`, `bug`, `enhancement`. See `docs/agents/triage-labels.md`.
+5 state roles + 2 category roles: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`, `bug`, `enhancement`; plus the optional agent-only role, mapped to `claude-only` and `codex-only` (an agent that sees the other agent's label leaves the issue alone). See `docs/agents/triage-labels.md`.
 
 ### Domain docs
 

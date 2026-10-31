@@ -35,9 +35,11 @@ Five **state** roles:
 - `ready-for-human`: needs human implementation
 - `wontfix`: will not be actioned
 
+One optional **agent-only** role marks an issue for one coding agent only (the repo's triage-labels doc maps it to one label per agent, and says which agents it has). It is neither a category nor a state role and is not needed for triage to be complete. Apply it when the issue only makes sense for one agent, for example a bug that happens in only one agent; leave it off otherwise, since an issue without it can be taken by any agent. Never apply it when the repo's triage-labels doc has no agent label, and never remove one already there without asking. An agent that sees another agent's label does not work the issue.
+
 For a PR, the same states read against the attached code: `ready-for-agent` means a brief is attached and an agent should take the next step on the diff; `ready-for-human` means it's ready for a human to merge.
 
-Every triaged issue should carry exactly one category role and one state role. If state roles conflict, flag it and ask the maintainer before doing anything else.
+Every triaged issue should carry exactly one category role and one state role (the agent-only role, when used, comes on top of those). If state roles conflict, flag it and ask the maintainer before doing anything else.
 
 These are canonical role names. The actual label strings used in the issue tracker may differ. The mapping should have been provided to you. If not, tell the user to run `setup-dev-skills`.
 
