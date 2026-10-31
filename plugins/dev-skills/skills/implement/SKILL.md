@@ -12,11 +12,11 @@ The issue tracker should have been provided to you. If not, tell the user to run
 Fetch the ticket from the issue tracker and state its title. If the reference is ambiguous, ask.
 
 - If it is a Spec, or a Ticket under one, stop and use `implement-spec` for the Spec instead.
-- Check its blocking edges. If any blocker is not merged, stop and tell the user (or the coordinator) which.
+- Check its blockers with the tracker doc's **Count open blockers**, which reads both the native edges and a `Blocked by:` line in the first or second line of the body (reading only the native edges misses the line), and its check of how each closed blocker was closed. If any blocker is open, or was closed as not planned, as a duplicate or as wontfix (that check also tells a wayfinding blocker, which is cleared once closed), stop and tell the user (or the coordinator) which.
 
 Start at `docs/index.md` and open only the docs that fit the ticket (with no index, fall back to `GLOSSARY.md` or `GLOSSARY-MAP.md`, and `docs/adr/`).
 
-Done when you have stated the title, every blocker is merged, and you know the ticket's **Model tier**: premium if the issue says so, otherwise regular.
+Done when you have stated the title, no blocker is open or closed without the work being done (a wayfinding blocker is cleared once closed), and you know the ticket's **Model tier**: premium if the issue says so, otherwise regular.
 
 ## 2. Make the Ticket branch
 

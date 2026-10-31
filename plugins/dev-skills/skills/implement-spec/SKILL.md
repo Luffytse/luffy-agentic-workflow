@@ -16,7 +16,7 @@ Start every subagent with a fresh context window. Keep communication to and from
 Fetch the spec and every ticket under it from the issue tracker and state the spec's title. If the reference is ambiguous, ask.
 
 - If it is a lone Ticket (under no Spec), stop and use `implement` instead.
-- Map the blocking edges into the task graph. If a blocker outside the spec is not merged, stop and tell the user (or the coordinator) which.
+- Map the blocking edges into the task graph, reading each ticket's blockers with the tracker doc's **Count open blockers**, which reads both the native edges and a `Blocked by:` line in the first or second line of the body (reading only the native edges misses the line). If a blocker outside the spec is open, or was closed as not planned, as a duplicate or as wontfix (the same doc's check, which exempts a wayfinding blocker), stop and tell the user (or the coordinator) which.
 
 Start at `docs/index.md` and open only the docs that fit (with no index, fall back to `GLOSSARY.md` or `GLOSSARY-MAP.md`, and `docs/adr/`).
 
