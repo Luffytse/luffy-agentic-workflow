@@ -2,6 +2,19 @@
 
 What each version of `dev-skills` brought, newest first. A version changes only when a Release is cut, and each Release adds one entry here: its goal, the issues it shipped, and what a project using the plugin must do when something breaks.
 
+## 0.23.0 (2026-10-31)
+
+Plugin versions change only at a Release, and no pull request takes a number another one could take (ADR 0008).
+
+- Spec: plugin versions change only at a Release (#257)
+- Switch-over: no plugin pull request takes a version, Patch or check number (#258)
+- Add a release skill and its repo release doc (#259)
+- Make the forked skills our own: move into skills/, drop PATCHES.md, credit Upstream in the README (#260)
+- Trim check-plugin.sh to named structural checks (#261)
+- Watch Upstream every 2 weeks and file one triage issue (#262)
+
+Also merged: three `REVIEW.md` Always-check lines, on glossary-term form and on decisions recorded before their rule change lands (from the retro of ADR 0008's pull request #256), and on a step re-entered with state recorded earlier (#282); the Upstream watch now runs from a reminder issue, not a scheduled task (#285); a comment in the plugin-checks CI workflow was updated (#286).
+
 ## 0.22.28 and earlier
 
 Before Releases, every merged change to the plugin bumped its version, so the versions up to 0.22.28 have no entries of their own; the repo's git history records each change and its bump. The versions that brought something new:
