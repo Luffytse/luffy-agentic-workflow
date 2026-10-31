@@ -1,19 +1,22 @@
 #!/usr/bin/env bash
-# Checks the dev-skills plugin layout and the Patches that ADR 0001 requires.
-# Run from anywhere: plugins/dev-skills/scripts/check-plugin.sh (or a symlink to it)
+# Checks the dev-skills plugin layout and the Patches that ADR 0001 requires. This repo's own tooling: it lives
+# at the repo root, not in the plugin, so it does not ship in every project's plugin cache.
+# Run from anywhere: scripts/check-plugin.sh (or a symlink to it)
 # Same result however it runs: under `bash -e` or SHELLOPTS=errexit (this script reports every failure itself
 # with bad(), and a no-match grep or find in a command substitution is a normal answer, not an error), and
-# through a symlink (the plugin tree is found from the script's real path).
+# through a symlink (the repo is found from the script's real path).
 set -u
 set +e
 src="${BASH_SOURCE[0]:-$0}"
 # follow symlinks one hop at a time with plain readlink: `readlink -f` is GNU-only and macOS lacks it
 while [ -L "$src" ]; do
-  link_dir="$(CDPATH= cd "$(dirname "$src")" && pwd)"
+  link_dir="$(CDPATH= cd -P "$(dirname "$src")" && pwd -P)"
   src="$(readlink "$src")"
   case "$src" in /*) ;; *) src="$link_dir/$src" ;; esac
 done
-root="$(CDPATH= cd "$(dirname "$src")/.." && pwd)"
+# -P / pwd -P: physical paths, so a symlinked parent directory (a linked scripts/ folder) does not make ".." the link's parent
+repo="$(CDPATH= cd -P "$(dirname "$src")/.." && pwd -P)"
+root="$repo/plugins/dev-skills" # the plugin tree
 forked="$root/upstream-skills"
 fail=0
 bad() { echo "FAIL: $*"; fail=1; }
@@ -90,12 +93,11 @@ fi
 # regular or premium tiers. The README tier table, PATCHES.md (which describes this
 # grep), this script and ADR 0002 (which define the tiers by naming the models) are exempt.
 plugin_rel="plugins/dev-skills"
-repo="$(cd "$root/../.." && pwd)"
 # NUL-separated file list and a check on grep's output (not xargs' exit code), so file
 # names with spaces and multi-batch xargs runs cannot hide a match.
 hits="$(cd "$repo" && find . -type f -not -path './.git/*' \
   -not -path "./$plugin_rel/README.md" -not -path "./$plugin_rel/PATCHES.md" \
-  -not -path "./$plugin_rel/scripts/check-plugin.sh" -not -path './LICENSE*' \
+  -not -path './scripts/check-plugin.sh' -not -path './LICENSE*' \
   -not -path "./$plugin_rel/LICENSE-mattpocock-skills" -not -path './docs/adr/0002-*' -print0 |
   xargs -0 grep -nIiE '\b(haiku|sonnet|opus)\b|claude[-_]?(opus|sonnet|haiku|[0-9])|\bgpt-?[0-9]|\bgemini\b')"
 if [ -n "$hits" ]; then
@@ -197,9 +199,8 @@ grep -qiF 'integration branch' "$forked/ask-matt/SKILL.md" && bad "ask-matt/SKIL
 # `<!-- code-review kind=...` Round-comment markers are a data format, not a skill name, and
 # PATCHES.md, ADRs, evals and this script are outside the scope.
 if [ -d "$forked" ]; then
-  scan="$forked"; [ -d "$own" ] && scan="$scan $own"
-  # shellcheck disable=SC2086
-  if grep -rnE --include=*.md --include=*.yaml '`(dev-skills:)?code-review`|(^|[^a-z-])/code-review([^a-z-]|$)|dev-skills:code-review|^name:[[:space:]]*code-review|[Tt]he code-review skill' $scan; then
+  scan=("$forked"); [ -d "$own" ] && scan+=("$own") # an array: a checkout path with a space must not split
+  if grep -rnE --include=*.md --include=*.yaml '`(dev-skills:)?code-review`|(^|[^a-z-])/code-review([^a-z-]|$)|dev-skills:code-review|^name:[[:space:]]*code-review|[Tt]he code-review skill' "${scan[@]}"; then
     bad "a skill still tells an agent to run code-review; use agentic-review"
   fi
   [ -e "$forked/code-review" ] && bad "skill folder code-review still exists; it is agentic-review"
@@ -256,7 +257,7 @@ else
   grep -qE '^[[:space:]]*pull_request:' "$wf" || bad "plugin-checks.yml does not run on pull_request"
   { grep -qE '^[[:space:]]*push:' "$wf" && grep -qE 'main' "$wf"; } || bad "plugin-checks.yml does not run on pushes to main"
   grep -qF '@anthropic-ai/claude-code' "$wf" || bad "plugin-checks.yml does not install @anthropic-ai/claude-code from npm"
-  grep -qF 'plugins/dev-skills/scripts/check-plugin.sh' "$wf" || bad "plugin-checks.yml does not run check-plugin.sh"
+  grep -qE '(^|[[:space:]:])(\./)?scripts/check-plugin\.sh' "$wf" || bad "plugin-checks.yml does not run scripts/check-plugin.sh (the repo root script, not plugins/dev-skills/scripts/)"
   grep -qF 'claude plugin validate .' "$wf" || bad "plugin-checks.yml does not run claude plugin validate ."
 fi
 
@@ -280,7 +281,7 @@ grep -qF '`/retro-planning`' "$forked/ask-matt/SKILL.md" || bad "ask-matt/SKILL.
 # fails, and so do two headers sharing a number (2 and 2b are different header numbers; for the pairs, 2b
 # is written as 2). A placeholder number (TBD- and a capital N) is exempt from those two number rules, since
 # several new checks in one pull request share it, but a placeholder pair (same name) claimed twice still fails.
-self="$root/scripts/check-plugin.sh"
+self="$repo/scripts/check-plugin.sh"
 patches="$root/PATCHES.md"
 if [ ! -f "$patches" ]; then bad "missing PATCHES.md"
 else
@@ -359,7 +360,8 @@ else
     [ -f "$sd/$f" ] || bad "missing skills/setup-dev-skills/$f"
   done
   [ -e "$sd/agents/openai.yaml" ] && bad "setup-dev-skills/agents/openai.yaml exists; our own skills have none"
-  grep -qF 'LICENSE-mattpocock-skills' "$sd/SKILL.md" || bad "setup-dev-skills/SKILL.md does not credit Matt Pocock's skills and LICENSE-mattpocock-skills"
+  grep -qF "Matt Pocock's" "$sd/SKILL.md" || bad "setup-dev-skills/SKILL.md does not credit Matt Pocock's skills (the text \"Matt Pocock's\")"
+  grep -qF 'LICENSE-mattpocock-skills' "$sd/SKILL.md" || bad "setup-dev-skills/SKILL.md does not name LICENSE-mattpocock-skills"
   grep -qF 'wayfinder:map' "$sd/SKILL.md" || bad "setup-dev-skills/SKILL.md does not create the wayfinder labels"
   grep -qiF 'never change' "$sd/SKILL.md" || bad "setup-dev-skills/SKILL.md does not say the settings check never changes settings"
   [ -e "$sd/issue-tracker-gitlab.md" ] || [ -e "$sd/issue-tracker-local.md" ] && bad "setup-dev-skills still carries a GitLab or local tracker seed"
@@ -419,7 +421,8 @@ done
 # match this script's own text. (b) Every plugin under plugins/ whose files differ from origin/main
 # (committed since the merge-base, staged, unstaged or untracked) has a plugin.json version strictly higher
 # than origin/main's. No origin/main (a shallow clone, no remote): (b) is skipped with a note. On main
-# itself HEAD is origin/main, so nothing differs and (b) passes.
+# itself HEAD is origin/main, so nothing differs and (b) passes. When origin/main exists but `git diff
+# origin/main...HEAD` fails (for example no merge base), the plugin gets a FAIL, not a skip.
 ph_hits="$(
   (cd "$repo" && find plugins/*/PATCHES.md plugins/*/README.md README.md CLAUDE.md GLOSSARY.md docs -type f -print0 2>/dev/null |
     xargs -0 grep -nE '(Patch|[Cc]heck|version|to) [`(]?TBD-[N]' 2>/dev/null)
@@ -440,8 +443,15 @@ else
   for pj in "$repo"/plugins/*/.claude-plugin/plugin.json; do
     [ -f "$pj" ] || continue
     pd="plugins/$(basename "$(dirname "$(dirname "$pj")")")"
-    changed="$(cd "$repo" && { git diff --name-only origin/main...HEAD -- "$pd"; git diff --name-only HEAD -- "$pd"
+    # a failing three-dot diff (no merge base, e.g. a shallow fetch of main plus an unrelated PR head) must fail
+    # loudly: an empty answer from a failed command would skip the plugin and pass an unbumped change
+    if ! committed="$(cd "$repo" && git diff --name-only origin/main...HEAD -- "$pd" 2>/dev/null)"; then
+      bad "$pd: git diff origin/main...HEAD failed (no merge base with origin/main?); fetch full history so the version bump can be checked"
+      continue
+    fi
+    changed="$(cd "$repo" && { printf '%s\n' "$committed"; git diff --name-only HEAD -- "$pd"
       git ls-files --others --exclude-standard -- "$pd"; })"
+    changed="$(printf '%s' "$changed" | sed '/^$/d')"
     [ -n "$changed" ] || continue
     old_v="$(cd "$repo" && git show "origin/main:$pd/.claude-plugin/plugin.json" 2>/dev/null | ver_of)"
     [ -n "$old_v" ] || continue # a new plugin: nothing to bump from

@@ -49,7 +49,7 @@ claude plugin install dai-portal-data@luffy-dev
 claude plugin install dev-skills@luffy-dev
 ```
 
-For `dev-skills`, run `plugins/dev-skills/scripts/check-plugin.sh` and `claude plugin validate .` before pushing, and record any change to Upstream text in `plugins/dev-skills/PATCHES.md`.
+For `dev-skills`, run `scripts/check-plugin.sh` and `claude plugin validate .` before pushing, and record any change to Upstream text in `plugins/dev-skills/PATCHES.md`.
 
 ## Layout
 
@@ -69,6 +69,5 @@ luffy-dev-skills/
         │   └── plugin.json     # plugin manifest
         ├── upstream-skills/    # forked from Matt Pocock's skills
         ├── skills/             # our own skills
-        ├── PATCHES.md          # changes to Upstream text
-        └── scripts/check-plugin.sh
+        └── PATCHES.md          # changes to Upstream text
 ```

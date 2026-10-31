@@ -28,8 +28,7 @@ plugins/dev-skills/
 ├── upstream-skills/             # forked from Upstream; every change is in PATCHES.md
 ├── skills/                      # our own skills: setup-project, retro-planning, setup-dev-skills
 ├── PATCHES.md                   # what we changed in Upstream text, and the Upstream commit
-├── LICENSE-mattpocock-skills    # Upstream's MIT licence
-└── scripts/check-plugin.sh      # checks the layout and the Patches
+└── LICENSE-mattpocock-skills    # Upstream's MIT licence
 ```
 
 Forked and own skills live in separate folders so it is always clear which text came from Upstream. Never put our own skill in `upstream-skills/`. To add one, create `skills/<name>/SKILL.md`; `plugin.json` already points at the folder.

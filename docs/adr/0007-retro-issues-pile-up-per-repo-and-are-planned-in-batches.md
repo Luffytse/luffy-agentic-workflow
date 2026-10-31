@@ -41,4 +41,4 @@ The thresholds (10, 2 weeks with 4, at most 3 groups, 2 plannings) are the user'
 - A new skill of our own, `retro-planning`, lives under `plugins/dev-skills/skills/`, and `ask-matt` routes to it (a Patch).
 - `triage` must skip issues labelled `retro`, since they carry no `needs-triage` and would otherwise look untriaged (a Patch).
 - `implement` and `implement-spec` end with `retro` (Patches).
-- This repo gets a CI job running `plugins/dev-skills/scripts/check-plugin.sh` and `claude plugin validate .` on every pull request.
+- This repo gets a CI job running `scripts/check-plugin.sh` and `claude plugin validate .` on every pull request.

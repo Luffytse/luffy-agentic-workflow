@@ -749,3 +749,12 @@ Our own, not Upstream; no Upstream text changed. `skills/setup-dev-skills/` gain
 
 - `scripts/check-plugin.sh`: new check 42 (setup-review-seed: the seed has the three sections and an empty list, and `SKILL.md` links it and says the repo's own rules never go into skill text).
 - `.claude-plugin/plugin.json`: version 0.22.10 to 0.22.11.
+
+## Not a Patch: `check-plugin.sh` moves out of the plugin to `scripts/` at the repo root
+
+Our own, not Upstream; no Upstream text changed, so this is not numbered. `check-plugin.sh` only checks this repo, yet it shipped in every project's plugin cache, so it moved from `plugins/dev-skills/scripts/` to `scripts/check-plugin.sh` at the repo root (git mv; `plugins/dev-skills/scripts/` is gone). It finds the repo from its own real path and the plugin tree at `plugins/dev-skills` under it. Every earlier entry in this file that says `scripts/check-plugin.sh` means this script, at its old place then.
+
+- `scripts/check-plugin.sh` (the repo root one): check 6 exempts `./scripts/check-plugin.sh` instead of the plugin's copy; check 19 expects the workflow to run `scripts/check-plugin.sh`.
+- `scripts/check-plugin.sh` fixes, issues #168, #169, #170 and #184 (the script is no longer plugin text, so they bump nothing): the root is found with `cd -P` / `pwd -P`, so a symlinked parent directory works (#168); check 15 scans an array, so a path with a space does not split (#169); a failing `git diff origin/main...HEAD` in check 29b is a FAIL for that plugin, not a silent skip (#170); check 24 tests the credit text `Matt Pocock's` and the `LICENSE-mattpocock-skills` filename in two greps with two messages (#184).
+- `README.md`, `plugins/dev-skills/README.md`, `CLAUDE.md`, `REVIEW.md`, `docs/index.md` and ADR 0007 point to the new place.
+- `.claude-plugin/plugin.json`: version 0.22.16 to 0.22.17 (the plugin loses a file).

@@ -19,6 +19,7 @@ Read this first, then open only the docs whose line fits your work. Specs and ti
 - [dev-skills README](../plugins/dev-skills/README.md): what the plugin is, install steps, the model-tier table and the forked/own folder layout. Read when installing the plugin, adding a skill of our own, or mapping a tier to a model.
 - [dev-skills PATCHES.md](../plugins/dev-skills/PATCHES.md): the Upstream commit and every change we made to Upstream text. Read before changing anything under `upstream-skills/` or merging an Upstream update.
 - [DOCS-INDEX.md](../plugins/dev-skills/upstream-skills/domain-modeling/DOCS-INDEX.md): the docs index format and update rule every writing skill follows. Read when changing how skills keep `docs/index.md` current.
+- [scripts/check-plugin.sh](../scripts/check-plugin.sh): this repo's own checker for the `dev-skills` layout, the Patches and the placeholder and version-bump rules; it lives outside the plugin so it does not ship to projects. Read when adding or changing a check, or before pushing a plugin change.
 - [ADR 0001](adr/0001-dev-skills-is-one-plugin-forked-from-matt-pocock.md): why `dev-skills` is one plugin forked from Matt Pocock's skills, and which skills it keeps. Read when adding, dropping or patching a skill.
 - [ADR 0002](adr/0002-skills-name-model-tiers-not-models.md): skills name cheap, regular or premium tiers, never models. Read when a skill picks a model.
 
