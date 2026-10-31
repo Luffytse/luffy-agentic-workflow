@@ -60,7 +60,7 @@ The step that picks the next Release's goal and issues: the agent proposes, the 
 _Avoid_: release triage
 
 **Release thread**:
-A project thread that cuts a Release (the bump pull request and its `CHANGELOG.md` entry) and then runs the next Release planning.
+A project thread that cuts a Release (the bump pull request and its `CHANGELOG.md` entry) and then runs the next Release planning, with the `release` skill.
 
 **Build thread**:
 A project thread that builds a Spec or a lone Ticket: a Spec thread or a Ticket thread.

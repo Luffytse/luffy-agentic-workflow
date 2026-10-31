@@ -618,5 +618,28 @@ done
 grep -qF "tracker doc's way of adding a line to an issue body" "$forked/to-tickets/SKILL.md" || bad "to-tickets/SKILL.md does not point its fallback sentences at the tracker doc's way of adding a line to an issue body"
 grep -qF "tracker doc's way of adding a line to an issue body" "$forked/wayfinder/SKILL.md" || bad "wayfinder/SKILL.md does not point its fallback at the tracker doc's way of adding a line to an issue body"
 
+# release-skill: the release skill and its repo release doc (issue #259): our own skill exists and reads a release doc,
+# setup-dev-skills links the release.md seed it writes from, this repo has its own release doc and a dev-skills
+# CHANGELOG.md, to-tickets and ask-matt name the skill's doc and route, and the skill names nothing only this repo has.
+# Structural: it tests which files exist and link each other, not the skill's wording.
+rl="$own/release"
+if [ ! -f "$rl/SKILL.md" ]; then bad "missing skills/release/SKILL.md"
+else
+  grep -qF 'release doc' "$rl/SKILL.md" || bad "release/SKILL.md does not read the repo's release doc"
+  grep -qF 'setup-dev-skills' "$rl/SKILL.md" || bad "release/SKILL.md does not send the user to setup-dev-skills when the repo has no release doc"
+  hits="$(grep -rnE 'PATCHES\.md|check-plugin|plugin\.json|luffy|Luffytse|dai-portal|mattpocock' "$rl")"
+  if [ -n "$hits" ]; then echo "$hits"; bad "release skill text names a file, repo or project only this repo has"; fi
+fi
+for rd in "$own/setup-dev-skills/release.md" "$repo/docs/agents/release.md"; do
+  [ -f "$rd" ] || { bad "missing release doc ${rd#"$repo"/}"; continue; }
+  for k in '**Version file**' '**Changelog**' '**Label prefix**'; do
+    grep -qF "$k" "$rd" || bad "${rd#"$repo"/} has no $k line"
+  done
+done
+grep -qF '(./release.md)' "$own/setup-dev-skills/SKILL.md" || bad "setup-dev-skills/SKILL.md does not link the release.md seed"
+[ -f "$root/CHANGELOG.md" ] || bad "missing plugins/dev-skills/CHANGELOG.md"
+grep -qF 'release doc' "$forked/to-tickets/SKILL.md" || bad "to-tickets/SKILL.md does not read the release doc for a Spec's release label"
+grep -qF '`/release`' "$forked/ask-matt/SKILL.md" || bad "ask-matt/SKILL.md does not route to \`/release\`"
+
 [ "$fail" -eq 0 ] && echo "OK: dev-skills plugin checks passed ($count skills)"
 exit "$fail"

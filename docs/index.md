@@ -11,6 +11,7 @@ Read this first, then open only the docs whose line fits your work. Specs and ti
 - [docs/agents/issue-tracker.md](agents/issue-tracker.md): this repo's issues live on GitHub, and the commands for issues, sub-issues, blocking and adding a line to an existing issue body. Read when a skill creates, reads, edits the body of, labels or closes an issue.
 - [docs/agents/triage-labels.md](agents/triage-labels.md): the label string for each triage role, and the labels that are not triage roles. Read when applying or filtering triage labels.
 - [docs/agents/domain.md](agents/domain.md): the single-context doc layout and how skills read the glossary and ADRs. Read when a skill looks for domain docs or flags an ADR conflict.
+- [docs/agents/release.md](agents/release.md): the release doc: `dev-skills`' version file, its `CHANGELOG.md` path, the `release-` label prefix and the extra steps of a bump pull request. Read when running the `release` skill or giving an issue a release label.
 
 ## Packaging
 
@@ -30,6 +31,7 @@ Read this first, then open only the docs whose line fits your work. Specs and ti
 - [ADR 0008](adr/0008-plugin-versions-change-only-at-a-release.md): plugin versions change only at a Release, what each part of X.Y.Z means, and how a Release is planned and cut. Read when working on versions, `CHANGELOG.md`, release labels or a Release thread.
 - [implement-spec eval RESULTS.md](../evals/implement-spec/RESULTS.md): one entry per build-flow check of `implement-spec`. Read to see how `implement-spec` did in its build-flow check.
 - [implement eval RESULTS.md](../evals/implement/RESULTS.md): one entry per build-flow check of `implement`. Read to see how `implement` did in its build-flow check.
+- [release eval RESULTS.md](../evals/release/RESULTS.md): one entry per dry run of `release` (a proposal only, nothing merged or labelled). Read to see how `release` did in its dry run.
 
 ## Code review
 

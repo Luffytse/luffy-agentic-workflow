@@ -69,5 +69,6 @@ luffy-dev-skills/
         │   └── plugin.json     # plugin manifest
         ├── upstream-skills/    # forked from Matt Pocock's skills
         ├── skills/             # our own skills
+        ├── CHANGELOG.md        # what each version brought
         └── PATCHES.md          # changes to Upstream text
 ```

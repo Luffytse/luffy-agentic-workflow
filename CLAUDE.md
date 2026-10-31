@@ -33,3 +33,7 @@ Issues and specs live in this repo's GitHub Issues. See `docs/agents/issue-track
 ### Domain docs
 
 Single-context: one root `GLOSSARY.md` and `docs/adr/`. See `docs/agents/domain.md`.
+
+### Releases
+
+`dev-skills`' version is in `plugins/dev-skills/.claude-plugin/plugin.json`; release labels are `release-X.Y.Z`. See `docs/agents/release.md`.

@@ -900,3 +900,17 @@ What (Upstream-derived text changed):
 - `.claude-plugin/plugin.json`: version unchanged (0.22.27); it changes only in a Release's bump pull request.
 
 Merging an Upstream update: Upstream's `implement` and `implement-spec` are replaced whole (Patches 8 and 11), so carry over no numbering step or placeholder bullet; keep the "taken only at a release" brief bullet, and the merge-only Round wording without a numbers commit.
+
+## Patch: the `release` skill, its release doc, and the routes to it (`to-tickets/`, `ask-matt/`, issue #259)
+
+Why: issue #259 (Spec #257). A plugin's version now changes only at a Release, and a Release thread needs a skill for the general flow (check the Release is done, pick the bump size, open the bump pull request, run the Release planning) that names no project, with each repo's specifics in a repo doc.
+
+What (Upstream text changed):
+
+- `to-tickets/SKILL.md` step 5, tracker bullet: after "the tickets are agent-grabbable by construction." two sentences: if the repo has a release doc (`docs/agents/release.md`) that defines a label prefix, and the source issue carries a label with that prefix, give each ticket that label too; give no other ticket a release label, since an issue filed during a Release waits for the next Release planning.
+- `ask-matt/SKILL.md`: a new `## Releases` section before "Vocabulary underneath" routes cutting the Release and the Release planning for the next one to **`/release`**, an urgent fix too; the Precondition's `setup-dev-skills` sentence adds "and the release doc `/release` reads".
+- Not Upstream text: new own skill `skills/release/SKILL.md`; `skills/setup-dev-skills/` gains the seed `release.md`, a Releases bullet, an exploration item, Section E (does the repo cut Releases; the version file, changelog path and label prefix), the seed in the draft list, a `### Releases` part of the `## Agent skills` block, and leaves the release labels to `release`; the triage label seed says what the release labels mark; its description names the release doc. This repo gets `docs/agents/release.md`, the same release-label line in `docs/agents/triage-labels.md`, a `### Releases` part in `CLAUDE.md`'s `## Agent skills` block, `plugins/dev-skills/CHANGELOG.md` with one entry for the versions up to 0.22.27, the plugin README's own-skills list and layout, the root README's folder tree, the `GLOSSARY.md` Release thread entry naming the skill, two `docs/index.md` lines, and the dry run in `evals/release/RESULTS.md`.
+- `scripts/check-plugin.sh`: new check `release-skill` (the skill exists, reads a release doc and names `setup-dev-skills`, and names no file, repo or project only this repo has; the seed and this repo's release doc have the Version file, Changelog and Label prefix lines; `setup-dev-skills` links the seed; `CHANGELOG.md` exists; `to-tickets` names the release doc; `ask-matt` routes to `/release`).
+- `.claude-plugin/plugin.json`: version unchanged (0.22.27); it changes only in a Release's bump pull request.
+
+Merging an Upstream update: take Upstream's text, then re-apply the two release-label sentences in `to-tickets` step 5, and the `## Releases` section and the Precondition clause in `ask-matt`.

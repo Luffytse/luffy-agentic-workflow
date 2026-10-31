@@ -1,6 +1,6 @@
 ---
 name: setup-dev-skills
-description: "Configure a GitHub repo for the dev-skills plugin: write its issue tracker, triage label and domain doc files, create the labels the skills use, and check the GitHub settings the build skills rely on. Use when the user sets up a repo for these skills, or the repo has no issue tracker or triage labels configured yet, or asks to update the repo's tracker, label or domain-doc files."
+description: "Configure a GitHub repo for the dev-skills plugin: write its issue tracker, triage label, domain doc and release doc files, create the labels the skills use, and check the GitHub settings the build skills rely on. Use when the user sets up a repo for these skills, or the repo has no issue tracker or triage labels configured yet, or asks to update the repo's tracker, label, domain-doc or release-doc files."
 ---
 
 # Set up dev-skills
@@ -11,6 +11,7 @@ Derived from Matt Pocock's setup skill; the seed files in this folder are mostly
 - **Labels**: the 5 state roles and 2 category roles that `triage` uses, and the `wayfinder:*` labels, in `docs/agents/triage-labels.md` and on the repo.
 - **Domain docs**: where `GLOSSARY.md` and ADRs live and how skills read them, in `docs/agents/domain.md`, plus the `docs/index.md` that lists the docs.
 - **Review rules**: a starter `REVIEW.md` at the repo root, where the repo's own review rules go.
+- **Releases**: where the version lives, the changelog path and the release label prefix that `release` reads, in `docs/agents/release.md`, for a repo that cuts versioned Releases.
 - **GitHub settings**: checked and reported, never changed.
 
 This is a prompt-driven skill, not a deterministic script. Explore, present what you found, confirm with the user, then write. It runs the same way on a fresh repo and on a re-run; a re-run shows a diff first (step 3).
@@ -27,6 +28,7 @@ Read whatever exists; assume nothing:
 - `GLOSSARY.md` and `GLOSSARY-MAP.md` at the repo root, and the legacy `CONTEXT.md` / `CONTEXT-MAP.md`. If a legacy file exists, offer to `git mv` it to its `GLOSSARY` name and rewrite those names in `docs/agents/domain.md`.
 - `docs/adr/` and any `src/*/docs/adr/` directories.
 - `docs/agents/`: do earlier output files exist? If so this is a re-run.
+- `docs/agents/release.md`, and the files a Release would touch: a version file (such as `package.json`, `pyproject.toml`, `Cargo.toml` or a plugin manifest) and a `CHANGELOG.md`.
 - `REVIEW.md` at the repo root: does it exist, and which of its sections (Important, Skip, Always check) does it have? An existing one is left as it is (step 3).
 - `docs/index.md`: the docs index, if one exists, and the other docs it should list (`REVIEW.md`, `CODING_STANDARDS.md`, `CONTRIBUTING.md`, `.out-of-scope/`, README files).
 - The repo's labels: `gh api repos/<owner>/<repo>/labels --paginate --jq '.[].name'`.
@@ -54,6 +56,12 @@ The defaults are the 5 state roles, `needs-triage`, `needs-info`, `ready-for-age
 
 On **yes**, ask the user for the rules' text, then record them in the repo's `CLAUDE.md` or `AGENTS.md` (the file step 4 picks) or, if they are about review, in `REVIEW.md`. Such rules never go into skill text: every project that loads the plugin reads the skills, so a rule that fits one repo belongs in that repo's own files.
 
+**Section E: Releases.** Ask one question:
+
+> Does this repo cut versioned Releases with the `release` skill? (recommended: **yes** when exploration found a version file, otherwise **no**)
+
+On **yes**, fill the release doc's three values, leading with what exploration found: the version file and the field or line that holds the version, the changelog path (an existing `CHANGELOG.md`, else one beside the version file), and the label prefix (default `release-`). Then ask whether the bump pull request must change or run anything else, such as a second file that repeats the version (recommended: **nothing**). On **no**, write no release doc.
+
 ### 3. Draft and diff
 
 Build every file from the seeds in this folder:
@@ -61,11 +69,12 @@ Build every file from the seeds in this folder:
 - [issue-tracker-github.md](./issue-tracker-github.md) becomes `docs/agents/issue-tracker.md`
 - [triage-labels.md](./triage-labels.md) becomes `docs/agents/triage-labels.md`
 - [domain.md](./domain.md) becomes `docs/agents/domain.md`
+- [release.md](./release.md) becomes `docs/agents/release.md`, only when Section E was **yes**
 - [review.md](./review.md) becomes `REVIEW.md` at the repo root, but only when the repo has none, first run or re-run. An existing `REVIEW.md` (one `retro` made, or the user's own) is never drafted over: nothing in it is removed or rewritten, and only a missing section of Important, Skip and Always check is offered, alone, as a diff; with all three present, report "no change".
 - the `## Agent skills` block (step 4)
 - `docs/index.md`, new or updated, listing every `docs/agents/` file, `REVIEW.md` (with a "read when reviewing a change or adding an Always check line" line) and every other doc found while exploring, in the format and under the rules of [DOCS-INDEX.md](../../upstream-skills/domain-modeling/DOCS-INDEX.md)
 
-On a re-run, diff each draft against the file in the repo. Keep the values the earlier run filled in (the repo link, the label strings, the PR flag) and change only what drifted from the seeds. Show the user the diff, or "no change" per file. The rules the user gave in Section D are drafted into the diff of the file they go in (`CLAUDE.md` or `AGENTS.md`, or `REVIEW.md`) and shown before writing; adding a line to an existing `REVIEW.md` is an addition, not a rewrite. Let the user edit before anything is written.
+On a re-run, diff each draft against the file in the repo. Keep the values the earlier run filled in (the repo link, the label strings, the PR flag, the release doc's values) and change only what drifted from the seeds. Show the user the diff, or "no change" per file. The rules the user gave in Section D are drafted into the diff of the file they go in (`CLAUDE.md` or `AGENTS.md`, or `REVIEW.md`) and shown before writing; adding a line to an existing `REVIEW.md` is an addition, not a rewrite. Let the user edit before anything is written.
 
 Done when the user has approved the drafts, or approved "no change".
 
@@ -91,11 +100,17 @@ Start at `docs/index.md`; it says which doc to read for what.
 ### Domain docs
 
 [one-line summary of layout: "single-context" or "multi-context"]. See `docs/agents/domain.md`.
+
+### Releases
+
+[one-line summary: the version file and the release label prefix]. See `docs/agents/release.md`.
 ```
+
+Leave out the `### Releases` part when the repo has no release doc.
 
 Then write the approved files, and `docs/index.md` last.
 
-**Create the labels.** Create every label the skills use that the repo lacks, whether or not `triage` is installed: the label string of each of the 5 state roles, `bug` and `enhancement`, and `wayfinder:map`, `wayfinder:research`, `wayfinder:prototype`, `wayfinder:grilling` and `wayfinder:task`. Use `gh api --method POST repos/<owner>/<repo>/labels -f name=<label>` (or the session's GitHub tools); `gh label create` needs GraphQL. Leave `retro` and `retro-planning` alone: `retro` and `retro-planning` create them when first needed.
+**Create the labels.** Create every label the skills use that the repo lacks, whether or not `triage` is installed: the label string of each of the 5 state roles, `bug` and `enhancement`, and `wayfinder:map`, `wayfinder:research`, `wayfinder:prototype`, `wayfinder:grilling` and `wayfinder:task`. Use `gh api --method POST repos/<owner>/<repo>/labels -f name=<label>` (or the session's GitHub tools); `gh label create` needs GraphQL. Leave `retro`, `retro-planning` and the release labels alone: `retro`, `retro-planning` and `release` create them when first needed.
 
 ### 5. Check GitHub settings and report
 
