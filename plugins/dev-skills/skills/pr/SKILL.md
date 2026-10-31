@@ -192,7 +192,7 @@ Closes #2
 Closes #3
 ```
 
-A spec's PR lists the spec and every ticket; any other issue it absorbs (a Retro issue, say) gets its own line.
+A spec's PR lists the spec and every ticket that has landed on its branch, not every ticket (a dropped or never-landed ticket stays out, or merging closes it as completed); any other issue a landed ticket absorbs (a Retro issue, say) gets its own line.
 
 ### Merge Danger
 
