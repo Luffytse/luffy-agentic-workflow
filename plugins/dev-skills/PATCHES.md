@@ -725,6 +725,18 @@ What:
 
 Merging an Upstream update: re-apply the `setup-project` entry and the checklist wording.
 
+## Patch 39: Rank step 2 states how a dismissed Finding is matched (`agentic-review/`)
+
+Why: issues #138 and #139 (Findings R2-7 and R3-6 of the review of #131). Rank step 2 dropped a Finding "already dismissed" but gave no matching rule, while step 3 matches on the same Bug class, so a Finder wording a dismissed problem under another Bug class got past both. ADR 0003's Rank line also left out Ticket checks.
+
+What:
+
+- `agentic-review/ROUNDS.md` (Rank step 2): adds that a Finding matches a dismissed one when it overlaps the dismissed one's locations and makes the same claim, whatever Bug class the Finder gave it.
+- Not Upstream text: `docs/adr/0003-code-review-runs-find-verify-rank-in-rounds.md`, Rank line: "in an earlier Round or Ticket check", and the same matching rule.
+- `.claude-plugin/plugin.json`: version 0.22.15 to 0.22.16.
+
+Merging an Upstream update: take Upstream's text, then re-apply the matching sentence in Rank step 2.
+
 ## Vendor model names in Upstream text
 
 None in the kept skills at the Base commit, so no Patch was needed for ADR 0002 (checked for ticket #4: grep for `haiku`, `sonnet`, `opus`, `claude-`, `gpt-`, `gemini` over `upstream-skills/`). Some kept skills start subagents (for example `grilling`, `wayfinder`, `code-review`, `implement-spec`), but none picks a model for them. Spec #1 adds tiers in later tickets (the `code-review` Finders and Verifiers, and the `implement` and `implement-spec` Implementers; the tier on each ticket from `to-tickets` is Patch 7, the `implement` Implementer's tier is Patch 8, and the `implement-spec` Implementers' tiers are Patch 11); each of those edits gets its own Patch here.

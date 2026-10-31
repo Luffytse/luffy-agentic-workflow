@@ -7,7 +7,7 @@ The Rank stage of [`agentic-review`](SKILL.md), the Round comment that records e
 You rank; no subagent. Over the Findings Verify kept:
 
 1. **Dedupe.** Findings with the same Bug class and overlapping locations are one Finding: merge their locations and keep every Finder's name.
-2. **Drop the dismissed.** A Finding already dismissed in an earlier Round or Ticket check (dropped by Verify, a Nit marked "skip", or a design Finding the user settled by keeping the design) is dropped, even if this Review's Verifier kept it.
+2. **Drop the dismissed.** A Finding already dismissed in an earlier Round or Ticket check (dropped by Verify, a Nit marked "skip", or a design Finding the user settled by keeping the design) is dropped, even if this Review's Verifier kept it. It matches a dismissed Finding when it overlaps the dismissed one's locations and makes the same claim, whatever Bug class the Finder gave it: wording the same problem as another Bug class does not make it new.
 3. **Hold the already raised.** A Finding already raised earlier (same Bug class, overlapping locations) is not reported again. It keeps its earlier id and stays open until fixed; an unfixed Important still blocks the stop. If this Review found new instances of its Bug class, add them to its locations in this Round's comment.
 4. **Sort** by Severity: Important, then Nit, then Pre-existing.
 5. **Cap the Nits** at 5, "fix" Nits first. The Nits cut by the cap are not reported and not recorded.
