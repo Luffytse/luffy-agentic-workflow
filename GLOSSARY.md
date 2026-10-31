@@ -56,7 +56,7 @@ _Avoid_: task, story
 A project goal (for example "M3 Trip planning") that groups the Specs and Tickets needed to reach it.
 
 **Release**:
-One version of a plugin and the few issues it ships, each labelled `release-X.Y.Z`, with one release issue holding its goal and notes. Only a Release changes a plugin's version (ADR 0008). Not a Milestone, which is a project goal.
+One version of a plugin and the few issues it ships, each labelled `release-X.Y.Z`, with one release issue holding its goal and notes. Not a Milestone, which is a project goal.
 _Avoid_: sprint, version bump
 
 **Release planning**:
