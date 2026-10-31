@@ -2,6 +2,24 @@
 
 What each version of `dev-skills` brought, newest first. A version changes only when a Release is cut, and each Release adds one entry here: its goal, the issues it shipped, and what a project using the plugin must do when something breaks.
 
+## 0.24.1 (2026-10-31)
+
+The review, release and build skills handle the edge cases that 0.24.0's reviews found.
+
+- filed Pre-existing row stays open (#299)
+- Result value not tied to Round 5 not clean (#315)
+- The cap is named three ways (#316)
+- Release label left by a dropped Release is reused on creation (#301)
+- Issue merged before an urgent cut is listed in two changelog entries (#302)
+- Release skill label queries count pull requests and are not paginated (#303)
+- Release skill "highest version" is not defined as a numeric comparison (#304)
+- Release skill: first-Release path says "the one just cut" when nothing was cut (#305)
+- Release skill: a rerun of an urgent request opens a second urgent release issue (#306)
+- Closed carried-over issue becomes a Release candidate (#312)
+- Spec PR closes a dropped ticket as completed (#308)
+- Tracker doc Close recipe has no REST form or reason (#309)
+- REVIEW.md: a wording edge case that needs a new clause is a Nit unless following the text literally gives a wrong result (#266)
+
 ## 0.24.0 (2026-10-31)
 
 The review, build and release skills do what they say: no false-clean Rounds, no Ticket started or left open by mistake, release cuts that cannot go wrong, and clearer history and planning.
