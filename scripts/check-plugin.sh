@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Structural checks of the dev-skills plugin. This repo's own tooling: it lives at the repo root,
 # not in the plugin, so it does not ship in every project's plugin cache.
-# Run from anywhere: scripts/check-plugin.sh (or a symlink to it)
+# Run from anywhere: scripts/check-plugin.sh (or a symlink to it). Requires python3 for JSON checks.
 #
 # Each check has a short name (the `# name:` comment above its code) and no number, so a new check
 # takes no counter that parallel pull requests could collide on. A check tests structure or a
@@ -14,7 +14,9 @@
 #   skill-name-matches-folder    each SKILL.md frontmatter name equals its folder name
 #   skill-links                  each relative .md or .yaml link in a SKILL.md points at a file that exists
 #   plugin-manifest              plugin.json, README.md, CHANGELOG.md and the licence file exist; plugin.json names its repository
+#   codex-packaging              Codex marketplace exposes only dev-skills, with matching manifest identity and shared skills path
 #   release-files                the release skill, its release doc seed and this repo's release doc exist
+#   openai-metadata-present      every skill folder has agents/openai.yaml
 #   codex-implicit-invocation    no agents/openai.yaml turns implicit invocation off
 #   openai-display-name          each agents/openai.yaml display_name reads like its skill's folder name
 #   vendor-model-names           no vendor model name in the repo's text (ADR 0002)
@@ -88,10 +90,56 @@ done
 [ -f "$root/CHANGELOG.md" ] || bad "missing CHANGELOG.md"
 grep -qE '"repository"[[:space:]]*:[[:space:]]*"https://github.com/[^"/]+/[^"/]+"' "$root/.claude-plugin/plugin.json" 2>/dev/null || bad "plugin.json has no repository field with a GitHub URL"
 
+# codex-packaging: Codex publishes only dev-skills and shares Claude's identity and skill tree.
+# Parse JSON rather than grepping formatting; missing or malformed packaging fails too.
+if ! python3 - "$repo" <<'PYCODE'
+import json
+import pathlib
+import sys
+
+repo = pathlib.Path(sys.argv[1])
+root = repo / "plugins/dev-skills"
+try:
+    def require(condition, message):
+        if not condition:
+            raise ValueError(message)
+
+    claude = json.loads((root / ".claude-plugin/plugin.json").read_text())
+    codex = json.loads((root / ".codex-plugin/plugin.json").read_text())
+    marketplace = json.loads((repo / ".agents/plugins/marketplace.json").read_text())
+    require(codex.get("name") == claude["name"], "Codex manifest name differs from Claude manifest")
+    require(codex.get("version") == claude["version"], "Codex manifest version differs from Claude manifest")
+    def skill_paths(manifest):
+        paths = manifest.get("skills")
+        if isinstance(paths, str):
+            paths = [paths]
+        require(isinstance(paths, list) and paths and all(isinstance(path, str) for path in paths), "manifest skills must name directories")
+        return [path.rstrip("/") for path in paths]
+    require(skill_paths(codex) == skill_paths(claude) == ["./skills"], "Codex and Claude manifests must use the shared ./skills tree")
+    require((root / "skills").is_dir(), "shared skills directory is missing")
+    entries = marketplace["plugins"]
+    require(marketplace["name"] == "luffy-dev", "Codex marketplace name differs from luffy-dev")
+    require(len(entries) == 1 and entries[0]["name"] == claude["name"], "Codex marketplace must offer only dev-skills")
+    source = entries[0]["source"]
+    require(source == {"source": "local", "path": "./plugins/dev-skills"}, "Codex marketplace must use the shared dev-skills plugin")
+except (AttributeError, KeyError, TypeError, ValueError, OSError) as error:
+    print(f"FAIL: codex-packaging: {error}")
+    sys.exit(1)
+PYCODE
+then
+  bad "codex-packaging failed (see above; requires python3)"
+fi
+
 # release-files: the release skill and the release docs it reads exist (presence only; the skill's text is
 # covered by repo-free-skill-text)
 for f in "$skills/release/SKILL.md" "$skills/setup-dev-skills/release.md" "$repo/docs/agents/release.md"; do
   [ -f "$f" ] || bad "missing ${f#"$repo"/}"
+done
+
+# openai-metadata-present: every skill folder carries Codex/OpenAI metadata
+for d in "$skills"/*/; do
+  [ -d "$d" ] || continue
+  [ -f "${d}agents/openai.yaml" ] || bad "skill $(basename "$d"): missing agents/openai.yaml"
 done
 
 # codex-implicit-invocation: every skill is implicitly invocable in the Codex/OpenAI metadata too

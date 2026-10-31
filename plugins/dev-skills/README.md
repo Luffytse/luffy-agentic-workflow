@@ -1,8 +1,10 @@
 # dev-skills
 
-The development skills as one Claude Code plugin: the path from `wayfinder` through specs, tickets and implementation to `agentic-review` and `retro`. The skills began as 22 of [Matt Pocock's skills](https://github.com/mattpocock/skills) (MIT) and are our own now. Every skill is model-invoked, so an agent in a project thread (where nobody types slash commands) can start any of them. See [ADR 0001](../../docs/adr/0001-dev-skills-is-one-plugin-forked-from-matt-pocock.md).
+The development skills as one plugin for Claude Code and Codex: the path from `wayfinder` through specs, tickets and implementation to `agentic-review` and `retro`. The skills began as 22 of [Matt Pocock's skills](https://github.com/mattpocock/skills) (MIT) and are our own now. Every skill is model-invoked, so an agent in a project thread (where nobody types slash commands) can start any of them. See [ADR 0001](../../docs/adr/0001-dev-skills-is-one-plugin-forked-from-matt-pocock.md).
 
 ## Install
+
+### Claude Code
 
 From inside Claude Code:
 
@@ -20,17 +22,71 @@ claude plugin install dev-skills@luffy-dev
 
 Skills are namespaced, for example `dev-skills:wayfinder`. For a Claude project, add the plugin in Project settings.
 
+### Codex
+
+From the shell (verified with Codex CLI `0.166.0-alpha.5.1`):
+
+```bash
+codex plugin marketplace add https://github.com/Luffytse/luffy-dev-skills
+codex plugin add dev-skills@luffy-dev
+codex plugin list --marketplace luffy-dev --json
+```
+
+The list should show `dev-skills` installed and enabled. Start a new Codex session to load the skills. Both agents use the same `skills/` tree.
+
+## Update
+
+For Claude Code:
+
+```bash
+/plugin marketplace update luffy-dev
+# Or from the shell:
+claude plugin marketplace update luffy-dev
+```
+
+For Codex with the GitHub marketplace:
+
+```bash
+codex plugin marketplace upgrade luffy-dev
+codex plugin add dev-skills@luffy-dev
+```
+
+Start a new Codex session after updating (restart the desktop app if using it).
+
+## Local development
+
+For Claude Code:
+
+```bash
+claude plugin marketplace add /path/to/luffy-dev-skills
+claude plugin install dev-skills@luffy-dev
+```
+
+For Codex:
+
+```bash
+# If luffy-dev is already configured from GitHub, remove that source first:
+codex plugin marketplace remove luffy-dev
+codex plugin marketplace add /path/to/luffy-dev-skills
+codex plugin add dev-skills@luffy-dev
+```
+
+Codex loads a cached copy. After editing the clone, repeat `codex plugin add dev-skills@luffy-dev` and start a new session (restart the desktop app if using it). `marketplace upgrade` applies to Git sources, not local paths. To return to GitHub, remove the local marketplace source, then repeat the Codex install steps. See the [official packaging docs](https://developers.openai.com/plugins/build/plugins#how-local-marketplaces-work).
+
+Run `scripts/check-plugin.sh` and `claude plugin validate .` from the repo root before pushing.
+
 ## Layout
 
 ```
 plugins/dev-skills/
-├── .claude-plugin/plugin.json   # lists the skills folder below
+├── .claude-plugin/plugin.json   # Claude Code manifest
+├── .codex-plugin/plugin.json    # Codex manifest, same name, version and skills path
 ├── skills/                      # every skill
 ├── CHANGELOG.md                 # what each version brought; a Release adds one entry
 └── LICENSE-mattpocock-skills    # Upstream's MIT notice
 ```
 
-To add a skill, create `skills/<name>/SKILL.md`; `plugin.json` already points at the folder.
+To add a skill, create `skills/<name>/SKILL.md` and `skills/<name>/agents/openai.yaml` with a readable `display_name` matching the folder name, a `short_description` and `policy.allow_implicit_invocation: true`; `plugin.json` already points at the folder.
 
 ## Skills added since the copy
 
@@ -41,15 +97,15 @@ To add a skill, create `skills/<name>/SKILL.md`; `plugin.json` already points at
 
 ## Model tiers
 
-Skills name a tier, never a model ([ADR 0002](../../docs/adr/0002-skills-name-model-tiers-not-models.md)). Other coding agents map the tiers to their own models. For Claude Code today:
+Skills name a tier, never a model ([ADR 0002](../../docs/adr/0002-skills-name-model-tiers-not-models.md)). The table maps tiers to each agent's models:
 
-| Tier | Claude Code model | Use for |
-|------|-------------------|---------|
-| cheap | Haiku | trivial jobs: running tests, simple checks |
-| regular | Sonnet | most implementation work |
-| premium | Opus | planning, grilling, heavy or tricky work |
+| Tier | Claude Code model | Codex model | Use for |
+|------|-------------------|-------------|---------|
+| cheap | Haiku | `gpt-6-luna` | trivial jobs: running tests, simple checks |
+| regular | Sonnet | `gpt-6.1-sol` | most implementation work |
+| premium | Opus | `gpt-6-astra` | planning, grilling, heavy or tricky work |
 
-A new model generation changes this table only.
+The Codex mapping is our recommendation based on the [official Codex models documentation](https://learn.chatgpt.com/docs/models), checked 2026-10-31: focused tasks, sustained complex work, and the hardest reasoning respectively. Availability depends on the account, client and workspace settings. In Codex, select a table entry with `codex -m <model>` or `/model` in an interactive session. A new model generation changes this table only.
 
 ## Credits and Upstream
 

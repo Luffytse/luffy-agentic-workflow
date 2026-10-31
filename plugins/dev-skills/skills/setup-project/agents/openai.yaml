@@ -1,0 +1,5 @@
+interface:
+  display_name: "Setup Project"
+  short_description: "Draft or update a project's coordinator instructions"
+policy:
+  allow_implicit_invocation: true
