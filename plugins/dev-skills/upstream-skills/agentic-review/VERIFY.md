@@ -16,6 +16,8 @@ Every Verifier gets: all candidate Findings in the fixed format, each tagged wit
 3. **Important or Nit?** confirm or change the Finder's proposal, using the meaning of Important you were given. Not asked for Pre-existing Findings.
 4. **For a Nit: fix or skip?** fix when it is cheap and clearly makes the code better; skip when it is taste, churn, or out of proportion to the change.
 
+When a call drops a Finding, or marks a Nit skip, name in its line the `file:line` the reason rests on (a guard elsewhere, say), if any: the dismissal is recorded with them.
+
 Then, for each open Important from earlier Rounds or Ticket checks, check the current code and say **fixed** (cite the line that fixes it), **still open** (cite the line that still has the problem), or **dismissed** (it was never real; say why).
 
 To try something out (plant a line, run a check, test a commit), work in your own copy: `git archive <head> | tar -x -C <a new scratch directory>`, or a throwaway `git worktree`. Never run `git checkout`, `switch`, `stash` or `reset` in the shared tree, because an Implementer is working in it; leave it on its branch, clean.

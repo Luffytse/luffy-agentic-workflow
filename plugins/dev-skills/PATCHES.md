@@ -799,3 +799,19 @@ What:
 - `.claude-plugin/plugin.json`: version 0.22.20 to 0.22.21.
 
 Our own file (`retro/BUG-CLASSES.md` is ours, not Upstream text), so an Upstream update never touches it; nothing to re-apply when merging one.
+
+## Patch 43: Rank matches on claim in steps 1 and 3, a fixed Finding holds nothing, a dismissal ends when its code changes (`agentic-review/`)
+
+Why: issues #204 and #205 (Findings R1-3 and R1-4 of the review of #202). Steps 1 and 3 matched on Bug class, so "ambiguous rule" at a line held by an open "contradictory rule" got a new id and the Result counted two Importants for one problem; step 3 had no status condition, so a `fixed` Finding could hold a regression; step 2 bound a dismissal forever, so a guard removed by a fix commit left the same bug dropped.
+
+What:
+
+- `agentic-review/ROUNDS.md` (Rank step 1): matches on overlapping locations and the same claim, whatever Bug class each Finder gave; same Bug class alone is not enough.
+- `agentic-review/ROUNDS.md` (Rank step 2): a dismissal binds only while neither the code at its locations nor the code its reason rests on (the lines its Note cites; a dismissal's Note cites them, if any, and a Verifier's dismissal that cites none is judged afresh when any file of its locations changed; a design Finding the user kept rests on its locations alone and binds while they are unchanged) has changed since the head of the comment that dismissed it, tested with `git diff <that head>..HEAD` on those files (any hunk touching the lines counts, no line-shift mapping); if a line changed, or a dismissed "skip" Nit now reads as Important, the Finding is judged afresh.
+- `agentic-review/ROUNDS.md` (Note bullet of the Round comment): a dismissal's Note gives the Verifier's reason and the lines it rests on as `file:line`.
+- `agentic-review/VERIFY.md` (after the four calls): when a call drops a Finding or marks a Nit skip, it names the `file:line` its reason rests on, if any.
+- `agentic-review/ROUNDS.md` (Rank step 3): matches the same way, and holds only while the earlier id is `open`; a `fixed` Finding holds nothing, so the same claim at its locations again is a new Finding. New instances become "the same claim at new locations".
+- Not Upstream text: `docs/adr/0003-code-review-runs-find-verify-rank-in-rounds.md`, Rank line, carries the same rules.
+- `.claude-plugin/plugin.json`: version 0.22.21 to 0.22.22.
+
+Merging an Upstream update: take Upstream's text, then re-apply the matching in steps 1 and 3, the open-only condition in step 3 and the unchanged-code condition in step 2.
