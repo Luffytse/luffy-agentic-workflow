@@ -2,6 +2,29 @@
 
 What each version of `dev-skills` brought, newest first. A version changes only when a Release is cut, and each Release adds one entry here: its goal, the issues it shipped, and what a project using the plugin must do when something breaks.
 
+## 0.25.0 (2026-11-01)
+
+Give shared rules one authoritative home, while fixing review-completion and release-recovery bugs that could undermine the workflow.
+
+- Plan: focused shared contracts and coherent workflow reuse (#348)
+- Establish shared-rule ownership guidance and base-skill support (#363)
+- Verify skill loading and application in Codex before consumer migration (#360)
+- Extract and migrate the focused docs-index base skill (#364)
+- Extract the review-record contract while preserving review and retro workflows (#365)
+- Extract the shared issue-absorption contract (#368)
+- Delegate retro ticket preparation to the full to-tickets workflow (#369)
+- Remove redundant review and project-configuration rules from callers (#366)
+- Complete the shared-rules migration and reconcile transition guidance (#370)
+- Urgent rerun after a partial first run skips labelling the fix (#325)
+- Release step 4 shortcut can post another Release's changelog entry (#326)
+- Urgent fix says "patch" but allows a bigger cut, against ADR 0008 (#327)
+- Result value conflict for Round 1 (#329)
+- fix-Nits commit after a design recount (#330)
+- CLAUDE.md: the restatement search covers the file you edited too (#338)
+- Retro: Implementer misses parallel sentences inside the file it edits (#328)
+
+Also merged: an optional agent-only label role, for issues meant for one coding agent (#339); `dev-skills` installs in Codex from the `luffy-dev` marketplace, with Codex metadata for every skill and README install steps (#340, #342, #343, #345), and the install checks recorded (#346, #356); ADR 0009, shared rules have one owner skill (#359); repo-local skills load live in Codex and Claude Code (#372); the glossary redefines Milestone as the user-set product goal (#388).
+
 ## 0.24.1 (2026-10-31)
 
 The review, release and build skills handle the edge cases that 0.24.0's reviews found.
