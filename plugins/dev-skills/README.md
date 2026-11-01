@@ -86,7 +86,7 @@ plugins/dev-skills/
 └── LICENSE-mattpocock-skills    # Upstream's MIT notice
 ```
 
-To add a skill, create `skills/<name>/SKILL.md` and `skills/<name>/agents/openai.yaml` with a readable `display_name` matching the folder name, a `short_description` and `policy.allow_implicit_invocation: true`; `plugin.json` already points at the folder.
+To add a skill, create `skills/<name>/SKILL.md` and `skills/<name>/agents/openai.yaml` with a readable `display_name` matching the folder name, a `short_description` and `policy.allow_implicit_invocation: true`; `plugin.json` already points at the folder. Keep a model-facing `description` in `SKILL.md` and omit `disable-model-invocation`. A Base skill may set `user-invocable: false` for Claude Code menu hiding while remaining model-loadable. Codex's implicit-invocation policy is separate from menu visibility; hiding is optional. See [skill mechanics](skills/writing-for-agents/SKILL-MECHANICS.md) for the metadata examples. Current consumers keep their instructions and references until the fresh-runtime gate and their migration pass (ADR 0009).
 
 ## Skills added since the copy
 
