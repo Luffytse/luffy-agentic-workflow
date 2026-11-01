@@ -70,7 +70,13 @@ Start a new Codex session after updating (restart the desktop app if using it).
 
 ### Claude Code
 
-If you're hacking on a plugin itself, point the marketplace at your local clone instead of GitHub:
+**In this repo:** we develop the skills here, so Claude Code reads them directly
+from the checkout. Edits are available without reinstalling the plugin.
+
+- `.claude/skills` links to `plugins/dev-skills/skills` for local skill discovery.
+- `.claude/settings.json` disables the cached plugin in this repo to avoid loading duplicate skills.
+
+**Across repos:** point the marketplace at your local clone instead of GitHub:
 
 ```bash
 claude plugin marketplace add /path/to/luffy-dev-skills
@@ -80,7 +86,13 @@ claude plugin install dev-skills@luffy-dev
 
 ### Codex
 
-Use the local clone as the marketplace source:
+**In this repo:** we develop the skills here, so Codex reads them directly from
+the checkout. Edits are available without reinstalling the plugin.
+
+- `.agents/skills` links to `plugins/dev-skills/skills` for local skill discovery.
+- `.codex/config.toml` disables the cached plugin in this repo to avoid loading duplicate skills.
+
+**Across repos (CLI):** register your local clone as a user-level marketplace:
 
 ```bash
 # If luffy-dev is already configured from GitHub, remove that source first:
@@ -97,8 +109,15 @@ For `dev-skills`, run `scripts/check-plugin.sh` and `claude plugin validate .` b
 
 ```
 luffy-dev-skills/
-├── .agents/plugins/
-│   └── marketplace.json        # Codex catalog (dev-skills only)
+├── .agents/
+│   ├── plugins/
+│   │   └── marketplace.json    # Codex catalog (dev-skills only)
+│   └── skills -> ../plugins/dev-skills/skills  # Codex skills from this checkout
+├── .claude/
+│   ├── settings.json           # disable the cached plugin in this repo
+│   └── skills -> ../plugins/dev-skills/skills  # Claude Code skills from this checkout
+├── .codex/
+│   └── config.toml             # disable the cached plugin in this repo
 ├── .claude-plugin/
 │   └── marketplace.json        # Claude Code catalog
 └── plugins/
