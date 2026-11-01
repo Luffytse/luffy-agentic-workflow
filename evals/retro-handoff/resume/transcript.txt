@@ -1,0 +1,20 @@
+USER:
+Resume retro-planning in this fixture using only its configured local tracker. A previous attempt may have partially published; inspect recorded state before acting. Do not implement code.
+
+
+ASSISTANT:
+I’m using the retro-planning skill to inspect the local record and reconcile any partial publication before continuing. I won’t implement code.
+
+
+ASSISTANT:
+Record #20 shows that the solution was already approved and Ticket #21 was created. I’m resuming the to-tickets workflow to repair its missing label and absorption comment, then verify publication and complete the record. This uses one of the three Ticket slots.
+
+
+ASSISTANT:
+Resumed and closed [planning #20](<isolated>/resume/fixture/issues/20.md).
+
+- Repaired and verified existing Ticket #21’s publication; no duplicate created.
+- #12 remains open, waiting on #21.
+- Recorded 1 of 3 Ticket slots used.
+
+Only the local tracker changed. No code implemented.

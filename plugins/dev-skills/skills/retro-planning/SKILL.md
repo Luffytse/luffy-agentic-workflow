@@ -19,7 +19,8 @@ Look for an open issue labelled `retro-planning`. If there is one, this is a res
 
 1. If its Snapshot section is still "None", continue at step 1.
 2. Otherwise read its snapshot table and cap, then reconcile the record with each snapshot issue's current state: closed, an `Absorbed by` comment made since the snapshot, a `Spun off to` comment, or a Ticket labelled `ready-for-agent` filed since the snapshot that links it and is not named in a spin-off's `Filed #<ticket> (from spin-off` comment. Any call carried out on the issues but missing from the record goes into the record now, so no group is walked twice and no Ticket filed twice. An issue with a `Spun off to` comment belongs to its spin-off: record only the spin-off itself, if the record lacks it, and leave its later closes and Tickets to the spin-off's comments.
-3. Redo steps 2 to 4 on the snapshot issues that still have no verdict, counting the record's "Tickets filed" toward the cap, then continue at step 5.
+3. Reconcile any unfinished handoff before walking another group: search for already-created Tickets even if labels or absorption comments are missing, using the recorded identifiers, source links and approved work. Count each real Ticket once toward the cap, and resume `to-tickets` with its existing identifiers, mappings, solution approval and incomplete actions to repair publication rather than create it again. Preserve a declined solution and the user's problem verdict; resume the pending decision, not a fresh proposal.
+4. Redo steps 2 to 4 on the snapshot issues that still have no verdict, counting the record's "Tickets filed" toward the cap, then continue at step 5.
 
 Otherwise file the record now as an **open** issue (format in "The record", with Cap `3 (default)` and every other section "None" for now), creating the `retro` and `retro-planning` labels if the repo lacks them. Its creation time is the **snapshot** time.
 
@@ -90,9 +91,9 @@ Show one group, with full details:
 - **What went wrong**: the concrete incident in each thread that filed or voted on it.
 - **Root cause** the issues share, and the distinct-thread count.
 - **Proposed verdict** with its reason.
-- For a proposed Ticket: its draft (title, done condition) and a Model tier (`regular` or `premium`; for `premium`, one line on why). Prefer a check or a hook that catches the problem mechanically over a new prose rule in a skill or steering file; propose a prose rule only when no check can see the problem, and say why.
+- For an acting group: the intended outcome and whether to address this problem. Ticket preparation follows that call.
 
-Then ask for the user's call and wait for it: act as a Ticket, spin off, close, or the user's own change (a different verdict, a reshaped Ticket, keep it open). The user's call is that group's approval: carry it out at once with step 6, update the record, then show the next group. A call that changes the grouping regroups only the groups not yet walked.
+Then ask for the user's call and wait for it: address the problem, spin off, close, or the user's own change (a different verdict, a reshaped problem, keep it open). Approval to address a problem authorizes preparation, not its concrete solution. Record the call, carry it out at once with step 6, and reconcile the result in the record before showing the next group. A call that changes the grouping regroups only the groups not yet walked.
 
 When every group is walked, show the mechanical closes in one short list (each issue, and the completed Ticket that absorbed it, or "expired"), and carry them out once the user agrees. One the user holds back stays open.
 
@@ -100,14 +101,17 @@ Done when every group in the walk and every mechanical close has the user's call
 
 ## 6. Carry out a call
 
-- **Ticket**: file it with `to-tickets`' issue template, including its `**Model tier:**` line. Label it `ready-for-agent` (the string `docs/agents/triage-labels.md` maps it to, if the repo has that file). Its done condition goes in the acceptance criteria. Apply `issue-absorption`'s writing agreement to the Retro issues.
+- **Address the problem**: invoke the complete `to-tickets` workflow. Pass the intended outcome; source reports explicitly marked as issues to absorb; agreed constraints, failed-fix context and known dependencies; this one group's scope; and the remaining actual-ticket budget. Request one complete Ticket, with a return before publication if investigation requires several. Prefer a mechanical check or hook over a prose rule; pass that preference as a constraint, with a reason required when only prose can address the problem. `to-tickets` owns context gathering, investigation, drafting, tier/dependency discussion, concrete-solution approval and verified publication. Include any existing publication identifiers, source mappings, approval and incomplete actions on resume.
+  - Reconcile its returned identifiers, source-to-ticket mappings and incomplete actions into the record. A real Ticket counts immediately even when a later label, link, comment or verification failed. Keep the handoff pending and resume its unfinished actions before showing another group; never recreate an existing Ticket.
+  - If several Tickets are necessary, return to the user's spin-off decision before any publication. Keep the cap unchanged unless the user explicitly changes it; a larger budget alone does not turn this one-Ticket handoff into permission to publish several.
+  - If the solution is declined, preserve both the problem approval and solution rejection, with the user's next call (revise, spin off, close or keep open). A decline creates no Ticket and consumes no slot. Once a solution has been approved and published, update the record without asking for solution approval again.
 - **`wontfix`** or another close: comment the reason, add the `wontfix` label (the string `docs/agents/triage-labels.md` maps it to, if the repo has that file) when the verdict is `wontfix`, and close.
 - **Spin off**: the group needs more discussion, so this planning does not decide it. Ask for a separate planning thread for its issues: in a project with a coordinator, ask the coordinator; otherwise tell the user to start one, and give them the brief. The brief names the issues, this record, and "Running a spun-off planning" below. On each issue, comment `Spun off to <thread link>; that planning decides it.` (with no link yet, name the thread as the user or coordinator named it). A spun-off group stays open, does not count toward the cap, and cannot expire.
 - **Expire**: comment `No new vote across 2 plannings. Reopen if seen again.` and close.
 - **Close with its Ticket**: recheck eligibility under `issue-absorption`; when eligible, comment `Closed with #<ticket>.` and close, otherwise apply its current lifecycle state.
 - **Held back by the cap**, or kept open: leave open.
 
-Then update the record straight away: the group's row in "Verdicts", its line in "Tickets filed", "Held back by the cap" or "Spun off", and "Cap" when the user raised the cap.
+Then update the record straight away: the group's row in "Verdicts", its line in "Tickets filed", "Held back by the cap" or "Spun off", and "Cap" when the user raised the cap. Keep pending handoffs in "Incomplete actions", including the problem verdict, solution approval or rejection, published identifiers, source mappings and remaining work; clear that entry only after reconciliation.
 
 Done when the issue's state matches the call and the record shows it.
 
@@ -121,7 +125,7 @@ Done when the record is complete and closed, and the user has its link.
 
 ## Running a spun-off planning
 
-When the brief says this thread owns a spun-off group, plan only its issues with the user. Discuss them as long as the user needs, then give each issue a verdict, carried out as in step 6: absorbed by a Ticket this thread files, or closed with a reason. File no `retro-planning` record of your own, and never edit the body of the record that spun it off: its planning is the body's only writer. Instead, comment on that record, open or closed: right after filing each Ticket, one comment for it, `Filed #<ticket> (from spin-off <this thread's link>), absorbs #<n>, ...`, so later plannings recheck it in step 2, and one more listing each issue you closed with its reason. The thread's work is done when no issue it owns is left open without an `Absorbed by` comment, and every Ticket it filed has its `Filed` comment on that record. On resuming this thread, first check that every Ticket it filed has its `Filed` comment, and post any that is missing.
+When the brief says this thread owns a spun-off group, plan only its issues with the user. Discuss them as long as the user needs, then give each issue a verdict, carried out as in step 6: absorbed by Tickets prepared and published through the complete `to-tickets` workflow, or closed with a reason. Pass this spun-off scope and its agreed budget instead of the ordinary one-Ticket limit; the originating planning's cap does not apply here. File no `retro-planning` record of your own, and never edit the body of the record that spun it off: its planning is the body's only writer. Instead, comment on that record, open or closed: right after filing each Ticket, one comment for it, `Filed #<ticket> (from spin-off <this thread's link>), absorbs #<n>, ...`, so later plannings recheck it in step 2, and one more listing each issue you closed with its reason. The thread's work is done when no issue it owns is left open without an `Absorbed by` comment, and every Ticket it filed has its `Filed` comment on that record. On resuming this thread, first check that every Ticket it filed has its `Filed` comment, and post any that is missing.
 
 ## The record
 
@@ -152,6 +156,10 @@ Snapshot time: <the record's creation time>
 | <root cause> | #20 | 2 | spun off | <thread link> |
 | <root cause> | #16 | 1 | kept open by the user | |
 | absorbed by a Ticket closed as completed | #11 | 2 | closed with its Ticket | #31 |
+
+## Incomplete actions
+
+None / <group: problem verdict; solution decision; existing Ticket identifiers and source mappings; remaining actions>
 
 ## Held back by the cap
 

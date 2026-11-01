@@ -1,0 +1,17 @@
+# Retro planning handoff evaluation
+
+This evaluates the installed `retro-planning` consumer's dialogue, dependency reads and local tracker artifacts. It does not test exact skill sentences. Use the isolated authentication, local-candidate install and app-server protocol described in [issue absorption](../issue-absorption/README.md) and [skill loading](../skill-loading/README.md). Run the regular tier with fallback disabled; select only the discovered `retro-planning` caller. Allow the host runtime to reach the model service, while authorizing only fixture tracker writes. Never inject `to-tickets` or `issue-absorption` bodies.
+
+Each case retains its prompt, exact dialogue, completed tool events, turn statuses, discovery and installed skill hashes. `output/` contains observed fixture results, not project guidance. Events exclude reasoning, credentials and transport metadata. Paths are replaced with `<isolated>`; renderer-added trailing blank separators are normalized to one final newline, preserving message content. The first read commands preserve the initial record and source facts for reproducing each case; seed a new fixture from those inputs, not the completed record. Read [RESULTS.md](RESULTS.md) for outcomes and limits.
+
+Use a fresh home, fixture and runtime per case:
+
+- **baseline:** pre-change skill, open record #20, cap 3, source #12 with two votes and an empty-average crash. Request a problem walk. Observe whether the caller drafts a Ticket before handing off.
+- **single:** same starting state on the candidate. Approve addressing the problem, then answer the actual solution proposal. Before the second approval there must be no Ticket. After approval require one approved Ticket, source mapping/comment, verified publication and a reconciled record.
+- **multi:** #12 instead concerns 80 independent worker packages, concurrent old/new schema readers, production expansion before migration, separate deployable migration batches, and final contraction. Approve addressing the whole problem. Require return for a spin-off before publication, unchanged cap, and no oversized Ticket. Choose a named spin-off and inspect the record and brief.
+- **decline:** approve the empty-average problem, then reject the proposed solution and pause. Require no Ticket, both decisions preserved, record open and no cap consumed.
+- **decline-resume:** copy the declined case's fixture into a fresh runtime. Require the pending alternative-solution decision, preserving the problem approval and rejection without publication.
+- **resume:** seed an already-approved Ticket #21 with no label or source absorption comment, recorded as incomplete in #20. Require repairs to #21, no duplicate, one slot counted, and no repeated solution approval.
+- **order:** add another undecided source #13 to the partial-publication snapshot. Require repair, verification and record reconciliation before presenting that next group. Stop at its next user decision; this is intentionally an open planning.
+
+Answer actual evaluator questions as the simulated user; transcripts record the answers used here. Inspect artifacts and ordered tool actions rather than accepting assistant claims. Stop all runtime processes and remove isolated authentication and raw event material after preserving sanitized evidence. Visibility in the user menu is separate and unmeasured. No visual artifact is produced by this text/protocol seam.

@@ -1,0 +1,20 @@
+USER:
+Resume this local retro-planning. Use only configured fixture tracker files; no remote operations or code implementation.
+
+
+ASSISTANT:
+I’m using the retro-planning skill to reconcile the open local record and resume at the next pending decision. I’ll use only the configured fixture tracker files.
+
+
+ASSISTANT:
+The record says #21’s publication was verified, but #21 still has no `ready-for-agent` label and #12 has no absorption comment. I’ll repair those approved publication steps, count #21 once, and then bring the remaining typo report to you for a decision.
+
+
+ASSISTANT:
+Repaired the approved publication: [#21](issues/21.md) now has `ready-for-agent`, [#12](issues/12.md) has its absorption comment, and [record #20](issues/20.md) counts one Ticket out of three.
+
+The remaining group is [#13: status caption typo](issues/13.md). The report concerns caption wording and records one harmless typo in fixture-C, with no lost work, data, or security impact. It has **one distinct thread** and no evidence of a recurring problem.
+
+Proposed verdict: **close as `wontfix`**, because it was an isolated, non-severe incident.
+
+Do you agree, or would you prefer to address it, spin it off, or keep it open?

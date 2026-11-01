@@ -1,0 +1,58 @@
+USER:
+Resume retro-planning for this fixture repository. All issue state is in issues/, configured by docs/agents/issue-tracker.md. Use only this local tracker; remote reads or writes are forbidden. Walk me through the selected problem. Do not implement code.
+
+
+ASSISTANT:
+I’m using the retro-planning and issue-absorption skills to reconcile the local record, then walk you through the pending decision. I’ll use only `issues/` and won’t implement code.
+
+
+ASSISTANT:
+Resumed [planning #20](issues/20.md), keeping its October 30 snapshot and cap of 3 Tickets. No Tickets or pending handoffs exist.
+
+The selected problem is [Retro #12](issues/12.md):
+
+- **Background:** `summary(values)` calculates an average by dividing the sum by the number of values.
+- **What went wrong:** In `fixture-A`, an empty report caused division by zero. In `fixture-B`, an empty import caused the same crash.
+- **Root cause:** Empty input has no defined handling. The issue has **2 distinct-thread votes**.
+- **Proposed verdict:** **Address the problem**, because it recurred across two threads.
+- **Intended outcome:** Define empty-input behavior, preserve the existing nonempty average, and require a mechanical check. Another prose reminder alone would not satisfy the report.
+
+Would you like to **address**, **spin off**, **close**, or **keep this problem open**? Addressing authorizes Ticket preparation; the concrete solution still needs your approval. No code will be implemented.
+
+USER:
+Address this problem. Prepare the concrete solution for approval.
+
+ASSISTANT:
+I’m using the to-tickets workflow to prepare one concrete Ticket for your approval, including the empty-input behavior and mechanical checks.
+
+
+ASSISTANT:
+1. **Handle empty summaries safely**
+   - **Blocked by:** None.
+   - **Model tier:** regular.
+   - **Delivers:** Return `0` for empty input and preserve the existing average for nonempty input.
+   - **Acceptance criteria:**
+     - Empty input returns `0` without raising.
+     - Nonempty averages remain unchanged, including fractional and negative results.
+     - Automated regression checks cover these cases.
+     - Absorbs [Retro #12](issues/12.md), with a separate `Closes #12` criterion.
+
+Returning `0` is a proposed behavior; the reports don’t specify the empty result.
+
+Do you approve this behavior, one-Ticket scope, no blockers, and regular tier, or want changes?
+
+The [planning record](issues/20.md) preserves your problem approval. No Ticket has been published and no code changed.
+
+The [to-tickets skill](<isolated>/decline/home/plugins/cache/luffy-dev/dev-skills/0.24.1/skills/to-tickets/SKILL.md) requires us to “iterate until the user approves the concrete breakdown,” so publication awaits this decision.
+
+USER:
+I decline that concrete solution. Keep the problem approval, but pause this planning so I can decide a different solution later.
+
+ASSISTANT:
+I’ll record the solution rejection, preserve your approval to address the problem, and leave the planning open and paused for a later decision.
+
+
+ASSISTANT:
+Paused and recorded in [planning #20](issues/20.md).
+
+Your problem approval remains; the concrete solution is recorded as declined. Planning #20 and Retro #12 remain open. No Ticket was published, no cap slot consumed, and no code changed.

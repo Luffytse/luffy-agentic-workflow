@@ -53,6 +53,9 @@ Read this first, then open only the docs whose line fits your work. Specs and ti
 
 ## Retros
 
+- [Retro handoff eval](../evals/retro-handoff/README.md): installed `retro-planning` delegation, approval, cap and resume fixtures. Read when changing the handoff to `to-tickets`.
+- [Retro handoff results](../evals/retro-handoff/RESULTS.md): observed dialogue and tracker artifacts for the complete workflow handoff. Read when assessing its approval, cap and resume coverage.
+
 - [Issue absorption eval](../evals/issue-absorption/README.md): fixture-only lifecycle, publication and closing-line decisions; read when rerunning the absorption contract migration checks. [Results](../evals/issue-absorption/RESULTS.md) record actual consumer loads and behavior.
 
 - [issue-absorption](../plugins/dev-skills/skills/issue-absorption/SKILL.md): the shared absorption agreement. Read when changing how Tickets absorb source reports, how planning interprets their lifecycle, or which absorbed sources a pull request closes.

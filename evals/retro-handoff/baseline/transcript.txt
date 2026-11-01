@@ -1,0 +1,33 @@
+USER:
+Resume retro-planning for this fixture repository. All issue state is in issues/, configured by docs/agents/issue-tracker.md. Use only this local tracker; remote reads or writes are forbidden. Walk me through the selected problem. Do not implement code.
+
+
+USER:
+Resume retro-planning for this fixture repository. All issue state is in issues/, configured by docs/agents/issue-tracker.md. Use only this local tracker; remote reads or writes are forbidden. Walk me through the selected problem. Do not implement code.
+
+
+ASSISTANT:
+I’m using the retro-planning skill to resume the local record, reconcile completed decisions, and walk you through the next undecided problem. I’ll use only `issues/` and won’t implement code.
+
+
+ASSISTANT:
+Resumed [planning #20](issues/20.md), keeping its October 30 snapshot and default cap of 3 Tickets. No decisions or Tickets need reconciliation.
+
+The selected problem is [#12: Empty input crashes summary](issues/12.md).
+
+**Background:** `summary(values)` computes `sum(values) / len(values)`. Empty input therefore divides by zero.
+
+**What went wrong:** In `fixture-A`, an empty report failed. In `fixture-B`, an empty import caused the same crash. That second report also requires preserving the existing nonempty average and adding a mechanical check.
+
+**Root cause:** Empty input has no defined behavior or regression check. This has occurred in **2 distinct threads**.
+
+**Proposed verdict: Act — file a Ticket.** An automated regression test can catch this directly; another prose reminder would add little protection.
+
+Draft Ticket:
+
+- **Title:** Handle empty summaries without crashing
+- **Done condition:** Define and document the empty-input result; verify it with an automated regression test; verify that nonempty inputs retain their existing average.
+- **Acceptance criterion:** Closes #12.
+- **Model tier:** regular.
+
+What’s your call: **file the Ticket**, **spin off**, **close**, or **reshape/keep open**? If filing, I suggest specifying `None` as the empty-input result; you can choose a different behavior.
