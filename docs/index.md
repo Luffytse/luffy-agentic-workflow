@@ -23,7 +23,7 @@ Read this first, then open only the docs whose line fits your work. Specs and ti
 - [scripts/check-plugin.sh](../scripts/check-plugin.sh): this repo's own checker for the `dev-skills` layout and repo-wide rules (no vendor model names, no person names, no repo-only text in skill text, skill name matching its folder, Codex packaging matching Claude Code and sharing its skills tree); its header lists the checks, each identified by a name, never a number. A check tests structure, not a skill's wording. It lives outside the plugin so it does not ship to projects. Read when adding or changing a check, or before pushing a plugin change.
 - [ADR 0001](adr/0001-dev-skills-is-one-plugin-forked-from-matt-pocock.md): why `dev-skills` is one plugin that began as Matt Pocock's skills and is now our own, and which skills it keeps. Read when adding or dropping a skill, or when the Upstream watch finds an idea.
 - [ADR 0002](adr/0002-skills-name-model-tiers-not-models.md): skills name cheap, regular or premium tiers, never models. Read when a skill picks a model.
-- [ADR 0009](adr/0009-shared-rules-have-one-owner-skill.md): shared-contract ownership, complete workflow reuse, the completed docs-index migration and remaining transition safeguards; menu hiding is optional. Read when sharing a rule, composing skills or adding a Base skill.
+- [ADR 0009](adr/0009-shared-rules-have-one-owner-skill.md): shared-contract ownership, complete workflow reuse, the completed docs-index, review-record and absorption migrations and remaining transition safeguards; menu hiding is optional. Read when sharing a rule, composing skills or adding a Base skill.
 
 ## Building
 
@@ -39,6 +39,9 @@ Read this first, then open only the docs whose line fits your work. Specs and ti
 - [Skill loading eval RESULTS.md](../evals/skill-loading/RESULTS.md): source provenance, actual turns, rule application and separate visibility limits. Read when checking what #360 proved and what the final Spec eval must rerun.
 
 ## Code review
+
+- [review-record](../plugins/dev-skills/skills/review-record/SKILL.md): shared Round/Ticket-check markers, fields, identities, statuses and retrospective interpretation, plus Bug class and Always-check meaning. Read when changing a review writer or record reader.
+- [review-record eval](../evals/review-record/README.md): multi-comment interpretation fixture, scoring and evidence. Read when changing the record contract.
 
 - [REVIEW.md](../REVIEW.md): this repo's review rules: what Important means, what to skip, and the Always check lines. Read when reviewing a change or adding an Always check line.
 - [ADR 0003](adr/0003-code-review-runs-find-verify-rank-in-rounds.md): Find, Verify, Rank, depths and Rounds. Read when working on `agentic-review`, `retro` or `pr`.

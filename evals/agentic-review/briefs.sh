@@ -136,6 +136,16 @@ if [ "$verify_only" = 0 ]; then
   drift="$(section "$finders" '### Docs index drift')"
   always="$(section "$finders" '### `REVIEW.md` Always check')"
   must "the Smell baseline section" "$smell"; must "the Docs index drift section" "$drift"; must "the REVIEW.md Always check section" "$always"
+  record="$(section "$skill/../review-record/SKILL.md" '## Terminology')"
+  must "the review-record terminology" "$record"
+  index_contract="$(cat "$skill/../docs-index/SKILL.md")"
+  must "the docs-index contract" "$index_contract"
+  drift="$drift
+
+$index_contract"
+  always="$always
+
+$record"
   finder finder-standards.md "$brief" "$(printf '%s\n\n%s\n\n%s' "$smell" "$drift" "$always")"
 
   spec="$(quoted "$(section "$finders" '## Spec Finder')")"; must "the spec Finder brief" "$spec"

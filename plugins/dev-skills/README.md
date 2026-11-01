@@ -90,6 +90,7 @@ To add a skill, create `skills/<name>/SKILL.md` and `skills/<name>/agents/openai
 
 ## Skills added since the copy
 
+- `review-record`: a Base skill for shared review comment meaning; loaded by review writers and retro readers. Review orchestration and retro preventive-check work stay with their workflows.
 - `issue-absorption`: a Base skill owning source-report records and lifecycle meaning, loaded by Ticket writers, planning readers and closing-line/closure consumers. Tracker operations remain in project configuration.
 
 - `setup-dev-skills`: derived from Upstream's setup skill. Sets up a GitHub repo for the skills: writes `docs/agents/` (issue tracker, labels, domain docs and, for a repo that cuts Releases, the release doc), the `## Agent skills` block, a starter `REVIEW.md` and `docs/index.md`, creates the labels the skills use, and reports the GitHub settings the build skills rely on without changing them. A re-run shows a diff first.

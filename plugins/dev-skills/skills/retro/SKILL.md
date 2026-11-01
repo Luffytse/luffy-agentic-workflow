@@ -11,7 +11,7 @@ The user has asked for a **retrospective**. You are suggesting improvements to t
 
 2. Read the primary sources for the session the user specifies. This may mean searching through session logs on this machine. If the user doesn't specify a session, default to the current one.
 
-3. If the session reviewed or built a pull request with `agentic-review` Rounds (or the user names one), turn its repeated Bug classes into checks: [BUG-CLASSES.md](BUG-CLASSES.md).
+3. If the session reviewed or built a pull request with `agentic-review` Rounds (or the user names one), load `review-record` by name to interpret its comments, then turn its repeated Bug classes into checks: [BUG-CLASSES.md](BUG-CLASSES.md).
 
 4. Look for candidates for improvement in these categories.
 

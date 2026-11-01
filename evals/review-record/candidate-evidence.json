@@ -1,0 +1,40 @@
+{
+  "model": "regular Codex tier at 8ff823f913b951cb3c48b476ec1eda08c35d4601/plugins/dev-skills/README.md",
+  "status": "completed",
+  "discovered_contract": [
+    {
+      "name": "review-record",
+      "description": "Interpret review records. Use when writing or reading Round or Ticket-check comments, or supplying Bug class and Always-check meaning to reviewers.",
+      "interface": {
+        "displayName": "Review Record",
+        "shortDescription": "Interpret shared review records",
+        "iconSmall": null,
+        "iconLarge": null,
+        "iconSmallUrl": null,
+        "iconLargeUrl": null,
+        "brandColor": null,
+        "defaultPrompt": null
+      },
+      "path": "/private/tmp/review-record-365/candidate/.agents/skills/review-record/SKILL.md",
+      "scope": "repo",
+      "enabled": true,
+      "pluginId": null
+    }
+  ],
+  "tools": [
+    {
+      "command": "/bin/zsh -lc 'cat .agents/skills/review-record/SKILL.md'",
+      "exitCode": 0
+    },
+    {
+      "command": "/bin/zsh -lc 'cat comments.json'",
+      "exitCode": 0
+    }
+  ],
+  "provider": "openai",
+  "allowProviderModelFallback": false,
+  "returned_model_matches_requested": true,
+  "client_local_date": "2026-10-31",
+  "client_timezone": "America/Los_Angeles",
+  "codex_cli_version": "0.166.0-alpha.5.1"
+}
