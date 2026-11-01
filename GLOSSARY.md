@@ -61,7 +61,7 @@ A product goal the user sets (for example "M3 Trip planning"), written down in o
 _Avoid_: epic, sprint
 
 **Release**:
-A named step inside a Milestone (for example "Milestone 1 · Release 1"), and the few features it delivers (at most 5 unless the user raises the cap for that Release; a feature is a Spec with its Tickets, a lone Ticket with the issues it absorbs, or a few related issues the user agrees to treat as one), every issue in them labelled `release-m<milestone>-r<n>` (by hand until #397 changes `release`), with one release issue holding its goal, notes, start and end commits and the versions it delivered. Its name is not a version: in this repo each skill-changing pull request bumps the version. Not a Milestone, which is the product goal its Releases work toward.
+A named step inside a Milestone (for example "Milestone 1 · Release 1"), and the few features it delivers (at most 5 unless the user raises the cap for that Release; a feature is a Spec with its Tickets, a lone Ticket with the issues it absorbs, or a few related issues the user agrees to treat as one), every issue in them labelled `release-m<milestone>-r<n>`, with one release issue holding its goal, notes, start and end commits and the versions it delivered. Its name is not a version: in this repo each skill-changing pull request bumps the version. Not a Milestone, which is the product goal its Releases work toward.
 _Avoid_: sprint, version bump
 
 **Release planning**:

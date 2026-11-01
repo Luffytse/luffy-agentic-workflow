@@ -25,4 +25,4 @@ When a skill mentions a role (e.g. "apply the AFK-ready triage label"), use the 
 
 ## Other labels
 
-`retro` and `retro-planning` are not triage roles. A `retro` issue carries no `needs-triage` and is left out of triage; see [ADR 0007](../adr/0007-retro-issues-pile-up-per-repo-and-are-planned-in-batches.md). The `wayfinder:*` labels mark a wayfinder map and its tickets; see `issue-tracker.md`. The `release-m<milestone>-r<n>` labels (`release-X.Y.Z` up to 0.25.0; written by hand until #397 changes `release`) mark the issues of one Release; see `release.md`.
+`retro` and `retro-planning` are not triage roles. A `retro` issue carries no `needs-triage` and is left out of triage; see [ADR 0007](../adr/0007-retro-issues-pile-up-per-repo-and-are-planned-in-batches.md). The `wayfinder:*` labels mark a wayfinder map and its tickets; see `issue-tracker.md`. The `release-m<milestone>-r<n>` labels (`release-X.Y.Z` up to 0.25.0) mark the issues of one Release; see `release.md`.
