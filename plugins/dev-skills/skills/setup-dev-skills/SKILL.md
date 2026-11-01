@@ -11,7 +11,7 @@ Derived from Matt Pocock's setup skill; the seed files in this folder are mostly
 - **Labels**: the 5 state roles and 2 category roles that `triage` uses, the optional agent-only role (one label per coding agent) when the user wants it, and the `wayfinder:*` labels, in `docs/agents/triage-labels.md` and on the repo.
 - **Domain docs**: where `GLOSSARY.md` and ADRs live and how skills read them, in `docs/agents/domain.md`, plus the `docs/index.md` that lists the docs.
 - **Review rules**: a starter `REVIEW.md` at the repo root, where the repo's own review rules go.
-- **Releases**: where the version lives, the changelog path and the release label prefix that `release` reads, in `docs/agents/release.md`, for a repo that cuts versioned Releases.
+- **Releases**: where the version lives, who bumps it (the bump mode), the changelog path, the release label prefix, and for pull-requests-bump repos the Release name form and the whole-Release check, that `release` reads, in `docs/agents/release.md`, for a repo that cuts versioned Releases.
 - **GitHub settings**: checked and reported, never changed.
 
 This is a prompt-driven skill, not a deterministic script. Explore, present what you found, confirm with the user, then write. It runs the same way on a fresh repo and on a re-run; a re-run shows a diff first (step 3).
@@ -66,7 +66,13 @@ On **yes**, ask the user for the rules' text, then record them in the repo's `CL
 
 > Does this repo cut versioned Releases with the `release` skill? (recommended: **yes** when exploration found a version file, otherwise **no**)
 
-On **yes**, fill the release doc's three values, leading with what exploration found: the version file and the field or line that holds the version, the changelog path (an existing `CHANGELOG.md`, else one beside the version file), and the label prefix (default `release-`). Then ask whether the bump pull request must change or run anything else, such as a second file that repeats the version (recommended: **nothing**). On **no**, write no release doc.
+On **yes**, fill the release doc's values, leading with what exploration found: the version file and the field or line that holds the version, the changelog path (an existing `CHANGELOG.md`, else one beside the version file), and the label prefix (default `release-`). Then ask three more things, which `release` reads:
+
+- the **bump mode** (recommended: **Releases bump**): either a Release's bump pull request changes the version and ordinary pull requests leave it alone, or **pull requests bump**, where each pull request that changes the files the repo names bumps the version as its last commit at merge, with a number handed out then. On pull requests bump, ask which files make a pull request bump;
+- on pull requests bump only, the **Release name** form: the name, label and release issue title forms with `<...>` placeholders, such as the name `Phase <n>`, the label `release-p<n>` and the title `Release Phase <n>` (a Release is named, not numbered);
+- on pull requests bump only, the **whole-Release check**: the checks to run on the changelog pull request's branch (recommended: the repo's own checks), and any clean-up pass.
+
+Then ask whether the bump pull request (Releases bump) or the bump commit (pull requests bump) must change or run anything else, such as a second file that repeats the version (recommended: **nothing**). On **no**, write no release doc.
 
 ### 3. Draft and diff
 
@@ -80,7 +86,7 @@ Build every file from the seeds in this folder:
 - the `## Agent skills` block (step 4)
 - `docs/index.md`, new or updated, listing every `docs/agents/` file, `REVIEW.md` (with a "read when reviewing a change or adding an Always check line" line) and every other doc found while exploring, by loading `docs-index` and applying its contract
 
-On a re-run, diff each draft against the file in the repo. Keep the values the earlier run filled in (the repo link, the label strings, the PR flag, the release doc's values) and change only what drifted from the seeds. Show the user the diff, or "no change" per file. The rules the user gave in Section D are drafted into the diff of the file they go in (`CLAUDE.md` or `AGENTS.md`, or `REVIEW.md`) and shown before writing; adding a line to an existing `REVIEW.md` is an addition, not a rewrite. Let the user edit before anything is written.
+On a re-run, diff each draft against the file in the repo. Keep the values the earlier run filled in (the repo link, the label strings, the PR flag, the release doc's values, including its bump mode, Release name form and whole-Release check) and change only what drifted from the seeds. Show the user the diff, or "no change" per file. The rules the user gave in Section D are drafted into the diff of the file they go in (`CLAUDE.md` or `AGENTS.md`, or `REVIEW.md`) and shown before writing; adding a line to an existing `REVIEW.md` is an addition, not a rewrite. Let the user edit before anything is written.
 
 Done when the user has approved the drafts, or approved "no change".
 
@@ -109,7 +115,7 @@ Start at `docs/index.md`; it says which doc to read for what.
 
 ### Releases
 
-[one-line summary: the version file and the release label prefix]. See `docs/agents/release.md`.
+[one-line summary: the version file, the bump mode (Releases bump or pull requests bump) and the release label prefix]. See `docs/agents/release.md`.
 ```
 
 Leave out the `### Releases` part when the repo has no release doc.
