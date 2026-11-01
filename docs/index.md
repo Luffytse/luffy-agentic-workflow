@@ -29,7 +29,7 @@ Read this first, then open only the docs whose line fits your work. Specs and ti
 
 - [ADR 0004](adr/0004-build-threads-coordinate-and-subagents-code.md): build threads coordinate, Implementer subagents code, and when the user must review. Read when working on `implement`, `implement-spec`, `to-tickets` or `setup-project`.
 - [ADR 0005](adr/0005-a-spec-is-one-long-lived-branch.md): the spec branch model, ticket worktrees and merges. Read when working on `implement-spec` or anything about branches.
-- [ADR 0008](adr/0008-plugin-versions-change-only-at-a-release.md): plugin versions change only at a Release, what each part of X.Y.Z means, and how a Release is planned and cut. Read when working on versions, `CHANGELOG.md`, release labels or a Release thread.
+- [ADR 0008](adr/0008-plugin-versions-change-only-at-a-release.md): plugin versions change only at a Release, what each part of X.Y.Z means, and how planned and urgent patch Releases are cut. Read when working on versions, `CHANGELOG.md`, release labels or a Release thread.
 - [implement-spec eval RESULTS.md](../evals/implement-spec/RESULTS.md): one entry per build-flow check of `implement-spec`. Read to see how `implement-spec` did in its build-flow check.
 - [implement eval RESULTS.md](../evals/implement/RESULTS.md): one entry per build-flow check of `implement`. Read to see how `implement` did in its build-flow check.
 - [release eval RESULTS.md](../evals/release/RESULTS.md): one entry per dry run of `release` (a proposal only, nothing merged or labelled). Read to see how `release` did in its dry run.

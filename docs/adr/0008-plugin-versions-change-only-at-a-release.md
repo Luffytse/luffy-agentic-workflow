@@ -10,7 +10,7 @@ Amended 2026-10-31 for Codex packaging (#342): `dev-skills` has a Claude Code ma
 - Each issue in it is built as before, by its own Ticket or Spec thread, and merges to main with no version change. Installed copies of the plugin do not update until the version changes, so main can run ahead of the last Release.
 - The coordinator starts Build threads only on issues carrying the current release label. Any issue filed during a Release, by hand or by a skill such as `to-spec`, `to-tickets`, `triage` or `retro-planning`, waits for the next Release planning, except Tickets split from a Spec already in the Release, which take its label.
 - Once every labelled issue is closed, a **Release thread** (premium tier) opens the bump pull request with a `CHANGELOG.md` entry; the user merges it. The same thread then runs the **Release planning** for the next Release: it proposes a goal and a scope of features from the open `ready-for-agent` issues and anything carried over, and labels only what the user approves.
-- A fix that cannot wait gets its own patch Release, cut as soon as it merges.
+- A fix that cannot wait gets its own patch Release, cut as soon as it merges if everything on main since the last Release fits a patch. If larger changes are already on main, wait for the planned Release to be cut, then reconsider the urgent Release from fresh main; an urgent Release always stays patch-only (clarified 2026-10-31, #327).
 - The general flow lives in a `release` skill. Each repo's specifics (where its version lives, its changelog path, its label prefix) live in a repo doc that `setup-dev-skills` writes, so the skill names no project.
 
 ## What each part of X.Y.Z means
