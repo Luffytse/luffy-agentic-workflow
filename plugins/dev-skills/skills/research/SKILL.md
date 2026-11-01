@@ -10,4 +10,4 @@ Its job:
 1. Investigate the question against **primary sources** (official docs, source code, specs, first-party APIs), not a secondary write-up of them. Follow every claim back to the source that owns it.
 2. Write the findings to a single Markdown file, citing each claim's source.
 3. Save it where the repo already keeps such notes; match the existing convention, and if there is none, put it somewhere sensible and say where.
-4. If the note is committed to a branch that will merge, add its line to `docs/index.md` in the same commit ([DOCS-INDEX.md](../domain-modeling/DOCS-INDEX.md)). A note on a throwaway branch that is never merged gets no line.
+4. If the note is committed to a branch that will merge, load `docs-index` and apply its contract. A note on a throwaway branch that is never merged gets no line.

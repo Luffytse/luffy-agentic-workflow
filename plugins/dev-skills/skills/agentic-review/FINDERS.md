@@ -37,7 +37,7 @@ Each smell reads *what it is* → *how to fix*; match it against the diff:
 
 ### Docs index drift
 
-Only when the repo has `docs/index.md`. A doc is anything the index is meant to list (the list in [`domain-modeling/DOCS-INDEX.md`](../domain-modeling/DOCS-INDEX.md#what-is-listed)): glossary pages, ADRs, `docs/agents/` files, `.out-of-scope/` notes, `REVIEW.md`, `CODING_STANDARDS.md`, `CONTRIBUTING.md`, README files and research notes; never `CLAUDE.md` or `AGENTS.md` files, `SKILL.md` files, code, or test fixtures. Report as Bug class **docs index drift**, one Finding listing every instance:
+Only when the repo has `docs/index.md`, load `docs-index` and paste its contract into the standards Finder brief so the Finder uses its listed-doc scope and exceptions. Report as Bug class **docs index drift**, one Finding listing every instance:
 
 - a doc added or renamed in the diff with no line in `docs/index.md`;
 - a line in `docs/index.md` whose link points at a file that does not exist at this Review's head.

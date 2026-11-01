@@ -1,3 +1,9 @@
+---
+name: docs-index
+description: Apply the documentation-index contract. Use when a document-writing workflow needs index format or update requirements, or when a checker assesses documentation-index drift.
+user-invocable: false
+---
+
 # Docs Index
 
 Each repo keeps one **docs index**, `docs/index.md`. It lists the docs the skills keep in the repo, so an agent can open only the ones that fit its work instead of loading them all.
@@ -6,21 +12,7 @@ Each repo keeps one **docs index**, `docs/index.md`. It lists the docs the skill
 
 Group docs by **Area** (each repo picks its own, for example site, hub, trip plugin; use "Whole repo" for docs that cover everything). Under each Area heading, one bullet per doc: a link, a colon, what the doc is, then a "Read when..." sentence.
 
-```md
-# Docs index
-
-Read this first, then open only the docs whose line fits your work.
-
-## Whole repo
-
-- [GLOSSARY.md](../GLOSSARY.md): the words used here (Order, Invoice, Customer...). Read when writing or naming anything.
-
-## Billing
-
-- [ADR 0003](adr/0003-invoices-are-immutable.md): why an issued Invoice is never edited. Read when changing how Invoices are corrected.
-- [Billing glossary](glossary/billing.md): Billing's terms. Read when working in Billing.
-- [.out-of-scope/dark-mode.md](../.out-of-scope/dark-mode.md): why dark mode was rejected. Read when a request touches theming.
-```
+See [EXAMPLE.md](EXAMPLE.md) for a complete index with Area headings and repository-relative links.
 
 Keep each line to one sentence of "what" and one "Read when". The "Read when" is the part that matters: it is how the agent decides whether to open the file.
 

@@ -9,7 +9,7 @@ A **Shared rule** is one that two or more skills must follow the same way: a rec
 - **Project configuration:** tracker operations, label mappings and release settings remain in the project's files. Skills read those files; they hold only rules that fit any project.
 - **Independent rules:** similar wording does not require a common owner. Repeated composition is also valid: callers may keep using `grilling` and `domain-modeling` directly, while `grill-with-docs` remains their convenient combined entry point.
 
-The planned bases are `docs-index` (index format and update requirements), `review-record` (working name: review markers, fields, Finding identifiers, statuses and record interpretation) and `issue-absorption` (absorption records and the meaning of completed versus abandoned fixes; migrated in #368). Writers and readers migrate together; callers keep their triggers and exceptions. Review orchestration stays in `agentic-review`, and the procedure for turning repeated Findings into preventive checks stays in `retro`.
+The `docs-index` Base skill now owns index format and update requirements; its writers and standards Finder load it by name, preserving caller triggers and exceptions. The `issue-absorption` Base skill owns absorption records and the meaning of completed versus abandoned fixes (migrated in #368). The remaining planned base is `review-record` (working name: review markers, fields, Finding identifiers, statuses and record interpretation). Writers and readers migrate together; callers keep their triggers and exceptions. Review orchestration stays in `agentic-review`, and the procedure for turning repeated Findings into preventive checks stays in `retro`.
 
 ## Workflow handoff
 
@@ -28,7 +28,7 @@ Upstream deliberately separated reusable interview and domain-modeling capabilit
 
 ## Migration and verification
 
-This narrows ADR 0006's rejected separate index skill: the trigger stays with each writer or checker, and the index contract moves only when its consumers work.
+This narrows ADR 0006's rejected separate index skill: the trigger stays with each writer or checker. The docs-index migration is implemented after successful loading/application evidence in #360; unrelated migrations below retain their transition safeguards.
 
 After this decision is recorded, #363 establishes authoring guidance and packaging support. #360 must demonstrate fresh-session discovery, loading and actual application of both workflow and reference dependencies before consumers switch. Closing that issue after a failed check is insufficient. Visibility is reported separately; a visible base may pass when hiding is unsupported.
 

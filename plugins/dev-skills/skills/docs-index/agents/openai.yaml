@@ -1,0 +1,5 @@
+interface:
+  display_name: "Docs Index"
+  short_description: "Maintain and check the documentation index"
+policy:
+  allow_implicit_invocation: true

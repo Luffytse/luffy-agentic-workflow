@@ -26,7 +26,7 @@ Report model discovery/loading/application separately from user-menu hiding. `sk
 
 ## Existing cross-folder references
 
-In a third fresh runtime select the installed production `dev-skills:grill-with-docs` caller only, using the first user turn in [production-composition.txt](production-composition.txt). Authorize fixture-only documentation writes, then answer the actual interview through explicit confirmation. Check installed sibling dependency reads and the caller's existing `../domain-modeling/DOCS-INDEX.md` reference. Observe resulting glossary and index links, rather than accepting the assistant's claim that it read the rule. Retain any unrelated workflow limitation; this does not certify every branch of those workflows.
+In a third fresh runtime select the installed production `dev-skills:grill-with-docs` caller only, using the first user turn in [production-composition.txt](production-composition.txt). Authorize fixture-only documentation writes, then answer the actual interview through explicit confirmation. Check installed sibling dependency reads, including the caller's by-name `docs-index` load for documentation writes. Observe resulting glossary and index links, rather than accepting the assistant's claim that it read the rule. Retain any unrelated workflow limitation; this does not certify every branch of those workflows.
 
 ## Evidence and cleanup
 
