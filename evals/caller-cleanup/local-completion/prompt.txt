@@ -1,0 +1,1 @@
+Isolated fixture only. Resume implement-spec after verified merge of PR-77. The Spec is S1; Ticket T1 landed; Ticket T2 was dropped. The local tracker has no PR closing-keyword support, and the PR has no Closes lines. Use configured local completion operations, then stop. Do not run git, remote tracker calls, review, cleanup or retro.

@@ -38,6 +38,8 @@ Read this first, then open only the docs whose line fits your work. Specs and ti
 - [Skill loading eval README](../evals/skill-loading/README.md): the fresh installed-runtime workflow/reference dependency gate, isolated fixtures and cross-folder reference check. Read when verifying dependency loading before consumer migration.
 - [Skill loading eval RESULTS.md](../evals/skill-loading/RESULTS.md): source provenance, actual turns, rule application and separate visibility limits. Read when checking what #360 proved and what the final Spec eval must rerun.
 
+- [Caller cleanup eval](../evals/caller-cleanup/README.md): bounded build-review handoffs, fix coordination and configured tracker/label operations. Read when changing build callers or publication role mapping; [results](../evals/caller-cleanup/RESULTS.md) retain observed behavior and limits.
+
 ## Code review
 
 - [review-record](../plugins/dev-skills/skills/review-record/SKILL.md): shared Round/Ticket-check markers, fields, identities, statuses and retrospective interpretation, plus Bug class and Always-check meaning. Read when changing a review writer or record reader.

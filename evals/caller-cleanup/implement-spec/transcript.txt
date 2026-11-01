@@ -1,0 +1,33 @@
+USER:
+This is an isolated behavioral fixture, not real project work. Use the selected build skill and the configured project docs. Resume at post-merge closure: PR-77 is verified merged and lists Closes T3 and Closes T4. Neither is absorbed. Perform the configured local closure operations now. Also assess starting a separate Ticket whose blockers are T1 and T2; report its startability and blocking IDs. Do not run git or real tracker commands, create branches, review code, or run retro. Stop after these two bounded operations.
+Then load the complete review workflow to give a fixture-only coordination plan: Spec PR after Round 2 has text fixes touching premium Ticket P and regular Ticket R; both ticket Implementers finished. State recipient/tier/branch/push evidence, continuation when next fixes need no higher tier, and what context the review needs from earlier Ticket checks. Separately give the complete Ticket-check handoff (Ticket path, diff base, depth, prior findings and destination), and merge method for a clean Standard Spec PR versus a clean Deep one. Do not dispatch reviewers or publish.
+
+
+ASSISTANT:
+I’ll use `dev-skills:implement-spec` and the configured tracker docs for the local closure and blocker checks, then load the review workflow for the fixture-only plan. I won’t run git, dispatch agents, publish, or run retro.
+
+
+ASSISTANT:
+The fixture tracker closes issues with a local `finish` operation and clears blockers only when their acceptance receipt is accepted. T3 needs closing; T4 is already closed. The separate Ticket cannot start: T1’s receipt is missing, while T2’s is accepted.
+
+
+ASSISTANT:
+Closed T3 in [state.json](<case>/fixture/state.json), recording `{"op":"finish","id":"T3","reason":"delivered","evidence":"PR-77"}` in [operations.json](<case>/fixture/operations.json). T4 was already closed and needed no operation.
+
+The separate Ticket is **not startable**. Blocking IDs: **T1**. Its acceptance receipt is missing; T2’s is accepted. Closed state alone does not clear a dependency.
+
+Loaded the complete review workflow: `SKILL.md`, `ROUNDS.md`, `FINDERS.md`, `VERIFY.md`, and `review-record`. The following is a fixture-only plan:
+
+- **Fix recipient:** a **new premium-tier Implementer**, with fresh context, working on the **Spec branch**. The highest touched Ticket tier wins: P is premium and R regular. Do not resume either finished Ticket Implementer for these PR fixes.
+- **Push evidence:** before each push, require `git status -sb` to show the Spec branch; afterward, require evidence that `git rev-parse origin/<branch>` equals `HEAD`. Return fixing commits and validation evidence to the review workflow. The coordinator must not move that checkout while the Implementer works.
+- **Continuation:** later fixes needing no higher tier may continue this new Implementer by message. If Round 2 is not clean, Round 3 reviews the fixes. If Round 2 is clean, its text “fix” Nits receive one final commit without another Round. Ordinary text fixes do not reduce the carried review depth.
+- **Earlier context:** supply the Spec, all Tickets, PR, Spec worktree and branch, base, head and merge context, plus **all Ticket-check records, including Pre-existing Findings**, and earlier Round records. Open Importants require verification at the current head; earlier dismissals, statuses, IDs and locations govern deduplication and continuation. Open Pre-existing Findings are filed after the final Round, with filing receipts preventing duplicates.
+
+The complete **Ticket-check handoff** supplies the Ticket and Spec pointers, **Ticket worktree path and Ticket branch**, **Spec branch as diff base**, **Quick depth**, and **all prior checks/Findings for that Ticket**. Run the complete check in the coordinating thread, with reads scoped to the Ticket worktree. Record it on the **Spec PR**, or retain the comment until the draft opens. Route fixes to that Ticket’s original Implementer, recheck evidence, and request another check. Accept when no Important remains open; after three unsuccessful checks, bring the Ticket to the user.
+
+| Clean Spec PR | Merge handling |
+|---|---|
+| Standard | Automatically merge when checks/CI pass and no other human-merge condition applies. Use a **merge commit**, titled with the PR’s typed title. |
+| Deep | Bring to the user; do not automatically merge. If subsequently authorized, use the same **merge commit** method. |
+
+No git or real tracker commands, branches, reviewers, publishing, or retro were run.

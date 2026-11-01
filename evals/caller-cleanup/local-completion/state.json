@@ -1,0 +1,11 @@
+{
+  "S1": {
+    "state": "closed"
+  },
+  "T1": {
+    "state": "closed"
+  },
+  "T2": {
+    "state": "open"
+  }
+}

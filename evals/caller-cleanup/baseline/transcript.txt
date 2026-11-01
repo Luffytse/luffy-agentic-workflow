@@ -1,0 +1,12 @@
+USER:
+This is an isolated behavioral fixture, not real project work. Use the selected build skill and the configured project docs. Resume at post-merge closure: PR-77 is verified merged and lists Closes T3 and Closes T4. Neither is absorbed. Perform the configured local closure operations now. Also assess starting a separate Ticket whose blockers are T1 and T2; report its startability and blocking IDs. Do not run git or real tracker commands, create branches, review code, or run retro. Stop after these two bounded operations.
+
+
+ASSISTANT:
+I’m using the implement skill for the two bounded operations: local post-merge closure and blocker assessment. I’ll read the configured project docs first.
+
+
+ASSISTANT:
+Closed T3 and recorded `finish` with reason `delivered` and evidence `PR-77`. T4 was already closed, so no closure operation was needed.
+
+The separate Ticket is **not startable**. Blocking IDs: **T1**, whose acceptance receipt is missing. T2’s receipt is accepted.
