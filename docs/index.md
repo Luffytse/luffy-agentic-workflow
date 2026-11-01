@@ -72,4 +72,4 @@ Read this first, then open only the docs whose line fits your work. Specs and ti
 
 - [ADR 0006](adr/0006-docs-are-found-through-one-index.md): this index, glossary pages per area, and which skills keep the index up to date. Read when a skill writes or reads docs.
 
-- [Shared-rules reconciliation](../evals/shared-rules/RESULTS.md): final ownership/reference audit and scoped evidence limits for Spec #348. Read when checking migration completion or the remaining final install gate.
+- [Shared-rules reconciliation](../evals/shared-rules/RESULTS.md): final ownership/reference audit and scoped evidence limits for Spec #348. Read when checking migration completion or the final install evidence and its limits.
