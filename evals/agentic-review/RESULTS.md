@@ -42,6 +42,46 @@ Pass: yes | no. <one line on what to change in VERIFY.md, if anything>
 
 ## Runs
 
+### 2026-10-31, dev-skills 0.24.1, Deep
+
+Base: implementation commit `6339a7ca79bd5b249cd68c5d90d4793bee54ee5a` for #329/#330, plugin version 0.24.1. The Ticket thread used the fixture and generated Deep briefs from the same unchanged `SKILL.md`, `FINDERS.md` and `VERIFY.md` inputs as the Standard run below. Five fresh Finders completed reports, then three fresh Verifiers voted; a fresh premium Gap sweep Finder reported K2, and three more fresh Verifiers voted on it. Agents ran in bounded batches because the session allowed at most 3 active child agents. Rank left 5 Important, 1 Nit (fix), and 0 Pre-existing Findings. As in Standard, this fixed-point fixture does not exercise design-answer Round completion; the scenario walkthroughs below cover that change.
+
+| id | Reported? | Severity given | All locations? | Notes |
+|----|-----------|----------------|----------------|-------|
+| P1 | yes | Important | n/a | 3 of 3 keep and Important; Verifiers corrected the Finder example: 1001/3 gives 333, 334, 334, not 333, 333, 335 |
+| P2 | yes | Important | yes | 3 of 3 keep and Important; payer and creditor locations |
+| P3 | yes | Important | n/a | 3 of 3 keep and Important; Verifiers corrected the example: balances Ana 1, Ben 1, Caro -2 pay Ben and leave Ana unpaid |
+| P4 | no | | n/a | pre-existing float parser bug missed |
+| P5 | yes | Important | yes | 3 of 3 keep and Important, citing the explicit every-doc-index spec requirement |
+| P6 | yes | Nit (fix) | n/a | 3 of 3 keep and Nit (fix); Bug class "public function without a docstring"; Always check line recorded as broken |
+| F1 | never raised | | | |
+| F2 | never raised | | | |
+| K1 | no | | n/a | known extra not raised |
+| K2 | yes | Important | n/a | Gap sweep: `splitter/split.py:8-11`; second vote 3 of 3 keep, Important and caused by this change; duplicate names lose part of the total, violating the exact-total guarantee |
+
+Extras: none beyond K2. Dropped by Verify: none. The corrected P1 and P3 examples retained their claims; K2 is distinct from P1's remainder assignment.
+Pass: no. P4 was not found, the same discovery miss as Standard. No change to discovery/Verify instructions or scoring expectations is included in this review-completion Ticket.
+
+### 2026-10-31, dev-skills 0.24.1, Standard
+
+Base: implementation commit `6339a7ca79bd5b249cd68c5d90d4793bee54ee5a` for #329/#330, plugin version 0.24.1. The Ticket thread built the fixture with `setup.sh` and generated the Standard briefs before that commit; `SKILL.md`, `FINDERS.md` and `VERIFY.md`, the brief inputs, are unchanged from its main base. Four fresh Finders and one fresh Verifier completed their reports, followed by Rank (4 Important, 1 Nit (fix), 0 Pre-existing). Agents ran in bounded batches because the session allowed at most 3 active child agents, rather than all Finders simultaneously. This fixed-point fixture checks Finding discovery and verification; it does not exercise the changed design-answer Round lifecycle. That lifecycle was checked separately by before/after scenario walkthroughs: Round 1 keep-all becomes clean but proceeds to Round 2; Rounds 2–5 commit and check text "fix" Nits before editing to clean; partial Nit locations stay open; agreed design changes require another Round within the cap, with Round 5 changes handed to the user unreviewed. No Verify-only run was required because `VERIFY.md` is unchanged.
+
+| id | Reported? | Severity given | All locations? | Notes |
+|----|-----------|----------------|----------------|-------|
+| P1 | yes | Important | n/a | spare cents assigned to the last people |
+| P2 | yes | Important | yes | both unescaped payer and creditor locations |
+| P3 | yes | Important | n/a | last creditor skipped |
+| P4 | no | | n/a | pre-existing float parser bug missed |
+| P5 | yes | Important | yes | both drift locations; Verifier cited the explicit every-doc-index spec requirement |
+| P6 | yes | Nit (fix) | n/a | Bug class "public function without a docstring"; Always check line recorded as broken |
+| F1 | never raised | | | |
+| F2 | never raised | | | |
+| K1 | no | | n/a | known extra not raised |
+| K2 | no | | n/a | known extra not raised |
+
+Extras: none. Dropped by Verify: none.
+Pass: no. P4 was not found. Discovery and Verify instructions are unchanged by this Ticket; the miss is recorded without changing those instructions or the expected results as part of the review-completion fix.
+
 All runs on 2026-10-31, dev-skills 0.22.13 (`agentic-review` text as on main f27a5c8), driven by the Ticket thread of #148, the same way as the 0.12.1 runs below: the thread built the fixture with `setup.sh` (head a0a951d, main af4d866), started the agents, passed the briefs from `FINDERS.md` and `VERIFY.md` word for word (written to brief files outside the repo, each agent told to read only its own brief and the scratch repo), merged duplicate candidates before Verify, and applied the Rank rules; it read `EXPECTED.md` only to score. Every Finder and Verifier was a fresh subagent; tiers were mapped to models by the Model tiers table in `plugins/dev-skills/README.md`. The thread had read `EXPECTED.md`, so it did not use a fresh session; the agents never saw `EXPECTED.md` or the Verify-only mapping, and the Verify-only Verifiers got the contents of `VERIFY-ONLY.md` pasted into their brief, never its path. Angles: bugs and edge cases plus security and privacy, as in every earlier Standard run. The fixed-point diff was `git diff --merge-base main`, with no untracked files. A slip in the run: the thread's first batch of Finder briefs lost the Finding format (the script that cut it out of `FINDERS.md` stopped at the `### <short title>` line inside the code block), so those Finders gave no line numbers. The thread discarded that batch and reran all four Finders, fresh, on fixed briefs. One Finder (security, first batch) ended without a report and was asked again, as `SKILL.md` says. Line numbers (#98): these are the first runs since `VERIFY.md`'s Location rule (#147), and every Location a Verifier gave was counted within its own file; in the full run the Verifier corrected two wrong Finder lines to the file's own lines. These are also the first runs with the Verify-only check and the known extras K1 and K2. No full Deep run was made this time, because the ticket asks for one run; the Verify-only Deep run is the Deep coverage. Through 0.22.17, `agentic-review` differs from 0.22.13 only in `ROUNDS.md`'s Rank step 2 (how a dismissed Finding is matched, #138), which a fixed-point Review and the Verify-only check do not use; no Find or Verify text changed.
 
 ### 2026-10-31, dev-skills 0.22.13, Standard
