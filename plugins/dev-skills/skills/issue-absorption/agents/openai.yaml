@@ -1,0 +1,5 @@
+interface:
+  display_name: "Issue Absorption"
+  short_description: "Record and interpret absorbed issues"
+policy:
+  allow_implicit_invocation: true

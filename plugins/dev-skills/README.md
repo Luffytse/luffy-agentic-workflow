@@ -90,6 +90,8 @@ To add a skill, create `skills/<name>/SKILL.md` and `skills/<name>/agents/openai
 
 ## Skills added since the copy
 
+- `issue-absorption`: a Base skill owning source-report records and lifecycle meaning, loaded by Ticket writers, planning readers and closing-line/closure consumers. Tracker operations remain in project configuration.
+
 - `setup-dev-skills`: derived from Upstream's setup skill. Sets up a GitHub repo for the skills: writes `docs/agents/` (issue tracker, labels, domain docs and, for a repo that cuts Releases, the release doc), the `## Agent skills` block, a starter `REVIEW.md` and `docs/index.md`, creates the labels the skills use, and reports the GitHub settings the build skills rely on without changing them. A re-run shows a diff first.
 - `setup-project`: interviews the user with `grilling` and drafts the project instructions that tell the coordinator how to brief build threads and which model each Model tier maps to (how the project works, never the state of its work). After approval the thread sends the text to the coordinator to save; it never edits project settings itself.
 - `retro-planning`: works through a snapshot of one repo's Retro backlog (ADR 0007): files an open `retro-planning` record, groups the Retro issues by root cause, walks the user through each group one at a time and carries out each call at once (a `ready-for-agent` Ticket up to the cap, a close, or a spin-off to its own planning thread), closes expired issues and issues whose Ticket has closed as completed in one list at the end, and closes the record.

@@ -9,7 +9,7 @@ A **Shared rule** is one that two or more skills must follow the same way: a rec
 - **Project configuration:** tracker operations, label mappings and release settings remain in the project's files. Skills read those files; they hold only rules that fit any project.
 - **Independent rules:** similar wording does not require a common owner. Repeated composition is also valid: callers may keep using `grilling` and `domain-modeling` directly, while `grill-with-docs` remains their convenient combined entry point.
 
-The planned bases are `docs-index` (index format and update requirements), `review-record` (working name: review markers, fields, Finding identifiers, statuses and record interpretation) and `issue-absorption` (working name: absorption records and the meaning of completed versus abandoned fixes). Writers and readers migrate together; callers keep their triggers and exceptions. Review orchestration stays in `agentic-review`, and the procedure for turning repeated Findings into preventive checks stays in `retro`.
+The planned bases are `docs-index` (index format and update requirements), `review-record` (working name: review markers, fields, Finding identifiers, statuses and record interpretation) and `issue-absorption` (absorption records and the meaning of completed versus abandoned fixes; migrated in #368). Writers and readers migrate together; callers keep their triggers and exceptions. Review orchestration stays in `agentic-review`, and the procedure for turning repeated Findings into preventive checks stays in `retro`.
 
 ## Workflow handoff
 

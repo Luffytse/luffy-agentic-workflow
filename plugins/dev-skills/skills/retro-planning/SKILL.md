@@ -9,6 +9,8 @@ Plan only the current repo. Its tracker is named in `docs/agents/issue-tracker.m
 
 **The cap: at most 3 Tickets per planning.** Every Ticket this planning files counts toward it: repeated groups, severe one-offs and failed fixes alike. A spun-off group does not count. Only the user may raise the cap, and only for this planning: when more groups qualify than fit, say so, and keep the cap unless the user raises it. The record notes the cap used and the user's reason.
 
+Load `issue-absorption` before reconciling absorption records, classifying the snapshot or carrying out an absorption or close-with-Ticket verdict. Apply its agreement and lifecycle as reference while continuing this planning.
+
 If the brief says this thread owns a spun-off group, skip steps 0 to 7 and go straight to "Running a spun-off planning".
 
 ## 0. Resume or start
@@ -34,13 +36,11 @@ Count each issue's **votes by distinct thread**: the thread its body names as th
 
 Give each issue a status:
 
-- **Waiting on an open Ticket**: absorbed by a Ticket that is still open. List it, and leave it out of steps 2 to 5.
+- **Waiting on an open Ticket**: the absorption contract says waiting. List it, and leave it out of steps 2 to 5.
 - **Spun off, waiting**: it has a `Spun off to <thread link>` comment and no later `Absorbed by` comment. Its owning planning has not decided it yet. List it, and leave it out of steps 2 to 5.
-- **Failed-fix candidate**: absorbed by a Ticket closed as completed (read the close reason with `gh issue view <n> --json state,stateReason`, or `state_reason` on the REST route, or the tracker doc's equivalent), with a new vote since the Ticket closed. It goes to step 2.
-- **Closing with its Ticket**: absorbed by a Ticket closed as completed, with no new vote since. Its verdict is **Close with its Ticket**.
-- **In the backlog**: every other issue, including one absorbed by a Ticket closed any other way than completed (not planned, duplicate, abandoned). Nothing fixed it, so it is not closing, not a failed-fix candidate and not waiting: it keeps its votes and new-vote answer, and is grouped and judged in steps 2 to 5 like any other.
-
-An issue's latest `Absorbed by` comment decides which Ticket it waits on or closes with.
+- **Failed-fix candidate**: the absorption contract says completed, with a new vote since the Ticket closed. It goes to step 2.
+- **Closing with its Ticket**: the contract says completed, with no new vote since. Its verdict is **Close with its Ticket**.
+- **In the backlog**: every other issue, including the contract's not-fixed sources. Keep its votes and new-vote answer, and group and judge it in steps 2 to 5 like any other.
 
 Write the snapshot table into the record.
 
@@ -50,7 +50,7 @@ Done when every open `retro` issue in the snapshot has its distinct-thread count
 
 For each Ticket named in an earlier record that closed as completed, check whether its problem has come back: an absorbed issue with a new vote after the Ticket closed, or a Retro issue in the snapshot filed or voted on after it closed that matches the Ticket's problem. Each match makes a **failed-fix group**: the fix did not work. This runs before the cap is filled, and a failed-fix group counts toward it.
 
-A Ticket closed any way other than completed (not planned, duplicate, abandoned) fixed nothing: mark it "not fixed", and its issues stay in the backlog.
+Apply the absorption contract to mark the other closed Tickets "not fixed".
 
 Done when every closed Ticket in the earlier records is marked "holding", "came back" or "not fixed", with the matching issues.
 
@@ -100,11 +100,11 @@ Done when every group in the walk and every mechanical close has the user's call
 
 ## 6. Carry out a call
 
-- **Ticket**: file it with `to-tickets`' issue template, including its `**Model tier:**` line. Label it `ready-for-agent` (the string `docs/agents/triage-labels.md` maps it to, if the repo has that file). Its done condition goes in the acceptance criteria. Absorb the Retro issues as `to-tickets` step 5 says for a Ticket that absorbs one or more existing issues: read their comments too, link them, put a `Closes #<n>` criterion for each (the pull request that closes the Ticket lists them, one line each), and comment `Absorbed by #<ticket>; closes when it is completed.` on each. They close only when the Ticket is completed: if it is closed as not planned, they stay open.
+- **Ticket**: file it with `to-tickets`' issue template, including its `**Model tier:**` line. Label it `ready-for-agent` (the string `docs/agents/triage-labels.md` maps it to, if the repo has that file). Its done condition goes in the acceptance criteria. Apply `issue-absorption`'s writing agreement to the Retro issues.
 - **`wontfix`** or another close: comment the reason, add the `wontfix` label (the string `docs/agents/triage-labels.md` maps it to, if the repo has that file) when the verdict is `wontfix`, and close.
 - **Spin off**: the group needs more discussion, so this planning does not decide it. Ask for a separate planning thread for its issues: in a project with a coordinator, ask the coordinator; otherwise tell the user to start one, and give them the brief. The brief names the issues, this record, and "Running a spun-off planning" below. On each issue, comment `Spun off to <thread link>; that planning decides it.` (with no link yet, name the thread as the user or coordinator named it). A spun-off group stays open, does not count toward the cap, and cannot expire.
 - **Expire**: comment `No new vote across 2 plannings. Reopen if seen again.` and close.
-- **Close with its Ticket**: first check the Ticket's close reason is `completed`; if not, leave the issue open in the backlog. Comment `Closed with #<ticket>.` and close.
+- **Close with its Ticket**: recheck eligibility under `issue-absorption`; when eligible, comment `Closed with #<ticket>.` and close, otherwise apply its current lifecycle state.
 - **Held back by the cap**, or kept open: leave open.
 
 Then update the record straight away: the group's row in "Verdicts", its line in "Tickets filed", "Held back by the cap" or "Spun off", and "Cap" when the user raised the cap.

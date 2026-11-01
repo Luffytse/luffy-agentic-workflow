@@ -1,0 +1,173 @@
+{
+  "snapshot_time": "2026-10-31T12:00:00Z",
+  "earlier_record_created": "2026-10-01",
+  "scope": "Snapshot classification and earlier-fix recheck only; stopped before grouping, user verdicts, or publication.",
+  "sources": [
+    {
+      "source": "#11",
+      "state": "open",
+      "status": "Waiting on an open Ticket",
+      "authoritative_ticket": "#31",
+      "votes_retained": 2,
+      "new_vote_since_earlier_record": false,
+      "eligible_for_mechanical_close": false,
+      "proposal": "Keep open while #31 is open."
+    },
+    {
+      "source": "#12",
+      "state": "open",
+      "status": "Closing with its Ticket",
+      "authoritative_ticket": "#32",
+      "votes_retained": 2,
+      "new_vote_since_earlier_record": false,
+      "eligible_for_mechanical_close": true,
+      "proposal": "Propose Close with its Ticket #32; no closure performed."
+    },
+    {
+      "source": "#13",
+      "state": "open",
+      "status": "In the backlog",
+      "authoritative_ticket": "#33",
+      "votes_retained": 2,
+      "new_vote_since_earlier_record": false,
+      "eligible_for_mechanical_close": false,
+      "proposal": "Retain in backlog with both votes; #33 was closed not_planned and fixed nothing."
+    },
+    {
+      "source": "#14",
+      "state": "open",
+      "status": "In the backlog",
+      "authoritative_ticket": "#34",
+      "votes_retained": 2,
+      "new_vote_since_earlier_record": false,
+      "eligible_for_mechanical_close": false,
+      "proposal": "Retain in backlog with both votes; #34 was closed duplicate and fixed nothing."
+    },
+    {
+      "source": "#15",
+      "state": "open",
+      "status": "Waiting on an open Ticket",
+      "authoritative_ticket": "#31",
+      "votes_retained": 2,
+      "new_vote_since_earlier_record": false,
+      "eligible_for_mechanical_close": false,
+      "proposal": "Keep open while #31 is open; the Oct 20 absorption supersedes #35."
+    },
+    {
+      "source": "#16",
+      "state": "open",
+      "status": "Failed-fix candidate",
+      "authoritative_ticket": "#32",
+      "votes_retained": 3,
+      "new_vote_since_earlier_record": true,
+      "eligible_for_mechanical_close": false,
+      "proposal": "Carry forward as a failed-fix group for #32; no verdict requested or Ticket filed."
+    },
+    {
+      "source": "#17",
+      "state": "open",
+      "status": "Closing with its Ticket",
+      "authoritative_ticket": "#32",
+      "votes_retained": 2,
+      "new_vote_since_earlier_record": false,
+      "eligible_for_mechanical_close": true,
+      "proposal": "Propose Close with its Ticket #32; the Oct 5 absorption supersedes #31."
+    },
+    {
+      "source": "#18",
+      "state": "open",
+      "status": "In the backlog",
+      "authoritative_ticket": null,
+      "votes_retained": 2,
+      "new_vote_since_earlier_record": false,
+      "eligible_for_mechanical_close": false,
+      "proposal": "Retain in backlog with both votes for later planning; unrelated to earlier fixes."
+    }
+  ],
+  "earlier_fixes_rechecked": [
+    {
+      "ticket": "#31",
+      "state": "open",
+      "result": "waiting on open Ticket",
+      "authoritative_sources": [
+        "#11",
+        "#15"
+      ],
+      "note": "Not a closed fix to recheck; #17 now belongs to #32."
+    },
+    {
+      "ticket": "#32",
+      "state": "closed",
+      "close_reason": "completed",
+      "closed_at": "2026-10-10",
+      "result": "came back",
+      "matching_issues": [
+        "#16"
+      ],
+      "authoritative_sources": [
+        "#12",
+        "#16",
+        "#17"
+      ],
+      "evidence": "#16 received a third distinct-thread vote in thread-new on Oct 22, after completion. #12 and #17 have no post-completion votes and remain individually eligible for mechanical close."
+    },
+    {
+      "ticket": "#33",
+      "state": "closed",
+      "close_reason": "not_planned",
+      "closed_at": "2026-10-10",
+      "result": "not fixed",
+      "authoritative_sources": [
+        "#13"
+      ]
+    },
+    {
+      "ticket": "#34",
+      "state": "closed",
+      "close_reason": "duplicate",
+      "closed_at": "2026-10-10",
+      "result": "not fixed",
+      "authoritative_sources": [
+        "#14"
+      ]
+    },
+    {
+      "ticket": "#35",
+      "state": "closed",
+      "close_reason": "completed",
+      "closed_at": "2026-10-10",
+      "result": "holding",
+      "matching_issues": [],
+      "authoritative_sources": [],
+      "note": "#15 was historically absorbed, but its latest absorption is #31. Reabsorption is not a vote or evidence of recurrence; no matching post-completion vote exists."
+    }
+  ],
+  "failed_fix_groups": [
+    {
+      "ticket": "#32",
+      "sources": [
+        "#16"
+      ],
+      "distinct_threads": 3
+    }
+  ],
+  "proposed_mechanical_closes": [
+    {
+      "source": "#12",
+      "ticket": "#32"
+    },
+    {
+      "source": "#17",
+      "ticket": "#32"
+    }
+  ],
+  "arrived_during_this_planning": [],
+  "actions_performed": {
+    "source_closures": [],
+    "tickets_filed": [],
+    "records_published": [],
+    "external_tracker_operations": [],
+    "network_operations": []
+  },
+  "user_verdicts_requested": false
+}
