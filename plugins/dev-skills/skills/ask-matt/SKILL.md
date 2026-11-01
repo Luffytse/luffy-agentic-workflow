@@ -91,6 +91,6 @@ Off the main flow entirely.
 
 ## Precondition
 
-**`setup-dev-skills`**: run before your first engineering flow to configure the issue tracker, triage labels, and doc layout the other skills assume, and the release doc `/release` reads. It supports GitHub repos only for now.
+**`setup-dev-skills`**: run before your first engineering flow to configure the issue tracker, triage labels, and doc layout the other skills assume, the Boundary record of what the user allows agents to do, and the release doc `/release` reads. It supports GitHub repos only for now.
 
 **`setup-project`**: run to write or update a project's instructions, the short text its coordinator reads before it starts a thread (how its threads work and what every brief carries, never the state of its work). Use it when a new repo, kind of thread or standing rule means they are out of date.

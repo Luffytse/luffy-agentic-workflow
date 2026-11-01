@@ -16,6 +16,7 @@
 #   plugin-manifest              plugin.json, README.md, CHANGELOG.md and the licence file exist; plugin.json names its repository
 #   codex-packaging              Codex marketplace exposes only dev-skills, with matching manifest identity and shared skills path
 #   release-files                the release skill, its release doc seed and this repo's release doc exist
+#   boundary-files               the Boundary record seed and this repo's Boundary record exist
 #   openai-metadata-present      every skill folder has agents/openai.yaml
 #   codex-implicit-invocation    no agents/openai.yaml turns implicit invocation off
 #   openai-display-name          each agents/openai.yaml display_name reads like its skill's folder name
@@ -133,6 +134,11 @@ fi
 # release-files: the release skill and the release docs it reads exist (presence only; the skill's text is
 # covered by repo-free-skill-text)
 for f in "$skills/release/SKILL.md" "$skills/setup-dev-skills/release.md" "$repo/docs/agents/release.md"; do
+  [ -f "$f" ] || bad "missing ${f#"$repo"/}"
+done
+
+# boundary-files: the Boundary record seed that setup-dev-skills writes from, and this repo's own record (presence only)
+for f in "$skills/setup-dev-skills/boundaries.md" "$repo/docs/agents/boundaries.md"; do
   [ -f "$f" ] || bad "missing ${f#"$repo"/}"
 done
 

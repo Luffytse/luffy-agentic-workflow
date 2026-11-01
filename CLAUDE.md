@@ -34,6 +34,10 @@ Issues and specs live in this repo's GitHub Issues. See `docs/agents/issue-track
 
 Single-context: one root `GLOSSARY.md` and `docs/adr/`. See `docs/agents/domain.md`.
 
+### Boundaries
+
+The agreed boundary: nothing needs the user's approval, no budget, one-hour check-ins, Milestone label `milestone-<n>`. No skill reads it yet: until #423 lands, the merge lists in `implement` and `implement-spec`, ADR 0004 and the glossary's **Door** entry govern merges. See `docs/agents/boundaries.md`.
+
 ### Releases
 
 `dev-skills`' canonical version source is `plugins/dev-skills/.claude-plugin/plugin.json`; `plugins/dev-skills/.codex-plugin/plugin.json` keeps a synchronized version copy; a skill-changing pull request bumps the version and a Release does not; a Release is named, not numbered, with the label `release-m<milestone>-r<n>`, and its changelog entry records its start and end commits and the versions it delivered. See `docs/agents/release.md`.

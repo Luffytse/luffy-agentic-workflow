@@ -1,6 +1,6 @@
 ---
 name: setup-dev-skills
-description: "Configure a GitHub repo for the dev-skills plugin: write its issue tracker, triage label, domain doc and release doc files, create the labels the skills use, and check the GitHub settings the build skills rely on. Use when the user sets up a repo for these skills, or the repo has no issue tracker or triage labels configured yet, or asks to update the repo's tracker, label, domain-doc or release-doc files."
+description: "Configure a GitHub repo for the dev-skills plugin: write its issue tracker, triage label, domain doc, release doc and Boundary record files, create the labels the skills use, and check the GitHub settings the build skills rely on. Use when the user sets up a repo for these skills, or the repo has no issue tracker or triage labels configured yet, or asks to update the repo's tracker, label, domain-doc, release-doc or Boundary-record files."
 ---
 
 # Set up dev-skills
@@ -12,6 +12,7 @@ Derived from Matt Pocock's setup skill; the seed files in this folder are mostly
 - **Domain docs**: where `GLOSSARY.md` and ADRs live and how skills read them, in `docs/agents/domain.md`, plus the `docs/index.md` that lists the docs.
 - **Review rules**: a starter `REVIEW.md` at the repo root, where the repo's own review rules go.
 - **Releases**: where the version lives, who bumps it (the bump mode), the changelog path, the release label prefix, and for pull-requests-bump repos the Release name form and the whole-Release check, that `release` reads, in `docs/agents/release.md`, for a repo that cuts versioned Releases.
+- **Boundaries**: which irreversible actions agents may take, which need the user's approval, the resource budget, the check-in interval and the Milestone label form, in the Boundary record, `docs/agents/boundaries.md`.
 - **GitHub settings**: checked and reported, never changed.
 
 This is a prompt-driven skill, not a deterministic script. Explore, present what you found, confirm with the user, then write. It runs the same way on a fresh repo and on a re-run; a re-run shows a diff first (step 3).
@@ -29,6 +30,7 @@ Read whatever exists; assume nothing:
 - `docs/adr/` and any `src/*/docs/adr/` directories.
 - `docs/agents/`: do earlier output files exist? If so this is a re-run.
 - `docs/agents/release.md`, and the files a Release would touch: a version file (such as `package.json`, `pyproject.toml`, `Cargo.toml` or a plugin manifest) and a `CHANGELOG.md`.
+- `docs/agents/boundaries.md`: does the Boundary record exist, and which values has it filled in?
 - `REVIEW.md` at the repo root: does it exist, and which of its sections (Important, Skip, Always check) does it have? An existing one is left as it is (step 3).
 - `docs/index.md`: the docs index, if one exists, and the other docs it should list (`REVIEW.md`, `CODING_STANDARDS.md`, `CONTRIBUTING.md`, `.out-of-scope/`, README files).
 - The repo's labels: `gh api repos/<owner>/<repo>/labels --paginate --jq '.[].name'`.
@@ -74,6 +76,24 @@ On **yes**, fill the release doc's values, leading with what exploration found: 
 
 Then ask whether the bump pull request (Releases bump) or the bump commit (pull requests bump) must change or run anything else, such as a second file that repeats the version (recommended: **nothing**). On **no**, write no release doc.
 
+**Section F: Boundaries.** Ask the user for the Boundary record's values, one question each, leading with the recommended answer:
+
+> Which irreversible actions may agents take without asking you, for example deleting test data they generated? (recommended: **none**)
+
+> Which actions must come to you for approval, for example deleting production or customer data? (recommended: **none** for a repo with no data of value, else ask the user to name them)
+
+An empty answer to the second question is valid. Skills will read this record in place of a fixed list, so never add actions the user did not name.
+
+> Is there a budget agents must stay within, such as a paid service, an API quota or a token limit? (recommended: **none**)
+
+> How often should a running thread check in with you? (recommended: **1 hour**)
+
+> What should a Milestone's membership label look like? (recommended: **`milestone-<n>`**, for example `milestone-1`)
+
+Never guess a value. Say that a Milestone issue may add allowed or forbidden actions for its own issues and wins over the record for them; the seed already says so.
+
+On a re-run, fill the fresh draft of the record from the existing record's values before diffing it, so a value filled in earlier is never shown as a revert to the seed's placeholder; ask again only for a value the existing record lacks, or that the user wants to change.
+
 ### 3. Draft and diff
 
 Build every file from the seeds in this folder:
@@ -82,11 +102,12 @@ Build every file from the seeds in this folder:
 - [triage-labels.md](./triage-labels.md) becomes `docs/agents/triage-labels.md`
 - [domain.md](./domain.md) becomes `docs/agents/domain.md`
 - [release.md](./release.md) becomes `docs/agents/release.md`, only when Section E was **yes**
+- [boundaries.md](./boundaries.md) becomes `docs/agents/boundaries.md`
 - [review.md](./review.md) becomes `REVIEW.md` at the repo root, but only when the repo has none, first run or re-run. An existing `REVIEW.md` (one `retro` made, or the user's own) is never drafted over: nothing in it is removed or rewritten, and only a missing section of Important, Skip and Always check is offered, alone, as a diff; with all three present, report "no change".
 - the `## Agent skills` block (step 4)
 - `docs/index.md`, new or updated, listing every `docs/agents/` file, `REVIEW.md` (with a "read when reviewing a change or adding an Always check line" line) and every other doc found while exploring, by loading `docs-index` and applying its contract
 
-On a re-run, diff each draft against the file in the repo. Keep the values the earlier run filled in (the repo link, the label strings, the PR flag, the release doc's values, including its bump mode, Release name form and whole-Release check) and change only what drifted from the seeds. Show the user the diff, or "no change" per file. The rules the user gave in Section D are drafted into the diff of the file they go in (`CLAUDE.md` or `AGENTS.md`, or `REVIEW.md`) and shown before writing; adding a line to an existing `REVIEW.md` is an addition, not a rewrite. Let the user edit before anything is written.
+On a re-run, diff each draft against the file in the repo. Keep the values the earlier run filled in (the repo link, the label strings, the PR flag, the release doc's values, including its bump mode, Release name form and whole-Release check, and the Boundary record's values) and change only what drifted from the seeds. Show the user the diff, or "no change" per file. The rules the user gave in Section D are drafted into the diff of the file they go in (`CLAUDE.md` or `AGENTS.md`, or `REVIEW.md`) and shown before writing; adding a line to an existing `REVIEW.md` is an addition, not a rewrite. Let the user edit before anything is written.
 
 Done when the user has approved the drafts, or approved "no change".
 
@@ -119,6 +140,14 @@ Start at `docs/index.md`; it says which doc to read for what.
 ```
 
 Leave out the `### Releases` part when the repo has no release doc.
+
+Add a `### Boundaries` part to the block, after `### Domain docs` and before `### Releases`:
+
+```markdown
+### Boundaries
+
+[one-line summary: what needs the user's approval ("nothing" if empty), the budget and the check-in interval]. See `docs/agents/boundaries.md`.
+```
 
 Then write the approved files, and `docs/index.md` last.
 

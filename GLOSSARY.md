@@ -147,6 +147,10 @@ _Avoid_: priority, blocker
 How hard a change is to walk back. A **one-way door** is a change that reverting its commits would not fully undo, including anything outside git (a data migration, deleted data, a public interface others depend on, a message sent outside the project, a published release); a **two-way door** is one a revert does undo. The `pr` skill records the call as `**Door:**` in the pull request body, and a pull request behind a one-way door is not self-merged.
 _Avoid_: risk level
 
+**Boundary record**:
+A repo's agent doc, `docs/agents/boundaries.md`, written with the user by `setup-dev-skills`: which irreversible actions agents may take, which actions need the user's approval (the list may be empty), the resource budget, the check-in interval (default one hour) and the form of a Milestone's membership label (for example `milestone-<n>`). Skills will read it instead of a fixed list; until the merge lists and the **Door** entry change, they still govern merges. A Milestone issue may add allowed or forbidden actions for its own issues and wins over the record for them.
+_Avoid_: permissions file, policy
+
 **Bug class**:
 The kind of problem a Finding is (for example "unescaped user input"), so every place it occurs is fixed together.
 _Avoid_: category, type
