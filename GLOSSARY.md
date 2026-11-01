@@ -61,7 +61,7 @@ A product goal the user sets (for example "M3 Trip planning"), written down in o
 _Avoid_: epic, sprint
 
 **Release**:
-One version of a plugin and the few features it ships (at most 5 unless the user raises the cap for that Release; a feature is a Spec with its Tickets, a lone Ticket with the issues it absorbs, or a few related issues the user agrees to treat as one), every issue in them labelled `release-X.Y.Z`, with one release issue holding its goal and notes. Not a Milestone, which is the product goal that one or more Releases work toward.
+A named step inside a Milestone (for example "Milestone 1 · Release 1"), and the few features it delivers (at most 5 unless the user raises the cap for that Release; a feature is a Spec with its Tickets, a lone Ticket with the issues it absorbs, or a few related issues the user agrees to treat as one), every issue in them labelled `release-m<milestone>-r<n>` (by hand until #397 changes `release`), with one release issue holding its goal, notes, start and end commits and the versions it delivered. Its name is not a version: in this repo each skill-changing pull request bumps the version. Not a Milestone, which is the product goal its Releases work toward.
 _Avoid_: sprint, version bump
 
 **Release planning**:
@@ -69,7 +69,7 @@ The step that picks the next Release's goal and features: the agent proposes, th
 _Avoid_: release triage
 
 **Release thread**:
-A project thread that cuts a Release (the bump pull request and its `CHANGELOG.md` entry) and then runs the next Release planning, with the `release` skill.
+A project thread that cuts a Release (its `CHANGELOG.md` entry, the whole-Release check and, where the release doc says Releases bump, the bump pull request) and then runs the next Release planning, with the `release` skill.
 
 **Build thread**:
 A project thread that builds a Spec or a lone Ticket: a Spec thread or a Ticket thread.

@@ -20,7 +20,7 @@ The thread merges its own pull request once the review is clean and CI is green,
 - the review ended with Result "5-Round cap reached" (Round 5 was not clean; a clean Round 5 is a clean Round like any other);
 - an agreed answer to a design Finding that changes the pull request came with no Round left to review it.
 
-In this repo, the rules add a change to the `agentic-review` skill (this repo's `CLAUDE.md`); the skills name only the general case, because a change to that skill is only ever made in this repo.
+A repo's own rules may add cases; the skills name only the general ones.
 
 The user then merges, or tells the thread to. This follows the Claude Code team's practice of setting human review by the risk of the change, not by who wrote it.
 

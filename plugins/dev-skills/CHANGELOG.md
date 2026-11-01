@@ -1,6 +1,6 @@
 # Changelog
 
-What each version of `dev-skills` brought, newest first. A version changes only when a Release is cut, and each Release adds one entry here: its goal, the issues it shipped, and what a project using the plugin must do when something breaks.
+What each version of `dev-skills` brought, newest first. Each pull request that changes a skill bumps the version, and each Release adds one entry here covering everything since the last Release: its goal, the versions it delivered, the issues it shipped, and what a project using the plugin must do when something breaks. Entries up to 0.25.0 are one per version, when only a Release bumped it.
 
 ## 0.25.0 (2026-11-01)
 

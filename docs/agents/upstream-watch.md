@@ -33,7 +33,7 @@ Two ways to record the new last-looked-at commit were open: the issue tells tria
 
 - Nothing then depends on a person remembering a chore. An issue instruction could be forgotten, or triage might close the issue as "none worth taking" without touching the README, and the next run would list the same commits again.
 - The record is the commit range that was looked at, not the commits that were taken. It is true as soon as the job has looked, so it should not wait for triage to decide the items.
-- It changes one line of one README and no skill text, so it needs no version, as ordinary changes under `plugins/` carry none ([ADR 0008](../adr/0008-plugin-versions-change-only-at-a-release.md)), and the job only opens it: the user merges it.
+- It changes one line of one README and no skill text, so it takes no version bump: only a change under `plugins/dev-skills/skills/` bumps the version ([ADR 0008](../adr/0008-each-skill-change-bumps-the-plugin-version.md)), and the job only opens it: the user merges it.
 - Step 1 reads an open watch pull request first, so an unmerged one never causes a repeat.
 
 The issue still names the range, so it is the readable record, and the README line is the machine-read one.
