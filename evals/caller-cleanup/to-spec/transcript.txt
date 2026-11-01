@@ -1,0 +1,10 @@
+USER:
+Isolated fixture; configured tracker uses local artifacts only. The user has approved the solution, seam and one regular-tier Ticket breakdown. Build a plain-text greeting formatter: accepts a name, returns Hello followed by that name; no UI or storage. Test seam is formatter input/output. Publish the Spec now using the configured tracker operation and label mapping. No further interview needed; no parent or absorbed sources, release labels or agent-only labels. Use local fixture files only; no network tracker calls. Stop after publication.
+
+
+ASSISTANT:
+I’m using the to-spec skill to publish the approved Spec through the local tracker configuration, then stop.
+
+
+ASSISTANT:
+Published the Spec in [published.json](<case>/fixture/published.json) with the configured `robot-queue` label and approved one regular-tier Ticket breakdown. No network calls made. Stopped after publication.

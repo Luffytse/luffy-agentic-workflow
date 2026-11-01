@@ -1,0 +1,24 @@
+USER:
+$grill-with-docs Interview me to settle this hypothetical tiny project plan. Use the full composed workflow; this test has no external facts to research. I want a personal Saturday reading habit. Ask questions and wait for answers until shared understanding, recording domain terms and settled decisions as the skill requires in this isolated fixture. All writes are authorized in this fixture only. Do not implement software, commit, publish, or contact anyone. A cross-folder reference should be read when its trigger occurs. There is no Claude Skill tool in this host; use the available skill descriptions and installed files to load dependencies by name.
+
+
+ASSISTANT:
+I’m using grill-with-docs with its grilling and domain-modeling dependencies. I’ll read the relevant instructions, then ask one question at a time and record terms and decisions as we settle them.
+
+
+ASSISTANT:
+❓ **Q1** - **Purpose**: Should this habit focus on enjoying a quiet reading break, with progress through books as a secondary benefit?
+
+➡️ I recommend yes: make enjoyment the reason to return each Saturday.
+
+---
+
+❓ **Q2** - **Reading material**: Should books you choose for pleasure count, in print, ebook, or audiobook form?
+
+➡️ I recommend yes: let interest guide your choice and keep the format flexible.
+
+---
+
+❓ **Q3** - **Scope**: Should we plan a four-Saturday trial before deciding whether to make this a standing routine?
+
+➡️ I recommend yes: a short trial gives us a concrete point to review what works.

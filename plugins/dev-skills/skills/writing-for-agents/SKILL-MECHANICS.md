@@ -4,14 +4,37 @@ The skill-specific branch of [`writing-for-agents`](SKILL.md): what changes when
 
 ## Invocation
 
-Two choices, trading the two loads:
+Model reachability and user-menu visibility are separate choices:
 
-- A **model-invoked** skill keeps a `description`, so the agent can fire it autonomously, and other skills can reach it. You can still type its name: model-invocation always _includes_ user reach; a description only ever adds agent discovery, never removes the human's. The description is the skill's top-level context pointer, forced to stay loaded at all times: permanent context load in exchange for discoverability. A model-invoked skill whose content is all reference is also one home for shared reference: another skill can invoke it, so reference needed by several skills lives in one place. Mechanics: omit `disable-model-invocation`, and write a model-facing description carrying the trigger branches (the pointer-writing rules in `SKILL.md` apply in full).
-- A **user-invoked** skill strips the description from the agent's reach: only the human typing its name can invoke it, and no other skill can. Zero context load, but it spends cognitive load: you are the index that must remember it exists. Mechanics: set `disable-model-invocation: true`; the `description` becomes human-facing: a one-line summary, trigger lists stripped.
+- A **model-invoked** skill has a model-facing `description` with trigger branches, so the agent can discover it and other skills can reach it. Its description spends context load; its body loads when needed. Omit `disable-model-invocation` to retain model reachability.
+- A **user-only** skill sets `disable-model-invocation: true` in Claude Code. Its description is not in the model's discovery context, so callers cannot rely on it as an autonomous dependency. Its human-facing description is a summary, and remembering it spends cognitive load.
+- A **Base skill** is model-invoked even when hidden from a user menu. In Claude Code, `user-invocable: false` hides the command while retaining model access. Keep the description and omit `disable-model-invocation`. Hiding is preferred where supported, but discovery, loading and application are required; visible bases are valid when the host cannot hide them.
 
-Pick model-invocation only when the agent must reach the skill on its own, or another skill must. If it only ever fires by hand, make it user-invoked and pay no context load.
+Choose model invocation whenever another skill needs the dependency, including a dependency shared by user-only workflows. Package a shared contract as a named Base skill, not as an external shared folder. Supporting files can stay beside their owning skill, behind pointers from it.
 
-Shared reference that two user-invoked skills both need can live in neither: with no descriptions, neither can fire the other. Push it to a plain file outside the skill system: external reference any skill can point at.
+### Metadata for a Base skill
+
+Use the contract's real name and trigger in `SKILL.md`; this example shows the shape:
+
+```yaml
+---
+name: example-contract
+description: Interpret example records. Use when a caller writes or reads an example record.
+user-invocable: false
+---
+```
+
+For Codex, supply `agents/openai.yaml` alongside it:
+
+```yaml
+interface:
+  display_name: "Example Contract"
+  short_description: "Interpret example records"
+policy:
+  allow_implicit_invocation: true
+```
+
+The display name should read like the folder name. The Codex policy preserves implicit invocation; it is not a menu-hiding setting. Check each supported host rather than assuming Claude Code's visibility flag has the same effect elsewhere. See the [Claude Code invocation reference](https://code.claude.com/docs/en/skills#control-who-invokes-a-skill) and [Codex metadata reference](https://developers.openai.com/codex/skills/#optional-metadata) for host-specific behavior. Metadata validation does not replace the fresh-runtime dependency check described in `SKILL.md`.
 
 ## Splitting by invocation
 
@@ -19,4 +42,4 @@ The invocation cut of splitting (the sequence cut lives in `SKILL.md`): split of
 
 ## Router skills
 
-When user-invoked skills multiply past what you can remember, that piled-up cognitive load is cured by a **router skill**: one user-invoked skill that names the others and when to reach for each, so the human has one skill to remember instead of many. It can only hint, never fire them: user-invoked skills have no description, so nothing but the human can reach them.
+When user-only skills multiply past what you can remember, that piled-up cognitive load is cured by a **router skill**: one user-only skill that names the others and when to reach for each, so the human has one skill to remember instead of many. For user-only targets, it directs the human to invoke them; model-invoked targets remain available for an agent to load.

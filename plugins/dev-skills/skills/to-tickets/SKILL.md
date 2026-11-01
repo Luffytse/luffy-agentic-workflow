@@ -7,13 +7,17 @@ description: "Split a plan, spec or conversation into tracer-bullet tickets, eac
 
 Break a plan, spec, or conversation into a set of **tickets**: tracer-bullet vertical slices, each declaring the tickets that **block** it.
 
-The issue tracker and triage label vocabulary should have been provided to you. If not, tell the user to run `setup-dev-skills`.
+Read the configured project issue-tracker and triage-label docs before publication. Use the triage-label doc's role-to-label mapping whenever applying a triage role. If either doc was not provided, tell the user to run `setup-dev-skills`.
 
 ## Process
 
 ### 1. Gather context
 
 Work from whatever is already in the conversation context. If the user passes a reference (a spec path, an issue number or URL) as an argument, fetch it and read its full body and comments.
+
+When another workflow calls this skill, retain its intended outcome, source roles (absorbed reports versus a parent), scope, constraints, failed-fix context, dependencies and publication budget. A problem approval permits investigation; step 4 still obtains approval of the concrete work. Load `issue-absorption` now when sources will be absorbed, so their bodies and comments inform the draft.
+
+For a resumed publication, first reconcile existing identifiers and source mappings with tracker state, including Tickets whose labels or links were never completed. Retain the prior solution decision and repair only incomplete actions. An existing Ticket is not a new publication slot.
 
 ### 2. Explore the codebase (optional)
 
@@ -40,6 +44,8 @@ Give each ticket a **model tier**, the tier its Implementer runs on: **regular**
 
 **Wide refactors are the exception to vertical slicing.** A **wide refactor** is one mechanical change (rename a column, retype a shared symbol) whose **blast radius** fans across the whole codebase, so a single edit breaks thousands of call sites at once and no vertical slice can land green. Don't force it into a tracer bullet; sequence it as **expand–contract**. First expand: add the new form beside the old so nothing breaks. Then migrate the call sites over in batches sized by blast radius (per package, per directory), each batch its own ticket blocked by the expand, keeping CI green batch to batch because the old form still exists. Finally contract: delete the old form once no caller remains, in a ticket blocked by every migrate batch. When even the batches can't stay green alone, keep the sequence but let them share an integration branch that all block a final integrate-and-verify ticket; green is promised only there.
 
+For a caller requesting one complete Ticket, return before publication if the work needs several: explain the required slices and why one would be oversized, and let the caller settle the larger scope. Respect its available budget; a cap is not permission to expand the requested scope.
+
 ### 4. Quiz the user
 
 Present the proposed breakdown as a numbered list. For each ticket, show:
@@ -56,21 +62,16 @@ Ask the user:
 - Should any tickets be merged or split further?
 - Does each ticket's model tier fit its difficulty?
 
-Iterate until the user approves the breakdown.
+Iterate until the user approves the concrete breakdown. If the user declines, publish nothing; return the rejection and any next decision to the caller. On resume, retain an existing solution approval unless the proposed work changes.
 
 ### 5. Publish the tickets to the configured tracker
 
 Publish the approved tickets. **How** depends on the tracker `setup-dev-skills` configured; the tickets are the same either way, only the shape of the blocking edges changes:
 
 - **Local files** → write one file per ticket under `.scratch/<feature-slug>/issues/<NN>-<slug>.md`, numbered from `01` in dependency order (blockers first). Each file's "Blocked by" lists the numbers/titles it depends on. Use the per-ticket file template below: one ticket per file, never a single combined file.
-- **A real issue tracker (GitHub, Linear, …)** → publish one issue per ticket in dependency order (blockers first) so each ticket's blocking edges can reference real identifiers. Use the platform's native blocking relationship where it has one; otherwise write each ticket's blockers in the form the tracker doc reads (for GitHub without native dependencies, a `Blocked by: #<n>, #<n>` line as the first line of the ticket body, above everything else including a `Part of #<parent>` line, and no `## Blocked by` section). The tracker doc's form wins over the issue template's `## Blocked by` section. If a native write fails at run time (for example a server without the dependencies API), write the tracker doc's fallback form for that ticket instead, using the tracker doc's way of adding a line to an issue body (the ticket already exists, and rewriting its body without reading it first loses its text), listing every blocker of that ticket, not only the failed one. Then check with the tracker doc's way of counting open blockers (it reads both the native edge and the body line) that every blocker of the ticket is in place in one form or the other; do not report the ticket published until they are. When blockers are written as the tracker doc's `Blocked by:` line or set as native edges, omit the `## Blocked by` section, including for a ticket with no blockers; write "None (can start immediately)" only where the template section is kept (local files). If the source was an existing issue that the tickets split (a parent, not one a Ticket absorbs, see below), make each ticket its sub-issue (tracker doc's operation). If that write fails at run time (for example a repo without sub-issues enabled), write the tracker doc's fallback form for that ticket instead, again with the tracker doc's way of adding a line to an issue body (a `Part of #<parent>` line on the line after the `Blocked by:` line, or as the first line if the ticket has none); then check with the tracker doc's way of checking a sub-issue link (it reads both the sub-issue edge and the body line) that the ticket is linked in one form or the other, and do not report the ticket published until it is. Apply the `ready-for-agent` triage label unless instructed otherwise; the tickets are agent-grabbable by construction. If the repo has a release doc (`docs/agents/release.md`) that defines a label prefix, and the source issue carries a label with that prefix (its Release's label), give each ticket that label too, so a Spec's Tickets ship in its Release. If the repo's triage-labels doc (`docs/agents/triage-labels.md`) maps an agent-only role to labels, and the source issue carries one, give each ticket that same label too, so the agent that the Spec is for builds its Tickets; when the source issue carries none, give no ticket one. Give no other ticket a release label: an issue filed during a Release waits for the next Release planning.
+- **A real issue tracker (GitHub, Linear, …)** → publish one issue per ticket in dependency order (blockers first) so each ticket's blocking edges can reference real identifiers. Use the platform's native blocking relationship where it has one; otherwise write each ticket's blockers in the form the tracker doc reads (for GitHub without native dependencies, a `Blocked by: #<n>, #<n>` line as the first line of the ticket body, above everything else including a `Part of #<parent>` line, and no `## Blocked by` section). The tracker doc's form wins over the issue template's `## Blocked by` section. If a native write fails at run time (for example a server without the dependencies API), write the tracker doc's fallback form for that ticket instead, using the tracker doc's way of adding a line to an issue body (the ticket already exists, and rewriting its body without reading it first loses its text), listing every blocker of that ticket, not only the failed one. Then check with the tracker doc's way of counting open blockers (it reads both the native edge and the body line) that every blocker of the ticket is in place in one form or the other; do not report the ticket published until they are. When blockers are written as the tracker doc's `Blocked by:` line or set as native edges, omit the `## Blocked by` section, including for a ticket with no blockers; write "None (can start immediately)" only where the template section is kept (local files). If the source was an existing issue that the tickets split (a parent, not one a Ticket absorbs, see below), make each ticket its sub-issue (tracker doc's operation). If that write fails at run time (for example a repo without sub-issues enabled), write the tracker doc's fallback form for that ticket instead, again with the tracker doc's way of adding a line to an issue body (a `Part of #<parent>` line on the line after the `Blocked by:` line, or as the first line if the ticket has none); then check with the tracker doc's way of checking a sub-issue link (it reads both the sub-issue edge and the body line) that the ticket is linked in one form or the other, and do not report the ticket published until it is. Apply the label mapped to the `ready-for-agent` role unless instructed otherwise; the tickets are agent-grabbable by construction. If the repo has a release doc (`docs/agents/release.md`) that defines a label prefix, and the source issue carries a label with that prefix (its Release's label), give each ticket that label too, so a Spec's Tickets ship in its Release. If the repo's triage-labels doc (`docs/agents/triage-labels.md`) maps an agent-only role to labels, and the source issue carries one, give each ticket that same label too, so the agent that the Spec is for builds its Tickets; when the source issue carries none, give no ticket one. Give no other ticket a release label: an issue filed during a Release waits for the next Release planning.
 
-If the source is **one or more existing issues** (a Ticket that absorbs them), the Ticket follows these four points:
-
-- Read each absorbed issue's body **and comments**. Put every requirement that must land with the fix into the Ticket's acceptance criteria, or into the Ticket that owns the file it touches.
-- The Ticket names the issues it absorbs and links their briefs instead of copying them; it is not made a sub-issue of any of them, since they are linked and closed through `Closes`, not parents.
-- Comment on each absorbed issue `Absorbed by #<ticket>; closes when it is completed.` (the wording `retro-planning` reads), and list `Closes #<n>` in the Ticket's acceptance criteria for each, one per line (the form `pr` writes its Closes lines in), so each closes only when the Ticket is completed; if the Ticket is closed as not planned, they stay open.
-- Right before publishing, re-read the state of every blocker and absorbed issue the draft names, and drop or note any that already closed.
+If the source is **one or more existing issues** that a Ticket absorbs, load `issue-absorption` and apply its writing agreement while drafting and publishing. Right before publishing, also re-read every blocker's state and drop or note any already closed.
 
 Work the **frontier**: any ticket whose blockers are all done. For a purely linear chain that means top to bottom.
 
@@ -121,3 +122,7 @@ In either form, avoid specific file paths or code snippets: they go stale fast. 
 ### 6. Offer `setup-project`
 
 Once the tickets are published, decide whether they changed what the project's threads need: a new repo, a new kind of thread, or a new standing rule. If so, offer the user `setup-project` in one line naming what changed. Only offer: call the Skill tool with "setup-project" only after the user says yes. If nothing changed, say nothing about it.
+
+### 7. Return to the caller
+
+Return the outcome (published, needs larger scope, declined or incomplete), every created Ticket identifier, source-to-ticket mappings, and all unfinished actions. Preserve identifiers even if creation succeeded but a later operation failed; report those as incomplete rather than fully published. The caller reconciles its record and cap before continuing. Do not ask again for an unchanged solution's approval on return.

@@ -37,7 +37,7 @@ Each smell reads *what it is* → *how to fix*; match it against the diff:
 
 ### Docs index drift
 
-Only when the repo has `docs/index.md`. A doc is anything the index is meant to list (the list in [`domain-modeling/DOCS-INDEX.md`](../domain-modeling/DOCS-INDEX.md#what-is-listed)): glossary pages, ADRs, `docs/agents/` files, `.out-of-scope/` notes, `REVIEW.md`, `CODING_STANDARDS.md`, `CONTRIBUTING.md`, README files and research notes; never `CLAUDE.md` or `AGENTS.md` files, `SKILL.md` files, code, or test fixtures. Report as Bug class **docs index drift**, one Finding listing every instance:
+Only when the repo has `docs/index.md`, load `docs-index` and paste its contract into the standards Finder brief so the Finder uses its listed-doc scope and exceptions. Report as Bug class **docs index drift**, one Finding listing every instance:
 
 - a doc added or renamed in the diff with no line in `docs/index.md`;
 - a line in `docs/index.md` whose link points at a file that does not exist at this Review's head.
@@ -46,7 +46,7 @@ Propose Nit, unless `REVIEW.md` or an ADR makes the index a rule, then Important
 
 ### `REVIEW.md` Always check
 
-Only when the repo's `REVIEW.md` has at least one Always check line. Each line there names a Bug class that earlier Reviews had to catch more than once, and what to look for (`retro` adds them: [BUG-CLASSES.md](../retro/BUG-CLASSES.md)). The other Finders get `REVIEW.md` too, but this check is the standards Finder's job, so every depth runs it, a Ticket check included.
+Only when the repo's `REVIEW.md` has at least one Always check line. Use the Bug class and Always-check meaning from `review-record` (load it by name and include that meaning with this brief). The other Finders get `REVIEW.md` too, but this check is the standards Finder's job, so every depth runs it, a Ticket check included.
 
 - Check every Always check line against the whole diff you were given (in Rounds 3 to 5, the whole-pull-request diff, not only the new commits), one line at a time, even when the change looks unrelated to it.
 - For each line the diff breaks, report one Finding whose Bug class is the one the line names, listing every instance. Propose its Severity by the meaning of Important like any other Finding.

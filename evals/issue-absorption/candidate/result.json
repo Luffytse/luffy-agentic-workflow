@@ -1,0 +1,175 @@
+{
+  "snapshot_time": "2026-10-31T12:00:00Z",
+  "earlier_record_created": "2026-10-01",
+  "scope": "Snapshot classification and earlier-fix recheck only; stopped after step 2.",
+  "sources": [
+    {
+      "source": "#11",
+      "status": "Waiting on an open Ticket",
+      "authoritative_ticket": "#31",
+      "votes_retained": 2,
+      "new_vote_since_earlier_record": false,
+      "new_vote_since_authoritative_ticket_completed": false,
+      "eligible_for_mechanical_close": false,
+      "proposal": "Keep open, waiting on #31."
+    },
+    {
+      "source": "#12",
+      "status": "Closing with its Ticket",
+      "authoritative_ticket": "#32",
+      "votes_retained": 2,
+      "new_vote_since_earlier_record": false,
+      "new_vote_since_authoritative_ticket_completed": false,
+      "eligible_for_mechanical_close": true,
+      "proposal": "Propose Close with its Ticket #32, subject to later user approval and eligibility recheck."
+    },
+    {
+      "source": "#13",
+      "status": "In the backlog",
+      "authoritative_ticket": "#33",
+      "votes_retained": 2,
+      "new_vote_since_earlier_record": false,
+      "new_vote_since_authoritative_ticket_completed": false,
+      "eligible_for_mechanical_close": false,
+      "proposal": "Retain in backlog with both votes; #33 was not completed."
+    },
+    {
+      "source": "#14",
+      "status": "In the backlog",
+      "authoritative_ticket": "#34",
+      "votes_retained": 2,
+      "new_vote_since_earlier_record": false,
+      "new_vote_since_authoritative_ticket_completed": false,
+      "eligible_for_mechanical_close": false,
+      "proposal": "Retain in backlog with both votes; duplicate closure of #34 is not a completed fix."
+    },
+    {
+      "source": "#15",
+      "status": "Waiting on an open Ticket",
+      "authoritative_ticket": "#31",
+      "votes_retained": 2,
+      "new_vote_since_earlier_record": false,
+      "new_vote_since_authoritative_ticket_completed": false,
+      "eligible_for_mechanical_close": false,
+      "proposal": "Keep open, waiting on latest absorber #31; older #35 cannot authorize closure."
+    },
+    {
+      "source": "#16",
+      "status": "Failed-fix candidate",
+      "authoritative_ticket": "#32",
+      "votes_retained": 3,
+      "new_vote_since_earlier_record": true,
+      "new_vote_since_authoritative_ticket_completed": true,
+      "eligible_for_mechanical_close": false,
+      "proposal": "Retain open as a failed-fix group for #32; the Oct 22 recurrence follows completion on Oct 10."
+    },
+    {
+      "source": "#17",
+      "status": "Closing with its Ticket",
+      "authoritative_ticket": "#32",
+      "votes_retained": 2,
+      "new_vote_since_earlier_record": false,
+      "new_vote_since_authoritative_ticket_completed": false,
+      "eligible_for_mechanical_close": true,
+      "proposal": "Propose Close with its Ticket #32; latest absorber supersedes #31, subject to later user approval and eligibility recheck."
+    },
+    {
+      "source": "#18",
+      "status": "In the backlog",
+      "authoritative_ticket": null,
+      "votes_retained": 2,
+      "new_vote_since_earlier_record": false,
+      "new_vote_since_authoritative_ticket_completed": false,
+      "eligible_for_mechanical_close": false,
+      "proposal": "Retain unrelated backlog issue with both votes."
+    }
+  ],
+  "earlier_fixes_rechecked": [
+    {
+      "ticket": "#31",
+      "state": "open",
+      "result": "not applicable: open",
+      "authoritative_sources": [
+        "#11",
+        "#15"
+      ],
+      "reason": "Waiting; not a closed fix to recheck."
+    },
+    {
+      "ticket": "#32",
+      "state": "closed",
+      "close_reason": "completed",
+      "closed_on": "2026-10-10",
+      "result": "came back",
+      "matching_issues": [
+        "#16"
+      ],
+      "authoritative_sources": [
+        "#12",
+        "#16",
+        "#17"
+      ],
+      "reason": "#16 gained a third distinct-thread vote on Oct 22. No recurrence for #12 or #17; their mechanical-close eligibility is per source."
+    },
+    {
+      "ticket": "#33",
+      "state": "closed",
+      "close_reason": "not_planned",
+      "closed_on": "2026-10-10",
+      "result": "not fixed",
+      "authoritative_sources": [
+        "#13"
+      ],
+      "matching_issues": []
+    },
+    {
+      "ticket": "#34",
+      "state": "closed",
+      "close_reason": "duplicate",
+      "closed_on": "2026-10-10",
+      "result": "not fixed",
+      "authoritative_sources": [
+        "#14"
+      ],
+      "matching_issues": []
+    },
+    {
+      "ticket": "#35",
+      "state": "closed",
+      "close_reason": "completed",
+      "closed_on": "2026-10-10",
+      "result": "holding",
+      "authoritative_sources": [],
+      "matching_issues": [],
+      "reason": "No matching recurrence. #15 transferred to #31 on Oct 20; the transfer is not a new vote and #35 cannot authorize closing #15."
+    }
+  ],
+  "failed_fix_groups": [
+    {
+      "ticket": "#32",
+      "sources": [
+        "#16"
+      ],
+      "distinct_threads": 3,
+      "counts_toward_ticket_cap_if_filed": true
+    }
+  ],
+  "proposed_mechanical_closes": [
+    {
+      "source": "#12",
+      "ticket": "#32"
+    },
+    {
+      "source": "#17",
+      "ticket": "#32"
+    }
+  ],
+  "ticket_cap": 3,
+  "actions_performed": {
+    "tracker_operations": false,
+    "closures": false,
+    "publication": false,
+    "user_verdicts_requested": false
+  },
+  "next_steps_not_executed": "Group and propose backlog verdicts, order the walk, and seek user calls. No expiry or cap allocation decided in this limited seam."
+}

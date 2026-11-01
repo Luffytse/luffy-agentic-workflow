@@ -10,7 +10,7 @@
 #
 # Checks:
 #   skill-layout                 skills/ holds only skill folders, each with a SKILL.md
-#   model-invoked                no skill sets disable-model-invocation or user-invocable
+#   model-invoked                every skill remains model-loadable; user-menu hiding is allowed
 #   skill-name-matches-folder    each SKILL.md frontmatter name equals its folder name
 #   skill-links                  each relative .md or .yaml link in a SKILL.md points at a file that exists
 #   plugin-manifest              plugin.json, README.md, CHANGELOG.md and the licence file exist; plugin.json names its repository
@@ -58,8 +58,8 @@ else
 fi
 
 # model-invoked: every skill is model-invoked
-if [ -d "$skills" ] && grep -rn --include=SKILL.md -E '^[[:space:]]*["'"'"']?(disable-model-invocation|user-invocable)["'"'"']?[[:space:]]*:' "$skills"; then
-  bad "a skill sets disable-model-invocation or user-invocable in frontmatter"
+if [ -d "$skills" ] && grep -rn --include=SKILL.md -E '^[[:space:]]*["'"'"']?disable-model-invocation["'"'"']?[[:space:]]*:' "$skills"; then
+  bad "a skill sets disable-model-invocation in frontmatter"
 fi
 
 # skill-name-matches-folder: a skill's SKILL.md frontmatter name: equals its folder name. The frontmatter is the

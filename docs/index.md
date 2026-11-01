@@ -19,11 +19,11 @@ Read this first, then open only the docs whose line fits your work. Specs and ti
 - [README.md](../README.md): Claude Code and Codex marketplace install, update and local-development steps. Read when changing install steps.
 - [dai-portal-data README](../plugins/dai-portal-data/README.md): the DAI Portal database plugin. Read only when working on that plugin.
 - [dev-skills README](../plugins/dev-skills/README.md): what the plugin is, Claude Code and Codex install, update and local-development steps, the model-tier table, the folder layout and the last Upstream commit looked at. Read when installing the plugin, adding a skill of our own, or mapping a tier to a model.
-- [DOCS-INDEX.md](../plugins/dev-skills/skills/domain-modeling/DOCS-INDEX.md): the docs index format and update rule every writing skill follows. Read when changing how skills keep `docs/index.md` current.
+- [scripts/test-check-plugin.py](../scripts/test-check-plugin.py): disposable-repository packaging tests for visible and hidden skills, model reachability and required agent metadata. Run when changing skill-loading checks; fresh-runtime dependency application is a separate gate.
 - [scripts/check-plugin.sh](../scripts/check-plugin.sh): this repo's own checker for the `dev-skills` layout and repo-wide rules (no vendor model names, no person names, no repo-only text in skill text, skill name matching its folder, Codex packaging matching Claude Code and sharing its skills tree); its header lists the checks, each identified by a name, never a number. A check tests structure, not a skill's wording. It lives outside the plugin so it does not ship to projects. Read when adding or changing a check, or before pushing a plugin change.
 - [ADR 0001](adr/0001-dev-skills-is-one-plugin-forked-from-matt-pocock.md): why `dev-skills` is one plugin that began as Matt Pocock's skills and is now our own, and which skills it keeps. Read when adding or dropping a skill, or when the Upstream watch finds an idea.
 - [ADR 0002](adr/0002-skills-name-model-tiers-not-models.md): skills name cheap, regular or premium tiers, never models. Read when a skill picks a model.
-- [ADR 0009](adr/0009-shared-rules-have-one-owner-skill.md): planned ownership of shared contracts, complete workflow reuse, the loading gate and gradual migration; existing rules govern until their migrations land, and menu hiding is optional. Read when sharing a rule, composing skills or adding a Base skill.
+- [ADR 0009](adr/0009-shared-rules-have-one-owner-skill.md): shared-contract ownership, complete workflow reuse, the completed contract and workflow migrations, consumer inventory and continuing consistency protections; menu hiding is optional. Read when sharing a rule, composing skills or adding a Base skill.
 
 ## Building
 
@@ -35,8 +35,15 @@ Read this first, then open only the docs whose line fits your work. Specs and ti
 - [release eval RESULTS.md](../evals/release/RESULTS.md): one entry per dry run of `release` (a proposal only, nothing merged or labelled). Read to see how `release` did in its dry run.
 - [Codex install eval README](../evals/codex-install/README.md): the clean GitHub install, fresh-runtime skill discovery and interactive `grilling` check. Read when rerunning the Codex install check.
 - [Codex install eval RESULTS.md](../evals/codex-install/RESULTS.md): one dated entry per Codex install check, including source commit, discovered skills, exact interview turns and portability issues. Read to see what Codex support last verified.
+- [Skill loading eval README](../evals/skill-loading/README.md): the fresh installed-runtime workflow/reference dependency gate, isolated fixtures and cross-folder reference check. Read when verifying dependency loading before consumer migration.
+- [Skill loading eval RESULTS.md](../evals/skill-loading/RESULTS.md): source provenance, actual turns, rule application and separate visibility limits. Read when checking what #360 proved and what the final Spec eval must rerun.
+
+- [Caller cleanup eval](../evals/caller-cleanup/README.md): bounded build-review handoffs, fix coordination and configured tracker/label operations. Read when changing build callers or publication role mapping; [results](../evals/caller-cleanup/RESULTS.md) retain observed behavior and limits.
 
 ## Code review
+
+- [review-record](../plugins/dev-skills/skills/review-record/SKILL.md): shared Round/Ticket-check markers, fields, identities, statuses and retrospective interpretation, plus Bug class and Always-check meaning. Read when changing a review writer or record reader.
+- [review-record eval](../evals/review-record/README.md): multi-comment interpretation fixture, scoring and evidence. Read when changing the record contract.
 
 - [REVIEW.md](../REVIEW.md): this repo's review rules: what Important means, what to skip, and the Always check lines. Read when reviewing a change or adding an Always check line.
 - [ADR 0003](adr/0003-code-review-runs-find-verify-rank-in-rounds.md): Find, Verify, Rank, depths and Rounds. Read when working on `agentic-review`, `retro` or `pr`.
@@ -48,6 +55,13 @@ Read this first, then open only the docs whose line fits your work. Specs and ti
 
 ## Retros
 
+- [Retro handoff eval](../evals/retro-handoff/README.md): installed `retro-planning` delegation, approval, cap and resume fixtures. Read when changing the handoff to `to-tickets`.
+- [Retro handoff results](../evals/retro-handoff/RESULTS.md): observed dialogue and tracker artifacts for the complete workflow handoff. Read when assessing its approval, cap and resume coverage.
+
+- [Issue absorption eval](../evals/issue-absorption/README.md): fixture-only lifecycle, publication and closing-line decisions; read when rerunning the absorption contract migration checks. [Results](../evals/issue-absorption/RESULTS.md) record actual consumer loads and behavior.
+
+- [issue-absorption](../plugins/dev-skills/skills/issue-absorption/SKILL.md): the shared absorption agreement. Read when changing how Tickets absorb source reports, how planning interprets their lifecycle, or which absorbed sources a pull request closes.
+
 - [ADR 0007](adr/0007-retro-issues-pile-up-per-repo-and-are-planned-in-batches.md): how `retro` files Retro issues, routes them to the repo where the fix lands, and how `retro-planning` works through a repo's Retro backlog. Read when working on `retro`, `retro-planning`, or the end of `implement` and `implement-spec`.
 
 ## Out of scope
@@ -57,3 +71,5 @@ Read this first, then open only the docs whose line fits your work. Specs and ti
 ## Docs
 
 - [ADR 0006](adr/0006-docs-are-found-through-one-index.md): this index, glossary pages per area, and which skills keep the index up to date. Read when a skill writes or reads docs.
+
+- [Shared-rules reconciliation](../evals/shared-rules/RESULTS.md): final ownership/reference audit and scoped evidence limits for Spec #348. Read when checking migration completion or the final install evidence and its limits.

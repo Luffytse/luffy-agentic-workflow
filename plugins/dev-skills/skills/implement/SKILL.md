@@ -5,18 +5,18 @@ description: "Build one lone Ticket as its Ticket thread: an Implementer subagen
 
 You are the **Ticket thread**: you coordinate one lone Ticket from issue to merged pull request. **Implementers write the code.** You brief them, check their evidence, open the pull request, run the Review, talk to the user and merge. You never write or edit code yourself, not even to resolve a merge conflict.
 
-The issue tracker should have been provided to you. If not, tell the user to run `setup-dev-skills`.
+Read the configured project issue-tracker doc before tracker operations. If none was provided, tell the user to run `setup-dev-skills`.
 
 ## 1. Read the ticket
 
 Fetch the ticket from the issue tracker and state its title. If the reference is ambiguous, ask.
 
 - If it is a Spec, or a Ticket under one, stop and use `implement-spec` for the Spec instead.
-- Check its blockers with the tracker doc's **Count open blockers**, which reads both the native edges and a `Blocked by:` line in the first or second line of the body (reading only the native edges misses the line), and its check of how each closed blocker was closed. If any blocker is open, or was closed as not planned, as a duplicate or as wontfix (that check also tells a wayfinding blocker, which is cleared once closed), stop and tell the user (or the coordinator) which.
+- Use the tracker doc's **Count open blockers** operation and its completion rules. If any blocker remains uncleared, stop and tell the user (or the coordinator) which.
 
 Start at `docs/index.md` and open only the docs that fit the ticket (with no index, fall back to `GLOSSARY.md` or `GLOSSARY-MAP.md`, and `docs/adr/`).
 
-Done when you have stated the title, no blocker is open or closed without the work being done (a wayfinding blocker is cleared once closed), and you know the ticket's **Model tier**: premium if the issue says so, otherwise regular.
+Done when you have stated the title, every blocker is cleared under the tracker doc, and you know the ticket's **Model tier**: premium if the issue says so, otherwise regular.
 
 ## 2. Make the Ticket branch
 
@@ -50,13 +50,11 @@ Write the title and body with the `pr` skill: it closes the ticket (and any othe
 
 ## 6. Review in Rounds
 
-Run the `agentic-review` skill on the pull request yourself, in this thread: its Finders and Verifiers are subagents, and a subagent cannot start them. Run it against the Implementer's worktree with git commands that do not move it (fetch first; `git -C <path> diff`, `log` and `rev-parse`, since your shell may start in your own checkout), so its `HEAD` is the Ticket branch's head, and tell its Finders and Verifiers the worktree path to run their git commands in (`git -C <path> ...`), only read-only ones (`show`, `diff`, `log`, `rev-parse`), never a `checkout` (of a branch or a `<sha>`), `switch --detach`, `stash` or `reset`, as the copy rule in [agentic-review's FINDERS.md](../agentic-review/FINDERS.md) and [VERIFY.md](../agentic-review/VERIFY.md) say. Its rules set the Review depth (a depth in your brief wins), the Rounds, the stop rule and the 5-Round cap.
+Run the complete `agentic-review` workflow on the pull request in this thread. Supply the Ticket, pull request, Implementer's worktree path, Ticket branch, base and any requested Review depth. Run your git reads with `git -C <path> ...` so they inspect that branch; pass the worktree path to the review workflow for its reviewers.
 
-Before each Round, fetch main. If it moved, have the Implementer merge main into the Ticket branch (a merge, never a rebase), resolve any conflicts and push. In a Round that reviews only the new commits, that merge counts among them: the Round reviews each new commit and, for the merge, only what it changed in the pull request, not the commits from main ([agentic-review step 1](../agentic-review/SKILL.md#1-pin-the-diff) gives the diff and tells the Finders). A Round whose new commits are only that merge, with conflicts only in text, runs at Quick depth unless the resolutions touch logic ([agentic-review's ROUNDS.md](../agentic-review/ROUNDS.md#merge-only-rounds)).
+Before each Round, fetch main. If it moved, have the same Implementer merge main into the Ticket branch (a merge, never a rebase), resolve any conflicts and push. Supply the resulting head and merge context to the review workflow.
 
-After each Round, send its Important Findings and "fix" Nits to the Implementer by message (on a pull request that changes design, put its design Findings to the user first and send only the agreed answers, as [agentic-review's ROUNDS.md](../agentic-review/ROUNDS.md#design-findings-go-to-the-user) says); it fixes, commits and pushes, then the next Round runs. On a clean Round 2 to 5, the Implementer makes the final text "fix" Nits commit before you post the clean comment, or before you edit a posted comment to `clean` after the user's design answers; check and record the Nits as [Nit status](../agentic-review/ROUNDS.md#the-round-comment) requires. No further Round reviews that final text commit. An agreed answer to a design Finding that changes the pull request gets one more Round instead. After the last Round, file Pre-existing Findings as `agentic-review` says.
-
-Done when a Round 2 to 5 is clean, or Round 5 is not clean (Result "5-Round cap reached").
+Route the workflow's fixes to the same Implementer by message; it fixes, commits and pushes. Return its commit and evidence to `agentic-review` and continue that workflow through its completion, including its final fix and filing actions. Review policy and completion belong to `agentic-review`; the merge decision below remains yours.
 
 ## 7. Merge, or bring it to the user
 
@@ -70,9 +68,9 @@ Bring the pull request to the user, and do not merge it, if any of these holds:
 
 The user then merges, or tells you to. Step 1 below runs last, just before the merge, on this path too: when the user tells you to merge, run it, then merge (step 2); when the user will merge it themselves, ask them to tell you first, so you can run it before they do. Otherwise merge it yourself once the Review is clean and CI is green (or the repo has no CI):
 
-1. Fetch main. If the Ticket branch lacks commits from main, have the Implementer merge main in (a merge, never a rebase) and push. If that merge had conflicts, run one more Round over its conflict resolutions, a merge-only Round (step 6: Quick depth, or the carried depth if a resolution touches logic); what it finds follows that step's normal Round rules; if no Round is left ([agentic-review's ROUNDS.md](../agentic-review/ROUNDS.md#the-round-loop)), bring the pull request to the user. Rerun the checks in the worktree, on the branch's head, and wait for CI (if the repo has any). If main moves again before the merge, repeat this step.
+1. Fetch main. If the Ticket branch lacks commits from main, have the Implementer merge main in (a merge, never a rebase) and push. If that merge had conflicts, return its resolutions to the complete `agentic-review` workflow for a merge-only Round under its depth and completion rules; if its Round budget is exhausted, bring the pull request to the user. Rerun the checks in the worktree, on the branch's head, and wait for CI (if the repo has any). If main moves again before the merge, repeat this step.
 2. **Squash-merge** into main, with the pull request's title (typed, as `pr` says) as the commit title and the pull request's body as the commit message, rather than the branch's commit messages joined together. Where the repo's own rules set another title convention, use that. Save the body with `gh pr view <n> --json body --jq .body > <file>`, then `gh pr merge <n> --squash --subject '<title>' --body-file <file>`; the single quotes and the file keep the shell from expanding backticks and `$(...)` in them; in both forms an apostrophe in the title is written as `'\''`. Where `gh pr` fails for lack of GraphQL, read the body with `gh api repos/<owner>/<repo>/pulls/<n> --jq '.body // ""' > <file>` and merge with `gh api --method PUT repos/<owner>/<repo>/pulls/<n>/merge -f merge_method=squash -f commit_title='<title>' -F commit_message=@<file>`.
-3. Once the pull request is merged (`gh api repos/<owner>/<repo>/pulls/<n> --jq .merged` prints `true`; when the user merged it, check once they tell you or you see it), read the issues its body lists with `Closes` (`gh api repos/<owner>/<repo>/pulls/<n> --jq .body`) and the state of each (`gh api repos/<owner>/<repo>/issues/<n> --jq .state`). For each one still `open`, comment naming the pull request (`gh issue comment <n> --body "..."`), then close it as completed (`gh issue close <n> --reason completed`). Where `gh issue` fails for lack of GraphQL, use `gh api --method POST repos/<owner>/<repo>/issues/<n>/comments -f body="..."` and `gh api --method PATCH repos/<owner>/<repo>/issues/<n> -f state=closed -f state_reason=completed`. If a read or a close fails, stop and tell the user; do not read it as closed.
+3. Before completing issues, require `gh api repos/<owner>/<repo>/pulls/<n> --jq .merged` to print `true`, including when the user reports merging the pull request. A failed read or any other result does not authorize completion. Read its body and use the tracker doc's operations to read the state of each issue listed by its closing lines. For absorbed sources, load `issue-absorption` and recheck closure eligibility. For each eligible issue still open, use the tracker doc's **Close** operation with a completed outcome and an explanation naming the pull request. If a read or close fails, stop and tell the user; do not treat it as closed.
 
 ## 8. Report
 

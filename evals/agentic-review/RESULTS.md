@@ -42,6 +42,44 @@ Pass: yes | no. <one line on what to change in VERIFY.md, if anything>
 
 ## Runs
 
+### 2026-10-31, dev-skills 0.24.1, Spec #348 candidate, Deep
+
+Source: `9b98dfec4cf92df1e354d542a4961d4216b45054`. Candidate-generated briefs; fresh regular standards/spec, cheap bugs/money and premium security Finders; three regular Verifiers, then premium gap Finder and three new regular gap Verifiers. Agents ran in available slots, not all concurrently. Expected/scoring files were withheld from reviewing agents. Six fixture unit tests passed. Rank: 6 Important, 1 Nit (fix), 1 Pre-existing.
+
+| id | Reported? | Severity given | All locations? | Notes |
+|----|-----------|----------------|----------------|-------|
+| P1 | yes | Important | n/a | 3/3 keep |
+| P2 | yes | Important | yes | 3/3; report.py:11,16 combined |
+| P3 | yes | Important | n/a | 3/3 keep |
+| P4 | yes | Pre-existing | n/a | real 3/3; attribution 2/3 Pre-existing (skeptic/spec), tracer voted new CLI Important; majority wins; money.py:6 and cli.py:9 |
+| P5 | yes | Important | yes | 3/3, explicit every-doc-index spec sentence; splitting.md:1-5, money.md:1-3, index.md:6 |
+| P6 | yes | Nit (fix) | n/a | 3/3; cli.py:7-11, Bug class public function without a docstring; Always-check broken |
+| F1 | never raised | | | no verified-drop claim |
+| F2 | never raised | | | no verified-drop claim |
+| K1 | yes | Important | n/a | gap: omitted payer, split.py:17-19; 3/3 keep, caused |
+| K2 | yes | Important | n/a | gap: duplicate participants, split.py:8-11; 3/3 keep, caused |
+
+Extras: only the known K1/K2 cases. No groups dropped; no synthetic fixture issues filed. Pass: yes, all six planted cases at accepted severities/locations. This does not convert Standard's failure below into a pass.
+
+### 2026-10-31, dev-skills 0.24.1, Spec #348 candidate, Standard
+
+Same source and candidate brief generation as Deep. Fresh regular standards/spec and cheap bugs/security Finders, followed by one fresh regular Verifier; run serially because Implementers occupied slots. All reports received; expected files withheld. Six fixture unit tests passed. Rank: 4 Important, 1 Nit (fix), 0 Pre-existing.
+
+| id | Reported? | Severity given | All locations? | Notes |
+|----|-----------|----------------|----------------|-------|
+| P1 | yes | Important | n/a | split.py:11 |
+| P2 | yes | Important | yes | report.py:11,16 combined |
+| P3 | yes | Important | n/a | split.py:27 |
+| P4 | no | | n/a | pre-existing money.py:6 never raised |
+| P5 | yes | Important | yes | explicit spec requirement; splitting.md:1, money.md:1, index.md:6 |
+| P6 | yes | Nit (fix) | n/a | cli.py:7-8; Bug class public function without a docstring; Always-check broken |
+| F1 | never raised | | | no verified-drop claim |
+| F2 | never raised | | | no verified-drop claim |
+| K1 | no | | n/a | allowed known extra absent |
+| K2 | no | | n/a | allowed known extra absent |
+
+Extras: none. All five candidate groups kept, zero dropped by Verify. Pass: no, P4 missed, the known discovery miss tracked in #376. No discovery fix or synthetic tracker issue is included here. VERIFY.md is unchanged, so no required Verify-only rerun. These fixed-point evaluations do not prove every Round lifecycle branch or the final remote installation.
+
 ### 2026-10-31, dev-skills 0.24.1, Deep
 
 Base: implementation commit `6339a7ca79bd5b249cd68c5d90d4793bee54ee5a` for #329/#330, plugin version 0.24.1. The Ticket thread used the fixture and generated Deep briefs from the same unchanged `SKILL.md`, `FINDERS.md` and `VERIFY.md` inputs as the Standard run below. Five fresh Finders completed reports, then three fresh Verifiers voted; a fresh premium Gap sweep Finder reported K2, and three more fresh Verifiers voted on it. Agents ran in bounded batches because the session allowed at most 3 active child agents. Rank left 5 Important, 1 Nit (fix), and 0 Pre-existing Findings. As in Standard, this fixed-point fixture does not exercise design-answer Round completion; the scenario walkthroughs below cover that change.

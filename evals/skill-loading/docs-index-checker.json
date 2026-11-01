@@ -1,0 +1,75 @@
+{
+  "provenance": "Local uncommitted #364 candidate based on 8ff823f913b951cb3c48b476ec1eda08c35d4601; production skill folders copied to project .agents/skills, not installed plugin cache. Final remote clean-install remains a separate Spec gate.",
+  "runtime": {
+    "model": "regular tier, candidate README Codex column at Spec base 8ff823f",
+    "modelProvider": "openai",
+    "approvalPolicy": "never",
+    "sandbox": {
+      "type": "workspaceWrite",
+      "writableRoots": [],
+      "networkAccess": false,
+      "excludeTmpdirEnvVar": false,
+      "excludeSlashTmp": false
+    }
+  },
+  "user": "Exercise the standards Finder docs index drift branch only, using .agents/skills/agentic-review/FINDERS.md. Read that branch and follow its contract dependency instruction; run no full Review and spawn no subagents. Inspect git diff HEAD~1..HEAD and current docs/index.md. scratch/research.md is exploratory research on a throwaway branch that will never merge. evals/data/input.md is test input data. Report the drift Finding with all instances and explain any excluded changed files. Read-only fixture task; do not fix files or post externally.",
+  "events": [
+    {
+      "type": "agentMessage",
+      "text": "I\u2019ll use the agentic-review skill\u2019s standards Finder docs-index branch only, read its contract dependency, and inspect the diff and current index without changing files."
+    },
+    {
+      "type": "commandExecution",
+      "command": "/bin/zsh -lc \"pwd; rg --files -g AGENTS.md -g FINDERS.md -g '*docs-index*' -g SKILL.md .agents . 2>/dev/null\"",
+      "status": "completed",
+      "exitCode": 0,
+      "output": "<docs364-runtime>/checker/fixture\n.agents/skills/grilling/SKILL.md\n.agents/skills/tdd/SKILL.md\n.agents/skills/retro-planning/SKILL.md\n.agents/skills/implement-spec/SKILL.md\n.agents/skills/implement/SKILL.md\n.agents/skills/wizard/SKILL.md\n.agents/skills/handoff/SKILL.md\n.agents/skills/tria",
+      "outputTruncated": true
+    },
+    {
+      "type": "commandExecution",
+      "command": "/bin/zsh -lc 'cat .agents/skills/agentic-review/FINDERS.md'",
+      "status": "completed",
+      "exitCode": 0,
+      "output": "# Finders\n\nBriefs for the Find stage of [`agentic-review`](SKILL.md). Every Finder is a brand-new subagent on the tier given here, and every brief includes:\n\n- The diff command for this Review and, in Rounds 3 to 5, the whole-pull-request diff command too, plus the commit list and, for a fixed point",
+      "outputTruncated": true
+    },
+    {
+      "type": "commandExecution",
+      "command": "/bin/zsh -lc 'git status --short; git ls-tree -r --name-only HEAD'",
+      "status": "completed",
+      "exitCode": 0,
+      "output": "?? .agents/\nREADME.md\ndocs/adr/0001-scans.md\ndocs/index.md\nevals/data/input.md\nscratch/research.md\n",
+      "outputTruncated": false
+    },
+    {
+      "type": "commandExecution",
+      "command": "/bin/zsh -lc \"cat .agents/skills/docs-index/SKILL.md; rg --files -g AGENTS.md -g REVIEW.md -g '*adr*' -g '*ADR*'; git diff --find-renames HEAD~1..HEAD; git show HEAD:docs/index.md\"",
+      "status": "completed",
+      "exitCode": 0,
+      "output": "---\nname: docs-index\ndescription: Maintain and check the documentation index. Use when creating, editing, renaming or deleting repo docs, or checking documentation-index drift.\nuser-invocable: false\n---\n\n# Docs Index\n\nEach repo keeps one **docs index**, `docs/index.md`. It lists the docs the skills ",
+      "outputTruncated": true
+    },
+    {
+      "type": "agentMessage",
+      "text": "The docs-index contract excludes throwaway research and test input data. I found two drift instances: the new ADR has no index entry, and the index links to a missing ADR. I\u2019ll confirm their line numbers for the single Finding."
+    },
+    {
+      "type": "commandExecution",
+      "command": "/bin/zsh -lc 'nl -ba docs/index.md; git show HEAD:docs/adr/0001-scans.md; git rev-parse HEAD; git cat-file -e HEAD:docs/adr/removed.md'",
+      "status": "failed",
+      "exitCode": 128,
+      "output": "     1\t# Docs index\n     2\t\n     3\t## Whole repo\n     4\t\n     5\t- [README.md](../README.md): the app. Read when exploring.\n     6\t- [Former decision](adr/removed.md): the former storage decision. Read when changing storage.\n# Scan history\n\nScan events are append-only for audits.\n1808b1536ac4e9063227",
+      "outputTruncated": true
+    },
+    {
+      "type": "agentMessage",
+      "text": "### Documentation index is missing an ADR and contains a broken link\n\n- Severity (proposed): Nit\n- Bug class: docs index drift\n- Locations: [docs/adr/0001-scans.md:1](docs/adr/0001-scans.md), [docs/index.md:6](docs/index.md)\n- Claim: The newly added scan-history ADR has no index entry. The index\u2019s \u201cFormer decision\u201d entry points to `docs/adr/removed.md`, which does not exist at HEAD; this instance is pre-existing.\n- Failure scenario: Agents navigating through the index miss the new ADR and encounter a missing file when seeking the former storage decision.\n- Evidence: The docs-index contract lists ADRs and requires new docs to receive an entry. The Finder branch also requires reporting index links to nonexistent files.\n\nExcluded changed files under that contract:\n\n- `scratch/research.md`: exploratory research on a throwaway branch that will never merge.\n- `evals/data/input.md`: test input data; Markdown fixtures are explicitly excluded.\n\nRead-only check completed. No full Review, subagents, file changes, or external posts."
+    },
+    {
+      "type": "turn",
+      "status": "completed",
+      "error": null
+    }
+  ]
+}

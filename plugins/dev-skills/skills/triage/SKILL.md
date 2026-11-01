@@ -76,7 +76,7 @@ Show counts and a one-line summary per item. Let the maintainer pick.
 
 3. **Verify the claim.** Before any grilling, check that the claim holds up. For a bug, reproduce it from the reporter's steps. For a PR, confirm the diff does what it claims: check it out, run the relevant tests or commands. Report what happened: confirmed (with code path), failed, or insufficient detail (a strong `needs-info` signal). A confirmed verification makes a much stronger agent brief.
 
-4. **Grill (if needed).** If the request needs fleshing out, call the Skill tool twice, for "grilling" and "domain-modeling", and grill it into shape a round of questions at a time, sharpening domain terms and updating the glossary (`GLOSSARY.md`, or the Area page `GLOSSARY-MAP.md` points to) and ADRs inline as decisions land. Any doc written here, including `.out-of-scope/` files, gets its line in `docs/index.md` in the same commit ([DOCS-INDEX.md](../domain-modeling/DOCS-INDEX.md)).
+4. **Grill (if needed).** If the request needs fleshing out, call the Skill tool twice, for "grilling" and "domain-modeling", and grill it into shape a round of questions at a time, sharpening domain terms and updating the glossary (`GLOSSARY.md`, or the Area page `GLOSSARY-MAP.md` points to) and ADRs inline as decisions land. When writing any doc here, including `.out-of-scope/` files, load `docs-index` and apply its contract.
 
 5. **Apply the outcome:**
    - `ready-for-agent`: post an agent brief comment ([AGENT-BRIEF.md](AGENT-BRIEF.md)).

@@ -1,0 +1,22 @@
+USER:
+This is an isolated behavioral fixture, not real project work. Use the selected build skill and the configured project docs. Resume at post-merge closure: PR-77 is verified merged and lists Closes T3 and Closes T4. Neither is absorbed. Perform the configured local closure operations now. Also assess starting a separate Ticket whose blockers are T1 and T2; report its startability and blocking IDs. Do not run git or real tracker commands, create branches, review code, or run retro. Stop after these two bounded operations.
+Then load the complete review workflow to give a fixture-only coordination plan for another PR currently after Round 2: one text Important and one text fix Nit are open, current Implementer A is available. State recipient, worktree context and how review proceeds. Include separate decisions for a clean Round 3 with a final text Nit, a newly agreed design change at clean Round 3, and a clean Deep review. No actual reviewer dispatch or publication.
+
+
+ASSISTANT:
+I’m using the implement skill to perform the local closure and blocker checks, then I’ll read the complete review workflow for the fixture-only plan.
+
+ASSISTANT:
+Closed T3 in the local fixture, recording `op=finish`, `reason=delivered`, and `evidence=PR-77` in `operations.json`, then setting its state to closed. T4 was already closed, so no closure operation was needed.
+
+The separate Ticket **cannot start**. Blocking IDs: **T1**. Its acceptance receipt is missing; closed state alone does not clear a blocker. T2 clears because its receipt is accepted.
+
+Loaded the complete agentic-review workflow and review-record contract. Fixture-only coordination plan:
+
+- **Recipient:** current Implementer A, continued by message in its existing Ticket worktree and branch. A fixes both the text Important and text fix Nit, commits, pushes, and returns commit and validation evidence.
+- **Round 3:** the coordinator checks main for changes and routes any required merge to A. Fresh Finders and Verifiers review commits since Round 2’s recorded head, at the carried review depth. Earlier open Importants go through Verify again. Reviewers use read-only access to A’s worktree; experiments use separate scratch copies.
+- **Clean Round 3 with a final text fix Nit:** A makes the final Nit commit. Check every affected location and record the fixing commit before recording the clean result. That final text commit gets no further Round.
+- **Newly agreed design change at clean Round 3:** A implements only the agreed change; **Round 4 reviews it**, despite Round 3 being clean. Design changes do not enter the unreviewed final text commit.
+- **Clean Deep review:** complete Deep verification and gap sweep, finish final text Nits, and bring the PR to the user for merging. Deep review prevents autonomous merge.
+
+At completion, the workflow files eligible Pre-existing Findings and records filing receipts. No reviewers were dispatched, nothing was published, and no git, real tracker, or retro commands ran.

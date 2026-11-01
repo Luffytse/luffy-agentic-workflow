@@ -1,0 +1,5 @@
+interface:
+  display_name: "Review Record"
+  short_description: "Interpret shared review records"
+policy:
+  allow_implicit_invocation: true

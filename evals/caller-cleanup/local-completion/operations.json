@@ -1,0 +1,14 @@
+[
+  {
+    "op": "finish",
+    "id": "S1",
+    "reason": "delivered",
+    "evidence": "PR-77"
+  },
+  {
+    "op": "finish",
+    "id": "T1",
+    "reason": "delivered",
+    "evidence": "PR-77"
+  }
+]

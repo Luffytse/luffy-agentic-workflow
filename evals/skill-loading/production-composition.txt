@@ -1,0 +1,79 @@
+USER:
+$grill-with-docs Interview me to settle this hypothetical tiny project plan. Use the full composed workflow; this test has no external facts to research. I want a personal Saturday reading habit. Ask questions and wait for answers until shared understanding, recording domain terms and settled decisions as the skill requires in this isolated fixture. All writes are authorized in this fixture only. Do not implement software, commit, publish, or contact anyone. A cross-folder reference should be read when its trigger occurs. There is no Claude Skill tool in this host; use the available skill descriptions and installed files to load dependencies by name.
+
+
+ASSISTANT:
+I’m using grill-with-docs and loading its grilling and domain-modeling dependencies. I’ll ask questions, wait for your answers, and record terms and decisions as they settle in this fixture.
+
+
+ASSISTANT:
+❓ **Q1 — Purpose**: Should this habit mainly give you a relaxed, enjoyable break each Saturday?
+
+➡️ I recommend yes: make enjoyment the goal, without a book or page quota.
+
+---
+
+❓ **Q2 — Reading material**: Should books you choose for pleasure count, in print, ebook, or audiobook form?
+
+➡️ I recommend yes: let your interest guide the choice and allow all three formats.
+
+---
+
+❓ **Q3 — Scope**: Should this remain a personal routine with no software, purchases, or accountability to other people required?
+
+➡️ I recommend yes: keep the routine small and within your control.
+
+The fixture has no existing planning docs. I’ve loaded both dependencies and the cross-folder docs-index rule; I’ll create records as terms and decisions settle. The required fact-finding subagent failed to start, so I checked the fixture directly.
+
+USER:
+Q1 yes, quiet enjoyment, no quota. Q2 paper books and short stories only; switching is allowed. Q3 yes, entirely personal, no software or purchases or other people. I live alone, control Saturday breakfast, and no external facts need research. Define Reading Session as ten minutes immediately after Saturday breakfast at my kitchen table; extra time optional. Phone silent in another room. Trial means four Saturdays at home, away Saturdays excluded, disrupted at-home Saturdays count as misses. Success means at least three sessions and overall enjoyment, mentally tracked. If attendance fails, retry once with five minutes; if enjoyment fails, switch book. Then stop without guilt if the retry fails. Record these settled definitions; no other constraints.
+
+ASSISTANT:
+I’ll record the settled terms and routine now. These choices are easy to reverse, so they don’t meet the skill’s criteria for an ADR. Two details remain: how the retry works, and what counts as a session when reading is interrupted.
+
+
+ASSISTANT:
+Recorded the definitions in [GLOSSARY.md](<spec360-run1>/fixture/GLOSSARY.md), the decisions in [reading-plan.md](<spec360-run1>/fixture/docs/reading-plan.md), and both in the docs index.
+
+❓ **Q4 — Retry**: Should the single retry last another four at-home Saturdays, requiring three sessions and overall enjoyment? If both attendance and enjoyment fail, should you shorten to five minutes and switch books together? For enjoyment alone, should switching books begin that single retry at ten minutes?
+
+➡️ I recommend yes to this interpretation, with no further retry afterward.
+
+---
+
+❓ **Q5 — Interruptions**: Should a session require the full ten minutes—or five during the shortened retry—but allow a brief interruption followed by resuming that same sitting?
+
+➡️ I recommend yes: count reading minutes, with an abandoned sitting counting as a miss.
+
+USER:
+Q4 yes to each recommendation: retry once for four at-home Saturdays with same three-session success threshold, five minutes if attendance failed, switch books if enjoyment failed, combine if both failed; enjoyment-only retry stays ten minutes. Q5 yes, brief interruption followed by same sitting resumption allowed, reading minutes count, abandoned sitting is a miss. These settle the remaining branches. Please summarize the complete plan and ask me to confirm shared understanding before closing.
+
+ASSISTANT:
+I’ll record the retry and interruption rules, then summarize the complete plan for your confirmation.
+
+
+ASSISTANT:
+The complete plan is recorded in the [glossary](<spec360-run1>/fixture/GLOSSARY.md) and [reading plan](<spec360-run1>/fixture/docs/reading-plan.md):
+
+- **Purpose:** quiet enjoyment, with no reading quota.
+- **Routine:** ten reading minutes immediately after Saturday breakfast at your kitchen table. Paper books and short stories only; switching and extra time are allowed. Phone silent in another room.
+- **Interruptions:** resume after a brief interruption within the same sitting; count only reading minutes. An abandoned sitting is a miss.
+- **Trial:** four at-home Saturdays. Away Saturdays are excluded; disrupted at-home Saturdays count as misses.
+- **Success:** at least three completed sessions and overall enjoyment, tracked mentally.
+- **One retry:** another four at-home Saturdays with the same success criteria. Shorten sessions to five minutes if attendance failed; switch books if enjoyment failed; combine both if both failed. Enjoyment-only retries stay at ten minutes.
+- **Stopping:** if the retry fails, stop without guilt.
+- **Scope:** entirely personal, requiring no software, purchases, or other people.
+
+All branches are settled. **Does this accurately capture our shared understanding so we can close the planning interview?**
+
+USER:
+Yes, this accurately captures the complete plan and I explicitly confirm shared understanding. Close the interview; do not implement, commit, publish, or contact anyone.
+
+ASSISTANT:
+I’ll mark shared understanding as confirmed in the local plan and close the interview.
+
+
+ASSISTANT:
+Interview closed. Your confirmation is recorded in the [reading plan](<spec360-run1>/fixture/docs/reading-plan.md).
+
+No implementation, commits, publishing, or outside contact occurred.
