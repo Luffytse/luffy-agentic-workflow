@@ -57,10 +57,11 @@ The label of the optional agent-only triage role: it marks an issue for one codi
 _Avoid_: assignee, owner
 
 **Milestone**:
-A project goal (for example "M3 Trip planning") that groups the Specs and Tickets needed to reach it.
+A product goal the user sets (for example "M3 Trip planning"), written down in one Milestone issue: the goal, the features to deliver by its end, their acceptance criteria, what is excluded and any budget (a limit on one of the project's paid or limited resources, such as a paid API key). It holds one or more Releases, which the agents plan, and it closes when the user accepts it at the Milestone review.
+_Avoid_: epic, sprint
 
 **Release**:
-One version of a plugin and the few features it ships (at most 5 unless the user raises the cap for that Release; a feature is a Spec with its Tickets, a lone Ticket with the issues it absorbs, or a few related issues the user agrees to treat as one), every issue in them labelled `release-X.Y.Z`, with one release issue holding its goal and notes. Not a Milestone, which is a project goal.
+One version of a plugin and the few features it ships (at most 5 unless the user raises the cap for that Release; a feature is a Spec with its Tickets, a lone Ticket with the issues it absorbs, or a few related issues the user agrees to treat as one), every issue in them labelled `release-X.Y.Z`, with one release issue holding its goal and notes. Not a Milestone, which is the product goal that one or more Releases work toward.
 _Avoid_: sprint, version bump
 
 **Release planning**:
