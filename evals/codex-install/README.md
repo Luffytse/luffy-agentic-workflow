@@ -16,7 +16,7 @@ codex plugin add dev-skills@luffy-dev --json
 codex plugin list --marketplace luffy-dev --json
 ```
 
-Before the Spec merges, add `--ref codex/spec-340-codex-install` to `marketplace add` (equivalently use `Luffytse/luffy-dev-skills@codex/spec-340-codex-install`). Say explicitly that this checks the remote Spec ref and leaves default-ref verification pending merge. Do not substitute a local checkout and call it a GitHub install. Record the fetched commit with `git -C "$CODEX_HOME/.tmp/marketplaces/luffy-dev" rev-parse HEAD` on the CLI version used here; if its cache layout changes, locate the fetched repository first. Confirm `dev-skills@luffy-dev` is installed and enabled and that no Claude-only plugin is offered (`list --available --marketplace luffy-dev --json` shows the catalog too).
+Before the Spec merges, add `--ref <current-Spec-branch>` to `marketplace add` (equivalently use `Luffytse/luffy-dev-skills@<current-Spec-branch>`). For Spec #348, use `codex/spec-348-shared-base` and verify that the fetched SHA is the actual current candidate containing all integrated migrations; the earlier #360 loading-gate SHA alone does not establish the final Spec result. Say explicitly that this checks the remote Spec ref and leaves default-ref verification pending merge. Do not substitute a local checkout and call it a GitHub install. Record the fetched commit with `git -C "$CODEX_HOME/.tmp/marketplaces/luffy-dev" rev-parse HEAD` on the CLI version used here; if its cache layout changes, locate the fetched repository first. Confirm `dev-skills@luffy-dev` is installed and enabled and that no Claude-only plugin is offered (`list --available --marketplace luffy-dev --json` shows the catalog too).
 
 ## Discover in a new runtime
 

@@ -1,0 +1,5 @@
+interface:
+  display_name: "Gate Contract"
+  short_description: "Interpret runtime-gate handoff records"
+policy:
+  allow_implicit_invocation: true

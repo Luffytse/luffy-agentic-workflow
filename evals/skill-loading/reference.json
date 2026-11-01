@@ -1,0 +1,17 @@
+{
+  "turns": [
+    {
+      "status": "completed",
+      "error": null
+    }
+  ],
+  "commands": [
+    {
+      "command": "/bin/zsh -lc 'cat .agents/skills/gate-contract/SKILL.md'",
+      "status": "completed",
+      "exitCode": 0,
+      "outputExcerpt": "---\nname: gate-contract\ndescription: Interpret runtime-gate handoff records. Use when a caller classifies these handoffs.\nuser-invocable: false\n---\nA handoff is accepted only when its status is `settled` and its receipt starts with `K7:`. Status `done` is not settled. A settled record with an absent",
+      "outputTruncated": true
+    }
+  ]
+}

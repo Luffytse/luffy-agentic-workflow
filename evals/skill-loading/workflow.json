@@ -1,0 +1,25 @@
+{
+  "turns": [
+    {
+      "status": "completed",
+      "error": null
+    },
+    {
+      "status": "completed",
+      "error": null
+    },
+    {
+      "status": "completed",
+      "error": null
+    }
+  ],
+  "commands": [
+    {
+      "command": "/bin/zsh -lc 'cat <spec360-run1>/home/plugins/cache/luffy-dev/dev-skills/0.24.1/skills/grilling/SKILL.md'",
+      "status": "completed",
+      "exitCode": 0,
+      "outputExcerpt": "---\nname: grilling\ndescription: \"Grill the user relentlessly about a plan, decision, or idea. Use when there is no working directory to record in, or the user wants only the interview with nothing written down; in a repo, grill-with-docs is the default.\"\n---\n\nInterview the user relentlessly until yo",
+      "outputTruncated": true
+    }
+  ]
+}
