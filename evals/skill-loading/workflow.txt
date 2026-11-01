@@ -46,4 +46,3 @@ ASSISTANT:
 Interview closed. We have confirmed the complete plan: ten minutes after breakfast over four at-home Saturdays; success is at least three sessions and an overall positive impression. No catch-up or retry if it falls short.
 
 No files created or implementation performed.
-

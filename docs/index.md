@@ -23,7 +23,7 @@ Read this first, then open only the docs whose line fits your work. Specs and ti
 - [scripts/check-plugin.sh](../scripts/check-plugin.sh): this repo's own checker for the `dev-skills` layout and repo-wide rules (no vendor model names, no person names, no repo-only text in skill text, skill name matching its folder, Codex packaging matching Claude Code and sharing its skills tree); its header lists the checks, each identified by a name, never a number. A check tests structure, not a skill's wording. It lives outside the plugin so it does not ship to projects. Read when adding or changing a check, or before pushing a plugin change.
 - [ADR 0001](adr/0001-dev-skills-is-one-plugin-forked-from-matt-pocock.md): why `dev-skills` is one plugin that began as Matt Pocock's skills and is now our own, and which skills it keeps. Read when adding or dropping a skill, or when the Upstream watch finds an idea.
 - [ADR 0002](adr/0002-skills-name-model-tiers-not-models.md): skills name cheap, regular or premium tiers, never models. Read when a skill picks a model.
-- [ADR 0009](adr/0009-shared-rules-have-one-owner-skill.md): shared-contract ownership, complete workflow reuse, the completed docs-index, review-record and absorption migrations and remaining transition safeguards; menu hiding is optional. Read when sharing a rule, composing skills or adding a Base skill.
+- [ADR 0009](adr/0009-shared-rules-have-one-owner-skill.md): shared-contract ownership, complete workflow reuse, the completed contract and workflow migrations, consumer inventory and continuing consistency protections; menu hiding is optional. Read when sharing a rule, composing skills or adding a Base skill.
 
 ## Building
 
@@ -71,3 +71,5 @@ Read this first, then open only the docs whose line fits your work. Specs and ti
 ## Docs
 
 - [ADR 0006](adr/0006-docs-are-found-through-one-index.md): this index, glossary pages per area, and which skills keep the index up to date. Read when a skill writes or reads docs.
+
+- [Shared-rules reconciliation](../evals/shared-rules/RESULTS.md): final ownership/reference audit and scoped evidence limits for Spec #348. Read when checking migration completion or the remaining final install gate.

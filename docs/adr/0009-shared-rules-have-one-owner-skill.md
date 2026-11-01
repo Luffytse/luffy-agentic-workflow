@@ -1,6 +1,6 @@
 # Shared rules have one owner skill
 
-A **Shared rule** is one that two or more skills must follow the same way: a record contract, a rule of a workflow they invoke, or a project configuration rule. The revised plan in [#348](https://github.com/Luffytse/luffy-dev-skills/issues/348) gives each one an owner, using complete workflows when they fit and focused **Base skills** for shared contracts. This is a planned migration: existing skill instructions, links, copies and repository checks govern until their respective migration Tickets land.
+A **Shared rule** is one that two or more skills must follow the same way: a record contract, a rule of a workflow they invoke, or a project configuration rule. The revised plan in [#348](https://github.com/Luffytse/luffy-dev-skills/issues/348) gives each one an owner, using complete workflows when they fit and focused **Base skills** for shared contracts. The scoped migrations are implemented; the ownership and consumer inventory below records their boundaries. Existing instructions and protections still govern any shared copies outside this scope.
 
 ## Ownership
 
@@ -13,7 +13,7 @@ The `docs-index` Base skill owns index format and update requirements; its write
 
 ## Workflow handoff
 
-The planned `retro-planning` handoff moves earlier: it selects one problem with the user, then `to-tickets` prepares, discusses and publishes the concrete Ticket. Retro planning keeps the snapshot, order, cap, closes, spin-offs and record, and updates that record before moving on.
+The `retro-planning` handoff migrated in #369 moves earlier: it selects one problem with the user, then `to-tickets` prepares, discusses and publishes the concrete Ticket. Retro planning keeps the snapshot, order, cap, closes, spin-offs and record, and updates that record before moving on.
 
 The ordinary handoff aims for one complete Ticket. If several are needed, it returns to planning before publication so the larger effort can be spun off, rather than forcing an oversized Ticket or silently raising the cap. Partial publication is reconciled on resume instead of duplicated. The absorption contract and this handoff land separately.
 
@@ -26,16 +26,23 @@ The ordinary handoff aims for one complete Ticket. If several are needed, it ret
 
 Upstream deliberately separated reusable interview and domain-modeling capabilities from their wrappers ([documented rationale](https://github.com/mattpocock/skills/commit/995fceec7a185754dbc2f32bc9b4f461b14578f2)). Repeated calls to those capabilities do not duplicate their rules.
 
-## Migration and verification
+## Implemented scope and verification
 
-This narrows ADR 0006's rejected separate index skill: the trigger stays with each writer or checker. The docs-index migration is implemented after successful loading/application evidence in #360; unrelated migrations below retain their transition safeguards.
+This narrows ADR 0006's rejected separate index skill: the trigger stays with each writer or checker. #363 established authoring guidance and packaging support. #360 passed the required fresh-runtime discovery, loading and actual application gate for complete-workflow and focused-reference dependencies. Its production composition proved reference readability/application, but its reported fact-finding subagent failure was unverified and is not a complete production workflow pass. User-menu hiding was unmeasured and remains optional; visibility is separate from model reachability.
 
-After this decision is recorded, #363 establishes authoring guidance and packaging support. #360 must demonstrate fresh-session discovery, loading and actual application of both workflow and reference dependencies before consumers switch. Closing that issue after a failed check is insufficient. Visibility is reported separately; a visible base may pass when hiding is unsupported.
+| Owner | Consumers and load point | Migration |
+| --- | --- | --- |
+| `docs-index` | Document writers (`domain-modeling`, `grill-with-docs`, `improve-codebase-architecture`, `research`, `retro`, `setup-dev-skills`, `triage`, including their supporting-file branches) at index updates; `agentic-review/FINDERS.md` standards branch when checking the index | #364 |
+| `review-record` | `agentic-review` before reading/writing comments and briefing Finders; `ROUNDS.md` writer, standards Finder and `retro/BUG-CLASSES.md` reader apply its record meaning | #365 |
+| `issue-absorption` | `to-tickets` before source-based drafting/publication; `retro-planning` before lifecycle classification and absorption; `pr` when selecting closing lines; builders when maintaining lines or completing absorbed sources | #368 |
+| `to-tickets` complete workflow | `retro-planning` after problem approval, including publication repair on resume; planning retains budget, order and record ownership | #369 |
+| `agentic-review` complete workflow | `implement` and `implement-spec` at review with worktree, branch, base and prior-check context; builders retain fixes, integration and independent merge policies | #366 |
+| Project tracker and triage docs | Builders read blocker/closure operations; `to-spec` and `to-tickets` read publication operations and role mappings | #366 |
 
-The migrations are #364 (docs index), #365 (review records), #368 (absorption), #369 (retro handoff, after #368) and #366 (redundant review/configuration rules, after #365). #370 reconciles the transition after those migrations. Behavioral checks cover record interpretation, caller exceptions, workflow handoffs and resumption, alongside repository and plugin validation.
+## Remaining references and consistency
 
-Until each migration lands, keep its current references and consistency protections. Preserve checks for remaining statements that must agree, contradictions within a skill and stale repository descriptions; remove only interim notes whose migration is complete. The deferred retro follow-up build redesign and independent interview composition are outside this effort, so completion is not a blanket ban on every cross-skill link.
+Owner-local supporting files remain behind their owner's pointers: `ROUNDS.md`, `FINDERS.md` and `VERIFY.md` own review procedure; `retro/BUG-CLASSES.md` owns aggregation and preventive checks. References to complete workflows retain their task and caller context. Direct `grilling`/`domain-modeling` composition remains valid. Retro's follow-up build redesign is deferred; its existing build references remain live. Release's feature-membership use of absorption and prototype's unrelated word sense are outside the absorption contract. Independent merge policies and Implementer briefs may differ.
 
-The #365 migration loads `review-record` in review writers and retro readers. It owns comment meaning and the reviewer’s Bug class/Always-check vocabulary; ranking, Rounds and Nit fix timing remain in `agentic-review`, and aggregation and guardrail work remain in `retro/BUG-CLASSES.md`. Other migrations retain their transition rules above.
+No blanket link-count target applies. For shared rules, check owners, consumers and any unmigrated copies together. For every changed rule, also check parallel statements within its skill and repository descriptions for contradictions or stale claims. These are continuing protections, not migration-only work.
 
-The #366 migration removes duplicated review procedures from build callers. They invoke the complete review workflow with worktree, branch, base and prior-check context, and keep fix assignment, integration and independent merge policies. Build callers read blocker and closure operations from the project tracker doc; publication callers map triage roles through the configured triage-label doc. Deferred follow-up builds and direct interview composition remain unchanged.
+Local migration evidence covers index writing/checking, record interpretation, absorption lifecycle/publication, caller exceptions and retro handoff/resumption. Standard/Deep fixture results and their limits are recorded in `evals/agentic-review/RESULTS.md`; Standard's known discovery miss remains a failure. The final integrated remote clean-install evaluation remains pending and must target the published actual final candidate. See `evals/shared-rules/RESULTS.md` for the final evidence reconciliation.

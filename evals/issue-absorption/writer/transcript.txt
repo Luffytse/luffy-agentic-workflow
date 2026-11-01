@@ -9,4 +9,3 @@ ASSISTANT:
 Published the fake tracker files: [ticket-41.md](ticket-41.md) and [comments.json](comments.json). Included #21 and #22 with exact absorption comments; dropped #23. No network or real tracker actions.
 
 Sources remain open while #41 is open, or if it closes without completion. A later absorption comment transfers authority to its named Ticket. Closure requires rechecking the authoritative Ticket completed the fix.
-

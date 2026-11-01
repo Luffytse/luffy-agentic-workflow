@@ -12,7 +12,7 @@ The seam is the persisted comment record consumed by review continuation and ret
 | retro/BUG-CLASSES.md reader | Included comments, latest state, historical locations and dismissal interpretation | Class-name aggregation, repeated-instance count, guardrail choice and PR work |
 | evals/agentic-review/briefs.sh | Candidate contract meaning when constructing standards briefs | Eval-only brief generation |
 
-The base loads no workflow. Review and retro explicitly load it by name where they need record meaning. VERIFY.md, default Important and Finding format stay in their existing owners. Build callers still use the review workflow; their separate migration is #366.
+The base loads no workflow. Review and retro explicitly load it by name where they need record meaning. VERIFY.md, default Important and Finding format stay in their existing owners. Build callers still use the review workflow; their separate migration landed in #366.
 
 ## Run
 

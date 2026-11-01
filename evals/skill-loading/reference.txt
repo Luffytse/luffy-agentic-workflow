@@ -17,4 +17,3 @@ Excluded:
 - **R1**: Status `pending` is not `settled`.
 
 Priority is ignored.
-

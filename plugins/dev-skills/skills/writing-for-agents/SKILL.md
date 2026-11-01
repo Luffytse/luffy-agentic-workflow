@@ -86,7 +86,7 @@ Keep shared record meaning separate from workflow procedures: a review-record co
 
 Before switching consumers, verify in a fresh supported runtime that their named dependencies are discovered, loaded and actually applied. Test complete-workflow and reference dependencies; report menu visibility separately. Keep current instructions, links and copies until that gate passes and the corresponding migration is complete. Migrate record writers and readers together, preserving caller triggers and exceptions.
 
-During migration, check remaining statements that must agree, parallel sentences in the edited file, and repository descriptions of the changed behavior. Independent policies can differ, but contradictions within a skill and stale descriptions still need fixing. Remove a transition note only after its migration is complete.
+For each changed rule, check remaining statements that must agree (including unmigrated shared copies), parallel sentences in the edited file, and repository descriptions of the changed behavior. Independent policies can differ, but contradictions within a skill and stale descriptions still need fixing. Remove a transition note only after its migration is complete.
 
 ## Pruning
 

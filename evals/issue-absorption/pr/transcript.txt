@@ -22,4 +22,3 @@ Excluded:
 - #19: absorbed by unlanded Ticket #34.
 
 Latest records assign #12 and #17 to #32, so both remain included. No network or tracker writes performed.
-

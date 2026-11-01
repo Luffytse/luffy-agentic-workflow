@@ -22,4 +22,3 @@ ASSISTANT:
 ❓ **Q3** - **Scope**: Should we plan a four-Saturday trial before deciding whether to make this a standing routine?
 
 ➡️ I recommend yes: a short trial gives us a concrete point to review what works.
-

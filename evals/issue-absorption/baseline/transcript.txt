@@ -21,4 +21,3 @@ Wrote and validated [result.json](<isolated>/baseline/fixture/result.json).
 Proposed mechanical closes: #12 and #17 with #32. #16 establishes that #32’s fix came back. Latest absorption comments control #15 and #17.
 
 Stopped after classification and recheck. No closures, verdict requests, publication, or network operations.
-

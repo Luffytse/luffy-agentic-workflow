@@ -77,4 +77,3 @@ ASSISTANT:
 Interview closed. Your confirmation is recorded in the [reading plan](<spec360-run1>/fixture/docs/reading-plan.md).
 
 No implementation, commits, publishing, or outside contact occurred.
-

@@ -23,4 +23,3 @@ Wrote and validated [result.json](<isolated>/candidate/fixture/result.json).
 Propose mechanical closure for #12 and #17 with #32. #16 shows recurrence; #13 and #14 retain their votes in the backlog. #11 and #15 wait on #31.
 
 Stopped after classification and earlier-fix recheck. No network, tracker operations, closures, publication, or user verdicts.
-
