@@ -9,8 +9,9 @@
 #   and a Pre-existing Finding.
 # `flip`: pull request 2 (branch count) has had one Round; R1-1 (a missing list file read as an empty list) is fixed
 #   since, and Round 2's Verify confirms it and kept a Finding whose fix would undo that fix, plus a different claim on
-#   the same line. Pull request 1 is a closed first attempt; inside a Milestone, the issue holds its attempt record.
-# `inside`: the issue carries the Milestone label the Boundary record names. `outside`: no label, no attempt record.
+#   the same line. Pull request 1 is a closed first attempt; the issue holds its attempt record.
+# `inside`: the issue carries the Milestone label the Boundary record names. `outside`: no label. The expected result is the
+# same in both: the stuck-review rule does not depend on Milestone membership.
 # The scoring (EXPECTED.md) stays in this folder, never in the repo. See evals/agentic-review/README.md,
 # "Convergence check".
 set -eu
@@ -300,7 +301,7 @@ Status: open
 - **AC1**: It prints the number of items.
 - **AC2**: An empty list prints 0.
 MD
-  # The first attempt's branch: its head is named by the attempt record (case inside).
+  # The first attempt's branch: its head is named by the attempt record.
   git -C "$r" switch -q -c count-1
   cat > "$r/src/count.sh" <<'SH'
 #!/usr/bin/env bash
@@ -350,8 +351,7 @@ State: open
 
 Adds \`src/count.sh\` and its test. Builds \`$issue\`, second attempt.
 MD
-  if [ "$case_" = inside ]; then
-    cat >> "$r/$issue" <<MD
+  cat >> "$r/$issue" <<MD
 
 ## Comments
 
@@ -374,7 +374,6 @@ Tried: R1-1 was fixed by filtering with \`grep -v '^#'\` piped to \`wc -l\`; the
 Lesson: each fix rewrote the whole counting line and lost the other filter. Count with one expression that drops both kinds of line, and test a list holding both.
 Untouched: none
 MD
-  fi
   mkdir -p "$r/.scratch/pulls/2"
   cat > "$r/.scratch/pulls/2/01-round-1.md" <<MD
 <!-- code-review kind=round round=1 depth=Standard head=$c0 base=$base -->
@@ -417,13 +416,14 @@ fi
 git -C "$r" switch -q main
 
 if [ "$case_" = inside ]; then
-  if [ "$fx" = returned ]; then
-    expect="Inside a Milestone (the issue carries \`milestone-1\`). The convergence check counts R3-1 as returned: R1-1 was fixed (Round 2), its location src/backup.sh:8 at Round 2's head is line 9 at this head, and R3-1 makes the same claim there under another Bug class name. R3-2 shares the lines but not the claim, and R3-3 is Pre-existing in another file: neither counts. The Round 3 comment's Result is the attempt-ended form with restart and the cause a returned Finding; R2-1 and R2-2 are fixed in $s3; R3-1, R3-2 and R3-3 are open. Nothing more is fixed and no Round 4 follows. An attempt record (attempt 1, pull request 1, Rounds 1 to 3, R3-1 returned from R1-1, R3-2 open, what was tried, the lesson that the R2-1 fix rewrote the cp line and lost R1-1's quoting, untouched: README.md and tests/backup.sh) is added to $issue with the Comment on an issue operation. R3-3 is filed as an issue with a filing receipt. The report says restart, with the record's link."
-  else
-    expect="Inside a Milestone (the issue carries \`milestone-1\`). The convergence check counts R2-1 as a flip: R1-1 is confirmed fixed by $s1, and R2-1's fix (print 0 and exit 0 for a missing file) would put back what that fix took out, at the same line. R2-2 shares the line but keeps the exit 1: it does not count. The issue already holds attempt 1's record, so the outcome is park. The Round 2 comment's Result is the attempt-ended form with park and the cause a fix that flipped back; R1-1 is fixed in $s1; R2-1 and R2-2 are open. Nothing more is fixed and no Round 3 follows. An attempt record (attempt 2, pull request 2, Rounds 1 to 2, R2-1 flipped from R1-1, R2-2 open, the earlier attempt's link, what was tried, a lesson naming the missing-versus-empty file question, untouched: tests/count.sh) is added to $issue as Comment 2. The report says park, with the record's link."
-  fi
+  member="Inside a Milestone (the issue carries \`milestone-1\`)."
 else
-  expect="Outside a Milestone (the issue carries no label in the Boundary record's form). No convergence check, no attempt record, nothing written to $issue. The Round $round comment's Result is \`not clean, 2 Important open\`; the Importants go to the owner to fix and Round $((round + 1)) follows. No outcome (restart or park) is reported."
+  member="Outside a Milestone (the issue carries no label in the Boundary record's form); the rule is the same."
+fi
+if [ "$fx" = returned ]; then
+  expect="$member The convergence check counts R3-1 as returned: R1-1 was fixed (Round 2), its location src/backup.sh:8 at Round 2's head is line 9 at this head, and R3-1 makes the same claim there under another Bug class name. R3-2 shares the lines but not the claim, and R3-3 is Pre-existing in another file: neither counts. The Round 3 comment's Result is the attempt-ended form with restart and the cause a returned Finding; R2-1 and R2-2 are fixed in $s3; R3-1, R3-2 and R3-3 are open. Nothing more is fixed and no Round 4 follows. An attempt record (attempt 1, pull request 1, Rounds 1 to 3, R3-1 returned from R1-1, R3-2 open, what was tried, the lesson that the R2-1 fix rewrote the cp line and lost R1-1's quoting, untouched: README.md and tests/backup.sh) is added to $issue with the Comment on an issue operation. R3-3 is filed as an issue with a filing receipt. The report says restart, with the record's link."
+else
+  expect="$member The convergence check counts R2-1 as a flip: R1-1 is confirmed fixed by $s1, and R2-1's fix (print 0 and exit 0 for a missing file) would put back what that fix took out, at the same line. R2-2 shares the line but keeps the exit 1: it does not count. The issue already holds attempt 1's record, so the outcome is park. The Round 2 comment's Result is the attempt-ended form with park and the cause a fix that flipped back; R1-1 is fixed in $s1; R2-1 and R2-2 are open. Nothing more is fixed and no Round 3 follows. An attempt record (attempt 2, pull request 2, Rounds 1 to 2, R2-1 flipped from R1-1, R2-2 open, the earlier attempt's link, what was tried, a lesson naming the missing-versus-empty file question, untouched: tests/count.sh) is added to $issue as Comment 2. The report says park, with the record's link."
 fi
 
 cat > "$out/PROMPT.md" <<MD

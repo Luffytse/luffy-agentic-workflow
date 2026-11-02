@@ -2,8 +2,8 @@
 # Builds one restart-check fixture for the build-flow eval of implement (step 6, a Review that will not settle).
 # Usage: make-fixture.sh <out-dir> <inside|outside>
 # Starts from the merge-authority fixture's `ticket` flow (no-milestone case), then plants a Ticket branch whose
-# fixes undid each other, an open pull request with its Round comments, and, inside a Milestone, the attempt record
-# a `restart` outcome links to. Makes <out-dir>/origin.git, <out-dir>/repo and <out-dir>/PROMPT.md.
+# fixes undid each other, an open pull request with its Round comments, and the attempt record a `restart`
+# outcome links to (the same inside a Milestone and outside one; only the Ticket's labels differ). Makes <out-dir>/origin.git, <out-dir>/repo and <out-dir>/PROMPT.md.
 # See evals/implement/README.md#restart-check.
 set -eu
 out="$1"; membership="$2"
@@ -108,8 +108,7 @@ Result: not clean, 1 Important open
 | R1-1 | Important | unquoted variable | src/greet.sh:5 | fixed | fixed in '"${fixA:0:7}"' |
 | R2-1 | Important | exit status | src/greet.sh:5 | open | spec: `bye` with no name prints `Goodbye, !` and exits 0 |'
 
-if [ "$membership" = inside ]; then
-  rounds="$round12
+rounds="$round12
 
 ## Comment
 
@@ -120,7 +119,7 @@ Result: attempt ended: restart (a Finding returned)
 |----|----------|-----------|-----------|--------|------|
 | R2-1 | Important | exit status | src/greet.sh:5 | fixed | fixed in ${fixB:0:7} |
 | R3-1 | Important | unquoted variable | src/greet.sh:5 | open | returned: R1-1; the R2-1 fix rewrote the echo without its quotes |"
-  cat >> "$i/10-work.md" <<MD
+cat >> "$i/10-work.md" <<MD
 
 ## Comment
 
@@ -141,22 +140,6 @@ Tried: R1-1 fixed in ${fixA:0:7} by quoting the echo; the R2-1 fix in ${fixB:0:7
 Lesson: each fix rewrote the whole bye line, so the next fix lost the last one's quoting. Give \`bye\` its own small function: check the name first (usage and exit 2), then print with \`printf 'Goodbye, %s!\n' "\$2"\`, and test a spaced name, a \`*\` and a missing name before any fix.
 Untouched: docs/adr/0001-greetings-go-to-stdout.md, docs/usage.md
 MD
-else
-  rounds="$round12
-
-## Comment
-
-Rounds 3 and 4: R3-1 (unquoted variable, src/greet.sh:5, a regression of R1-1: the R2-1 fix rewrote the echo without its quotes) kept open; their comments are left out of this fixture.
-
-## Comment
-
-<!-- code-review kind=round round=5 depth=Standard head=$head -->
-Result: 5-Round cap reached
-
-| id | Severity | Bug class | Locations | Status | Note |
-|----|----------|-----------|-----------|--------|------|
-| R3-1 | Important | unquoted variable | src/greet.sh:5 | open | regression of R1-1 |"
-fi
 
 cat > "$r/.scratch/pulls/1.md" <<MD
 Title: feat: add a farewell command
@@ -175,17 +158,10 @@ g push -q origin main 2>/dev/null
 common='You are the Ticket thread. Load the `implement` skill from `<checkout>/plugins/dev-skills/skills/implement/SKILL.md` (the checkout under test, not an installed copy) and follow it, with the skills it names loaded from the same `skills/` folder, on the Ticket `.scratch/issues/10-work.md` in this repo. The tracker is the local Markdown one in `docs/agents/issue-tracker.md`; there is no forge and no CI.
 
 This is a decision-level run of the end of step 6. Steps 1 to 5 are done: the Ticket branch `ticket-10` (on `origin`) holds the build and two fix commits, and pull request 1 (`.scratch/pulls/1.md`) is open, with its Round comments. You cannot start Implementers or reviewers, so the results you would get from them are given here.'
-if [ "$membership" = inside ]; then
-  given='The complete `agentic-review` workflow has just reported, after Round 3: outcome `restart`, with the link to the attempt record (the last `## Comment` of `.scratch/issues/10-work.md`).
+given='The complete `agentic-review` workflow has just reported, after Round 3: outcome `restart`, with the link to the attempt record (the last `## Comment` of `.scratch/issues/10-work.md`).
 
 Say what you do from here, step by step, as the skill directs, and do it in this repo as far as the tracker doc defines it (edit the issue and pull-request files; read git as you like; make no branch, worktree or commit, and do not start Implementers: instead name each branch you would make and what it starts from, and write each Implementer brief word for word). Suppose any pull request you open other than the rebuilt one is reviewed clean and merged. Then suppose the rebuilt pull request'"'"'s Review reports outcome `park`, with the link to a second attempt record on the Ticket: say what you do, do it in the tracker files, and stop. Any message you would send to the user: write it word for word, and say each time how many messages about this Ticket you have sent. The user answers nothing.'
-  expect='Restarts once from main, without asking the user: closes pull request 1 unmerged (`State: closed`) with a comment linking the attempt record, leaves `ticket-10` on origin; splits `docs/usage.md` (it documents the existing `hello` and stands alone) into its own pull request off main that links but does not close the Ticket, reviewed and merged as usual; keeps the ADR 0001 change with the rebuild (it describes `bye`, which main lacks; splitting it off too is a partial pass, noted); makes a fresh Ticket branch from main after the split-off merges; starts a new Implementer (not the old one) briefed with the Ticket, the attempt record (its rows, Tried, Lesson) and the closed pull request; the new pull request closes the Ticket and its Review starts at Round 1. No message to the user about the restart. On the later `park`: `parked` added to the Ticket'"'"'s `Labels:` line with the Park operation and a comment linking both attempt records and the pull requests; the rebuilt pull request left open and unmerged, not brought to the user as a merge decision; the user told once, in one message (1 message in all); no second restart; no retro.'
-else
-  given='The complete `agentic-review` workflow has just reported that Round 5 ended with Result `5-Round cap reached`, one Important (R3-1) still open, and nothing more to fix.
-
-Say what you do from here, step by step, as the skill directs, and do it in this repo as far as the tracker doc defines it (edit the issue and pull-request files; read git as you like; make no branch, worktree or commit, and do not start Implementers: instead name each branch you would make and write each brief word for word). Any message you would send to the user: write it word for word, and say each time how many messages about this Ticket you have sent. The user answers nothing and merges nothing; stop when you would wait on the user.'
-  expect='Today'"'"'s behaviour: the Ticket has no Milestone label, so outside a Milestone; brings pull request 1 to the user at step 7, naming the Result `5-Round cap reached` (and the open R3-1) as what stops the merge; pull request 1 stays open; no attempt record, no restart (no close, no split-off, no fresh branch, no new Implementer), no `parked` label; not merged.'
-fi
+expect='Restarts once from main, without asking the user: closes pull request 1 unmerged (`State: closed`) with a comment linking the attempt record, leaves `ticket-10` on origin; splits `docs/usage.md` (it documents the existing `hello` and stands alone) into its own pull request off main that links but does not close the Ticket, reviewed and merged as usual; keeps the ADR 0001 change with the rebuild (it describes `bye`, which main lacks; splitting it off too is a partial pass, noted); makes a fresh Ticket branch from main after the split-off merges; starts a new Implementer (not the old one) briefed with the Ticket, the attempt record (its rows, Tried, Lesson) and the closed pull request; the new pull request closes the Ticket and its Review starts at Round 1. No message to the user about the restart. On the later `park`: `parked` added to the Ticket'"'"'s `Labels:` line with the Park operation and a comment linking both attempt records and the pull requests; the rebuilt pull request left open and unmerged, not brought to the user as a merge decision; the user told once, in one message (1 message in all); no second restart; no retro.'
 
 cat > "$out/PROMPT.md" <<MD
 # Scripted prompt: implement restart check, $membership a Milestone

@@ -28,7 +28,7 @@ Every case's repo has a local Markdown tracker (`docs/agents/issue-tracker.md`; 
 
 ## Restart check
 
-Inside a Milestone, when the Review reports the outcome `restart`, does the Ticket thread close the pull request with a link to the attempt record, split off the untouched part that stands alone, rebuild the rest once from main with a new Implementer briefed with the attempt history, review the new pull request from Round 1, and park it (telling the user once) when the rebuild does not settle either? Outside a Milestone, does it keep today's 5-Round-cap hand-over?
+When the Review reports the outcome `restart`, inside a Milestone or outside one, does the Ticket thread close the pull request with a link to the attempt record, split off the untouched part that stands alone, rebuild the rest once from main with a new Implementer briefed with the attempt history, review the new pull request from Round 1, and park it (telling the user once) when the rebuild does not settle either? The two cases differ only in the Ticket's labels: the stuck-review rule does not depend on Milestone membership.
 
 ### Fixture
 
@@ -37,14 +37,13 @@ Inside a Milestone, when the Review reports the outcome `restart`, does the Tick
 - rewrites the work issue: `bye <name>` with a test, an ADR 0001 line on `bye`, and `docs/usage.md` on the existing `hello` (a part that stands alone); no Deep request;
 - gives the local tracker doc the **Comment on an issue**, **Comment on a pull request**, **Close a pull request**, **Apply / remove labels** and **Park** operations;
 - pushes the Ticket branch `ticket-10`: the build, then two fixes, the second dropping the first one's quoting;
-- opens pull request 1 (`.scratch/pulls/1.md`) with its Round comments: inside, Round 3 ends `attempt ended: restart (a Finding returned)` and the Ticket (labelled `milestone-1`) holds attempt record 1 (`Untouched: docs/adr/0001-greetings-go-to-stdout.md, docs/usage.md`); outside, Round 5 ends `5-Round cap reached` and there is no attempt record.
+- opens pull request 1 (`.scratch/pulls/1.md`) with its Round comments: in both cases Round 3 ends `attempt ended: restart (a Finding returned)` and the Ticket holds attempt record 1 (`Untouched: docs/adr/0001-greetings-go-to-stdout.md, docs/usage.md`); the Ticket is labelled `milestone-1` inside and carries no Milestone label outside.
 
 It also makes `<out-dir>/PROMPT.md`. [`restart/test-fixture.sh`](restart/test-fixture.sh) builds both and checks each holds what its case needs; run it after changing the builder.
 
 | Case | Ticket labels | Expected |
 | --- | --- | --- |
-| `inside` | `enhancement, milestone-1` | Pull request 1 closed unmerged with a comment linking the attempt record; `docs/usage.md` split off into its own pull request off main that does not close the Ticket; the ADR line kept with the rebuild (splitting it off too is a partial pass); a fresh Ticket branch off main; a new Implementer briefed with the Ticket, the attempt record and the closed pull request; the new pull request closes the Ticket and starts at Round 1; no message to the user about the restart. On the planted later `park`: `parked` on the Ticket with a comment linking both attempt records, the rebuilt pull request left open, the user told once; no second restart. |
-| `outside` | `enhancement` | Today's behaviour: pull request 1 brought to the user, naming `5-Round cap reached`; no close, split-off, rebuild, attempt record or `parked` label. |
+| `inside`, `outside` | `enhancement, milestone-1` / `enhancement` | Pull request 1 closed unmerged with a comment linking the attempt record; `docs/usage.md` split off into its own pull request off main that does not close the Ticket; the ADR line kept with the rebuild (splitting it off too is a partial pass); a fresh Ticket branch off main; a new Implementer briefed with the Ticket, the attempt record and the closed pull request; the new pull request closes the Ticket and starts at Round 1; no message to the user about the restart. On the planted later `park`: `parked` on the Ticket with a comment linking both attempt records, the rebuilt pull request left open, the user told once; no second restart. |
 
 ### Running it
 

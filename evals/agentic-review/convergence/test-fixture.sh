@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Builds the convergence fixtures of the agentic-review eval (returned and flip, each inside and outside a Milestone)
 # and checks each holds what the check needs: the Boundary record, the tracker operations, the earlier Round comments,
-# the fixed rows, the line shift the matching must follow, the kept Findings in the prompt, and (flip, inside) the
+# the fixed rows, the line shift the matching must follow, the kept Findings in the prompt, and (flip) the
 # earlier attempt record. Run: bash evals/agentic-review/convergence/test-fixture.sh
 set -u
 here="$(cd "$(dirname "$0")" && pwd)"
@@ -75,12 +75,8 @@ for fx in returned flip; do
       line_has "$r" "$lh" "$script" 5 'echo 0; exit 0' || bad "$t: count.sh:5 at Round 1's head is not the exit-0 line"
       line_has "$r" "$branch" "$script" 5 'exit 1' || bad "$t: count.sh:5 at the head is not the exit-1 fix"
       grep -q '^State: closed' "$r/.scratch/pulls/1.md" 2>/dev/null || bad "$t: no closed first pull request"
-      if [ "$case" = inside ]; then
-        grep -q '^<!-- code-review kind=attempt attempt=1 ' "$issue" || bad "$t: the issue has no earlier attempt record"
-        grep -q 'kind=attempt.*pr=1' "$issue" || bad "$t: the earlier attempt record does not name pull request 1"
-      else
-        grep -q 'kind=attempt' "$issue" && bad "$t: an attempt record outside a Milestone"
-      fi
+      grep -q '^<!-- code-review kind=attempt attempt=1 ' "$issue" || bad "$t: the issue has no earlier attempt record"
+      grep -q 'kind=attempt.*pr=1' "$issue" || bad "$t: the earlier attempt record does not name pull request 1"
     fi
 
     # the scoring file stays out of the repo; the prompt holds the kept Findings and its Expected line

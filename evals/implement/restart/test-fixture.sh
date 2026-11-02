@@ -23,20 +23,18 @@ for m in inside outside; do
   [ "$(git -C "$r" rev-list --count origin/main..origin/ticket-10)" = 3 ] || bad "$m: ticket-10 does not hold the build and two fixes"
   if [ "$m" = inside ]; then
     grep -q '^Labels:.*milestone-1' "$i" || bad "$m: work issue lacks milestone-1"
-    grep -q "<!-- code-review kind=attempt attempt=1 pr=1 head=$head -->" "$i" || bad "$m: no attempt record at the branch head"
-    grep -q '^Outcome: restart' "$i" || bad "$m: attempt record outcome is not restart"
-    grep -q '^Untouched: docs/adr/0001-greetings-go-to-stdout.md, docs/usage.md' "$i" || bad "$m: Untouched line wrong"
-    grep -q 'attempt ended: restart (a Finding returned)' "$p" || bad "$m: Round 3 Result is not the restart"
-    for sha in $(git -C "$r" rev-list origin/main..origin/ticket-10 --skip=0 --max-count=2); do
-      grep -q "${sha:0:7}" "$i" || bad "$m: Tried does not name fix commit $sha"
-    done
-    grep -q 'restart' "$d/PROMPT.md" || bad "$m: prompt does not plant the restart outcome"
   else
     grep -q '^Labels:.*milestone-' "$i" && bad "$m: work issue has a Milestone label"
-    grep -q 'kind=attempt' "$i" && bad "$m: outside case has an attempt record"
-    grep -q 'Result: 5-Round cap reached' "$p" || bad "$m: Round 5 Result is not the cap"
-    grep -q 'no attempt record' "$d/PROMPT.md" || bad "$m: Expected does not rule out the restart"
   fi
+  grep -q "<!-- code-review kind=attempt attempt=1 pr=1 head=$head -->" "$i" || bad "$m: no attempt record at the branch head"
+  grep -q '^Outcome: restart' "$i" || bad "$m: attempt record outcome is not restart"
+  grep -q '^Untouched: docs/adr/0001-greetings-go-to-stdout.md, docs/usage.md' "$i" || bad "$m: Untouched line wrong"
+  grep -q 'attempt ended: restart (a Finding returned)' "$p" || bad "$m: Round 3 Result is not the restart"
+  grep -q 'Result: 5-Round cap reached' "$p" && bad "$m: pull request still shows the retired 5-Round cap Result"
+  for sha in $(git -C "$r" rev-list origin/main..origin/ticket-10 --skip=0 --max-count=2); do
+    grep -q "${sha:0:7}" "$i" || bad "$m: Tried does not name fix commit $sha"
+  done
+  grep -q 'restart' "$d/PROMPT.md" || bad "$m: prompt does not plant the restart outcome"
   git -C "$r" rev-parse --verify -q origin/main >/dev/null || bad "$m: no origin/main"
 done
 rm -rf "$out"
