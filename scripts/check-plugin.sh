@@ -24,6 +24,7 @@
 #   no-person-names              no person's name in skill or doc text
 #   repo-free-skill-text         skill text names nothing that exists only in this repo
 #   no-agent-label-strings       the plugin names no repo's agent-only label strings (a repo maps the role in its triage-labels.md)
+#   tracker-operation-names      each operation cited as the tracker doc's **Name** or "Name" operation exists as a bold bullet in every issue-tracker seed
 #
 # `claude plugin validate .` is not run here: CI runs it as its own step; the README says to run it before pushing.
 #
@@ -218,6 +219,24 @@ if [ -n "$hits" ]; then
   echo "$hits"
   bad "plugin text names an agent-only label string (claude-only or codex-only); say the role and let the repo's triage-labels.md map it"
 fi
+
+# tracker-operation-names: skill text that cites an operation of the tracker doc by name
+# (the tracker doc's **<Name>** operation, or the tracker doc's "<Name>" operation) names an operation that exists:
+# a bold bullet (- **<Name>**) in every issue-tracker seed (setup-dev-skills/issue-tracker-*.md). Checks the cited
+# name only, never the surrounding prose.
+for seed in "$skills"/setup-dev-skills/issue-tracker-*.md; do
+  [ -f "$seed" ] || continue
+  ops="$(sed -nE 's/^- \*\*([^*]+)\*\*.*/\1/p' "$seed")"
+  while IFS= read -r hit; do
+    [ -n "$hit" ] || continue
+    loc="${hit%%: *}"
+    name="${hit#*: }"
+    name="$(printf '%s' "$name" | sed -E "s/^tracker doc's //; s/ operation\$//; s/^(\*\*|\")//; s/(\*\*|\")\$//")"
+    printf '%s\n' "$ops" | grep -qxF -- "$name" || bad "${loc#"$repo"/}: cited tracker operation \"$name\" is not a bold bullet in $(basename "$seed")"
+  done <<EOF_HITS
+$(grep -rnoE --include='*.md' "tracker doc's (\*\*[^*]+\*\*|\"[^\"]+\") operation" "$skills" | grep -v "/setup-dev-skills/issue-tracker-" | sed -E 's/^([^:]+:[0-9]+):/\1: /')
+EOF_HITS
+done
 
 [ "$fail" -eq 0 ] && echo "OK: dev-skills plugin checks passed"
 exit "$fail"

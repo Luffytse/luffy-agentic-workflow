@@ -65,6 +65,28 @@ class SkillLoadingPackaging(unittest.TestCase):
         (self.repo / "docs/agents/boundaries.md").unlink()
         self.check(1)
 
+    def cite(self, text):
+        (self.skill / "SKILL.md").write_text(
+            "---\nname: fixture-contract\ndescription: Use when a caller needs the fixture contract.\n"
+            "user-invocable: false\n---\n\n" + text + "\n"
+        )
+        return subprocess.run(
+            ["bash", str(self.repo / "scripts/check-plugin.sh")],
+            cwd=self.repo, text=True, capture_output=True,
+        )
+
+    def test_cited_tracker_operation_that_exists_passes(self):
+        for cite in ('the tracker doc\'s **Close** operation', 'the tracker doc\'s "Comment on an issue" operation'):
+            result = self.cite(cite)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_cited_tracker_operation_missing_from_tracker_doc_fails(self):
+        for cite in ('the tracker doc\'s **Comment** operation', 'the tracker doc\'s "Comment" operation'):
+            result = self.cite("Intro line.\n" + cite)
+            self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+            self.assertIn("fixture-contract/SKILL.md:8", result.stdout)
+            self.assertIn("Comment", result.stdout)
+
 
 if __name__ == "__main__":
     unittest.main()
