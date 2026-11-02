@@ -53,7 +53,7 @@ Read the Implementer's report against the ticket's acceptance criteria and rerun
 
 Run the complete `agentic-review` Ticket-check entry point in this thread. Supply the Ticket and Spec, the Ticket worktree path and branch, the Spec branch as diff base, Quick depth, and prior Ticket-check Findings. Run your git reads as `git -C <path> ...`; pass the worktree path to the review workflow for its reviewers. Record each check on the Spec pull request; until the draft opens (step 6), keep the comments and post them once it does.
 
-Route the workflow's fixes to the ticket's same Implementer; it fixes and commits. Rerun step 4, then request a new Ticket check through `agentic-review`. Carry the check records forward to step 7, including Pre-existing Findings.
+Route the workflow's fixes to the ticket's same Implementer; it fixes and commits, or, where `agentic-review` allows a rebuttal, sends one with its evidence in place of a fix, which you return to `agentic-review`. Rerun step 4, then request a new Ticket check through `agentic-review`. Carry the check records forward to step 7, including Pre-existing Findings.
 
 Done when a check leaves no Important open. At most 3 checks: if the third still has an Important open, bring the ticket to the user and start no tickets that it blocks. The tickets it does not block still land, and the Spec pull request stays a draft, with no Rounds, until the user decides.
 
@@ -76,7 +76,7 @@ Run the complete `agentic-review` workflow on the Spec pull request in this thre
 
 Before each Round, fetch main and, if it moved, merge it into the Spec branch as in step 6.1, and push. Supply the resulting head and merge context to the review workflow.
 
-Route the workflow's fixes to a **new** Implementer on the Spec branch, on the highest tier of the tickets those Findings touch (regular if they touch no ticket's files). Brief it to check before each push that `git status -sb` shows the Spec branch, and afterwards report that `git rev-parse origin/<branch>` equals `HEAD`. It fixes, commits and pushes; a later Round may continue it by message if its Findings need no higher tier. Return its commit and evidence to `agentic-review` and continue that workflow through its completion, including its final fix and filing actions. Review policy and completion belong to `agentic-review`; the merge decision below remains yours.
+Route the workflow's fixes to a **new** Implementer on the Spec branch, on the highest tier of the tickets those Findings touch (regular if they touch no ticket's files). Brief it to check before each push that `git status -sb` shows the Spec branch, and afterwards report that `git rev-parse origin/<branch>` equals `HEAD`. It fixes, commits and pushes, or, where `agentic-review` allows a rebuttal, sends one with its evidence in place of a fix; a later Round may continue it by message if its Findings need no higher tier. Return its commit, evidence and any rebuttals to `agentic-review` and continue that workflow through its completion, including its final fix and filing actions. Review policy and completion belong to `agentic-review`; the merge decision below remains yours.
 
 ## 8. Merge, or bring it to the user
 

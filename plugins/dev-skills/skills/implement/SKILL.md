@@ -54,7 +54,7 @@ Run the complete `agentic-review` workflow on the pull request in this thread. S
 
 Before each Round, fetch main. If it moved, have the same Implementer merge main into the Ticket branch (a merge, never a rebase), resolve any conflicts and push. Supply the resulting head and merge context to the review workflow.
 
-Route the workflow's fixes to the same Implementer by message; it fixes, commits and pushes. Return its commit and evidence to `agentic-review` and continue that workflow through its completion, including its final fix and filing actions. Review policy and completion belong to `agentic-review`; the merge decision below remains yours.
+Route the workflow's fixes to the same Implementer by message; it fixes, commits and pushes, or, where `agentic-review` allows a rebuttal, sends one with its evidence in place of a fix. Return its commit, evidence and any rebuttals to `agentic-review` and continue that workflow through its completion, including its final fix and filing actions. Review policy and completion belong to `agentic-review`; the merge decision below remains yours.
 
 ## 7. Merge, or bring it to the user
 

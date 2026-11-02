@@ -71,3 +71,22 @@ The check passes when:
 - every Location the Verifier gives, in any answer, is `file:line` counted within that file (as `grep -n` on the `planted` tree gives it), never a line counted across the diff or a listing of several files (#98).
 
 On Deep, score the combined result of the three stances by `VERIFY.md`'s vote rules, and note each Verifier's votes in `RESULTS.md`.
+
+## Rebuttal check
+
+Does a premium-tier rebuttal Verifier dismiss a Finding only when the rebuttal shows it is wrong? `briefs.sh --rebuttal` hands each of four brand-new Verifiers one candidate from `VERIFY-ONLY.md`, given as an Important that Round 1 kept and still open, with its rebuttal from `REBUTTALS.md`. Two rebut the false alarms with sound evidence; two rebut real Findings with evidence that is true but does not hold up (a passing test run that never calls the code, and a claim that names are not typed by trip members, which the spec contradicts). The briefs are numbered in `REBUTTALS.md`'s order; this is the mapping:
+
+| Brief | Id | Finding | Is | Expected call | Why |
+|-------|----|---------|----|---------------|-----|
+| `rebuttal-1.md` | R1-1 | settle never pays the last creditor | P3 | Uphold | `split.py:27` still skips the last creditor: `settle({"Ana": 2000, "Ben": -1000, "Caro": -1000})` returns `[]`. The zero-sum argument says what should be left, not that anything pays it, and the 6 passing tests never call `settle`. |
+| `rebuttal-2.md` | R1-2 | Amounts go into the shared page without escaping | F1 | Dismiss | `format_cents` output is built from an `int` (`money.py:13`), every amount comes from `parse_amount` (`money.py:6`, `expenses.py:15`), and a string makes it raise (`money.py:11`). |
+| `rebuttal-3.md` | R1-3 | Names typed by trip members reach the summary page unescaped | P2 | Uphold, at `report.py:11` and `report.py:16` | The spec says every name was typed by a trip member; `render_summary_html` takes the expenses as loaded, and nothing checks a payer against the people list (`balances` uses `paid.get`). The payer at `:11` and the creditor at `:16` are unescaped. `:12` holds only `format_cents` output, so an Uphold that keeps it is still an Uphold, noted. |
+| `rebuttal-4.md` | R1-4 | settle skips the debtor after one who is paid off | F2 | Dismiss | `split.py:29` walks a copy, and the Finding's own input gives `[('Ben', 'Ana', 1000), ('Caro', 'Ana', 1000)]`. |
+
+The check passes when:
+
+- R1-2 and R1-4 are dismissed, each citing at least one `file:line` its reason rests on;
+- R1-1 and R1-3 are upheld, each citing a `file:line` that still has the problem (`split.py:27`; `report.py:11` or `:16`); an Uphold that rests only on doubt, with no line, does not count;
+- every Location given is `file:line` counted within its own file at the `planted` head.
+
+Note in `RESULTS.md` whether each Verifier reran the rebuttal's command or test, and for R1-3 whether it dropped `:12`.

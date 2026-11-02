@@ -40,6 +40,22 @@ Locations counted within their own file: yes | no. <any line counted across a li
 Pass: yes | no. <one line on what to change in VERIFY.md, if anything>
 ```
 
+For the rebuttal check (scored by the rebuttal section of `EXPECTED.md`):
+
+```
+### <date>, dev-skills <version>, Rebuttal
+
+| Id | Expected | Got | Lines cited | Reran the evidence? | Pass? |
+|----|----------|-----|-------------|---------------------|-------|
+| R1-1 | Uphold | | | | |
+| R1-2 | Dismiss | | | | |
+| R1-3 | Uphold | | | | |
+| R1-4 | Dismiss | | | | |
+
+Locations counted within their own file: yes | no.
+Pass: yes | no. <one line on what to change in the rebuttal rules, if anything>
+```
+
 For the Milestone-agreement check (scored by `milestone/EXPECTED.md`):
 
 ```
@@ -59,6 +75,34 @@ Pass: yes | no. <one line on what to change in agentic-review, if anything>
 ```
 
 ## Runs
+
+### 2026-11-02, dev-skills 0.29.0, Rebuttal
+
+Base: `3f6b381` (branch `ticket-441`, version left at 0.29.0 as on the Spec branch). The rebuttal brief and `REBUTTALS.md` are as in that commit; the run itself was made on the working tree just before it, whose later edits touched only `ROUNDS.md`, `review-record` and ADR 0003, not the brief. Driven by the Ticket #441 Implementer, which had read `EXPECTED.md`: a fresh fixture from `setup.sh`, briefs from `briefs.sh --rebuttal`, and each brief given whole to a brand-new headless session on the premium tier (a `claude -p` session on the premium model of the `model-tiers` map, read-only tools), told to read only it and the scratch repo. None saw this README, `EXPECTED.md`, `VERIFY-ONLY.md`, `REBUTTALS.md` or `RESULTS.md`.
+
+| Id | Expected | Got | Lines cited | Reran the evidence? | Pass? |
+|----|----------|-----|-------------|---------------------|-------|
+| R1-1 | Uphold | Uphold | `split.py:27`, plus `split.py:39` (returns with debts left in `pending`) | yes: the 6 tests pass but `grep` finds no test calling `settle`; the one-creditor input returns `[]`; a two-creditor input leaves Dan unpaid | yes |
+| R1-2 | Dismiss | Dismiss | `money.py:6`, `:11`, `:13`, `expenses.py:15`, `report.py:12`, `:16` | yes: `format_cents("<b>")` raises `TypeError`; also tried a float and `load_expenses` with typed text | yes |
+| R1-3 | Uphold | Uphold | `report.py:11`, `report.py:16`; dropped `:12` as not a problem | yes: rendered a page with a markup payer in its own copy | yes |
+| R1-4 | Dismiss | Dismiss | `split.py:25`, `:29`, `:34`, `:36` | yes: the Finding's input prints `[('Ben', 'Ana', 1000), ('Caro', 'Ana', 1000)]` | yes |
+
+Locations counted within their own file: yes.
+Pass: yes. The Verifiers rejected both unsound rebuttals on a run of their own, not on doubt: R1-1's passing tests never call `settle`, and R1-3's command-line path never reaches the page. R1-3 also corrected the Finding's scenario (one creditor gets no transfer, so the creditor cell needs two or more creditors). R1-2 and R1-4 each named, in one line, the real Findings in the same lines (the unescaped payer, the loop bound) without counting them against the call.
+
+### 2026-11-02, dev-skills 0.29.0, Verify-only, Standard
+
+Base and driver as the Rebuttal run above. `VERIFY.md` changed only by the new "Rebuttals" section and one intro sentence, outside the brief that `--verify-only` cuts, so the Verifier brief `briefs.sh --verify-only` cuts is unchanged; rerun as the README asks for any `VERIFY.md` change. One brand-new headless session on the regular tier (a `claude -p` session on the regular model of the `model-tiers` map).
+
+| id | Kept or dropped | Severity given | Caused by this change? | Locations given | Notes |
+|----|-----------------|----------------|------------------------|-----------------|-------|
+| V-a | dropped | n/a | n/a | n/a | `parse_amount` returns an `int`, `format_cents` formats only digits, `.` and `-`; the only `Expense(` is `expenses.py:15` |
+| V-b | dropped | n/a | n/a | n/a | the loop walks `list(pending)`, a copy |
+| V-c | kept | Important | yes | `splitter/split.py:27` | |
+| V-d | kept | Important | yes | `splitter/report.py:11`, `splitter/report.py:16` | dropped `:12`, pointing at V-a |
+
+Locations counted within their own file: yes.
+Pass: yes.
 
 ### 2026-11-02, dev-skills 0.27.0, Milestone agreement (rerun after the brief fix)
 

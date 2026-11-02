@@ -1,16 +1,18 @@
 # agentic-review eval
 
-A small fixture pull request with planted problems of known Bug classes (one of them a break of the fixture's own `REVIEW.md` Always check line), plus two plausible false alarms, to check that `agentic-review` reports the right Findings with the right Severity and drops the false ones. Rerun it whenever `agentic-review` changes, at Standard and at Deep depth. A Verify-only check hands the Verifier the false alarms and two real controls as candidates, so Verify's drop call is tested even when no Finder raises them; run it whenever `VERIFY.md` changes, alongside the full runs.
+A small fixture pull request with planted problems of known Bug classes (one of them a break of the fixture's own `REVIEW.md` Always check line), plus two plausible false alarms, to check that `agentic-review` reports the right Findings with the right Severity and drops the false ones. Rerun it whenever `agentic-review` changes, at Standard and at Deep depth. A Verify-only check hands the Verifier the false alarms and two real controls as candidates, so Verify's drop call is tested even when no Finder raises them; run it whenever `VERIFY.md` changes, alongside the full runs. A rebuttal check hands a premium-tier rebuttal Verifier a fixer's rebuttal of each of those four candidates; run it whenever the rebuttal rules (`VERIFY.md` "Rebuttals", `ROUNDS.md` "Rebuttals, inside a Milestone") change.
 
 ## Files
 
 - `base/`: the fixture repo before the change (a tiny Python cost splitter with its own `docs/index.md` and a `REVIEW.md` holding one Always check line, which the change breaks once).
 - `after/`: the files the change adds or edits; `setup.sh` also deletes `docs/currency.md` (renamed to `docs/money.md`).
 - `SPEC.md`: the ticket the change builds; `setup.sh` copies it, untracked, to `.scratch/SPEC.md` in the scratch repo.
-- `EXPECTED.md`: the planted Findings (Bug class, Severity, every location), the false alarms, the known extras, how a run is scored, and the scoring of the Verify-only check.
+- `EXPECTED.md`: the planted Findings (Bug class, Severity, every location), the false alarms, the known extras, how a run is scored, and the scoring of the Verify-only and rebuttal checks.
 - `VERIFY-ONLY.md`: the candidate Findings handed to the Verifier in the Verify-only check, in the fixed Finding format, each tagged with its Finder.
+- `REBUTTALS.md`: one fixer's rebuttal of each `VERIFY-ONLY.md` candidate, for the rebuttal check.
+- `test-rebuttal.sh`: builds the fixture and the rebuttal briefs and checks each holds the brief, one Finding, its rebuttal and only citations that hold; run it after changing `REBUTTALS.md`, `briefs.sh` or the rebuttal brief.
 - `setup.sh`: builds the fixture as a scratch repo.
-- `briefs.sh`: builds the Finder and Verifier briefs from the current `FINDERS.md` and `VERIFY.md`, whole, so nobody cuts them out by hand.
+- `briefs.sh`: builds the Finder and Verifier briefs from the current `FINDERS.md` and `VERIFY.md`, whole, so nobody cuts them out by hand (`--verify-only` and `--rebuttal` for those checks).
 - `RESULTS.md`: one entry per run.
 - `brief-lib.sh`: the helpers `briefs.sh` and `milestone/briefs.sh` share to cut the briefs out of the skill files.
 - `milestone/`: the Milestone-agreement check below (`make-fixture.sh`, `test-fixture.sh`, `briefs.sh`, `DESIGN-FINDINGS.md`, `EXPECTED.md`).
@@ -38,6 +40,15 @@ Run it whenever `VERIFY.md` changes, alongside the full runs. In the full runs n
 5. Score each result with the Verify-only section of `EXPECTED.md` and record it in `RESULTS.md`. The Verifiers work in the scratch repo and read only their brief; none of them sees this README, `EXPECTED.md` or `RESULTS.md`.
 
 The fixture's own tests pass (`python3 -m unittest` in the scratch repo): the planted bugs are the kind tests miss.
+
+## Rebuttal check
+
+Inside a Milestone, a fixer may rebut an open Important, and a premium-tier rebuttal Verifier decides it (`VERIFY.md`, "Rebuttals"). This check asks whether that Verifier dismisses the two false alarms on sound rebuttals and upholds the two real Findings against rebuttals that sound right but do not hold. Run it whenever the rebuttal rules or brief change.
+
+1. Build the fixture with `setup.sh` as above.
+2. Build the briefs: `evals/agentic-review/briefs.sh --rebuttal <scratch-repo>`. It writes `<scratch-repo>.briefs/rebuttal/rebuttal-1.md` to `rebuttal-4.md`: the rebuttal Verifier brief from `VERIFY.md`, word for word, the Review's inputs with the head to judge at, one `VERIFY-ONLY.md` candidate as an open Important with an id, and its rebuttal from `REBUTTALS.md`. `bash evals/agentic-review/test-rebuttal.sh` checks the builder and the fixture.
+3. Start one brand-new subagent on the premium tier per brief, each given that file and told to read only it and the scratch repo. They never see this README, `EXPECTED.md`, `VERIFY-ONLY.md`, `REBUTTALS.md` or `RESULTS.md`.
+4. Score with the rebuttal section of `EXPECTED.md` and record it in `RESULTS.md`.
 
 ## Milestone-agreement check
 

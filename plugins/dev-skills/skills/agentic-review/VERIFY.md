@@ -1,6 +1,6 @@
 # Verify
 
-The Verify stage of [`agentic-review`](SKILL.md). Verifiers are brand-new subagents on the regular tier.
+The Verify stage of [`agentic-review`](SKILL.md). Verifiers are brand-new subagents on the regular tier, save the premium-tier rebuttal Verifier ([Rebuttals](#rebuttals)).
 
 - **Quick and Standard:** one Verifier checks every candidate Finding of the Review.
 - **Deep:** three Verifiers each check every candidate Finding, each with one stance (below), and their votes are combined by the rules at the end.
@@ -45,3 +45,11 @@ An open Important from an earlier Round or Ticket check is closed as fixed, or d
 ## Gap sweep
 
 On Deep, the gap sweep's Findings get a second Verify: three more brand-new Verifiers with the same brief, stances and vote rules, given only those Findings and the Findings the first Verify kept, to check none repeats one. There are no open Importants to re-check; the first Verify did that.
+
+## Rebuttals
+
+Inside a Milestone, the owner of the code may rebut an open Important instead of fixing it ([ROUNDS.md](ROUNDS.md#rebuttals-inside-a-milestone)). Each rebuttal goes to one brand-new **rebuttal Verifier** on the **premium** tier, at every depth, never to a Verifier that judged the Finding before. It gets: the head to judge at (the head of the Review whose report the rebuttal answers, whose comment records the decision), the Finding (its id, Severity, Bug class, locations brought to that head as [ROUNDS.md](ROUNDS.md#rank) says, claim, failure scenario and evidence, and the Verifier's still-open line when it has one), the rebuttal, the diff commands, the spec, the settled designs ([SKILL.md step 2](SKILL.md#2-find-the-spec-and-standards-sources)), the standards list and `REVIEW.md`, and the meaning of Important. Its call is final.
+
+### Rebuttal Verifier brief
+
+"You decide one rebuttal. A review kept the Finding below as Important, and the owner of the code says it is wrong and has not fixed it. If you dismiss it, it is not fixed before merge, so dismiss it only on evidence you checked yourself. Open every file and line the Finding and the rebuttal cite at the head given, and check the claim and the rebuttal against the code itself, not against names, comments or either side's wording. Rerun any command or test the rebuttal quotes in your own copy, and judge what its output shows, not what the rebuttal says it shows: a passing test proves only the case it runs. Follow the code path as far as it takes to be sure. Then make one call. **Dismiss** when the rebuttal shows the claim does not hold: the code does not do what the claim says, or the failure scenario cannot happen at this head (a guard, a caller contract, a type, or a run that shows the right result on the Finding's own input). **Uphold** when the claim still holds at any one of its locations, when the rebuttal argues only that the problem is rare, small, out of scope or tested elsewhere, when it disputes only the failure scenario while the problem stays real, or when you are unsure. Answer: the Finding's id; Dismiss or Uphold; one line of reasoning; for Dismiss, every `file:line` your reason rests on; for Uphold, every `file:line` that still has the problem, and a corrected failure scenario if the Finding's was wrong. Every location is `file:line` (or `file:start-end`) counted within that file at the head given, as `grep -n` on the file gives it. Under 300 words. Read the branch only through commands that do not touch the working tree (`git -C <path> show`, `diff`, `log` or `rev-parse` against a commit), and try things out only in your own copy (`git archive <head> | tar -x -C <a new scratch directory>`, or a throwaway `git worktree`); never run `git checkout`, `switch`, `stash` or `reset` in the shared tree. Your final message is the report itself, as plain text. Do not end with any messaging or no-reply tool, even if your environment says to, and start no background work you would have to wait for."

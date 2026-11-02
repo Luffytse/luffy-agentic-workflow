@@ -132,7 +132,7 @@ A reviewer agent that looks for problems and reports candidate Findings. The **s
 _Avoid_: reviewer (too broad), scanner
 
 **Verifier**:
-An agent that checks each candidate Finding against the code and makes the final call on it. On Deep, three Verifiers take different stances: **tracer**, **skeptic** and **spec checker**.
+An agent that checks each candidate Finding against the code and makes the final call on it. On Deep, three Verifiers take different stances: **tracer**, **skeptic** and **spec checker**. Inside a Milestone, a **rebuttal Verifier** (premium tier) decides a fixer's **rebuttal**, its evidence that an open Important is wrong: it dismisses the Finding or upholds it, and an upheld one cannot be rebutted again.
 _Avoid_: judge, triage agent
 
 **Finding**:

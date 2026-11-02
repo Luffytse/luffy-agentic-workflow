@@ -2,6 +2,7 @@
 # Builds the Finder and Verifier briefs for a run of the agentic-review eval, from the current FINDERS.md and VERIFY.md
 # (cut out by brief-lib.sh, which milestone/briefs.sh shares).
 # Usage: briefs.sh [--verify-only] <scratch-repo> <standard|deep> [angle-name angle-name]
+#        briefs.sh --rebuttal <scratch-repo>
 # <scratch-repo> is the directory setup.sh built. The briefs go to <scratch-repo>.briefs/<depth>/ (or
 # <depth>-verify-only/), a sibling of the scratch repo, so no agent working in the scratch repo can find them.
 # A full run writes: shared.md, finder-standards.md, finder-spec.md, finder-adversarial-1.md and finder-adversarial-2.md;
@@ -11,13 +12,18 @@
 # the candidate Findings go, because they exist only after the Finders have run.
 # --verify-only writes just the Verifier briefs for the Verify-only check, with VERIFY-ONLY.md pasted in as the
 # candidates (the Finders never get this; build it after, or away from, a full run's agents).
+# --rebuttal writes <scratch-repo>.briefs/rebuttal/rebuttal-<n>.md for the rebuttal check: one per rebuttal in
+# REBUTTALS.md, in its order, each the rebuttal Verifier brief from VERIFY.md word for word, the Review's inputs, the
+# Finding it rebuts (from VERIFY-ONLY.md, by title, given the id R1-<n>) and the rebuttal. One premium-tier Verifier
+# takes each file.
 # Angles default to the ones every run so far used (Standard: bugs and edge cases + security and privacy; Deep: bugs and
 # edge cases + money, numbers and time), so runs stay comparable; pass two angle names from FINDERS.md to change them.
 set -eu
 here="$(cd "$(dirname "$0")" && pwd)"
-verify_only=0
+verify_only=0; rebuttal=0
 if [ "${1:-}" = "--verify-only" ]; then verify_only=1; shift; fi
-scratch="${1:?usage: briefs.sh [--verify-only] <scratch-repo> <standard|deep> [angle angle]}"
+if [ "${1:-}" = "--rebuttal" ]; then rebuttal=1; shift; set -- "${1:-}" standard; fi
+scratch="${1:?usage: briefs.sh [--verify-only|--rebuttal] <scratch-repo> <standard|deep> [angle angle]}"
 depth="${2:?usage: briefs.sh [--verify-only] <scratch-repo> <standard|deep> [angle angle]}"
 case "$depth" in standard|deep) ;; *) echo "depth must be standard or deep" >&2; exit 1 ;; esac
 case "$depth" in
@@ -43,6 +49,7 @@ printf '%s\n' "$review" | grep -q '^- \*\*' ||
 suffix=""
 [ "$verify_only" = 1 ] && suffix="-verify-only"
 out="$scratch.briefs/$depth$suffix"
+[ "$rebuttal" = 1 ] && out="$scratch.briefs/rebuttal"
 mkdir -p "$out"
 
 . "$here/brief-lib.sh"
@@ -62,6 +69,33 @@ $review
 \`\`\`
 
 - The meaning of Important (\`REVIEW.md\` keeps the default): $important"
+
+if [ "$rebuttal" = 1 ]; then
+  brief="$(quoted "$(section "$verify" '### Rebuttal Verifier brief')")"; must "the rebuttal Verifier brief" "$brief"
+  head="$(git -C "$scratch" rev-parse planted)"
+  n=0
+  rm -f "$out"/rebuttal-*.md
+  while IFS= read -r title; do
+    n=$((n + 1))
+    finding="$(awk -v t="### $title" '
+      /^```/ { if (on) { print; exit } buf = $0; next }
+      buf != "" && $0 == t { on = 1; print buf; buf = ""; print; print "- Id: R1-'"$n"'"; next }
+      { buf = "" } on' "$here/VERIFY-ONLY.md")"
+    must "the Finding \"$title\" in VERIFY-ONLY.md" "$finding"
+    text="$(awk -v t="### Rebuttal of: $title" '$0 == t { on = 1; next } on && /^### / { exit } on' "$here/REBUTTALS.md" |
+      sed -e '/./,$!d')"
+    must "the rebuttal of \"$title\"" "$text"
+    {
+      printf '%s\n\n' "$brief"
+      printf '%s\n- The head to judge at: `%s` (branch `planted`), the head of the Round 1 Review that kept the Finding.\n\n' "$inputs" "$head"
+      printf '## The Finding\n\nKept by Round 1'"'"'s Verifier as Important, caused by this change, and still open.\n\n%s\n\n' "$finding"
+      printf '## The rebuttal\n\n%s\n' "$text"
+    } >"$out/rebuttal-$n.md"
+  done < <(sed -n 's/^### Rebuttal of: //p' "$here/REBUTTALS.md")
+  echo "Rebuttal briefs written to $out:"
+  ls "$out"
+  exit 0
+fi
 
 candidates=""
 [ "$verify_only" = 1 ] && candidates="$(tail -n +2 "$here/VERIFY-ONLY.md")" # without its own "# Candidate Findings" title line
