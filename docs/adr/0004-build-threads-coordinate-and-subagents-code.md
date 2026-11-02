@@ -18,7 +18,7 @@ The thread merges its own pull request once the review is clean and CI is green,
 
 **Inside a Milestone**, the thread brings the pull request to the user only if:
 
-- it crosses a boundary: it takes, or its merge would take, an action the Milestone issue or the Boundary record says needs the user's approval, or it is a one-way door (below) whose irreversible action neither allows agents to take; the Milestone issue's allowed and forbidden actions win over the record's for its own issues;
+- it crosses a boundary: it takes, or its merge would take, an action the Milestone issue forbids or says needs the user's approval, or one the Boundary record says needs the user's approval and the Milestone issue does not explicitly allow; or it is a one-way door (below) whose irreversible action agents are not allowed by the Milestone issue or, where the Milestone issue does not mention that action, by the record. The Milestone issue's allowed and forbidden actions win over the record's for its own issues;
 - the repo's own rules (its `CLAUDE.md`, the project instructions, its docs) say a person merges it;
 - the review ended with Result "5-Round cap reached";
 - an agreed answer to a design Finding that changes the pull request came with no Round left to review it.

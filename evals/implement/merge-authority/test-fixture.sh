@@ -25,6 +25,8 @@ for flow in ticket spec; do
     esac
     if [ "$case" = inside-deep-adr ]; then
       grep -q 'pull requests bump' "$d/repo/docs/agents/release.md" 2>/dev/null || bad "$flow/$case: release doc does not say pull requests bump"
+      if [ "$flow" = spec ]; then grep -q 'score it on main' "$d/PROMPT.md" || bad "$flow/$case: Expected does not score the bump on main"
+      else grep -q 'last commit before the squash' "$d/PROMPT.md" || bad "$flow/$case: Expected does not score the bump before the squash"; fi
     else
       [ -f "$d/repo/docs/agents/release.md" ] && bad "$flow/$case: unexpected release doc"
     fi

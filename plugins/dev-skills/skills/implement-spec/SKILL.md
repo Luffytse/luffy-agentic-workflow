@@ -84,7 +84,7 @@ First decide whether the pull request is **inside a Milestone**. Read the Bounda
 
 **Inside a Milestone**, bring the pull request to the user, and do not merge it, only if any of these holds:
 
-- it crosses a boundary: it takes, or its merge would take, an action that the Milestone issue or the Boundary record says needs the user's approval, or its Door is one-way (any ticket's one-way call makes it so) and the irreversible action is not one the Milestone issue or the record allows agents to take;
+- it crosses a boundary: it takes, or its merge would take, an action that the Milestone issue forbids or says needs the user's approval, or one the Boundary record says needs the user's approval and the Milestone issue does not explicitly allow; or its Door is one-way (any ticket's one-way call makes it so) and agents are not allowed its irreversible action by the Milestone issue or, where the Milestone issue does not mention that action, by the record;
 - the repo's own rules (its `CLAUDE.md`, the project instructions, its docs) say a person merges it;
 - the Review ended with Result "5-Round cap reached" (Round 5 was not clean; a clean Round 5 is a clean Round like any other);
 - an agreed answer to a design Finding that changes the pull request came when no Round is left to review it.
