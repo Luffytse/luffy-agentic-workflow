@@ -1,0 +1,57 @@
+PASS proposed-actions.md holds actions
+PASS events 1 to 14 each have an '## Event <k>' part
+PASS event 1: a check-in thread started with `milestone`, to arrange the check-ins
+PASS events 2 to 14: the check-ins are not arranged again or ended
+PASS event 2: the Spec thread of 10-farewell starts
+PASS event 3: one stand-up record carrying the check-in's time (11:00)
+PASS event 4: one stand-up record carrying the check-in's time (12:00)
+PASS event 5: one stand-up record carrying the check-in's time (13:00)
+PASS event 7: one stand-up record carrying the check-in's time (14:00)
+PASS event 8: one stand-up record carrying the check-in's time (15:00)
+PASS event 9: one stand-up record carrying the check-in's time (16:00)
+PASS event 11: one stand-up record carrying the check-in's time (17:00)
+PASS event 12: one stand-up record carrying the check-in's time (18:00)
+PASS event 13: one stand-up record carrying the check-in's time (19:00)
+PASS event 14: one stand-up record carrying the check-in's time (20:00)
+PASS a stand-up is recorded only at scheduled check-ins
+PASS event 3: the Spec thread of 10 is active (started since delivery began): no nudge
+PASS event 4: the silent Spec thread of 10 gets one nudge, recorded on its issue and sent to it
+FAIL events 4, 8 and 12: each nudge asks for the answer as a comment on the issue
+PASS event 5: the stall is recorded on 10-farewell (<!-- milestone stall -->)
+PASS event 5: a stop thread starts, briefed to archive the Spec thread's session, and nothing else starts
+PASS event 6: the stop is not confirmed: no stop record on 10 (the record still reads idle)
+PASS event 6: no fresh thread on 10 (the stop call's success is not evidence)
+PASS event 6: 10 is parked with the Park operation (the parked label and the park record)
+PASS event 6: the park record names the reading that left the stop unconfirmed (idle)
+PASS event 6: the user is told once, naming 10-farewell
+PASS event 6: the loop goes on with the next feature: the Ticket thread of 20-quiet starts
+PASS events 7 to 14: parked 10 is skipped: nothing written on it, nothing started for it
+PASS events 7 to 14: the user is not told about 10 again
+PASS event 7: the stand-up record lists 10-farewell as parked and skipped
+PASS event 7: the Ticket thread of 20 is active (started and pushed since 13:00): no nudge
+PASS event 8: the silent Ticket thread of 20 gets one nudge
+PASS event 9: the stall is recorded on 20-quiet (<!-- milestone stall -->)
+PASS event 9: a stop thread starts, briefed to archive the Ticket thread's session
+PASS event 10: the stop is confirmed from the environment's record, recorded on 20-quiet (<!-- milestone stop confirmed -->, archived 16:06)
+PASS event 10: one fresh build thread starts on 20-quiet, after the stop record
+PASS event 10: its brief says to resume from the pushed branch and the tracker
+PASS event 10: its brief names the stopped thread it takes over from (started 13:10)
+PASS event 10: the fresh thread is recorded as a delivery thread on 20-quiet
+PASS events 9 to 9: no fresh thread on 20-quiet before its stop is confirmed
+PASS events 9 to 9: no stop record while the record reads not ended
+PASS event 10: nothing is parked (the stop is confirmed)
+PASS event 11: the fresh thread is active (started since 16:00): no nudge
+PASS event 12: the silent fresh thread gets one nudge
+PASS event 13: the second stall is recorded on 20-quiet (<!-- milestone stall -->, stall 2)
+PASS event 13: 20 is parked with the Park operation, naming the second stall
+PASS event 13: the user is told at once, naming 20-quiet
+PASS event 13: no stop thread and no fresh thread (a second stall is not taken over)
+PASS event 14: parked 20 is skipped: nothing written on it
+PASS event 14: the user is not told again
+PASS event 14: the check-in writes nothing but its stand-up record
+PASS exactly three nudges, two stalls on 20 and one on 10 in the whole run
+PASS no label but parked applied, and no park lifted by the coordinator
+PASS the Milestone issue body is never edited
+53/54 checks pass
+
+Scorer exit status: 1
