@@ -1,0 +1,5 @@
+interface:
+  display_name: "Milestone"
+  short_description: "Verify this environment can run a Milestone unattended"
+policy:
+  allow_implicit_invocation: true
