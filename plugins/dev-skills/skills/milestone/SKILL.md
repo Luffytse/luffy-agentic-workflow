@@ -165,7 +165,7 @@ Delivery does not start until the user says how to go on. With every essential c
 
 ## Delivery
 
-Delivery starts only when both hold: planning has settled, and the Startup verification result comment on the Milestone issue reads `Verdict: ready`. Until then nothing is built, labelled for a Release or started as a build thread for this Milestone; a `not ready` verdict waits on the user, as Step 7 of Startup verification says.
+Delivery starts only when both hold: planning has settled, and the latest Startup verification result comment on the Milestone issue reads `Verdict: ready`. Until then nothing is built, labelled for a Release or started as a build thread for this Milestone; a `not ready` verdict waits on the user, as Step 7 of Startup verification says, until the user orders a rerun or says to go on, which the coordinator records as a comment on the Milestone issue quoting the user before delivery starts, naming each failed capability it starts without.
 
 The coordinator then runs delivery as a **loop**. Each time it wakes (delivery starting, a thread reporting or asking, a scheduled check-in, the user writing), it reads the state afresh, as "Read the state" says, and takes every step below that the state calls for: first what the wake brings to steps 3 and 4 (a number to hand out, a merge to check, a re-read), then step 5, then steps 1 and 2. What a thread says it did is a reason to read, never the state itself. The project's own instructions add only what is the project's: its thread limit, its model tier map, what else a brief carries, and its own extra rules; where they say nothing, this loop is the whole job. Checking in on a thread that has gone quiet, and taking over from it, are not part of this skill yet.
 
