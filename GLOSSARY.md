@@ -68,6 +68,9 @@ _Avoid_: sprint, version bump
 The step that picks the next Release's goal and features: the agent proposes, the user decides, and only approved issues get the label.
 _Avoid_: release triage
 
+**Triage batch**:
+Inside a Milestone (a Boundary record naming a Milestone label form and an open Milestone issue), the run of `triage` that the caller makes at the end of a Release: agents decide every open `needs-triage` issue against the Milestone without asking the user per issue, record each decision on the issue, and post one `## Triage batch` summary comment on the release issue for the Milestone review. A blocker of a feature being built now and a security or data-loss risk are triaged at once instead: one issue, any time inside a Milestone, by whoever sees it, with no Release named, and listed in the next batch's summary; a decision that crosses a boundary or changes the Milestone's agreement goes to the user. Outside a Milestone `triage` waits on the user as before.
+
 **Release thread**:
 A project thread that cuts a Release (its `CHANGELOG.md` entry, the whole-Release check and, where the release doc says Releases bump, the bump pull request) and then runs the next Release planning, with the `release` skill.
 
