@@ -103,7 +103,7 @@ Base: `301d551d28ef4915efeb5ec3521ea7b0aa68c10b` (branch `claude/project-thread-
 | P3 | yes | Important | n/a | 3 of 3; `split.py:27` |
 | P4 | yes | Pre-existing | n/a | raised by both adversarial Finders; 3 of 3 real and Pre-existing; `money.py:6` |
 | P5 | yes | Important | yes | 3 of 3 Important, each citing the spec's every-doc-index line; `index.md:6`, `splitting.md:1`, `money.md:1` (tracer gave the missing lines as `index.md:7`, outvoted on location) |
-| P6 | yes | Nit (fix) | n/a | 3 of 3 Nit (fix), lowering the Standards Finder's Important; `cli.py:7`, Bug class "public function without a docstring"; the Standards Finder's Always check section lists the line as broken by it |
+| P6 | yes | Nit (fix) | n/a | 3 of 3 Nit (fix), lowering the standards Finder's Important; `cli.py:7`, Bug class "public function without a docstring"; the standards Finder's Always check section lists the line as broken by it |
 | F1 | never raised | | | |
 | F2 | never raised | | | |
 | K1 | yes | Nit (skip) | n/a | raised by both adversarial Finders; 3 of 3 keep, Nit (skip); `split.py:17-19` |
@@ -123,7 +123,7 @@ Base, skill text and driver as the Deep run above, on the same scratch repo: fou
 | P3 | yes | Important | n/a | `split.py:27` |
 | P4 | yes | Pre-existing | n/a | raised by the bugs-and-edge-cases Finder, which ran `parse_amount("0.29")` and got 28; `money.py:6` |
 | P5 | yes | Important | yes | Verifier cited the spec's every-doc-index line, overruling an adversarial Finder's Nit; `index.md:6`, `money.md:1`, `splitting.md:1` |
-| P6 | yes | Nit (fix) | n/a | lowered from the Standards Finder's Important; `cli.py:7`, Bug class "public function without a docstring"; the Standards Finder's Always check list shows the line broken by it |
+| P6 | yes | Nit (fix) | n/a | lowered from the standards Finder's Important; `cli.py:7`, Bug class "public function without a docstring"; the standards Finder's Always check list shows the line broken by it |
 | F1 | never raised | | | |
 | F2 | never raised | | | |
 | K1 | yes | Nit (skip) | n/a | raised by the spec Finder (Nit, unsure) and the bugs Finder (Important, unsure); `split.py:18-19` |
@@ -134,7 +134,7 @@ Pass: yes. All six planted cases at accepted Severities and locations; P4 found 
 
 ### 2026-11-02, dev-skills 0.29.0, Convergence check
 
-Base: `3817c93e3ef06f1e0b59b3f943142577b2d9af54` (branch `ticket-440`, version left at 0.29.0 as on main; one later wording fix in `ROUNDS.md`, "A Finding has also returned", is not in the copy the runs read). Driven by the Ticket's Implementer: each fixture built with `convergence/make-fixture.sh`, the text between the lines of its `PROMPT.md` given to a fresh headless top-level session on the premium tier (`claude -p`, edits allowed, working directory the fixture repo), with `<checkout>` set to a copy of `plugins/` alone, so `EXPECTED.md` and the Expected line stayed out of reach. No subagents (Find and Verify given).
+Base: `3817c93e3ef06f1e0b59b3f943142577b2d9af54` (branch `ticket-440`, version left at 0.29.0 as on main; later changes to `ROUNDS.md`, including the resumed-record rule and rebuttal counting, are not in the copy the runs read). Driven by the Ticket's Implementer: each fixture built with `convergence/make-fixture.sh`, the text between the lines of its `PROMPT.md` given to a fresh headless top-level session on the premium tier (`claude -p`, edits allowed, working directory the fixture repo), with `<checkout>` set to a copy of `plugins/` alone, so `EXPECTED.md` and the Expected line stayed out of reach. No subagents (Find and Verify given).
 
 | run | Expected | Got | Pass? | Notes |
 |-----|----------|-----|-------|-------|
@@ -147,7 +147,7 @@ False matches: none (R3-2, R3-3 and R2-2 not counted).
 
 Baseline: the two inside runs on the unchanged skill (main's `agentic-review` at 0.29.0), driven the same way, both failed: returned noted that R3-1 is R1-1 back but planned Round 4; flip did not hold R2-1 under R1-1 and went on to Round 3. No attempt record in either.
 
-Not exercised: the late design Round, an attempt ended at Round 5, and a Finding that returns from an earlier attempt record (the flip run checked only that a different claim does not).
+Not exercised: the late design Round, an attempt ended at Round 5, the resumed-record rule, and a Finding that returns from an earlier attempt record (the flip run checked only that a different claim does not).
 
 Pass: yes.
 
