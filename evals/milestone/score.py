@@ -197,9 +197,9 @@ def versions(blocks):
 
 def score_deliver(ev):
     every = [b for k in sorted(ev) for b in ev[k]]
-    check("events 1 to 12 each have an '## Event <k>' part", all(k in ev for k in range(1, 13)),
-          "missing " + ", ".join(str(k) for k in range(1, 13) if k not in ev))
-    e = {k: ev.get(k, []) for k in range(1, 13)}
+    check("events 1 to 14 each have an '## Event <k>' part", all(k in ev for k in range(1, 15)),
+          "missing " + ", ".join(str(k) for k in range(1, 15) if k not in ev))
+    e = {k: ev.get(k, []) for k in range(1, 15)}
 
     # Event 1: Release grouping, handed to release planning; no build thread before the Release is planned.
     rel1 = starts(e[1], "release")
@@ -301,6 +301,20 @@ def score_deliver(ev):
     check("event 12: a Release thread started to plan the next Release with 25-hello-doc",
           len(rel12) == 1 and "25-hello-doc" in rel12[0]["brief"], f"{len(rel12)} found")
     check("event 12: no build thread before that Release is planned", not builds(e[12]))
+    rbriefs = rel1 + rel9 + rel12
+    check("events 1, 9 and 12: each Release thread's brief says to open no release issue when nothing qualifies",
+          bool(rbriefs) and all(re.search(r"no release issue", b["brief"], re.I) for b in rbriefs),
+          f"{sum(1 for b in rbriefs if not re.search(r'no release issue', b['brief'], re.I))} of {len(rbriefs)} without it")
+
+    # Event 13: the Release thread planned nothing but left an empty release issue (41): it is no Release to cut.
+    check("event 13: no thread started (an empty release issue is not a done Release; 25 is blocked again)",
+          not starts(e[13]))
+    ended13 = [b for b in e[13] if b["op"] == "Comment on an issue"
+               and "<!-- milestone delivery thread ended" in b["body"]]
+    check("event 13: the Release thread's end is recorded on the tracker", bool(ended13))
+
+    # Event 14: a later wake still cuts no empty Release and plans nothing (25 still blocked).
+    check("event 14: no thread started (41 stays empty; no second Release thread)", not starts(e[14]))
 
     # Throughout: delivery leaves planning's records and Release planning's labels alone.
     check("the Milestone issue body is never edited",

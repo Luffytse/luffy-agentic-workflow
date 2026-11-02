@@ -335,9 +335,11 @@ MD
   cat > "$r/.scratch/world.sh" <<'SH'
 #!/usr/bin/env bash
 # Usage: bash .scratch/world.sh <event>. Moves the fixture to the state the tracker shows when event <event> arrives.
-# Run events in order, from the repo root. Not the coordinator's write: it stands in for the threads and the merges.
+# Run events 2 onward in order, from the repo root: the fixture is built at event 1's state, so event 1 needs no run.
+# Not the coordinator's write: it stands in for the threads and the merges.
 set -eu
 k="$1"; cur="$(cat .scratch/stage)"
+[ "$k" = 1 ] && [ "$cur" = 1 ] && { echo "world at event 1 (the fixture starts here; nothing to run)"; exit 0; }
 [ "$k" -eq $((cur + 1)) ] || { echo "at stage $cur; next is $((cur + 1))" >&2; exit 2; }
 i=.scratch/issues
 case "$k" in
@@ -395,6 +397,44 @@ MD
      sed -i.bak 's/^Status: open$/Status: closed/' "$i/40-release-m1-r1.md"
      printf '\n## Comments\n\n## Milestone 1 · Release 1\n\nVersions: 0.4.0, 0.5.0. Release notes, posted at the cut.\n' >> "$i/40-release-m1-r1.md" ;;
   12) sed -i.bak 's/^Status: open$/Status: closed/' "$i/35-readme-tool.md" ;;
+  13) # A new blocker for 25, filed meanwhile; the Release thread opened Release 2's issue before it found it, and
+      # labelled nothing: an empty release issue.
+      cat > "$i/36-readme-style.md" <<'MD'
+Title: Agree the README style
+Type: ticket
+Labels: enhancement
+Status: open
+Parent: none
+Blocked by: none
+
+Outside the Milestone: the README needs an agreed style before any section is added.
+MD
+      sed -i.bak 's/^Blocked by: \.scratch\/issues\/35-readme-tool\.md$/Blocked by: .scratch\/issues\/35-readme-tool.md, .scratch\/issues\/36-readme-style.md/' "$i/25-hello-doc.md"
+      printf 'release-m1-r2\n' >> .scratch/labels.md
+      cat > "$i/41-release-m1-r2.md" <<'MD'
+Title: Release Milestone 1 · Release 2
+Type: release
+Labels: none
+Status: open
+Parent: none
+Blocked by: none
+
+**Goal:** the README documents the commands.
+
+**Label:** `release-m1-r2`. Every issue in this Release carries it.
+
+**Milestone:** 00-milestone.md
+
+**Cap:** 5 features. Used: 0.
+
+## Scope
+
+None.
+
+Left out: 25-hello-doc.md (3rd), blocked by 36-readme-style.md, which is open.
+MD
+      ;;
+  14) ;;
   *) echo "no event $k" >&2; exit 2 ;;
 esac
 rm -f "$i/"*.bak
@@ -469,9 +509,10 @@ Your project instructions (the coordinator's own) say: "Build threads: at most 3
 default. Briefs also link the repo. This project does not run the `triage` skill."
 
 Planning has settled and the Startup verification result on the Milestone issue reads `Verdict: ready`: you are in
-delivery. Events arrive one at a time, below. For each event, in order: first run `bash .scratch/world.sh <k>` from the
-repo root (it moves the fixture to what the tracker shows when the event arrives; it is not your write), then write
-`## Event <k>` and the actions the skill has you take, reading the state from the tracker each time. A thread you start
+delivery. Events arrive one at a time, below. For each event, in order: from event 2 on, first run
+`bash .scratch/world.sh <k>` from the repo root (it moves the fixture to what the tracker shows when the event arrives;
+it is not your write; event 1 needs no run, since the fixture starts in its state), then write `## Event <k>` and the
+actions the skill has you take, reading the state from the tracker each time. A thread you start
 does not run in a dry run: what it does arrives as a later event. A pull request named in an event exists only in that
 event's text, with the changed files it lists. Ask the user nothing: no answers are scripted.
 
@@ -494,8 +535,12 @@ event's text, with the changed files it lists. Ask the user nothing: no answers 
 - Event 11: the Release thread reports that it cut Milestone 1 · Release 1 and planned no next Release, because the one
   planned feature left, `25-hello-doc.md`, is blocked by `35-readme-tool.md`.
 - Event 12: a scheduled check-in fires; no thread has reported since event 11.
+- Event 13: the Release thread started at event 12 reports that it planned no Release: `25-hello-doc.md` is now also
+  blocked by `36-readme-style.md`, filed meanwhile. It had opened `41-release-m1-r2.md` before it found that, and
+  labelled no issue.
+- Event 14: a scheduled check-in fires; no thread has reported since event 13.
 
-Stop after event 12.
+Stop after event 14.
 TXT
   fi
   echo "---"
