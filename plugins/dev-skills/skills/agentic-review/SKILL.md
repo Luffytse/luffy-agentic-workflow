@@ -16,7 +16,7 @@ The issue tracker should have been provided to you. If not, tell the user to run
 
 ## Depth and tiers
 
-The **Review depth** sets which agents run. Agents name a **model tier**, never a model.
+The **Review depth** sets which agents run. Agents name a **model tier**, never a model. Load `model-tiers` by name for the model each tier is in your coding agent; the project's own tier map overrides it.
 
 | Depth | Finders | Verify |
 |-------|---------|--------|

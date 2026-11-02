@@ -21,7 +21,7 @@ Matt Pocock's public skills repo (`mattpocock/skills`), where the `dev-skills` s
 _Avoid_: original, source
 
 **Model tier**:
-How strong a model a step needs: **cheap**, **regular**, or **premium**. Each agent maps the tiers to its own models, so a skill names a tier and never a vendor's model.
+How strong a model a step needs: **cheap**, **regular**, or **premium**. Each agent maps the tiers to its own models, so a skill names a tier and never a vendor's model. The plugin's default map is the `model-tiers` skill (one column per coding agent); a project's own map overrides it (ADR 0002).
 _Avoid_: model size, model class
 
 **Model-invoked skill**:

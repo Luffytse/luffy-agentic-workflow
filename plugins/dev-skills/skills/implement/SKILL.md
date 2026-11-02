@@ -24,7 +24,7 @@ Give the Implementer its own git worktree on the Ticket branch, so nothing you d
 
 ## 3. Start one Implementer
 
-Start **one Implementer** subagent on the ticket's tier. Brief it with pointers, not copies:
+Start **one Implementer** subagent on the ticket's tier. Load `model-tiers` by name for the model each tier is in your coding agent; the project's own tier map overrides it. Brief it with pointers, not copies:
 
 - the ticket link, its worktree path and the Ticket branch, and that it commits there and works only in that worktree, running every git command as `git -C <path> ...` (a shell may start each command back in your checkout);
 - the worktree is a fresh checkout and may need its dependencies installed again;

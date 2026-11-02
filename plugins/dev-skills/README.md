@@ -90,6 +90,7 @@ To add a skill, create `skills/<name>/SKILL.md` and `skills/<name>/agents/openai
 
 ## Skills added since the copy
 
+- `model-tiers`: a Base skill holding the plugin's default map from Model tier to each coding agent's models; loaded by any skill that runs a step or subagent on a tier, overridden by a project's own map.
 - `review-record`: a Base skill for shared review comment meaning; loaded by review writers and retro readers. Review orchestration and retro preventive-check work stay with their workflows.
 - `issue-absorption`: a Base skill owning source-report records and lifecycle meaning, loaded by Ticket writers, planning readers and closing-line/closure consumers. Tracker operations remain in project configuration.
 
@@ -100,15 +101,7 @@ To add a skill, create `skills/<name>/SKILL.md` and `skills/<name>/agents/openai
 
 ## Model tiers
 
-Skills name a tier, never a model ([ADR 0002](../../docs/adr/0002-skills-name-model-tiers-not-models.md)). The table maps tiers to each agent's models:
-
-| Tier | Claude Code model | Codex model | Use for |
-|------|-------------------|-------------|---------|
-| cheap | Haiku | `gpt-6-luna` | trivial jobs: running tests, simple checks |
-| regular | Sonnet | `gpt-6.1-sol` | most implementation work |
-| premium | Opus | `gpt-6-astra` | planning, grilling, heavy or tricky work |
-
-The Codex mapping is our recommendation based on the [official Codex models documentation](https://learn.chatgpt.com/docs/models), checked 2026-10-31: focused tasks, sustained complex work, and the hardest reasoning respectively. Availability depends on the account, client and workspace settings. In Codex, select a table entry with `codex -m <model>` or `/model` in an interactive session. A new model generation changes this table only.
+Skills name a tier, never a model ([ADR 0002](../../docs/adr/0002-skills-name-model-tiers-not-models.md)). The `model-tiers` skill (`skills/model-tiers/SKILL.md`) holds the map from each tier to each coding agent's models, and is the only place in the plugin that names them; a project's own map overrides it. A new model generation changes that file only.
 
 ## Credits and Upstream
 

@@ -13,7 +13,7 @@ class SkillLoadingPackaging(unittest.TestCase):
         self.addCleanup(self.temp.cleanup)
         self.repo = pathlib.Path(self.temp.name) / "repo"
         source = pathlib.Path(__file__).resolve().parents[1]
-        shutil.copytree(source, self.repo, ignore=shutil.ignore_patterns(".git", "__pycache__"))
+        shutil.copytree(source, self.repo, symlinks=True, ignore=shutil.ignore_patterns(".git", "__pycache__"))
         self.skill = self.repo / "plugins/dev-skills/skills/fixture-contract"
         (self.skill / "agents").mkdir(parents=True)
         self.write_skill("user-invocable: false\n")
@@ -64,6 +64,28 @@ class SkillLoadingPackaging(unittest.TestCase):
     def test_missing_boundary_record_fails(self):
         (self.repo / "docs/agents/boundaries.md").unlink()
         self.check(1)
+
+    def plant(self, rel, text="Run it on Son" + "net.\n"):
+        with open(self.repo / rel, "a") as f:
+            f.write("\n" + text)
+
+    def test_model_name_in_readme_fails(self):
+        self.plant("plugins/dev-skills/README.md")
+        self.check(1)
+
+    def test_model_name_in_other_skill_fails(self):
+        self.plant("plugins/dev-skills/skills/implement/SKILL.md")
+        self.check(1)
+
+    def test_model_tiers_reference_is_exempt(self):
+        self.plant("plugins/dev-skills/skills/model-tiers/SKILL.md")
+        self.check(0)
+
+    def test_every_tier_naming_skill_points_at_the_map(self):
+        skills = self.repo / "plugins/dev-skills/skills"
+        for name in ["implement", "implement-spec", "agentic-review", "to-tickets",
+                     "release", "retro-planning", "setup-project"]:
+            self.assertIn("model-tiers", (skills / name / "SKILL.md").read_text(), name)
 
     def cite(self, text):
         (self.skill / "SKILL.md").write_text(

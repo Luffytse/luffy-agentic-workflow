@@ -167,14 +167,14 @@ for y in "$skills"/*/agents/openai.yaml; do
 done
 
 # vendor-model-names: no vendor model names in the repo's text (ADR 0002): skills name cheap, regular or
-# premium tiers. The README tier table, this script and ADR 0002 (which define the tiers by naming the models) are exempt.
+# premium tiers. The tier map in the `model-tiers` skill (the plugin's one place that names the models) and this script are exempt.
 plugin_rel="plugins/dev-skills"
 # NUL-separated file list and a check on grep's output (not xargs' exit code), so file
 # names with spaces and multi-batch xargs runs cannot hide a match.
 hits="$(cd "$repo" && find . -type f -not -path './.git/*' \
-  -not -path "./$plugin_rel/README.md" \
+  -not -path "./$plugin_rel/skills/model-tiers/SKILL.md" \
   -not -path './scripts/check-plugin.sh' -not -path './LICENSE*' \
-  -not -path "./$plugin_rel/LICENSE-mattpocock-skills" -not -path './docs/adr/0002-*' -print0 |
+  -not -path "./$plugin_rel/LICENSE-mattpocock-skills" -print0 |
   xargs -0 grep -nIiE '\b(haiku|sonnet|opus)\b|claude[-_]?(opus|sonnet|haiku|[0-9])|\bgpt-?[0-9]|\bgemini\b')"
 if [ -n "$hits" ]; then
   echo "$hits"

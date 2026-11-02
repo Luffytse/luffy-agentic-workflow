@@ -1,0 +1,5 @@
+interface:
+  display_name: "Model Tiers"
+  short_description: "Map model tiers to each agent's models"
+policy:
+  allow_implicit_invocation: true

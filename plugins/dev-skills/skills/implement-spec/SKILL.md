@@ -33,7 +33,7 @@ Create the Spec branch from an up-to-date main and push it. Keep your own checko
 Run at most **3 Implementers at once**, counting every Implementer that is working: building a ticket, fixing Findings or conflicts, or on the Spec branch. Before starting or resuming one, wait for a free slot. For each frontier ticket, when a slot is free:
 
 1. Make its worktree yourself: `git worktree add <path> -b <ticket-branch> <spec-branch>`, with `<path>` outside your checkout. Claude Code's own subagent worktrees start only from the default branch or HEAD, so don't use them. The Ticket branch stays local and is **never pushed** (a pushed branch would have to be deleted afterwards, and where the remote cannot delete branches they would pile up).
-2. Start one Implementer on the ticket's tier. Brief it with pointers, not copies:
+2. Start one Implementer on the ticket's tier. Load `model-tiers` by name for the model each tier is in your coding agent; the project's own tier map overrides it. Brief it with pointers, not copies:
    - the ticket link, its worktree path and Ticket branch, and that it commits there and never pushes, running every git command as `git -C <path> ...` (a shell may start each command back in your checkout);
    - start at `docs/index.md`, plus the exploration notes if any;
    - the worktree is a fresh checkout and may need its dependencies installed again;

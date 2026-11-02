@@ -41,7 +41,7 @@ codex plugin add dev-skills@luffy-dev
 codex plugin list --marketplace luffy-dev --json
 ```
 
-The list should show `dev-skills` installed and enabled. Start a new Codex session to load the skills. See the [dev-skills Model tiers](plugins/dev-skills/README.md#model-tiers) for model selection.
+The list should show `dev-skills` installed and enabled. Start a new Codex session to load the skills. See the [model-tiers skill](plugins/dev-skills/skills/model-tiers/SKILL.md) for the tier-to-model map used for model selection.
 
 ## Update
 

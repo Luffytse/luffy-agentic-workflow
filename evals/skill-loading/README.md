@@ -6,7 +6,7 @@ Run this manual behavioral check before migrating shared contracts, and after ch
 
 Follow the isolated-home/authentication and GitHub installation procedure in [the install check](../codex-install/README.md), selecting the current remote Spec ref and recording the immutable SHA actually fetched. For #360 the ref is `codex/spec-348-shared-base`. Require the actual candidate containing #363, not a live or copied published cache. Start with an empty home and preserve the live installation. Compare the installed plugin files with the fetched source, recording mismatches before running any session.
 
-Use the regular Codex tier from the candidate plugin README, provider `openai`, with fallback disabled. Every runtime uses the same isolated `CODEX_HOME`; each case has a separate fixture directory and new app-server process. Supplementary fixtures live outside the installed plugin cache. Copy only the relevant folder(s) from `fixtures/` into each case's `.agents/skills/`.
+Use the regular Codex tier from the candidate plugin's `model-tiers` skill, provider `openai`, with fallback disabled. Every runtime uses the same isolated `CODEX_HOME`; each case has a separate fixture directory and new app-server process. Supplementary fixtures live outside the installed plugin cache. Copy only the relevant folder(s) from `fixtures/` into each case's `.agents/skills/`.
 
 ## Workflow case
 
