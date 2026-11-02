@@ -2,6 +2,23 @@
 
 One entry per run, newest first. Rerun when `agentic-review` changes, and record the plugin version from `plugins/dev-skills/.claude-plugin/plugin.json`. An entry written inside an open pull request names the commit and plugin version it ran on as its base; anything that happens after the entry's last commit (later Rounds, merges, the merge itself) is recorded on the pull request, not in the file.
 
+### 2026-11-02, base dev-skills 0.44.0, merge-only depth summary
+
+Base: main `0c35d65`; green used that base with the working-tree Round-comment Depth summary changed to point to its existing Merge-only Rounds owner. The coordinator drove two fresh regular-tier Codex agents (`red_probe` and `green_probe`) with the [bounded decision prompt](merge-depth/README.md); scoring expectations were withheld. The summary entry point was isolated: agents followed its pointers rather than repairing contradictions from unreferenced text; the owner section was supplied for pointer lookup and the following-Round continuation.
+
+Each cell records the returned run depth / marker `depth=` / heading depth; every heading had the shape `## Code review: Round <n> of at most 5 (<depth>)`.
+
+| Case | Expected | Red: original summary | Green: owner pointer |
+| --- | --- | --- | --- |
+| A: spelling and cross-reference | Quick | Quick / Quick / Quick | Quick / Quick / Quick |
+| B: shell check exit-code behavior | Deep | Quick / Quick / Quick — fail | Deep / Deep / Deep |
+| C: Markdown rule changes merge authority | Deep | Quick / Quick / Quick — fail | Deep / Deep / Deep |
+| Following ordinary Round 4 | Deep, from ordinary Round 2 | Deep / Deep / Deep, from Round 2 | Deep / Deep / Deep, from Round 2 |
+
+Red failed B/C before the fix. Green passed every row after the pointer fix; the existing owner rule supplies the logic exception without changing its semantics. `bash scripts/check-plugin.sh`, `claude plugin validate .` and `git diff --check` passed on the changed worktree. Not visual; Door: two-way, since the changes are git-only text and a revert undoes them.
+
+Limits: these were decisions over supplied scenarios and passages, not live merges or Review execution. No actual conflict resolutions, posted Round comments, Find/Verify, installed-runtime loading, mixed merge/fix ranges or late-design budget paths were exercised. The full planted Standard/Deep fixture suites were not rerun for this bounded summary fix. Later Rounds and final version allocation belong to the pull request record, not this base-version entry.
+
 ## Template
 
 ```

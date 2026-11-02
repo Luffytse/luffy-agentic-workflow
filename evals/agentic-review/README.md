@@ -64,6 +64,10 @@ The fixture, built by [`milestone/make-fixture.sh`](milestone/make-fixture.sh), 
 5. **Decision-level runs** (optional, both cases): give a fresh top-level session that can start subagents the text between the lines of `<out-dir>/PROMPT.md`, with its working directory at `<out-dir>/repo` and `<checkout>` replaced by this checkout's path. Keep `PROMPT.md`'s Expected line away from it.
 6. Score with `milestone/EXPECTED.md` and add an entry to `RESULTS.md` with the Milestone-agreement template there, saying which parts ran and how they were driven.
 
+## Merge-only depth summary check
+
+The bounded [merge-depth decision probe](merge-depth/README.md) checks the Round-comment summary entry point: wording-only versus logic or rule-meaning resolutions, matching marker and heading, and carried depth in the following ordinary Round. Rerun when that summary or its owner pointer changes. It does not run a merge or a full Review.
+
 ## Convergence check
 
 Inside a Milestone and outside one alike, does a Review notice a Finding that returns after its fix, or a fix that flips back, end the attempt with the right Result, write the attempt record on the issue, file its Pre-existing Findings and report `restart` (no earlier attempt record) or `park` (one); and does it leave a different claim on the same lines alone? Rerun it whenever `agentic-review`'s Rank, Round loop or "When a review will not settle" rules (`ROUNDS.md`), or the `review-record` Result values or attempt-record shape, change. Scoring: [`convergence/EXPECTED.md`](convergence/EXPECTED.md).
