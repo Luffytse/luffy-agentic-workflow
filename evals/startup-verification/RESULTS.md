@@ -19,6 +19,46 @@ Pass: yes | no. Lessons: <what to change in the skill, if anything>
 
 ## Runs
 
+### 2026-11-02, commit 6b9183e158e4cf1f62c9676f6963ab89e2f58bcf (base), dev-skills 0.38.0 (base): Claude Code cloud project, real run of all four probes
+
+Runner: the Ticket thread of #474 (session `session_REMOVED`, created 2026-11-02T10:16:03Z, child of the coordinator session), running the probes by hand from the skill text on branch `claude/project-thread-pqls03` at ff80455, not as a verification thread started with the skill. The probe was split, as that text's "Who runs it" allows: the coordinator started both worker threads and read the stopped thread's state with its own tools, and the runner took the actions only a thread can take. Tools held, read from each session's tools: the coordinator holds thread start and the session-details call (`get_session`), but no archive, interrupt or scheduling tool (`archive_session`, `interrupt_session`, `send_later`); threads hold `send_later` and `archive_session`. Run: 2026-11-02 10:24:05–10:28:36 UTC.
+Runtime: environment kind `anthropic_cloud` (Claude Code cloud project); permission mode `auto` (session-details call); sandbox on (`IS_SANDBOX=1` in the environment). Runner's probe tools: one-shot scheduling (`send_later`), the scheduled-task list, the session-details and session archive calls, subagent start, tracker read and write.
+Probes (all times UTC on 2026-11-02):
+- Scheduled check-in: `send_later` to the runner's own session at 10:24:17Z, token `sv-checkin-d27275be`, scheduled for 10:27:00Z, trigger `trig_REMOVED`. The check-in arrived carrying the token at 10:28:24Z, 1m24s after the scheduled time, inside the 15-minute bound. Scheduler record: `ROUTINE_RUN_STATUS_SUCCEEDED`, fired 10:28:24Z, `run_once_fired`. Pass. Limits: one-minute granularity; delivery only between the runner's turns; the coordinator itself holds no scheduling tool.
+- Real worker state: a cheap-tier project thread started by the coordinator (session `session_REMOVED`), token `sv-worker-05c0b52b`. The runner read Milestone #396's comments from the tracker at 10:25:11Z: https://github.com/Luffytse/luffy-dev-skills/issues/396#issuecomment-6574778050, created 10:24:36Z, author `Luffytse`. Pass. Limits: the GitHub tool acts as the user, so the token, not the author, ties the comment to the probe.
+- Confirmed stop: a cheap-tier project thread started by the coordinator (session `session_REMOVED`), token `sv-stop-201d00a5`, a background shell loop appending a line every 30 seconds to a file in the project's shared folder (`/mnt/project-files/startup-verification-scratch/`, readable from both containers). Before the stop: session-details call at about 10:25:15Z, `SESSION_STATUS_IDLE` (not ended; the file was still growing). Stop: the runner archived the session with the session archive call at about 10:25:20Z. After: the archive response and the coordinator's own session-details read at about 10:25:30Z, `SESSION_STATUS_ARCHIVED`, bucket COMPLETED; the coordinator noted `updated_at` stayed 10:24:36Z (archiving does not move it). Corroboration only: the file held lines at 10:24:36Z and 10:25:06Z and nothing later, unchanged at 10:26:42Z and 10:28:36Z. Pass. Limits: idle is not ended (the dry run below saw an idle thread keep writing); an archive can be undone by unarchiving, so it stays a stop only while no one unarchives; only a thread holds the archive call, so with this stop a thread takes it while the coordinator reads the record. The scratch file was deleted after the run.
+- Loaded skill version: the runner itself, a fresh thread (session created 10:16:03Z, after main's 6b9183e at 10:14:34Z), invoked `dev-skills:model-tiers`; load path `/root/.claude/plugins/synced/<account>/dev-skills/skills/model-tiers`; loaded 0.38.0; main's manifest 0.38.0 at 6b9183e. Pass. Limits: the account's synced plugin folder; equal version is not equal text (the synced copy differs from main only in front-matter quoting of the `retro-planning` and `setup-project` descriptions).
+Result comment: https://github.com/Luffytse/luffy-dev-skills/issues/396#issuecomment-6574870210 (Verdict: ready)
+Not exercised: a takeover by a fresh thread after the archive (C3, #407); an unarchive; Codex (#475); a verification thread started with the skill (the Ticket thread played the runner); the coordinator scheduling its own check-in (it has no scheduling tool, so the thread is the one that wakes).
+Pass: yes. Lessons: in this environment the stop this run proved is a thread archiving the old thread's session, with the coordinator reading `ARCHIVED` from the session-details call; C3 (#407) takes over by the means startup verification proved, so if it uses a different stop, that stop needs its own probe run; idle is not a stop; the thread list is not evidence (the coordinator's `list_threads` read did not list the probe thread).
+
+### 2026-11-02, commit 6b9183e158e4cf1f62c9676f6963ab89e2f58bcf (base), dev-skills 0.38.0 (base): Claude Code cloud project, planted failure
+
+Runner and runtime: the same runner and settings as the real run above. Only tracker reads are needed for this case.
+Probes: real worker state only. Expected token `sv-planted-3dd1bbb3` on Milestone #396; no worker was asked to write it. The runner read the comments through the tracker at 10:25:31Z and again at 10:26:42Z, more than a minute later. Both reads returned zero comments carrying the token.
+
+Failure report, in the result shape:
+
+```
+| Real worker state | yes | marker token sv-planted-3dd1bbb3 expected on #396; no worker asked to write it (planted) | fail | no comment with token (2 reads, 10:25:31Z and 10:26:42Z); worker said: none | planted case: the token was never meant to be written |
+
+Verdict: not ready: Real worker state
+```
+
+Result comment: not posted separately.
+Not exercised: a real worker, the 10-minute worker wait (there was no worker), or a separate result-comment write.
+Pass: yes, as an eval: tracker evidence made the probe fail, and the verdict names Real worker state.
+
+### 2026-11-02, commit 6b9183e158e4cf1f62c9676f6963ab89e2f58bcf (base), dev-skills 0.38.0 (base): Claude Code cloud project, confirmed-stop research (dry runs)
+
+Runner: the Ticket thread of #474 (same session as above), with the coordinator starting the thread in (b) and reading its state. Not a full run: only the confirmed-stop probe, run twice to choose the worker kind and stop mechanism. The skill text change on this branch rests on (b).
+Probes (all times UTC on 2026-11-02):
+- (a) Subagent: a background cheap-tier subagent, token `sv-stop-7bd1f775`, writing to the runner's scratchpad, started about 10:17:50Z; one line at 10:17:56Z. `TaskStop` at about 10:18:25Z answered success; the harness then delivered a one-time task notification with status `killed`, whose note says the subagent can be resumed by a message. No later readable record exists. The file stayed at 1 line (read 10:18:30Z). Not chosen: delivery takes over threads, not subagents, and a one-time notification to the parent is not a record the coordinator can read.
+- (b) Thread: a cheap-tier project thread started by the coordinator (session `session_REMOVED`), token `sv-stop-368431b9`, a background shell loop appending a line every 30 seconds. Session-details call: `SESSION_STATUS_RUNNING` at about 10:18:35Z, `SESSION_STATUS_IDLE` at about 10:19:45Z while its file kept growing (lines at 10:18:34Z, 10:19:04Z, 10:19:34Z). The session archive call at about 10:19:50Z returned `ARCHIVED`; the coordinator read `ARCHIVED`, bucket COMPLETED, at about 10:20Z. No line after 10:19:34Z (read 10:21:39Z).
+Result comment: none (research only).
+Not exercised: the other three probes; a planted failure.
+Pass: not applicable (research). Lessons: an idle thread is not stopped (its background work keeps writing), so the probe reads "not ended" for running or idle; an archived session is ended, and the session-details call is a record the coordinator can read.
+
 ### 2026-11-02, commit 391ef1ee64fac5896cead088b21f7eef81b6db33 (base), dev-skills 0.35.0 (base): Codex local macOS, real run of all four probes
 
 Runner: the coordinator `/root`, session `01a19af8-3b7d-7b80-8195-f33216674dc0`, running the probes by hand from the checkout's `milestone` skill text. This runner holds the collaboration tools that would start and interrupt delivery workers; the Implementer recording this entry did not run the probes. Run: 2026-11-02T06:35:21.907Z–06:52:04Z.
