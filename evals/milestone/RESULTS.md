@@ -1,6 +1,71 @@
 # Results
 
-One entry per run of the `milestone` skill's dry run (the planning cases and the delivery cases: `deliver`, `deliver-stall`, `deliver-checkin-failed`, `deliver-pause`, `deliver-lift`, `deliver-thread-end`), newest first ([README](README.md) says how to build, run and score it). Record the commit and the plugin version from `plugins/dev-skills/.claude-plugin/plugin.json`; an entry written inside an open pull request names the commit and version it ran on as its base. Each planning run also applies the shape to one real Milestone issue (`score.py --shape`) and names the migration it needs, if any; each `deliver` run also applies the loop, read-only, to one real Milestone and names the thread it would start next and the next Release it would plan.
+One entry per run of the `milestone` skill's dry run (the planning cases and the delivery cases: `deliver`, `deliver-stall`, `deliver-checkin-failed`, `deliver-pause`, `deliver-lift`, `deliver-thread-end`, and the report cases), newest first ([README](README.md) says how to build, run and score it). Record the commit and the plugin version from `plugins/dev-skills/.claude-plugin/plugin.json`; an entry written inside an open pull request names the commit and version it ran on as its base. Each planning run also applies the shape to one real Milestone issue (`score.py --shape`) and names the migration it needs, if any; each `deliver` run also applies the loop, read-only, to one real Milestone and names the thread it would start next and the next Release it would plan.
+
+## 2026-11-02 — Ticket #408: report and stop for review
+
+Base: main `d0c387e`, plugin **0.41.0** in both manifests throughout these runs.
+The candidate is the source skill in this entry's commit, not an installed-plugin
+load. Six coordinator-dispatched fresh premium-tier Codex subagents (`fork_turns:
+none`) received only their fixture prompt/read surface and the source-skill path;
+they did not see the scorer or expected results. The Implementer wrote the fixture
+and scored their unchanged actions afterward. Runner identities: `/root/eval_red`,
+`/root/eval_green`, `/root/eval_incomplete`, `/root/eval_final_ready`,
+`/root/eval_reentry`, `/root/eval_final_cut`.
+
+| Case | Score | Observed |
+| --- | --- | --- |
+| Baseline ready, before skill edit | 2/23, expected red | Empty action list; baseline defers reporting and treats parked F20 as incomplete. |
+| Initial candidate ready | 23/23 | One report with both feature outcomes, criterion evidence, parked writer risk, B30 reason, all three visible user messages and the unplanned correction, per-thread and known partial usage, settings, versions, decisions and proposals; check-ins end before the report; no acceptance/close. |
+| Incomplete feature | 2/2 | No final report or schedule ending with F20 open and unparked. |
+| Final candidate ready | 23/23 | Same report behavior on the final skill; evidence gaps remain explicit. |
+| Final candidate re-entry | 1/1 | Existing four actions, including report and schedule ending, unchanged; no duplicate writes or notification. |
+| Final candidate final-cut | 2/2 | All features merged but R1's cut still due: Release thread/start record proposed, no report or schedule ending until it finishes. |
+
+[Evidence](report/evidence/) retains inputs, prompts, actual proposed actions and
+scorer output. Only the vendor model identifier emitted in final-cut actions is
+replaced with `[premium-tier model]` to satisfy the repository's text rule;
+[checksums](report/evidence/checksums.json) record original and committed hashes.
+No score-relevant content was repaired. Re-entry includes the existing actions in
+both the read surface and actions file, plus the before-actions comparison.
+
+Initial green/incomplete ran before the final sequencing and evidence-capture
+clarifications; they are supplementary evidence. Final ready, re-entry and
+final-cut read the frozen final skill: SHA-256
+`64242dd001852a1a4fcfad9b7ecd01380c1bf849e706278929b3d1ac819d10ad`;
+reporting reference SHA-256
+`11369839b1a25bef130a5c1bd9476d6946a9010b73fa30b46f7621173db5e138`.
+Final-ready initially scored 22/23 because the scorer omitted the runtime alias
+`cached_input`; accepting that alias gives 23/23 on the identical output. Guard
+mutations swapping input/output totals or marking the progress correction planned
+each fail their own check. Report contents were also read manually.
+
+Round 1 Nit R1-2 added a scorer-only attribution guard: the original duration
+checks accepted coordinator/build-10 durations swapped between their rows.
+`python3 evals/milestone/report/test-score-durations.py` failed red on that
+mutation, then passed for both initial and final reports after binding coordinator
+120 minutes and build-10 50 minutes to their rows and wall time to its statement.
+The unchanged ready reports now score 24/24 (one additional wall-time check);
+the historical score files above retain their original 23-check outputs. Source
+skill/reporting hashes and runtime behavior are unchanged.
+
+Round 2 final Nit R2-1 added known start/end checks bound to the same thread
+rows. Before the fix, coordinator `10:00–11:00 | 120 min` still passed; the new
+regression failed red on that contradiction. Both recorded ready reports now
+pass 26/26, while separately changing coordinator's end to 11:00 or build-10's
+end to 12:00 (keeping their duration figures intact) fails the corresponding
+session-evidence check. Duration-swap guards continue to pass. These are scorer
+fixes only; historical artifacts and source-skill/reporting hashes remain unchanged.
+
+Limits: these test decisions over supplied tracker/session records, not collection
+from live runtime usage files, real recurring schedules, thread starts or stops,
+tracker comments, installed dependency discovery, user acceptance or a proof run.
+The initial Claude Code CLI attempt returned `Not logged in` before a model/tool
+turn (zero usage), retained in [runtime result](report/evidence/claude-unavailable.json);
+it is no behavior evidence. No real external operation was taken. The report names
+unreadable history before 11:00Z, missing build-20 usage/version and unknown
+parent/subagent overlap rather than inventing totals. Actual Milestone #396 still
+has #409 to deliver, so this Ticket posts no real final report or acceptance.
 
 ## 2026-11-02 — Ticket #499: fresh Codex delivery evaluations
 

@@ -1,0 +1,78 @@
+{
+  "red/records.json": {
+    "original_sha256": "467341c2187319a002ec227b511206701f30989caa71cdb5f280937c2d5a400e",
+    "committed_sha256": "467341c2187319a002ec227b511206701f30989caa71cdb5f280937c2d5a400e"
+  },
+  "red/actions.json": {
+    "original_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+    "committed_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  "red/PROMPT.md": {
+    "original_sha256": "1a3e56819ec923a0107bbc6a9cb9c22dbf111b4c10f2f9e9f66fbc635f6b227e",
+    "committed_sha256": "1a3e56819ec923a0107bbc6a9cb9c22dbf111b4c10f2f9e9f66fbc635f6b227e"
+  },
+  "green-initial/records.json": {
+    "original_sha256": "467341c2187319a002ec227b511206701f30989caa71cdb5f280937c2d5a400e",
+    "committed_sha256": "467341c2187319a002ec227b511206701f30989caa71cdb5f280937c2d5a400e"
+  },
+  "green-initial/actions.json": {
+    "original_sha256": "d4f92bd233d4b5cdb63faf6b1ff4adabfa7f2c8b0d4880f76d947820f01d4786",
+    "committed_sha256": "d4f92bd233d4b5cdb63faf6b1ff4adabfa7f2c8b0d4880f76d947820f01d4786"
+  },
+  "green-initial/PROMPT.md": {
+    "original_sha256": "1a3e56819ec923a0107bbc6a9cb9c22dbf111b4c10f2f9e9f66fbc635f6b227e",
+    "committed_sha256": "1a3e56819ec923a0107bbc6a9cb9c22dbf111b4c10f2f9e9f66fbc635f6b227e"
+  },
+  "incomplete/records.json": {
+    "original_sha256": "686d3888d39b50c44f4b36685827b0c21c89d1ae26b4f5be97763c11b8b24e3d",
+    "committed_sha256": "686d3888d39b50c44f4b36685827b0c21c89d1ae26b4f5be97763c11b8b24e3d"
+  },
+  "incomplete/actions.json": {
+    "original_sha256": "63747a83cfbde8091c815dd549d0009eb98ae427f4eb1d0c92505fa75923d28e",
+    "committed_sha256": "63747a83cfbde8091c815dd549d0009eb98ae427f4eb1d0c92505fa75923d28e"
+  },
+  "incomplete/PROMPT.md": {
+    "original_sha256": "1a3e56819ec923a0107bbc6a9cb9c22dbf111b4c10f2f9e9f66fbc635f6b227e",
+    "committed_sha256": "1a3e56819ec923a0107bbc6a9cb9c22dbf111b4c10f2f9e9f66fbc635f6b227e"
+  },
+  "ready-final/records.json": {
+    "original_sha256": "467341c2187319a002ec227b511206701f30989caa71cdb5f280937c2d5a400e",
+    "committed_sha256": "467341c2187319a002ec227b511206701f30989caa71cdb5f280937c2d5a400e"
+  },
+  "ready-final/actions.json": {
+    "original_sha256": "b547b00eb6b398d4076ce6bf5908977df8ee2a3b04097eac23a9b32d24ab0a7a",
+    "committed_sha256": "b547b00eb6b398d4076ce6bf5908977df8ee2a3b04097eac23a9b32d24ab0a7a"
+  },
+  "ready-final/PROMPT.md": {
+    "original_sha256": "1a3e56819ec923a0107bbc6a9cb9c22dbf111b4c10f2f9e9f66fbc635f6b227e",
+    "committed_sha256": "1a3e56819ec923a0107bbc6a9cb9c22dbf111b4c10f2f9e9f66fbc635f6b227e"
+  },
+  "reentry/records.json": {
+    "original_sha256": "6a8c5bb0134f2ed02601542e7c0747999aa6ff305362295c671bec0619b6d640",
+    "committed_sha256": "6a8c5bb0134f2ed02601542e7c0747999aa6ff305362295c671bec0619b6d640"
+  },
+  "reentry/actions.json": {
+    "original_sha256": "d4f92bd233d4b5cdb63faf6b1ff4adabfa7f2c8b0d4880f76d947820f01d4786",
+    "committed_sha256": "d4f92bd233d4b5cdb63faf6b1ff4adabfa7f2c8b0d4880f76d947820f01d4786"
+  },
+  "reentry/before-actions.json": {
+    "original_sha256": "d4f92bd233d4b5cdb63faf6b1ff4adabfa7f2c8b0d4880f76d947820f01d4786",
+    "committed_sha256": "d4f92bd233d4b5cdb63faf6b1ff4adabfa7f2c8b0d4880f76d947820f01d4786"
+  },
+  "reentry/PROMPT.md": {
+    "original_sha256": "1a3e56819ec923a0107bbc6a9cb9c22dbf111b4c10f2f9e9f66fbc635f6b227e",
+    "committed_sha256": "1a3e56819ec923a0107bbc6a9cb9c22dbf111b4c10f2f9e9f66fbc635f6b227e"
+  },
+  "final-cut/records.json": {
+    "original_sha256": "caeb45b20e921c0708669fabda442d3e18806006909ceed8957ce73df859d7f6",
+    "committed_sha256": "caeb45b20e921c0708669fabda442d3e18806006909ceed8957ce73df859d7f6"
+  },
+  "final-cut/actions.json": {
+    "original_sha256": "39308e1598ff24b2faa6c91bd42aa747ac23828655f2f93aca69a0ccd04b3900",
+    "committed_sha256": "e7720eb7a2f40f12d976c7bc15947238142be3608d34802ace15cd0d7556db6e"
+  },
+  "final-cut/PROMPT.md": {
+    "original_sha256": "1a3e56819ec923a0107bbc6a9cb9c22dbf111b4c10f2f9e9f66fbc635f6b227e",
+    "committed_sha256": "1a3e56819ec923a0107bbc6a9cb9c22dbf111b4c10f2f9e9f66fbc635f6b227e"
+  }
+}

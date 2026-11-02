@@ -1,0 +1,174 @@
+{
+  "milestone": {
+    "id": "M1",
+    "state": "open",
+    "goal": "quiet farewell",
+    "delivery_start": "2026-11-02T10:00:00Z",
+    "now": "2026-11-02T12:00:00Z",
+    "features": [
+      "F10",
+      "F20"
+    ],
+    "acceptance": "farewell works and quiet suppresses output",
+    "excluded": "colour"
+  },
+  "features": [
+    {
+      "id": "F10",
+      "acceptance": [
+        "bye prints farewell",
+        "usage documents bye"
+      ],
+      "state": "closed",
+      "state_reason": "completed",
+      "pull_request": {
+        "id": "P7",
+        "merged": true,
+        "evidence": "tracker://P7/tests"
+      },
+      "evidence": {
+        "bye prints farewell": "tracker://P7/test-bye",
+        "usage documents bye": "tracker://P7/test-usage"
+      }
+    },
+    {
+      "id": "F20",
+      "acceptance": [
+        "quiet suppresses output"
+      ],
+      "state": "open",
+      "parked": false,
+      "blockers": [
+        "customer registry permission"
+      ],
+      "park_record": "tracker://F20/park",
+      "writer_state": "idle, stop unconfirmed"
+    }
+  ],
+  "releases": [
+    {
+      "id": "R1",
+      "state": "open",
+      "features": [
+        "F10",
+        "F20"
+      ],
+      "maintenance_left_open": [
+        {
+          "id": "B30",
+          "reason": "colour polish: unrelated to a feature and not severe"
+        }
+      ]
+    }
+  ],
+  "startup": {
+    "verdict": "ready",
+    "evidence": "tracker://M1/startup",
+    "probes": {
+      "scheduled check-in": "pass",
+      "real worker state": "pass",
+      "confirmed stop": "pass",
+      "loaded skill version": "pass"
+    },
+    "permission": "acceptEdits",
+    "sandbox": "enabled; recorded by runtime settings"
+  },
+  "threads": [
+    {
+      "id": "coordinator",
+      "kind": "milestone",
+      "start": "2026-11-02T10:00:00Z",
+      "end": "2026-11-02T12:00:00Z",
+      "loaded_version": "0.41.0",
+      "load_source": "/fixture/plugin",
+      "usage_record": "session://coordinator",
+      "tokens": {
+        "input": 1200,
+        "output": 300,
+        "cached_input": 400
+      },
+      "skill_load_tokens": {
+        "value": 250,
+        "kind": "estimate",
+        "basis": "session input delta includes the prompt"
+      }
+    },
+    {
+      "id": "build-10",
+      "kind": "implement",
+      "start": "2026-11-02T10:10:00Z",
+      "end": "2026-11-02T11:00:00Z",
+      "loaded_version": "0.40.0",
+      "load_source": "/fixture/older-plugin",
+      "usage_record": "session://build-10",
+      "tokens": {
+        "input": 500,
+        "output": 100,
+        "cached_input": 100
+      },
+      "skill_load_tokens": {
+        "value": 80,
+        "kind": "measured",
+        "basis": "session recorded skill-load usage"
+      }
+    },
+    {
+      "id": "build-20",
+      "kind": "implement",
+      "start": "2026-11-02T11:00:00Z",
+      "end": null,
+      "loaded_version": null,
+      "usage_record": null,
+      "tokens": null,
+      "skill_load_tokens": null,
+      "gap": "session unreadable; idle writer may remain"
+    }
+  ],
+  "user_messages": [
+    {
+      "id": "chat://coordinator/u1",
+      "time": "10:01Z",
+      "text": "Please plan farewell first.",
+      "context": "feature planning"
+    },
+    {
+      "id": "tracker://F20/u2",
+      "time": "11:20Z",
+      "text": "You stalled again; check the pull request now.",
+      "context": "user noticed missing progress"
+    },
+    {
+      "id": "chat://build-20/u3",
+      "time": "11:30Z",
+      "text": "Registry access needs my approval; leave it parked.",
+      "context": "parked blocker"
+    }
+  ],
+  "visibility_gaps": [
+    "build-20 chat history before 11:00Z unreadable"
+  ],
+  "decisions": [
+    {
+      "kind": "design answer",
+      "id": "D2",
+      "link": "tracker://P7/round2/D2",
+      "answer": "keep the existing CLI spelling"
+    },
+    {
+      "kind": "rules-file merge",
+      "files": [
+        "REVIEW.md"
+      ],
+      "link": "tracker://P7/merge"
+    }
+  ],
+  "checkins": {
+    "running": true,
+    "id": "sched-01",
+    "stop_readback": "disabled; no future firing"
+  },
+  "suggestions": [
+    "resolve registry permission for quiet",
+    "measure unreadable session usage next Milestone"
+  ]
+}

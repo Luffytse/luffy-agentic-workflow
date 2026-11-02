@@ -1,0 +1,24 @@
+FAIL one report comment on Milestone
+FAIL acceptance evidence
+FAIL park and maintenance reasons
+FAIL every readable user message
+FAIL permission sandbox and Startup
+FAIL per-thread versions and gaps
+FAIL decision evidence
+FAIL skill loading estimate and measurement
+FAIL next Milestone suggestions
+FAIL history visibility gap
+FAIL elapsed total is two hours
+FAIL per-thread elapsed includes 50 minutes
+FAIL planning message classified planned
+FAIL progress correction classified unplanned
+FAIL parked blocker answer classified planned
+FAIL known token subtotal preserves categories
+FAIL skill loading estimate tied to coordinator
+FAIL skill loading measured tied to build-10
+FAIL report stops for user review
+FAIL schedule stopped before report
+FAIL schedule readback recorded
+PASS no build or close/accept action
+PASS Milestone remains open
+Exit: 1

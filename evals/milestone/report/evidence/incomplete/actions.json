@@ -1,0 +1,7 @@
+[
+  {
+    "operation": "message-user",
+    "target": "M1",
+    "body": "M1 is not ready for Milestone review: F20 remains open and unparked, blocked by customer registry permission. F10 is merged in P7 with acceptance evidence at tracker://P7/test-bye and tracker://P7/test-usage. The historical park reference and request to leave F20 parked do not establish its current Park state, which reads false. build-20 is unreadable and its stop is unconfirmed; no replacement worker can safely start from this evidence. Check-ins remain running on sched-01; R1 remains open. No completion report or acceptance claim is made."
+  }
+]

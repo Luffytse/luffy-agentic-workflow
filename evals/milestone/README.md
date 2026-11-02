@@ -20,6 +20,8 @@ The **dry run** lives in the fixture's tracker doc (`docs/agents/issue-tracker.m
 | `deliver-lift` | the `deliver-stall` fixture (`.scratch/variant` reads `lift`) | Twenty-one events: events 1 to 14 as in `deliver-stall`; at 21:00Z a check-in fires, the user having removed `parked` from 20 at 20:40Z (the issue shows `User removed label parked at 20:40Z.`; the fresh thread's pull request #12, a failing draft, is on the tracker and its session still reads idle since 16:12Z); the stop thread reports it archived that session (the record reads archived since 21:06Z); at 22:00Z the user writes that they removed `parked` from 10 at 21:50Z; the stop thread reports it archived 10's session while the record still reads idle since 10:30Z; a check-in at 23:00Z at which 20's fresh thread (started 21:10Z) has given up in review at 22:50Z and parked 20 itself (the label and an attempt record, no coordinator record); the user removes `parked` from 20 at 23:20Z; the stop thread reports it archived that session (the record reads archived since 23:36Z) | Events 1 to 14: as in `deliver-stall`. Event 15: a `<!-- milestone park lifted -->` comment on 20 naming the removal (20:40), a stop thread briefed to archive the session of the fresh thread started 16:10Z (the second stall left a writer possibly remaining), recorded as a delivery thread, a Stand-up record (21:00Z) listing 10 as parked and skipped, and no fresh thread yet and no message to the user. Event 16: a stop record on 20 (archived 21:06Z), then a fresh Ticket thread with `implement` on 20 whose brief names the pushed branch, pull request #12 and the attempt history and the thread it takes over from (16:10Z), recorded as a delivery thread; no Stand-up. Event 17: a park-lifted record on 10 (21:50), a stop thread for the Spec thread's session (started 10:05Z), no fresh thread, no Stand-up. Event 18: no stop record and no fresh thread (the record still reads idle), 10 parked again (the `parked` label and a park record naming the idle reading) and the user told once. Event 19: the thread's review park is adopted: one coordinator `<!-- milestone parked -->` record on 20 (a review park, a writer may remain, linking the attempt record), no label, no message to the user, a Stand-up listing 10 and 20 as parked and skipped. Event 20: a park-lifted record on 20 (23:20) and a stop thread for the thread started 21:10Z, no fresh thread. Event 21: a stop record (archived 23:36Z), then a fresh Ticket thread on 20 naming pull request #12 and the attempt history. Throughout events 15 to 18: the coordinator removes no label and 20 is not parked again. |
 | `deliver-checkin-failed` | the `deliver` fixture, cut to events 1 to 4; its `world.sh` never writes a check-in record | Events 1, 3 and 4 as in `deliver`; at event 2 the check-in thread reports that the scheduler refused the coordinator's session as a target | Event 1: the check-in thread, as in `deliver`. Event 2: a `<!-- milestone check-in failed -->` comment on the Milestone issue naming the refusal, and the Spec thread of 10 still started. Events 2 to 4: no check-in thread started again and no message to one (the failure is read back from the tracker, so check-ins stay off). |
 
+The original `deliver` sequence stops at event 23 while its cleanup thread is ending the schedule. Under the report rule, the coordinator waits for that thread's no-future-firing read-back before posting a report; the bounded report cases below supply that read-back directly. Historical RESULTS entries keep the behavior of the revisions they tested.
+
 ## Thread end identity regression
 
 Build `bash evals/milestone/make-thread-end-fixture.sh <out-dir>` and score with
@@ -42,3 +44,37 @@ checks, not an execution of the scheduler or proof of fresh-agent behavior.
 5. Record the run in [RESULTS.md](RESULTS.md) with its template, with the commit and plugin version of the checkout under test.
 
 The `plan` case stops before delivery; `deliver` starts where planning and Startup verification have ended.
+
+
+## Milestone report
+
+`report/make-fixture.py <out-dir> ready` creates a bounded coordinator read
+surface (`records.json`) and prompt, without any actual tracker or scheduler.
+The ready case combines a merged feature with criterion-level test links and a
+parked feature in an open Release. It plants chat and issue user messages, an
+unplanned progress correction, measured session token categories and an estimated
+skill-loading delta, missing history/usage/version evidence, Startup settings,
+design/rules-file decisions and deferred maintenance. `incomplete` leaves that
+second feature open and unparked, so a final report and schedule ending are wrong.
+
+Run a fresh premium-tier coordinator with only its PROMPT.md (substitute the
+checkout path); keep `score.py` away from it. The prompt models tracker writes
+and scheduler actions in `actions.json`; it authorizes no real operation. Score
+with `python3 evals/milestone/report/score.py <out-dir> ready` (or `incomplete`).
+Read the report manually too: the scorer checks criterion evidence ids, individual
+message classification, category-labeled known totals, elapsed time, attributed
+skill-loading measurement/estimate, gaps, and stopping for review with the
+Milestone open. Rerun the ready prompt against its existing actions and require
+unchanged actions: no duplicate report, notification, or schedule ending. This
+proves coordinator behavior over supplied records, not runtime token collection,
+real scheduling, external proof acceptance, or completeness of inaccessible chats.
+
+The `final-cut` case makes both features merged while nonempty R1 is still open
+and its cut has not started: start its Release thread and await its evidence,
+with no final report or schedule ending yet. For re-entry, copy the ready case's
+records and actions into a fresh directory, set `checkins.running` false and add
+those actions to `existing_tracker_and_scheduler_actions` in records.json; save
+`actions.json` as `before-actions.json`. A fresh coordinator runs the same prompt.
+`score.py <out-dir> reentry` requires the action list to remain unchanged.
+
+Run `python3 evals/milestone/report/test-score-durations.py` for the scorer regression: both recorded ready reports must pass, while swapping only coordinator/build-10 elapsed values between their rows, or contradicting either row's known session end time while keeping its elapsed figure, must fail.

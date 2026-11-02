@@ -1,0 +1,24 @@
+PASS one report comment on Milestone
+PASS acceptance evidence
+PASS park and maintenance reasons
+PASS every readable user message
+PASS permission sandbox and Startup
+PASS per-thread versions and gaps
+PASS decision evidence
+PASS skill loading estimate and measurement
+PASS next Milestone suggestions
+PASS history visibility gap
+PASS elapsed total is two hours
+PASS per-thread elapsed includes 50 minutes
+PASS planning message classified planned
+PASS progress correction classified unplanned
+PASS parked blocker answer classified planned
+PASS known token subtotal preserves categories
+PASS skill loading estimate tied to coordinator
+PASS skill loading measured tied to build-10
+PASS report stops for user review
+PASS schedule stopped before report
+PASS schedule readback recorded
+PASS no build or close/accept action
+PASS Milestone remains open
+Exit: 0

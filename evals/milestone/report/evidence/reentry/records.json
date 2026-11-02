@@ -1,0 +1,196 @@
+{
+  "milestone": {
+    "id": "M1",
+    "state": "open",
+    "goal": "quiet farewell",
+    "delivery_start": "2026-11-02T10:00:00Z",
+    "now": "2026-11-02T12:00:00Z",
+    "features": [
+      "F10",
+      "F20"
+    ],
+    "acceptance": "farewell works and quiet suppresses output",
+    "excluded": "colour"
+  },
+  "features": [
+    {
+      "id": "F10",
+      "acceptance": [
+        "bye prints farewell",
+        "usage documents bye"
+      ],
+      "state": "closed",
+      "state_reason": "completed",
+      "pull_request": {
+        "id": "P7",
+        "merged": true,
+        "evidence": "tracker://P7/tests"
+      },
+      "evidence": {
+        "bye prints farewell": "tracker://P7/test-bye",
+        "usage documents bye": "tracker://P7/test-usage"
+      }
+    },
+    {
+      "id": "F20",
+      "acceptance": [
+        "quiet suppresses output"
+      ],
+      "state": "open",
+      "parked": true,
+      "blockers": [
+        "customer registry permission"
+      ],
+      "park_record": "tracker://F20/park",
+      "writer_state": "idle, stop unconfirmed"
+    }
+  ],
+  "releases": [
+    {
+      "id": "R1",
+      "state": "open",
+      "features": [
+        "F10",
+        "F20"
+      ],
+      "maintenance_left_open": [
+        {
+          "id": "B30",
+          "reason": "colour polish: unrelated to a feature and not severe"
+        }
+      ]
+    }
+  ],
+  "startup": {
+    "verdict": "ready",
+    "evidence": "tracker://M1/startup",
+    "probes": {
+      "scheduled check-in": "pass",
+      "real worker state": "pass",
+      "confirmed stop": "pass",
+      "loaded skill version": "pass"
+    },
+    "permission": "acceptEdits",
+    "sandbox": "enabled; recorded by runtime settings"
+  },
+  "threads": [
+    {
+      "id": "coordinator",
+      "kind": "milestone",
+      "start": "2026-11-02T10:00:00Z",
+      "end": "2026-11-02T12:00:00Z",
+      "loaded_version": "0.41.0",
+      "load_source": "/fixture/plugin",
+      "usage_record": "session://coordinator",
+      "tokens": {
+        "input": 1200,
+        "output": 300,
+        "cached_input": 400
+      },
+      "skill_load_tokens": {
+        "value": 250,
+        "kind": "estimate",
+        "basis": "session input delta includes the prompt"
+      }
+    },
+    {
+      "id": "build-10",
+      "kind": "implement",
+      "start": "2026-11-02T10:10:00Z",
+      "end": "2026-11-02T11:00:00Z",
+      "loaded_version": "0.40.0",
+      "load_source": "/fixture/older-plugin",
+      "usage_record": "session://build-10",
+      "tokens": {
+        "input": 500,
+        "output": 100,
+        "cached_input": 100
+      },
+      "skill_load_tokens": {
+        "value": 80,
+        "kind": "measured",
+        "basis": "session recorded skill-load usage"
+      }
+    },
+    {
+      "id": "build-20",
+      "kind": "implement",
+      "start": "2026-11-02T11:00:00Z",
+      "end": null,
+      "loaded_version": null,
+      "usage_record": null,
+      "tokens": null,
+      "skill_load_tokens": null,
+      "gap": "session unreadable; idle writer may remain"
+    }
+  ],
+  "user_messages": [
+    {
+      "id": "chat://coordinator/u1",
+      "time": "10:01Z",
+      "text": "Please plan farewell first.",
+      "context": "feature planning"
+    },
+    {
+      "id": "tracker://F20/u2",
+      "time": "11:20Z",
+      "text": "You stalled again; check the pull request now.",
+      "context": "user noticed missing progress"
+    },
+    {
+      "id": "chat://build-20/u3",
+      "time": "11:30Z",
+      "text": "Registry access needs my approval; leave it parked.",
+      "context": "parked blocker"
+    }
+  ],
+  "visibility_gaps": [
+    "build-20 chat history before 11:00Z unreadable"
+  ],
+  "decisions": [
+    {
+      "kind": "design answer",
+      "id": "D2",
+      "link": "tracker://P7/round2/D2",
+      "answer": "keep the existing CLI spelling"
+    },
+    {
+      "kind": "rules-file merge",
+      "files": [
+        "REVIEW.md"
+      ],
+      "link": "tracker://P7/merge"
+    }
+  ],
+  "checkins": {
+    "running": false,
+    "id": "sched-01",
+    "stop_readback": "disabled; no future firing"
+  },
+  "suggestions": [
+    "resolve registry permission for quiet",
+    "measure unreadable session usage next Milestone"
+  ],
+  "existing_tracker_and_scheduler_actions": [
+    {
+      "operation": "end-checkins",
+      "target": "sched-01",
+      "body": "End scheduled check-ins; fixture scheduler read-back: disabled; no future firing."
+    },
+    {
+      "operation": "comment",
+      "target": "M1",
+      "body": "<!-- milestone check-in ended -->\nsched-01 read-back: disabled; no future firing."
+    },
+    {
+      "operation": "comment",
+      "target": "M1",
+      "body": "<!-- milestone report -->\n## Milestone report \u2014 ready for user review\n\nAgreement source: M1 in records.json, latest available agreement (revision not recorded). Report time: 2026-11-02T12:00:00Z. Goal: quiet farewell. Acceptance: farewell works and quiet suppresses output. Excluded: colour.\n\n### Outcomes\n\n| Feature | Acceptance criterion | Outcome | Evidence |\n| --- | --- | --- | --- |\n| F10 | bye prints farewell | Satisfied; merged P7, issue closed completed | tracker://P7/test-bye; tracker://P7/tests |\n| F10 | usage documents bye | Satisfied; merged P7 | tracker://P7/test-usage |\n| F20 | quiet suppresses output | Unmet delivery criterion; parked, no merge or test evidence available | tracker://F20/park |\n\nM1 is ready for review because every feature is merged with evidence or parked, not because all acceptance criteria are met. No regression or end-of-Milestone checks are recorded beyond P7's cited test evidence. R1 remains open with parked F20; no Release cut is in progress in the supplied records, and R1 cannot be called cut or complete.\n\n### Parked and maintenance\n\nF20 is parked on customer registry permission (tracker://F20/park). build-20 is idle with stop unconfirmed: a writer may remain. Further attempt history, branch and pull request records are unavailable. No restart or takeover is authorized by this review gate.\n\nR1 leaves B30 open: colour polish, unrelated to a feature and not severe (records.json releases[R1].maintenance_left_open). Colour remains excluded scope. Separate Triage batch and Release-end Retro planning records were not supplied; their completeness is unknown.\n\n### User messages\n\n| Time (2026-11-02 UTC) | Source | Message | Classification |\n| --- | --- | --- | --- |\n| 10:01 | chat://coordinator/u1 | \u201cPlease plan farewell first.\u201d | Planned: feature planning |\n| 11:20 | tracker://F20/u2 | \u201cYou stalled again; check the pull request now.\u201d | Unplanned step-in: user noticed missing progress and pushed the thread |\n| 11:30 | chat://build-20/u3 | \u201cRegistry access needs my approval; leave it parked.\u201d | Planned: answering a parked feature's blocker |\n\nInventory covers all three readable user messages. build-20 chat history before 11:00Z is unreadable; additional messages there are unknown. Please check this inventory at the review. The visible unplanned step-in and incomplete history prevent a claim of unattended success.\n\n### Time and tokens\n\n| Thread / kind | Start\u2013end or last observed (UTC) | Elapsed | Input | Output | Cached input | Session |\n| --- | --- | --- | --- | --- | --- | --- |\n| coordinator / milestone | 10:00\u201312:00, ended | 120 min | 1200 | 300 | 400 | session://coordinator |\n| build-10 / implement | 10:10\u201311:00, ended | 50 min | 500 | 100 | 100 | session://build-10 |\n| build-20 / implement | 11:00\u201312:00 report observation, end unknown | 60 min observed window, actual elapsed unknown | unknown | unknown | unknown | unavailable: session unreadable |\n\nMilestone wall time: 120 min (10:00\u201312:00). Known ended-thread elapsed subtotal: 170 min; with build-20's start-to-report observation window, summed observed windows are 230 min, not wall time or proof of active compute. Runtime kind is unrecorded for each thread.\n\nKnown raw token-record subtotal, partial: input 1700, output 400, cached input 500. Each readable usage record is counted once. Cached input is retained separately and is not added to input again. Runtime field definitions and parent/subagent inclusion are not supplied, so an overlap-free all-thread total is unknown; build-20 is missing. No additional verification, planning, Release, check-in, stop or Implementer subagent session inventory is exposed; their usage and possible overlap are unknown.\n\nSkill loading by thread kind: milestone/coordinator 250 input tokens, estimate, basis \u201csession input delta includes the prompt\u201d (session://coordinator); implement/build-10 80 input tokens measured, basis \u201csession recorded skill-load usage\u201d (session://build-10); implement/build-20 unknown because its session is unreadable. Measured skill-load subtotal 80, partial; estimated skill-load subtotal 250, separate from measured usage. These are attribution figures, not extra tokens to add to session totals. No time or token caps are inferred.\n\n### Versions and Startup verification\n\n| Thread | Recorded loaded plugin version | Recorded load source |\n| --- | --- | --- |\n| coordinator | 0.41.0 | /fixture/plugin |\n| build-10 | 0.40.0 | /fixture/older-plugin |\n| build-20 | unknown | unknown; unreadable session |\n\nSources: session://coordinator, session://build-10, and records.json threads. No revision was recorded. The differing versions are preserved; current installed files would not prove earlier loads.\n\nStartup verification: ready, tracker://M1/startup. Scheduled check-in: pass; real worker state: pass; confirmed stop: pass; loaded skill version: pass. Detailed probe mechanisms, times, worker kinds and limits are not included in the fixture and remain unknown. This historical stop pass does not confirm build-20 stopped. No failed-essential-probe user go-on is recorded.\n\nRecorded permission mode: acceptEdits. Sandbox: enabled; recorded by runtime settings (tracker://M1/startup). Runtime environment kind, per-thread setting differences and subsequent changes are unknown. Scheduler sched-01 dry-run ending read-back: disabled; no future firing (records.json checkins.stop_readback), before this report.\n\n### Agent decisions\n\n- Design answer D2: keep the existing CLI spelling, tracker://P7/round2/D2. Reason not recorded.\n- Rules-file merge: REVIEW.md, tracker://P7/merge.\n- F20 remains parked on customer registry permission, tracker://F20/park; the user's supporting instruction is chat://build-20/u3. Stop remains unconfirmed.\n- R1 maintenance decision: B30 left open because colour polish is unrelated to a feature and not severe (records.json releases[R1].maintenance_left_open).\n- Stand-up, takeover, other review Finding details and build decision histories are not supplied; no claim that other decisions were absent.\n\n### Next Milestone\n\nProposals only: resolve registry permission for quiet; measure currently unreadable session usage next Milestone. B30 colour polish may be considered separately if the user changes the excluded scope. None is added to this agreement.\n\nM1 remains open. Ready for the user's Milestone review; acceptance pending."
+    },
+    {
+      "operation": "message-user",
+      "target": "coordinator",
+      "body": "Dry-run report on M1 (actions.json report comment): ready for your Milestone review; acceptance pending. F10 merged; F20 remains parked on registry permission and a writer may remain. Check-ins ended with no future firing. M1 and R1 remain open. Please check the user-message inventory, including the recorded unplanned step-in and unreadable-history gap."
+    }
+  ]
+}
