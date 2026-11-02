@@ -1,6 +1,6 @@
 # Results
 
-One entry per run of the `milestone` skill's dry run (the planning cases and the delivery cases: `deliver`, `deliver-stall`, `deliver-checkin-failed`, `deliver-pause`, `deliver-lift`), newest first ([README](README.md) says how to build, run and score it). Record the commit and the plugin version from `plugins/dev-skills/.claude-plugin/plugin.json`; an entry written inside an open pull request names the commit and version it ran on as its base. Each planning run also applies the shape to one real Milestone issue (`score.py --shape`) and names the migration it needs, if any; each `deliver` run also applies the loop, read-only, to one real Milestone and names the thread it would start next and the next Release it would plan.
+One entry per run of the `milestone` skill's dry run (the planning cases and the delivery cases: `deliver`, `deliver-stall`, `deliver-checkin-failed`, `deliver-pause`, `deliver-lift`, `deliver-thread-end`), newest first ([README](README.md) says how to build, run and score it). Record the commit and the plugin version from `plugins/dev-skills/.claude-plugin/plugin.json`; an entry written inside an open pull request names the commit and version it ran on as its base. Each planning run also applies the shape to one real Milestone issue (`score.py --shape`) and names the migration it needs, if any; each `deliver` run also applies the loop, read-only, to one real Milestone and names the thread it would start next and the next Release it would plan.
 
 ## 2026-11-02 — PR #500 R2-1: thread end identity
 
