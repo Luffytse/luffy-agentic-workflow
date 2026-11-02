@@ -2,6 +2,35 @@
 
 What each version of `dev-skills` brought, newest first. Each pull request that changes a skill bumps the version, and each Release adds one entry here covering everything since the last Release: its goal, the versions it delivered, the issues it shipped, and what a project using the plugin must do when something breaks. Entries up to 0.25.0 are one per version, when only a Release bumped it.
 
+## Milestone 1 · Release 3 (2026-11-02)
+
+The `milestone` skill runs a Milestone end to end: it verifies its runtime at startup, plans and delivers the Milestone's Releases, checks in on and safely takes over silent threads, and writes the Milestone report, so the project's instructions keep only what is specific to the project.
+
+Versions: 0.34.0, 0.35.0, 0.36.0, 0.37.0, 0.38.0, 0.39.0, 0.40.0, 0.41.0, 0.42.0. Commits: ace9974..7cc9ca0.
+
+- to-tickets: scope edges, and splitting a Milestone Spec without waiting, with its membership label (#458)
+- A stuck review restarts once, then parks, outside a Milestone too (#448)
+- Inside a Milestone, a conflict check after Round 5 gets one extra Round instead of going to the user (#447)
+- Spec: startup verification before autonomous delivery (Milestone 1, piece C1) (#405)
+- Startup verification: milestone skill, result shape, check-in and worker-state probes in Claude Code (#465)
+- Startup verification: confirmed-stop and loaded-skill-version probes in Claude Code (#466)
+- Startup verification: run in Codex and record both agents (#467)
+- Spec: the milestone skill runs a Milestone from planning to delivery (Milestone 1, piece C2) (#406)
+- Milestone skill: planning phase and the Milestone issue (#483)
+- Milestone skill: delivery loop, Release grouping, version hand-out (#484)
+- Spec: startup verification passes in Claude Code and Codex (Milestone 1, before C3) (#473)
+- Startup verification: confirmed stop passes in Claude Code (#474)
+- Startup verification: check-ins, confirmed stop and installed skill version pass in Codex (#475)
+- Spec: stand-up check-ins and safe takeover of a silent thread (Milestone 1, piece C3) (#407)
+- milestone: scheduled check-ins reach the coordinator during delivery (C3, Ticket 1 of #407) (#495)
+- milestone: a check-in reads real thread state and nudges a silent thread (C3, Ticket 2 of #407) (#496)
+- milestone: confirm a silent thread stopped, then take over or park (C3, Ticket 3 of #407) (#497)
+- milestone: pause and resume a Milestone, and resume a parked feature (C3, Ticket 4 of #407) (#498)
+- milestone: check-ins and takeover pass in Codex (C3, Codex run of #407) (#499)
+- milestone: write the Milestone report for the Milestone review (Milestone 1, piece C4) (#408)
+
+Also merged: extend related-text reviews to repository layout, packaging and contributor descriptions (#355); add an Always-check line for state-machine exits (#489).
+
 ## Milestone 1 · Release 2 (2026-11-02)
 
 Agents run the end of a Release inside a Milestone: a stuck review restarts once and then parks, and triage, Retro planning and the next Release's scope run as agent batches, so a Release ends without waiting on the user.
