@@ -72,6 +72,8 @@ The workflow reports the outcome `park`, with the link to the attempt record, wh
 
 First decide whether the pull request is **inside a Milestone**. Read the Boundary record (the one the repo's `CLAUDE.md` or `AGENTS.md` points to, usually `docs/agents/boundaries.md`) for its Milestone label form. The pull request is inside a Milestone when the ticket carries a label in that form; then read the Milestone issue (the issue that carries the same label and holds the Milestone's goal) for allowed or forbidden actions of its own, which win over the record's for this ticket. With no Boundary record, or no label in its form on the ticket, the pull request is outside a Milestone.
 
+Before either merge list, if an agreed design answer changes the pull request after a clean late design or late merge-only Round, return it to `agentic-review` under its after-clean design-answer rule. Inside a Milestone it records `agreed design change after last Round` without another Round, and step 6 carries out `restart` or `park`, skipping this merge step. Outside a Milestone the existing merge list below applies.
+
 **Inside a Milestone**, bring the pull request to the user, and do not merge it, only if any of these holds:
 
 - it crosses a boundary: it takes, or its merge would take, an action that the Milestone issue forbids or says needs the user's approval, or one the Boundary record says needs the user's approval and the Milestone issue does not explicitly allow; or its Door is one-way and, for any of its irreversible actions, the Milestone issue does not explicitly allow agents to take it (or, where the Milestone issue does not mention it, the record does not);

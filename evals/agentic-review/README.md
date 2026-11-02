@@ -68,6 +68,10 @@ The fixture, built by [`milestone/make-fixture.sh`](milestone/make-fixture.sh), 
 
 The bounded [merge-depth decision probe](merge-depth/README.md) checks the Round-comment summary entry point: wording-only versus logic or rule-meaning resolutions, matching marker and heading, and carried depth in the following ordinary Round. Rerun when that summary or its owner pointer changes. It does not run a merge or a full Review.
 
+## Exhausted design-answer check
+
+The bounded [exhausted design-answer decision probe](exhausted-design/README.md) checks an agreed design change received after a clean late design or late merge-only Round, restart/park records and ordinary-budget/outside controls. It does not run a full Review or post tracker records.
+
 ## Convergence check
 
 Inside a Milestone and outside one alike, does a Review notice a Finding that returns after its fix, or a fix that flips back, end the attempt with the right Result, write the attempt record on the issue, file its Pre-existing Findings and report `restart` (no earlier attempt record) or `park` (one); and does it leave a different claim on the same lines alone? Rerun it whenever `agentic-review`'s Rank, Round loop or "When a review will not settle" rules (`ROUNDS.md`), or the `review-record` Result values or attempt-record shape, change. Scoring: [`convergence/EXPECTED.md`](convergence/EXPECTED.md).
