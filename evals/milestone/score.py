@@ -2,7 +2,7 @@
 """Score a milestone dry run (planning phase or delivery loop), or check one Milestone issue body against the shape.
 
 Usage:
-  score.py <out-dir> <plan|add-feature|deliver|deliver-checkin-failed|deliver-stall|deliver-pause|deliver-lift>   score <out-dir>/repo/.scratch/proposed-actions.md for that case
+  score.py <out-dir> <plan|add-feature|deliver|deliver-checkin-failed|deliver-stall|deliver-pause|deliver-lift|deliver-thread-end>   score <out-dir>/repo/.scratch/proposed-actions.md for that case
   score.py --shape <body-file>            check a Milestone issue body (for example a real one) against the shape
 
 Prints one line per check (PASS or FAIL with what it saw) and exits 1 when any check fails.
@@ -876,11 +876,29 @@ def score_deliver_lift(ev):
           and re.search(r"attempt", f21[0]["brief"], re.I) is not None)
 
 
+def score_thread_end(events):
+    """Two workers share an issue; only the named planner's end releases its guard."""
+    e = {k: events.get(k, []) for k in range(1, 4)}
+    end = "<!-- milestone delivery thread ended -->"
+    helper = records(e[1], end, "00-milestone")
+    check("helper failure records its own thread and start", len(helper) == 1
+          and "check-helper" in helper[0]["body"] and "start-helper" in helper[0]["body"])
+    check("helper failure does not start a duplicate planner", not starts(e[1]))
+    check("next wake keeps planner running", not starts(e[2]))
+    planner = records(e[3], end, "00-milestone")
+    check("planner report records its own thread and start", len(planner) == 1
+          and "release-planner" in planner[0]["body"] and "start-planner" in planner[0]["body"])
+    next_threads = starts(e[3], "release")
+    check("matched planner end permits the next Release planning", len(next_threads) == 1)
+    check("planner end precedes next start", bool(planner) and bool(next_threads)
+          and planner[0]["n"] < next_threads[0]["n"])
+
+
 def main():
     if len(sys.argv) == 3 and sys.argv[1] == "--shape":
         shape(open(sys.argv[2]).read())
     elif len(sys.argv) == 3 and sys.argv[2] in ("plan", "add-feature", "deliver", "deliver-checkin-failed", "deliver-stall",
-                                                         "deliver-pause", "deliver-lift"):
+                                                         "deliver-pause", "deliver-lift", "deliver-thread-end"):
         out, case = sys.argv[1], sys.argv[2]
         try:
             text = open(f"{out}/repo/.scratch/proposed-actions.md").read()
@@ -888,7 +906,9 @@ def main():
             text = ""
         blocks = parse_actions(text)
         check("proposed-actions.md holds actions", bool(blocks))
-        if case == "deliver":
+        if case == "deliver-thread-end":
+            score_thread_end(parse_events(text))
+        elif case == "deliver":
             score_deliver(parse_events(text))
         elif case == "deliver-stall":
             score_deliver_stall(parse_events(text))

@@ -2,6 +2,30 @@
 
 One entry per run of the `milestone` skill's dry run (the planning cases and the delivery cases: `deliver`, `deliver-stall`, `deliver-checkin-failed`, `deliver-pause`, `deliver-lift`), newest first ([README](README.md) says how to build, run and score it). Record the commit and the plugin version from `plugins/dev-skills/.claude-plugin/plugin.json`; an entry written inside an open pull request names the commit and version it ran on as its base. Each planning run also applies the shape to one real Milestone issue (`score.py --shape`) and names the migration it needs, if any; each `deliver` run also applies the loop, read-only, to one real Milestone and names the thread it would start next and the next Release it would plan.
 
+## 2026-11-02 — PR #500 R2-1: thread end identity
+
+Base: `4d8447a`, plugin 0.40.0. Fix: the R2-1 commit containing this entry;
+version remains 0.40.0 pending the coordinator's final bump. Seam: the existing
+dry-run tracker and proposed actions, with `make-thread-end-fixture.sh`'s focused
+overlay and `score.py <out-dir> deliver-thread-end` (see README).
+
+Driven by hand by the Implementer, reading the pre-fix and fixed lifecycle text;
+no fresh agent session or real scheduler ran. Before: helper failure writes the
+generic ended marker after the planner's start, so the Release running definition
+allows a duplicate planner at event 1. Both end markers lack identity: **4/7**.
+After: event 1 records check-helper's failure and `Ended check-helper; start
+start-helper.`, tells the user the scheduling limit, and starts nothing. Event 2
+starts nothing. Event 3 records `Ended release-planner; start start-planner.` and
+starts and records the next Release planner for the still-eligible features:
+**7/7**. The empty-issue fill report still writes its end; its behavior from R1-1
+is preserved, not replaced with a tracker-derived completion rule.
+
+Scorer guards on copies of the passing actions: replacing the helper identity
+with the planner identity fails the helper-record check; inserting a Release
+start at event 2 fails the next-wake check; removing the event 3 start fails both
+the next-planning and ordering checks. Limit: these traces exercise the written
+rule by hand, not a fresh Claude Code or Codex coordinator's adherence to it.
+
 ## Template
 
 ```
