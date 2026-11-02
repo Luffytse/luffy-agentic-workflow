@@ -1,14 +1,18 @@
 #!/usr/bin/env bash
 # Builds one fixture for the milestone skill's dry run: its planning phase (plan, add-feature) or its delivery loop (deliver).
-# Usage: make-fixture.sh <out-dir> <plan|add-feature|deliver|deliver-checkin-failed|deliver-stall>
+# Usage: make-fixture.sh <out-dir> <plan|add-feature|deliver|deliver-checkin-failed|deliver-stall|deliver-pause|deliver-lift>
 # Makes <out-dir>/repo (a git repo, one commit on main, with a dry-run local tracker) and <out-dir>/PROMPT.md
 # (the scripted prompt for a fresh coordinator session). See evals/milestone/README.md.
 set -eu
 out="$1"; case_="$2"
-case "$case_" in plan|add-feature|deliver|deliver-checkin-failed|deliver-stall) ;; *) echo "unknown case: $case_" >&2; exit 2 ;; esac
+case "$case_" in plan|add-feature|deliver|deliver-checkin-failed|deliver-stall|deliver-pause|deliver-lift) ;; *) echo "unknown case: $case_" >&2; exit 2 ;; esac
 # deliver-checkin-failed is the deliver fixture, cut to events 1 to 4, in which the check-in thread cannot arrange the check-ins.
 # deliver-stall is the deliver fixture with its own world from event 3 on: threads that stall, a stop that does not
 # take, a takeover, and a second stall.
+# deliver-lift is deliver-stall's first fourteen events, then the user lifts the two parks (20's after a second stall,
+# whose writer may remain; 10's, whose stop was never confirmed) and the coordinator resumes them.
+# deliver-pause is the deliver fixture with its own world from event 3 on: "up to 2 at once", 25 unblocked, a pause on
+# the user's word, a resume, and the next thread started on it.
 kind="$case_"; case "$case_" in deliver-*) kind=deliver ;; esac
 [ -e "$out" ] && { echo "$out exists" >&2; exit 2; }
 mkdir -p "$out"
@@ -89,12 +93,17 @@ event `<k>` (also when it leads to no write), and keep numbering the blocks on f
   per line with its UTC time. No such file means nothing has been pushed.
 - **Read a PR**: read `.scratch/pulls/<n>.md`: its state, whether it is ready for review since when, its changed files,
   its checks and its comments, each with its time.
+- **List PRs**: read every file under `.scratch/pulls/`; each starts with a `Builds:` line naming the issue file it
+  builds (or `none`), then the fields **Read a PR** lists.
 - **Count open blockers**: read the issue's `Blocked by:` header and the `Status:` of each issue it names. A blocker whose
   status is `closed` is cleared, unless its file has a `Closed as: not planned` line. The issue is startable when no
   named blocker is open or uncleared.
 - **Park**: mark an issue parked, or read whether it is. To mark it, add the `parked` label (**Apply / remove labels**),
   then comment on the issue (**Comment on an issue**) with a link to the attempt history. An issue is parked when its
-  `Labels:` include `parked`; the user lifts the park by removing the label.
+  `Labels:` include `parked`; the user lifts the park by removing the label. Your own label writes land only in
+  `.scratch/proposed-actions.md`, so a label the user removes shows as a comment `User removed label parked at <time>.`
+  on the issue, which undoes your own earlier `Add: parked` for that issue. A label a thread adds shows as a comment `Label parked added by <thread> at <time>.`, next to the
+  comment that links its attempt history; a thread's own label write reaches the tracker, yours does not.
 
 ## The environment's record of a thread
 
@@ -325,7 +334,9 @@ if [ "$kind" = deliver ]; then
   done
   sed -i.bak 's/^Parent: none$/Parent: .scratch\/issues\/00-milestone.md/' "$r/.scratch/issues/10-farewell.md" "$r/.scratch/issues/20-quiet.md"
   rm -f "$r/.scratch/issues/"*.bak
-  write_milestone "One at a time, in this order." '| 3 | `25-hello-doc.md` Document the commands in the README | lone Ticket | the README lists `hello` and `bye` with one example each |'
+  order="One at a time, in this order."
+  [ "$case_" = deliver-pause ] && order="Up to 2 at once, in this order."
+  write_milestone "$order" '| 3 | `25-hello-doc.md` Document the commands in the README | lone Ticket | the README lists `hello` and `bye` with one example each |'
   printf '\nModel tier: regular. Review depth: Deep.\n' >> "$r/.scratch/issues/10-farewell.md"
   # A third planned feature, blocked by an issue outside the Milestone: left out of Release 1, planned once it is free.
   cat > "$r/.scratch/issues/25-hello-doc.md" <<'MD'
@@ -338,6 +349,7 @@ Blocked by: .scratch/issues/35-readme-tool.md
 
 The README lists `hello` and `bye`, with one example each. Model tier: cheap.
 MD
+  [ "$case_" = deliver-pause ] && sed -i.bak 's/^Blocked by: .scratch\/issues\/35-readme-tool.md$/Blocked by: none/' "$r/.scratch/issues/25-hello-doc.md"
   cat > "$r/.scratch/issues/35-readme-tool.md" <<'MD'
 Title: Pick the README format checker
 Type: ticket
@@ -379,7 +391,10 @@ s=.scratch/sessions
 mkdir -p "$s" .scratch/branches .scratch/pulls
 # The deliver-stall world: from event 3 on, the Spec thread of 10 stalls and its archive does not take; the Ticket
 # thread of 20 stalls, is stopped and taken over, and its fresh thread stalls too.
-if [ -e .scratch/variant ] && [ "$k" -ge 3 ]; then
+variant="$(cat .scratch/variant 2>/dev/null || true)"
+# A comment from the user on an issue (the dry run's stand-in for the user acting on the tracker).
+user_comment() { grep -q '^## Comments' "$1" || printf '\n## Comments\n' >> "$1"; printf '\n%s\n' "$2" >> "$1"; }
+if [ -n "$variant" ] && [ "$variant" != pause ] && [ "$k" -ge 3 ]; then
   case "$k" in
     3) printf 'Thread started 10:05Z: running since 10:05Z\n' > "$s/10-farewell.md" ;;
     4) printf 'Thread started 10:05Z: idle since 10:30Z\n' > "$s/10-farewell.md" ;;
@@ -394,6 +409,61 @@ if [ -e .scratch/variant ] && [ "$k" -ge 3 ]; then
     12) printf 'Thread started 13:10Z: archived since 16:06Z\nThread started 16:10Z: idle since 16:12Z\n' > "$s/20-quiet.md" ;;
     13) ;; # the fresh thread still silent after its nudge: the feature's second stall
     14) ;;
+    15) # The user removed `parked` from 20 at 20:40Z. The fresh thread's pull request #12 (draft, failing) is on the
+        # tracker. Its session still reads idle since 16:12Z: a writer may remain.
+        [ "$variant" = lift ] || { echo "no event $k" >&2; exit 2; }
+        user_comment "$i/20-quiet.md" 'User removed label parked at 20:40Z. Go ahead: the test file is fine to change.'
+        printf 'Builds: 20-quiet.md\nState: open, draft since 16:11Z.\nChanged: src/greet.sh, test.sh\nChecks: failing\nComments: none\n' > .scratch/pulls/12.md ;;
+    16) # The stop thread archived the fresh thread's session at 21:06Z.
+        [ "$variant" = lift ] || { echo "no event $k" >&2; exit 2; }
+        printf 'Thread started 13:10Z: archived since 16:06Z\nThread started 16:10Z: archived since 21:06Z\n' > "$s/20-quiet.md" ;;
+    17) # The user removed `parked` from 10 at 21:50Z. Its session still reads idle since 10:30Z.
+        [ "$variant" = lift ] || { echo "no event $k" >&2; exit 2; }
+        user_comment "$i/10-farewell.md" 'User removed label parked at 21:50Z. The farewell wording is settled: carry on.' ;;
+    18) # The stop thread says it archived 10's session; the record still reads idle (read 22:09Z and 22:10Z).
+        [ "$variant" = lift ] || { echo "no event $k" >&2; exit 2; } ;;
+    19) # 20's fresh thread (started 21:10Z) gave up in review at 22:50Z: a review park, written by the thread alone.
+        [ "$variant" = lift ] || { echo "no event $k" >&2; exit 2; }
+        printf 'Thread started 13:10Z: archived since 16:06Z\nThread started 16:10Z: archived since 21:06Z\nThread started 21:10Z: idle since 22:50Z\n' > "$s/20-quiet.md"
+        user_comment "$i/20-quiet.md" "$(printf '<!-- code-review kind=attempt n=2 -->\nAttempt 2 of PR #12 ended at 22:50Z: Round 5 not clean. Tried: the --quiet flag in say(). Lesson: the exit code path is shared.\nLabel parked added by the Ticket thread (started 21:10Z) at 22:50Z.')" ;;
+    20) # The user removed `parked` from 20 at 23:20Z.
+        [ "$variant" = lift ] || { echo "no event $k" >&2; exit 2; }
+        user_comment "$i/20-quiet.md" 'User removed label parked at 23:20Z. Try the exit code in a separate function.' ;;
+    21) # The stop thread archived the 21:10Z thread's session at 23:36Z.
+        [ "$variant" = lift ] || { echo "no event $k" >&2; exit 2; }
+        printf 'Thread started 13:10Z: archived since 16:06Z\nThread started 16:10Z: archived since 21:06Z\nThread started 21:10Z: archived since 23:36Z\n' > "$s/20-quiet.md" ;;
+    *) echo "no event $k" >&2; exit 2 ;;
+  esac
+  rm -f "$i/"*.bak
+  echo "$k" > .scratch/stage
+  echo "world at event $k"
+  exit 0
+fi
+# The deliver-pause world: two features at once, 25 unblocked; a pause on the user's word, the threads' safe points,
+# check-ins while paused, a resume, and what the loop starts on it.
+if [ "$variant" = pause ] && [ "$k" -ge 3 ]; then
+  case "$k" in
+    3) # Both threads (started 10:05Z) have pushed.
+       printf '10:10Z farewell: the bye command\n' > .scratch/branches/10-farewell.md
+       printf '10:12Z quiet: the --quiet flag\n' > .scratch/branches/20-quiet.md
+       printf 'Thread started 10:05Z: running since 10:05Z\n' > "$s/10-farewell.md"
+       printf 'Thread started 10:05Z: running since 10:05Z\n' > "$s/20-quiet.md" ;;
+    4) # 10's thread pushed and recorded its safe point; 20's finished: #8 merged, its Ticket closed.
+       printf '10:28Z farewell: usage text (safe point)\n' >> .scratch/branches/10-farewell.md
+       user_comment "$i/10-farewell.md" "$(printf '<!-- milestone safe point -->\nSafe point at 10:28Z (thread started 10:05Z): head commit `farewell: usage text` pushed, 10:28Z; no pull request yet; the usage Ticket 12 is left, nothing half-done.')"
+       printf 'Thread started 10:05Z: idle since 10:28Z\n' > "$s/10-farewell.md"
+       sed -i.bak 's/^Status: open$/Status: closed/' "$i/20-quiet.md"
+       printf 'State: merged 10:29Z, with no version change.\nChanged: src/greet.sh, test.sh\nChecks: passing\nComments: none\n' > .scratch/pulls/8.md
+       printf 'Thread started 10:05Z: archived since 10:31Z\n' > "$s/20-quiet.md" ;;
+    5) ;; # a check-in while paused: nothing changed since 10:30Z
+    6) ;; # a check-in while paused: the thread at its safe point has done nothing since
+    7) ;; # the user says to resume
+    8) printf '12:45Z farewell: the usage Ticket\n' >> .scratch/branches/10-farewell.md
+       printf 'Thread started 10:05Z: running since 12:45Z\n' > "$s/10-farewell.md"
+       printf '12:50Z README: the commands section\n' > .scratch/branches/25-hello-doc.md
+       printf 'Thread started 12:30Z: running since 12:50Z\n' > "$s/25-hello-doc.md" ;;
+    9) printf '13:40Z README: one example each\n' >> .scratch/branches/25-hello-doc.md
+       printf 'Thread started 10:05Z: idle since 12:46Z\n' > "$s/10-farewell.md" ;;
     *) echo "no event $k" >&2; exit 2 ;;
   esac
   rm -f "$i/"*.bak
@@ -403,6 +473,7 @@ if [ -e .scratch/variant ] && [ "$k" -ge 3 ]; then
 fi
 case "$k" in
   2) printf 'release-m1-r1\n' >> .scratch/labels.md
+     [ "$variant" = pause ] && sed -i.bak 's/^Labels: \(.*milestone-1\)$/Labels: \1, release-m1-r1/' "$i/25-hello-doc.md"
      for f in 10-farewell 11-bye-code 12-bye-usage 20-quiet; do
        sed -i.bak 's/^Labels: \(.*milestone-1\)$/Labels: \1, release-m1-r1/' "$i/$f.md"
      done
@@ -439,6 +510,9 @@ Posted as a comment when the Release is cut.
 
 Planned by the Release thread from the Milestone issue's order, without waiting for the user.
 MD
+     if [ "$variant" = pause ]; then
+       sed -i.bak -e 's/Used: 2\./Used: 3./' -e 's/^Left out: .*$/- **Document the commands in the README** (3rd)\n  - 25-hello-doc.md/' "$i/40-release-m1-r1.md"
+     fi
      ;;
   3) sed -i.bak 's/^Status: open$/Status: closed/' "$i/11-bye-code.md" "$i/12-bye-usage.md" ;;
   4) ;;
@@ -546,7 +620,9 @@ echo "$k" > .scratch/stage
 echo "world at event $k"
 SH
   echo 1 > "$r/.scratch/stage"
-  [ "$case_" = deliver-stall ] && printf 'b\n' > "$r/.scratch/variant"
+  [ "$case_" = deliver-stall ] && printf 'stall\n' > "$r/.scratch/variant"
+  [ "$case_" = deliver-lift ] && printf 'lift\n' > "$r/.scratch/variant"
+  [ "$case_" = deliver-pause ] && printf 'pause\n' > "$r/.scratch/variant"
   # The variant's world: the scheduler refuses the coordinator's session, so no check-in record ever appears.
   [ "$case_" = deliver-checkin-failed ] && printf 'world.sh: the scheduler refuses the target\n' > "$r/.scratch/checkin-refused"
 fi
@@ -680,7 +756,7 @@ if [ "$case_" = deliver-checkin-failed ]; then
   ' "$out/PROMPT.md" > "$out/PROMPT.md.new" && mv "$out/PROMPT.md.new" "$out/PROMPT.md"
 fi
 
-if [ "$case_" = deliver-stall ]; then
+if [ "$case_" = deliver-stall ] || [ "$case_" = deliver-lift ]; then
   # Events 1 and 2 as in deliver; then its own events, which the world's variant plays from event 3 on.
   awk '
     /^- Event 3 \(/ { drop = 1 }
@@ -699,8 +775,47 @@ if [ "$case_" = deliver-stall ]; then
       print "- Event 12 (18:00Z): a scheduled check-in fires; no thread has reported since event 10."
       print "- Event 13 (19:00Z): a scheduled check-in fires; no thread has reported since event 10."
       print "- Event 14 (20:00Z): a scheduled check-in fires; no thread has reported since event 10."
+      if (lift) {
+        print "- Event 15 (21:00Z): a scheduled check-in fires; the user removed `parked` from `20-quiet.md` at 20:40Z and commented"
+        print "  on it."
+        print "- Event 16 (21:10Z): the stop thread started at event 15, if you started one, reports that it archived the session of"
+        print "  the Ticket thread of `20-quiet.md` started at 16:10Z: the archive call returned success."
+        print "- Event 17 (22:00Z): the user writes that they removed `parked` from `10-farewell.md` at 21:50Z and commented on it."
+        print "- Event 18 (22:10Z): the stop thread started at event 17, if you started one, reports that it archived the session of"
+        print "  the Spec thread of `10-farewell.md` (the one started at 10:05Z): the archive call returned success."
+        print "- Event 19 (23:00Z): a scheduled check-in fires; the Ticket thread of `20-quiet.md` started at 21:10Z gave up in review"
+        print "  at 22:50Z and parked its issue itself (see the issue)."
+        print "- Event 20 (23:30Z): the user writes that they removed `parked` from `20-quiet.md` at 23:20Z and commented on it."
+        print "- Event 21 (23:40Z): the stop thread started at event 20, if you started one, reports that it archived the session of"
+        print "  the Ticket thread of `20-quiet.md` started at 21:10Z."
+        print ""
+        print "Stop after event 21."; next
+      }
       print ""
       print "Stop after event 14."; next }
+    drop { next }
+    { print }
+  ' lift=$([ "$case_" = deliver-lift ] && echo 1 || echo 0) "$out/PROMPT.md" > "$out/PROMPT.md.new" && mv "$out/PROMPT.md.new" "$out/PROMPT.md"
+fi
+
+if [ "$case_" = deliver-pause ]; then
+  # Event 1 as in deliver; then its own events, which the world's variant plays from event 3 on.
+  awk '
+    /^- Event 2 \(/ { drop = 1 }
+    /^Stop after event 23\.$/ { drop = 0
+      print "- Event 2 (10:05Z): the Release thread reports that it planned Milestone 1 · Release 1 with all three features (`10-farewell.md`,"
+      print "  `20-quiet.md` and `25-hello-doc.md`, which has no blocker now), and the check-in thread reports that it arranged the"
+      print "  check-ins."
+      print "- Event 3 (10:20Z): the user writes: \"Pause the Milestone: I need to stop spending for a while.\""
+      print "- Event 4 (10:30Z): the Ticket thread of `20-quiet.md` reports that its pull request #8 (`src/greet.sh` and `test.sh` only)"
+      print "  merged with no version change and that its Ticket is closed."
+      print "- Event 5 (11:00Z): a scheduled check-in fires; no thread has reported since event 4."
+      print "- Event 6 (12:00Z): a scheduled check-in fires; no thread has reported since event 4."
+      print "- Event 7 (12:30Z): the user writes: \"Resume the Milestone.\""
+      print "- Event 8 (13:00Z): a scheduled check-in fires; no thread has reported since event 7."
+      print "- Event 9 (14:00Z): a scheduled check-in fires; no thread has reported since event 7."
+      print ""
+      print "Stop after event 9."; next }
     drop { next }
     { print }
   ' "$out/PROMPT.md" > "$out/PROMPT.md.new" && mv "$out/PROMPT.md.new" "$out/PROMPT.md"
