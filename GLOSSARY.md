@@ -121,7 +121,7 @@ Inside a Milestone, the check after Rank from Round 2 on: an Important caused by
 _Avoid_: loop detection
 
 **Attempt**:
-Inside a Milestone, one build of a change and the Rounds that review it. It ends when the convergence check finds a returned or flipped Finding, or Round 5 or the late design Round is not clean; the Review then reports **restart** (the first attempt) or **park** (a later one) to its caller. A park is carried out by the build thread: see **Parked**.
+Inside a Milestone, one build of a change and the Rounds that review it. It ends when the convergence check finds a returned or flipped Finding, or Round 5 or the late design Round is not clean; the Review then reports **restart** (the first attempt) or **park** (a later one) to its caller. The build thread carries out a restart: it closes the pull request, keeps the untouched parts (a lone Ticket splits off those that stand alone; a Spec keeps, on a fresh Spec branch, the landed Tickets whose files are all untouched and shared with no other landed Ticket, and whose blockers are kept) and rebuilds the rest once from main, in a new pull request whose Rounds start at Round 1. A park is carried out by the build thread too: see **Parked**.
 
 **Attempt record**:
 The comment a Review writes on the issue the pull request builds (the lone Ticket, or the Spec) when an attempt ends, in the shape `review-record` owns: the attempt number, the pull request, the Rounds, the Findings it ended on, what was tried, the lesson and the untouched files. It follows the problem: a later attempt reads every earlier one. A Spec thread also writes one on a Ticket it parks after the Ticket's third Ticket check.
