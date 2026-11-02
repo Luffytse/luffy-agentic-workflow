@@ -92,6 +92,46 @@ Pass: yes | no. <one line on what to change in agentic-review, if anything>
 
 ## Runs
 
+### 2026-11-02, dev-skills 0.29.0, Spec #400 pull request #444, Deep
+
+Base: `301d551d28ef4915efeb5ec3521ea7b0aa68c10b` (branch `claude/project-thread-ksqrgp`, pull request #444, after its Round 1 fixes; version left at 0.29.0 as on main). The skill text read is that commit's `plugins/dev-skills/skills/agentic-review/` (main's plus this pull request). The commit that adds this entry, and any later docs-only commits, change no file the briefs are cut from. Driven by the pull request's Implementer, which had read `EXPECTED.md`, so not a fresh session; it had no subagent tool, so every agent was a brand-new headless `claude -p` session on its tier from the `model-tiers` map (cheap, regular, premium, as `FINDERS.md` and `VERIFY.md` give them), working directory the scratch repo, Write and Edit tools disallowed, given one brief file from `briefs.sh` and told to read only it and the scratch repo. A fresh fixture from `setup.sh`; six fixture unit tests passed; the scratch repo was clean after the run. Five Finders ran in parallel; their reports were pasted into the three stance briefs whole, each tagged with its Finder, and the Verifiers merged the duplicates. The premium gap sweep got the kept Findings; its two Findings went to three more brand-new regular Verifiers with the kept Findings for the repeat check. Votes combined by `VERIFY.md`'s rules. Rank: 5 Important, 5 Nits shown (2 fix, 3 skip; the cap cut one skip Nit, `balances` shadowing the function name, kept 2 of 3), 1 Pre-existing.
+
+| id | Reported? | Severity given | All locations? | Notes |
+|----|-----------|----------------|----------------|-------|
+| P1 | yes | Important | n/a | 3 of 3 keep and Important; `split.py:11` |
+| P2 | yes | Important | yes | 3 of 3; `report.py:11` and `:16` in one Finding (spec, both adversarial and security Finders merged) |
+| P3 | yes | Important | n/a | 3 of 3; `split.py:27` |
+| P4 | yes | Pre-existing | n/a | raised by both adversarial Finders; 3 of 3 real and Pre-existing; `money.py:6` |
+| P5 | yes | Important | yes | 3 of 3 Important, each citing the spec's every-doc-index line; `index.md:6`, `splitting.md:1`, `money.md:1` (tracer gave the missing lines as `index.md:7`, outvoted on location) |
+| P6 | yes | Nit (fix) | n/a | 3 of 3 Nit (fix), lowering the Standards Finder's Important; `cli.py:7`, Bug class "public function without a docstring"; the Standards Finder's Always check section lists the line as broken by it |
+| F1 | never raised | | | |
+| F2 | never raised | | | |
+| K1 | yes | Nit (skip) | n/a | raised by both adversarial Finders; 3 of 3 keep, Nit (skip); `split.py:17-19` |
+| K2 | yes | Important | n/a | gap sweep; second Verify 3 of 3 keep, 2 of 3 Important (tracer, skeptic: shares no longer add up to the total, as the spec asks; spec checker Nit (fix)); `split.py:8-12`, `split.py:19`, `cli.py:10` |
+
+Extras: unrequested rename of `currency.md` to `money.md` (spec Finder), Nit (skip) by 2 of 3, real; missing tests for spare-cent order, `balances`, `settle` and the report, Nit (fix) 3 of 3, real; `balances` parameter shadows the function (standards smell), kept 2 of 3 as Nit (skip), real but harmless, cut by the Nit cap; CLI gives a traceback with missing arguments (gap sweep), Nit (skip) 3 of 3, real, `cli.py:9-10` (the skeptic's `cli.py:8-9` was off by one, outvoted). Dropped by Verify: duplicated loops in `report.py` and bare-tuple transfers (standards smells), 3 of 3 drop. No false extra kept.
+Pass: yes. All six planted cases at accepted Severities and locations, P4 included, and both known extras at accepted Severities. Locations counted within their own file, apart from the two outvoted lines noted.
+
+### 2026-11-02, dev-skills 0.29.0, Spec #400 pull request #444, Standard
+
+Base, skill text and driver as the Deep run above, on the same scratch repo: four Finders (regular standards and spec, cheap bugs and edge cases and cheap security and privacy) in parallel, then one brand-new regular Verifier with their reports pasted whole, each tagged with its Finder; the Verifier merged the duplicates. Rank: 4 Important, 5 Nits (3 fix, 2 skip; under the cap), 1 Pre-existing.
+
+| id | Reported? | Severity given | All locations? | Notes |
+|----|-----------|----------------|----------------|-------|
+| P1 | yes | Important | n/a | `split.py:11` |
+| P2 | yes | Important | yes | `report.py:11` and `:16` in one Finding |
+| P3 | yes | Important | n/a | `split.py:27` |
+| P4 | yes | Pre-existing | n/a | raised by the bugs-and-edge-cases Finder, which ran `parse_amount("0.29")` and got 28; `money.py:6` |
+| P5 | yes | Important | yes | Verifier cited the spec's every-doc-index line, overruling an adversarial Finder's Nit; `index.md:6`, `money.md:1`, `splitting.md:1` |
+| P6 | yes | Nit (fix) | n/a | lowered from the Standards Finder's Important; `cli.py:7`, Bug class "public function without a docstring"; the Standards Finder's Always check list shows the line broken by it |
+| F1 | never raised | | | |
+| F2 | never raised | | | |
+| K1 | yes | Nit (skip) | n/a | raised by the spec Finder (Nit, unsure) and the bugs Finder (Important, unsure); `split.py:18-19` |
+| K2 | no | | n/a | known extra not raised |
+
+Extras: unrequested rename of `currency.md` to `money.md`, Nit (fix), real; missing tests, Nit (fix), real; CLI traceback with missing arguments, Nit (skip), real. Dropped by Verify: terminal escape sequences in CLI output from member-typed names (security Finder, unsure), correctly. No false extra kept.
+Pass: yes. All six planted cases at accepted Severities and locations; P4 found at Standard, which the 0.24.1 Standard runs missed (#376).
+
 ### 2026-11-02, dev-skills 0.29.0, Convergence check
 
 Base: `3817c93e3ef06f1e0b59b3f943142577b2d9af54` (branch `ticket-440`, version left at 0.29.0 as on main; one later wording fix in `ROUNDS.md`, "A Finding has also returned", is not in the copy the runs read). Driven by the Ticket's Implementer: each fixture built with `convergence/make-fixture.sh`, the text between the lines of its `PROMPT.md` given to a fresh headless top-level session on the premium tier (`claude -p`, edits allowed, working directory the fixture repo), with `<checkout>` set to a copy of `plugins/` alone, so `EXPECTED.md` and the Expected line stayed out of reach. No subagents (Find and Verify given).
