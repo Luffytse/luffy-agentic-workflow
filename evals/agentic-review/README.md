@@ -16,6 +16,7 @@ A small fixture pull request with planted problems of known Bug classes (one of 
 - `RESULTS.md`: one entry per run.
 - `brief-lib.sh`: the helpers `briefs.sh` and `milestone/briefs.sh` share to cut the briefs out of the skill files.
 - `milestone/`: the Milestone-agreement check below (`make-fixture.sh`, `test-fixture.sh`, `briefs.sh`, `DESIGN-FINDINGS.md`, `EXPECTED.md`).
+- `convergence/`: the convergence check below (`make-fixture.sh`, `test-fixture.sh`, `EXPECTED.md`).
 
 ## How to run
 
@@ -63,3 +64,13 @@ The fixture, built by [`milestone/make-fixture.sh`](milestone/make-fixture.sh), 
 5. **Decision-level runs** (optional, both cases): give a fresh top-level session that can start subagents the text between the lines of `<out-dir>/PROMPT.md`, with its working directory at `<out-dir>/repo` and `<checkout>` replaced by this checkout's path. Keep `PROMPT.md`'s Expected line away from it.
 6. Score with `milestone/EXPECTED.md` and add an entry to `RESULTS.md` with the Milestone-agreement template there, saying which parts ran and how they were driven.
 
+## Convergence check
+
+Inside a Milestone, does a Review notice a Finding that returns after its fix, or a fix that flips back, end the attempt with the right Result, write the attempt record on the issue, file its Pre-existing Findings and report `restart` (no earlier attempt record) or `park` (one); does it leave a different claim on the same lines alone; and outside a Milestone does nothing change? Rerun it whenever `agentic-review`'s Rank, Round loop or "When a review will not settle" rules (`ROUNDS.md`), or the `review-record` Result values or attempt-record shape, change. Scoring: [`convergence/EXPECTED.md`](convergence/EXPECTED.md).
+
+[`convergence/make-fixture.sh`](convergence/make-fixture.sh) builds a scratch repo with a Boundary record (label form `milestone-<n>`), a local Markdown tracker with "Comment on an issue" and "Create an issue" operations, a Milestone issue and a lone Ticket under `.scratch/issues/`, and a pull request with its earlier Round comments. Fixture `returned`: Round 3 of a backup script, where the fix commit since Round 2 dropped R1-1's quoting again on a line that moved; Verify kept that Finding (under another Bug class name), a different claim on the same lines and a Pre-existing one. Fixture `flip`: Round 2 of a count script, where Verify kept a Finding whose fix undoes R1-1's, and a different claim on the same line; pull request 1 is a closed first attempt, and in case `inside` its attempt record is on the issue, so the outcome is `park`. Case `inside` labels the Ticket `milestone-1`; `outside` does not. The kept Findings go into `PROMPT.md`. [`convergence/test-fixture.sh`](convergence/test-fixture.sh) builds all four and checks each holds what the check needs; run it after changing the builder.
+
+1. Build each fixture and case outside this repo: `bash evals/agentic-review/convergence/make-fixture.sh <out-dir> <returned|flip> <inside|outside>`. Each makes `<out-dir>/repo` and `<out-dir>/PROMPT.md`.
+2. Copy this checkout's `plugins/` folder to a directory of its own, so the session reads the skills but not `evals/`.
+3. Give a fresh top-level session the text between the lines of `PROMPT.md`, its working directory at `<out-dir>/repo` and `<checkout>` replaced by that copy's path. It starts no subagents (Find and Verify have run). Keep the Expected line and `EXPECTED.md` away from it. One run per fixture and case: four runs.
+4. Score with `convergence/EXPECTED.md` and add an entry to `RESULTS.md` with the convergence template there, saying how each run was driven.

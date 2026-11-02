@@ -74,7 +74,42 @@ Extras: <the Finders' other Findings; whether R2-1, R2-2 and R2-3 were raised>
 Pass: yes | no. <one line on what to change in agentic-review, if anything>
 ```
 
+For the convergence check (scored by `convergence/EXPECTED.md`):
+
+```
+### <date>, dev-skills <version>, Convergence check
+
+| run | Expected | Got | Pass? | Notes |
+|-----|----------|-----|-------|-------|
+| returned, inside | R3-1 returned R1-1; restart; record; R3-3 filed | | | conditions failed: |
+| flip, inside | R2-1 flipped R1-1; park (attempt 2); record | | | conditions failed: |
+| returned, outside | not clean, 2 Important open; Round 4; no record | | | |
+| flip, outside | not clean, 2 Important open; Round 3; no record | | | |
+
+False matches: <R3-2, R3-3 or R2-2 counted?>
+Pass: yes | no. <one line on what to change in agentic-review, if anything>
+```
+
 ## Runs
+
+### 2026-11-02, dev-skills 0.29.0, Convergence check
+
+Base: `3817c93e3ef06f1e0b59b3f943142577b2d9af54` (branch `ticket-440`, version left at 0.29.0 as on main; one later wording fix in `ROUNDS.md`, "A Finding has also returned", is not in the copy the runs read). Driven by the Ticket's Implementer: each fixture built with `convergence/make-fixture.sh`, the text between the lines of its `PROMPT.md` given to a fresh headless top-level session on the premium tier (`claude -p`, edits allowed, working directory the fixture repo), with `<checkout>` set to a copy of `plugins/` alone, so `EXPECTED.md` and the Expected line stayed out of reach. No subagents (Find and Verify given).
+
+| run | Expected | Got | Pass? | Notes |
+|-----|----------|-----|-------|-------|
+| returned, inside | R3-1 returned R1-1; restart; record; R3-3 filed | as expected | yes | all 8 conditions. Matched R1-1's line 8 at Round 2's head to line 9 and named commit 6ba2c84 as the one that dropped the quotes; Result `attempt ended: restart (a Finding returned)`; record Comment 1 (attempt 1, R3-1 returned R1-1, R3-2 open, Tried, a Lesson naming the lost quoting, Untouched `README.md, tests/backup.sh`); R3-3 filed as `21-unquoted-path.md` (`needs-triage`) with a receipt |
+| flip, inside | R2-1 flipped R1-1; park (attempt 2); record | as expected | yes | all 8 conditions. Result `attempt ended: park (a fix flipped back)`; record Comment 2 (attempt 2, earlier attempt linked, R2-1 flipped R1-1, R2-2 open, a Lesson that the Ticket must settle missing file versus empty list, Untouched `tests/count.sh`); said neither Finding returns attempt 1's row; no filing |
+| returned, outside | not clean, 2 Important open; Round 4; no record | as expected | yes | said the convergence check does not run outside a Milestone; noted the quoting came back and suggested a test, without ending on it; R3-3 left for the last Round |
+| flip, outside | not clean, 2 Important open; Round 3; no record | as expected | yes | warned the owner that R2-1's fix as asked would undo R1-1's, and went on to Round 3 |
+
+False matches: none (R3-2, R3-3 and R2-2 not counted).
+
+Baseline: the two inside runs on the unchanged skill (main's `agentic-review` at 0.29.0), driven the same way, both failed: returned noted that R3-1 is R1-1 back but planned Round 4; flip did not hold R2-1 under R1-1 and went on to Round 3. No attempt record in either.
+
+Not exercised: the late design Round, an attempt ended at Round 5, and a Finding that returns from an earlier attempt record (the flip run checked only that a different claim does not).
+
+Pass: yes.
 
 ### 2026-11-02, dev-skills 0.29.0, Rebuttal
 
