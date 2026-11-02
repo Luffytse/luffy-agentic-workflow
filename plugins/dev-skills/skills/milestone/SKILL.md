@@ -1,11 +1,79 @@
 ---
 name: milestone
-description: "Run a Milestone's Startup verification: before autonomous delivery starts, prove in this environment that a scheduled check-in fires, that a worker's real state can be read back from the tracker, that a stopped worker is confirmed stopped, and that a fresh thread loads main's skill version, and post the result on the Milestone issue. Use when a Milestone is about to start autonomous delivery, or the user asks whether this environment can run a Milestone unattended."
+description: "Plan and start a Milestone: write the Milestone issue with the user (goal, features with acceptance criteria, exclusions, budget, boundaries, membership label), add a feature mid-Milestone, and run Startup verification, which proves in this environment that a scheduled check-in fires, that a worker's real state can be read back from the tracker, that a stopped worker is confirmed stopped and that a fresh thread loads main's skill version, before autonomous delivery starts. Use when the user asks for a Milestone or to add a feature to one, when a Milestone is about to start autonomous delivery, or when the user asks whether this environment can run a Milestone unattended."
 ---
 
 # Milestone
 
-A **Milestone** is a product goal the user sets, written down in one Milestone issue, which agents deliver unattended across one or more Releases. This skill holds only **Startup verification** for now. Writing the Milestone issue and running its delivery arrive in a later version of this skill; until then, run Startup verification, hand the result back, and go no further.
+A **Milestone** is a product goal the user sets, written down in one Milestone issue, which agents deliver unattended across one or more Releases. This skill runs it in three phases, in order:
+
+1. **Planning**, with the user: the Milestone issue is written and every feature in it is labelled.
+2. **Startup verification**, once the Milestone issue exists: proof that this environment can run delivery unattended.
+3. **Delivery**: agents build the planned features. It starts only once both phases before it are done (see "Delivery").
+
+**No Milestone.** A project is inside a Milestone only while its Milestone issue is open: an open issue carrying a label in the Boundary record's Milestone label form, whose body is the Milestone rather than a feature. Until the user asks for one, this skill changes nothing: the project's own instructions and the other skills behave as they do with no Milestone.
+
+## Planning
+
+The coordinator runs it with the user, when the user asks for a Milestone. The Milestone issue is the user's agreement: everything agents later decide on their own inside the Milestone (who merges, what goes into a Release, how a design question is answered) rests on it, so every field in it comes from the user or from a feature's issue the user planned, never from a guess.
+
+**The features are the user's.** A feature is a Spec with its Tickets, a lone Ticket with the issues it absorbs, or a few related issues the user agrees to treat as one. Agents may **propose** a feature: an open issue that serves the goal, or a gap between the goal and the features listed. Ask about each proposal as one question, saying why it might belong. Only the user adds a feature: a proposal the user does not take stays out, and nothing is listed or labelled for it.
+
+### Steps
+
+1. **Read the setup.** Read the Boundary record (the one the project's `CLAUDE.md` or `AGENTS.md` points to, usually `docs/agents/boundaries.md`) for its Milestone label form, its approvals and its budget, and the tracker doc (`docs/agents/issue-tracker.md`) for its operations. With no Boundary record, or one that names no Milestone label form, tell the user to run `setup-dev-skills`, which writes it, and stop: without the form there is no membership label. Then look for an open Milestone issue. If one exists, carry on from what it holds: to add a feature, go to "Adding a feature mid-Milestone"; to finish an interrupted planning, do only the steps whose result is missing.
+2. **Goal.** Ask for the outcome the user wants by the Milestone's end. Done when the user agrees a one-paragraph goal in their own words.
+3. **Features.** Ask which features deliver the goal. The user plans each one with an agent the usual way: `grill-with-docs` (or `grilling`), then `to-spec` and `to-tickets` for a multi-session feature, or one lone Ticket, in its own thread or here, as the user prefers. An existing issue counts as a feature once the user names it and says it is planned. Done when every feature the user named has its own issue holding its acceptance criteria, and the user has answered every proposal.
+4. **Order.** Ask the build order, and whether features are built one at a time or several at once (and how many).
+5. **Acceptance and limits.** Ask how the user will accept the Milestone at its review, what is excluded, the budget (the Boundary record's, or a tighter one for this Milestone), and any boundaries beyond the Boundary record: an action this Milestone's issues may also take, or one that needs the user's approval. "None beyond the Boundary record" is an answer; silence is not.
+6. **Agree the draft.** Show the user the whole Milestone issue, its title and its label, in the shape below, and change it until the user agrees it.
+7. **Write it.** The membership label fills the Boundary record's form with the next Milestone number: one more than the highest number among the labels already in that form (1 when there are none). Create the label if the tracker lacks it. Create the Milestone issue with the tracker doc's **Create an issue** operation, carrying the label, with the agreed text. Then, for each feature in order, apply the label (**Apply / remove labels**) to every open issue it holds (its own issue, its Tickets, the issues it absorbs or its related issues), and make its own issue a sub-issue of the Milestone issue (**Make an issue a sub-issue of a parent**) where it has no parent yet: the label, not the link, makes it a member. Read the Milestone issue and every labelled issue back from the tracker.
+
+Planning **settles** when the Milestone issue reads back as the user agreed it and every open issue of every feature it lists carries the label. Tell the user in one line, with the issue's link, and go on to Startup verification. A feature planned after this point joins as "Adding a feature mid-Milestone" says.
+
+### The Milestone issue
+
+Title: `Milestone <n>: <name>`, with the number of its label. Body:
+
+```
+## Goal
+
+<the outcome the user wants by the Milestone's end, in the user's words>
+
+## Features, in build order
+
+<One at a time, in this order. | In this order, up to <k> at once.> Each feature is its own issue carrying `<label>`.
+
+| # | Feature | Kind | Accepted when |
+| --- | --- | --- | --- |
+| 1 | <issue link> <short name> | <Spec, lone Ticket or related issues> | <its acceptance criteria as the user agreed them, in short; its issue holds them in full> |
+
+## Acceptance
+
+- Every feature above is merged and its issue closed.
+- <what the user will check at the Milestone review>
+
+## Excluded
+
+- <what is left out, and where it goes instead, if anywhere>
+
+## Boundaries
+
+- **Budget:** <the limit, or none>
+- <each boundary beyond the Boundary record, or: None beyond the Boundary record.>
+```
+
+Keep the headings, their order and the table's first four columns: the skills that run inside the Milestone read its goal, its features in order, their acceptance criteria, its exclusions and its boundaries from them. Extra columns and notes are fine.
+
+### Adding a feature mid-Milestone
+
+When the user asks to add a feature while the Milestone runs, or takes one an agent proposed:
+
+1. **Plan it with the user first**, as planning step 3 says. Until it is planned, nothing about it changes in the Milestone issue or its labels.
+2. **List it.** Ask where it goes in the order. Rewrite the Milestone issue's body with its row in that place, marked `(added <date> by the user)`: read the whole body first, write it whole back with only that change, and read it back.
+3. **Label it**, only after the row is in: apply the label to every open issue it holds and link its own issue as a sub-issue, as in planning step 7.
+
+Listing before labelling keeps every labelled issue one the Milestone issue lists. A Release already planned keeps its scope; the new feature waits for the next Release planning. Tell the user in one line what was added and where. A change to the goal, the acceptance, an exclusion or a boundary is the user's too: write it the same way, once the user agrees it.
 
 ## Startup verification
 
@@ -94,3 +162,7 @@ When an essential capability failed, tell the user before any delivery starts, n
 - **Loaded skill version** failed: threads here may run other skill text than main's, so they can follow rules main has since changed, and a stale cache goes unnoticed.
 
 Delivery does not start until the user says how to go on. With every essential capability passing, say so in one line with a link to the result comment.
+
+## Delivery
+
+Delivery starts only when both hold: planning has settled, and the Startup verification result comment on the Milestone issue reads `Verdict: ready`. Until then nothing is built, labelled for a Release or started as a build thread for this Milestone; a `not ready` verdict waits on the user, as Step 7 of Startup verification says. Delivery's own steps (grouping the planned features into Releases, starting build threads, handing out version numbers) are not part of this skill yet; until they are, once both hold, the coordinator delivers as the project's own instructions say.
