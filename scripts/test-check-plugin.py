@@ -57,6 +57,14 @@ class SkillLoadingPackaging(unittest.TestCase):
         (self.skill / "agents/openai.yaml").unlink()
         self.check(1)
 
+    def test_missing_boundary_seed_fails(self):
+        (self.repo / "plugins/dev-skills/skills/setup-dev-skills/boundaries.md").unlink()
+        self.check(1)
+
+    def test_missing_boundary_record_fails(self):
+        (self.repo / "docs/agents/boundaries.md").unlink()
+        self.check(1)
+
 
 if __name__ == "__main__":
     unittest.main()

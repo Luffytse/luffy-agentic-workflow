@@ -58,7 +58,7 @@ Not feature work, just upkeep.
 
 ## Releases
 
-For a repo that cuts versioned Releases (its release doc, `docs/agents/release.md`, says where the version lives), ordinary pull requests leave the version alone, and **`/release`** ships them a few features at a time. Start a thread for it when every issue with the current release label has closed: it **cuts the Release** (picks the patch, minor or major bump from what shipped and opens the bump pull request with its changelog entry, which you merge), then runs the **Release planning** for the next one (proposes a goal and at most 5 features, and labels only what you approve). A fix that cannot wait goes through it too, as a patch Release of one issue.
+For a repo that cuts versioned Releases, its release doc (`docs/agents/release.md`) sets the **bump mode**, and **`/release`** ships a few features at a time in either. Where **Releases bump** (the default), ordinary pull requests leave the version alone and `/release` cuts the Release: it picks the patch, minor or major bump from what shipped and opens the bump pull request with its changelog entry, which you merge. Where **pull requests bump**, each pull request that changes what the release doc names adds the bump itself at merge, with a number handed out then (`/implement` and `/implement-spec` ask for it), and `/release` opens no bump pull request: it writes the changelog entry for everything merged since the last Release in a changelog pull request that changes no version, and names the Release by the release doc's name form, not a version. Start a thread for `/release` when every issue with the current release label has closed; it then runs the **Release planning** for the next one (proposes a goal and at most 5 features, and labels only what you approve). Where Releases bump, a fix that cannot wait goes through it too, as a patch Release of one issue; where pull requests bump, it ships in its own pull request, which bumps the version as it merges.
 
 ## Vocabulary underneath
 
@@ -91,6 +91,6 @@ Off the main flow entirely.
 
 ## Precondition
 
-**`setup-dev-skills`**: run before your first engineering flow to configure the issue tracker, triage labels, and doc layout the other skills assume, and the release doc `/release` reads. It supports GitHub repos only for now.
+**`setup-dev-skills`**: run before your first engineering flow to configure the issue tracker, triage labels, and doc layout the other skills assume, the Boundary record of what the user allows agents to do, and the release doc `/release` reads. It supports GitHub repos only for now.
 
 **`setup-project`**: run to write or update a project's instructions, the short text its coordinator reads before it starts a thread (how its threads work and what every brief carries, never the state of its work). Use it when a new repo, kind of thread or standing rule means they are out of date.
