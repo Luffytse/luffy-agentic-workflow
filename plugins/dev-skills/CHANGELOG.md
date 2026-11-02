@@ -2,6 +2,21 @@
 
 What each version of `dev-skills` brought, newest first. Each pull request that changes a skill bumps the version, and each Release adds one entry here covering everything since the last Release: its goal, the versions it delivered, the issues it shipped, and what a project using the plugin must do when something breaks. Entries up to 0.25.0 are one per version, when only a Release bumped it.
 
+## Milestone 1 · Release 2 (2026-11-02)
+
+Agents run the end of a Release inside a Milestone: a stuck review restarts once and then parks, and triage, Retro planning and the next Release's scope run as agent batches, so a Release ends without waiting on the user.
+
+Versions: 0.30.0, 0.31.0, 0.32.0, 0.33.0. Commits: 7d04de2..ace9974.
+
+- Spec: a stuck review restarts once, then parks (Milestone 1, piece B4) (#400)
+- agentic-review: detect a stuck review, record the attempt, report restart or park (piece B4, Ticket 1) (#440)
+- agentic-review: a premium-tier Verifier judges a fixer's rebuttal (piece B4, Ticket 2) (#441)
+- implement, implement-spec: park a stuck pull request or Ticket and tell the user once (piece B4, Ticket 3) (#442)
+- implement, implement-spec: restart a stuck pull request once from main (piece B4, Ticket 4) (#443)
+- triage: inside a Milestone, agents triage in a Release-end batch (Milestone 1, piece B5) (#401)
+- retro-planning: inside a Milestone, agents plan the Retro backlog at Release end (Milestone 1, piece B6) (#403)
+- release: inside a Milestone, agents plan the next Release (Milestone 1, piece B7) (#404)
+
 ## Milestone 1 · Release 1 (2026-11-02)
 
 Per-PR versions are in place and agents merge inside the Milestone's boundaries, so most later pieces of Milestone 1 need nothing from the user.
