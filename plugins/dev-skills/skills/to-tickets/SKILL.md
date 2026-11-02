@@ -62,7 +62,7 @@ Ask the user:
 - Should any tickets be merged or split further?
 - Does each ticket's model tier fit its difficulty?
 
-Iterate until the user approves the concrete breakdown. If the user declines, publish nothing; return the rejection and any next decision to the caller. On resume, retain an existing solution approval unless the proposed work changes.
+Iterate until the user approves the concrete breakdown. When the caller says it is deciding inside a Milestone, judge whether the breakdown is a feature (a Spec with its Tickets, not a lone Ticket): if so, publish nothing and return it to the caller as needs larger scope; if not, the caller's approval of the concrete breakdown stands in for the user's, so settle these questions with the caller and publish without asking the user. If the user declines, publish nothing; return the rejection and any next decision to the caller. On resume, retain an existing solution approval unless the proposed work changes.
 
 ### 5. Publish the tickets to the configured tracker
 

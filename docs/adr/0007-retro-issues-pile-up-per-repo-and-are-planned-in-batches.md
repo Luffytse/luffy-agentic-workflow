@@ -25,7 +25,7 @@ It runs per repo and reads only that repo's Retro issues; the `dev-skills` repo 
 8. Recheck whether the problem behind an earlier fix has come back. If it has, the fix did not work, and that group goes first.
 9. The record lists the snapshot, the cap, every verdict and vote count, what was spun off and what arrived during the planning. The planning closes it at the end. A planning that pauses leaves it open and is resumed from it: the resumed run keeps the snapshot, first brings the record up to date with what was already done on the issues (closes, Tickets, spin-offs), redoes the grouping for the issues still without a verdict, and walks on from there. The next planning, and `retro`'s 2-week clock, read only closed records; the clock runs from the newest closed record's creation, which is now its planning's start.
 
-The thresholds (10, 2 weeks with 4, at most 3 groups, 2 plannings) are the user's choices, not taken from a source.
+The thresholds (10, 2 weeks with 4, at most 3 groups, 2 plannings) are the user's choices, not taken from a source. Inside a Milestone (ADR 0004, ADR 0008) the 3-group cap and the walk with the person do not apply: agents decide every group at Release end (see `retro-planning`).
 
 ## Considered options
 

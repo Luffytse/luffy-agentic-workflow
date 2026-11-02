@@ -1,15 +1,17 @@
 ---
 name: retro-planning
-description: Work through this repo's Retro backlog: snapshot the open Retro issues, group them by root cause, walk the user through each group one at a time and act on each call at once (a Ticket, a close, or a spin-off to its own planning), keeping an open record that is closed at the end. Use when Retro planning is due, or to resume one whose record is still open.
+description: Work through this repo's Retro backlog: snapshot the open Retro issues, group them by root cause, walk the user through each group one at a time and act on each call at once (a Ticket, a close, or a spin-off to its own planning), keeping an open record that is closed at the end; inside a Milestone, agents decide every group at Release end. Use when Retro planning is due, or to resume one whose record is still open.
 ---
 
 A **Retro planning** works through one repo's **Retro backlog** (its open issues labelled `retro`): it merges duplicates, closes one-offs, and turns repeated problems into Tickets. Run this thread at the **premium** tier: the snapshot, verdict, cap, order, spin-off and expiry rules below interact, and each must be applied exactly. Load `model-tiers` by name for the model each tier is in your coding agent; the project's own tier map overrides it.
 
 Plan only the current repo. Its tracker is named in `docs/agents/issue-tracker.md`; with no such file, use the GitHub repo of the checkout's `origin` remote. Read and write only that repo's issues, using the commands that file gives.
 
-**The cap: at most 3 Tickets per planning.** Every Ticket this planning files counts toward it: repeated groups, severe one-offs and failed fixes alike. A spun-off group does not count. Only the user may raise the cap, and only for this planning: when more groups qualify than fit, say so, and keep the cap unless the user raises it. The record notes the cap used and the user's reason.
+**The cap: at most 3 Tickets per planning.** Every Ticket this planning files counts toward it: repeated groups, severe one-offs and failed fixes alike. A spun-off group does not count. Only the user may raise the cap, and only for this planning: when more groups qualify than fit, say so, and keep the cap unless the user raises it. The record notes the cap used and the user's reason. Inside a Milestone there is no cap (see "Inside a Milestone").
 
 Load `issue-absorption` before reconciling absorption records, classifying the snapshot or carrying out an absorption or close-with-Ticket verdict. Apply its agreement and lifecycle as reference while continuing this planning.
+
+This file describes a planning that runs with the user. Inside a Milestone (the agreement test in "Inside a Milestone" at the end), follow that section instead of walking the user through each group.
 
 If the brief says this thread owns a spun-off group, skip steps 0 to 7 and go straight to "Running a spun-off planning".
 
@@ -62,7 +64,7 @@ Group the remaining backlog issues by root cause and merge duplicates. A group's
 Give each group the first verdict that fits:
 
 1. **Act, failed fix**: a failed-fix group from step 2.
-2. **Expire**: the group has had no new vote across 2 plannings. That is: every issue in it has a count of 1 or more under "plannings without a new vote" in the newest record, and none has a new vote. Close it with "reopen if seen again". A group the newest record held back by the cap never expires.
+2. **Expire**: the group has had no new vote across 2 plannings. That is: every issue in it has a count of 1 or more under "plannings without a new vote" in the newest record, and none has a new vote. Close it with "reopen if seen again". A group the newest record held back by the cap never expires (inside a Milestone, nor one it listed as proposed to the user).
 3. **Act**: seen in 2 or more distinct threads.
 4. **Act, severe**: seen in one thread, but severe: lost data, a security problem, or a large waste of time or money.
 5. **Close as `wontfix`**: seen in one thread and not severe. Write the reason.
@@ -82,6 +84,8 @@ After them come the `wontfix` groups, oldest issue first. Expiries and issues cl
 Done when every group has its place in one ordered walk.
 
 ## 5. Walk the user through each group, one at a time
+
+Inside a Milestone this step is replaced by "Deciding the groups" below.
 
 Take the groups in the step 4 order. While this planning has filed fewer Tickets than the cap allows (spin-off Tickets live only in comments on the record and do not count), the next acting group is proposed as a Ticket; once the cap is full, each later acting group is shown as **held back by the cap**. So when the user closes or spins off a proposed Ticket, its slot stays free and the next acting group moves up into it.
 
@@ -126,6 +130,40 @@ Done when the record is complete and closed, and the user has its link.
 ## Running a spun-off planning
 
 When the brief says this thread owns a spun-off group, plan only its issues with the user. Discuss them as long as the user needs, then give each issue a verdict, carried out as in step 6: absorbed by Tickets prepared and published through the complete `to-tickets` workflow, or closed with a reason. Pass this spun-off scope and its agreed budget instead of the ordinary one-Ticket limit; the originating planning's cap does not apply here. File no `retro-planning` record of your own, and never edit the body of the record that spun it off: its planning is the body's only writer. Instead, comment on that record, open or closed: right after filing each Ticket, one comment for it, `Filed #<ticket> (from spin-off <this thread's link>), absorbs #<n>, ...`, so later plannings recheck it in step 2, and one more listing each issue you closed with its reason. The thread's work is done when no issue it owns is left open without an `Absorbed by` comment, and every Ticket it filed has its `Filed` comment on that record. On resuming this thread, first check that every Ticket it filed has its `Filed` comment, and post any that is missing.
+
+## Inside a Milestone
+
+A planning runs **inside a Milestone** when both hold: the Boundary record (the one the repo's `CLAUDE.md` or `AGENTS.md` points to, usually `docs/agents/boundaries.md`) names a Milestone label form, and an open Milestone issue exists (the issue carrying a label in that form that holds the Milestone's goal; for a Release-end run, the one the release issue links or names). The caller, the Release thread, runs it at the end of a named Release, naming the Release or its release issue, together with or after the Triage batch (see `triage`). With no such agreement, everything above runs as written, cap included, and everything below is skipped.
+
+Inside a Milestone agents decide: the user is asked nothing per group, except as "Goes to the user" says. Read the Milestone issue (goal, features, acceptance criteria, exclusions, its own boundaries) and the Boundary record before the first group. Steps 0 to 4 run as written, except that the record's Cap section reads `none (inside a Milestone)`. No cap applies: no Ticket counts toward one, no group is held back by one, and the cap wording in steps 0 to 4, step 5's held-back logic, "Held back by the cap" and "raised by the user" apply to nothing here.
+
+### Deciding the groups
+
+Take the groups in step 4 order and decide each one yourself, without waiting. Step 3's verdict says whether a group deserves action; the call sets its **disposition**:
+
+- **joins the next Release**: an acting group whose fix touches a feature of this Milestone (it blocks it, or fixes something the feature relies on) or is severe (a security flaw, lost data, a large waste of time or money). Carry it out through step 6's "Address the problem", as changed below. This is the proposal for Release planning, which owns the release labels: apply no release label. The fix does not count toward the Release's feature cap.
+- **stays open**: any other acting group, including one an open Ticket or a planned piece of the Milestone already covers. Write the reason down; leave its issues open.
+- **closed**: a `wontfix` group, an expiry, or an issue closing with its Ticket, carried out as step 6 says. Mechanical closes need no asking.
+- **proposed to the user**: see "Goes to the user".
+- **spun off**: only as step 6 says, for a group that needs discussion with the user; prefer a disposition above.
+
+Carry each call out at once with step 6, then update the record's "Verdicts" row: the disposition in the Verdict column, and in the last column the reason and any Ticket. The user sees every call and reason at the Milestone review.
+
+Step 6's "Address the problem" changes here. No budget limit is passed; request the group's Tickets, each separately sized, and tell `to-tickets` that this planning is deciding inside a Milestone. `to-tickets` drafts the breakdown and judges whether the fix is a **feature** (a Spec with its Tickets, not a lone Ticket). If it is, `to-tickets` publishes nothing and returns the breakdown as "needs larger scope"; if not, this planning's approval of the concrete breakdown stands in for the user's (`to-tickets` step 4) and `to-tickets` publishes. The "return to the user's spin-off decision" and "solution is declined" bullets apply to nothing here. A returned feature-sized breakdown makes the group "Goes to the user": proposed, nothing filed.
+
+### Goes to the user
+
+Ask one question per decision, saying which kind it is, for a group that:
+
+- **crosses a boundary** in the Boundary record or in the Milestone issue's own boundaries,
+- **changes the Milestone's agreement** (goal, acceptance criteria, exclusions), or
+- would join the next Release but needs a **feature-sized** fix: the user plans every feature, agents only propose. (A group that would stay open anyway is not proposed.)
+
+Propose it and file nothing: the group stays open and its disposition is `proposed to the user`. The record lists it under "Proposed to the user" (group, issues, kind, question), with its issues' "plannings without a new vote" at 0. A group the newest record listed there and still open is listed again as waiting, not asked again, unless it has a new vote.
+
+### Dry run
+
+When the caller asks for a dry run (proposals only), run steps 0 to 4 read-only, with no record issue filed and the snapshot read at the current time, then decide each group as above. Write nothing to the tracker: no record, comment, label, close or Ticket, and ask the user nothing. Return each group with its disposition, reason, and for a group that joins the next Release the Ticket it would file, in your reply.
 
 ## The record
 
@@ -196,4 +234,12 @@ None / <group: problem verdict; solution decision; existing Ticket identifiers a
 - #19: <thread link>
 ```
 
-Every verdict appears, kept-open ones included. "Plannings without a new vote" covers every snapshot issue left open that is not waiting on a Ticket or spun off: 0 if it had a new vote since the previous record or is held back by the cap, otherwise the previous record's count plus 1 (a missing count is 0). "Spun off, waiting" lists issues spun off by an earlier planning and still undecided; this planning's own spin-offs are under "Spun off".
+Every verdict appears, kept-open ones included. "Plannings without a new vote" covers every snapshot issue left open that is not waiting on a Ticket or spun off: 0 if it had a new vote since the previous record, is held back by the cap or (inside a Milestone) is proposed to the user, otherwise the previous record's count plus 1 (a missing count is 0). "Spun off, waiting" lists issues spun off by an earlier planning and still undecided; this planning's own spin-offs are under "Spun off".
+
+Inside a Milestone the record differs in four places: Cap reads `none (inside a Milestone)`; the Verdict column of "Verdicts" holds the disposition (`joins the next Release`, `stays open`, `closed`, `proposed to the user`, `spun off`) and its last column the reason and any Ticket; the zero case of "Open issues: plannings without a new vote" also covers a group proposed to the user; and a required section follows "Held back by the cap" (which reads "None"):
+
+```markdown
+## Proposed to the user
+
+- <root cause>: #14, <kind: crosses a boundary / changes the agreement / feature-sized>, <question>
+```
