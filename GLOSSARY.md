@@ -129,7 +129,7 @@ _Avoid_: section, module
 One run of the `agentic-review` skill, in three stages: find candidate Findings, verify them, then rank the survivors. It has two entry points: a pull request (reviewed in Rounds), or the diff since a fixed point (a commit, branch, tag or merge-base; it also reads uncommitted work). The second kind is one Review, not a Round; a Ticket check is that kind, one Review at Quick depth over a Ticket branch's diff.
 
 **Round**:
-One Review plus the fix commits that follow it (the final commit of "fix" Nits is not reviewed by another Round). Rounds 1 and 2 are **full-PR Rounds**; Rounds 3 to 5 are **commit Rounds**, which review only the commits added since the last Round (for a merge from main, only what it changed in the pull request). A Late design Round and a Late merge-only Round may follow Round 5, and the Rounds belong to one Attempt.
+One Review plus the fix commits that follow it (the final text "fix" Nit commit is checked before the clean comment and included if a later merge-only Round's pinned range contains it). Rounds 1 and 2 are **full-PR Rounds**; Rounds 3 to 5 are **commit Rounds**, which review only the commits added since the last Round (for a merge from main, only what it changed in the pull request). A Late design Round and a Late merge-only Round may follow Round 5, and the Rounds belong to one Attempt.
 _Avoid_: pass, iteration
 
 **Late design Round**:
@@ -158,7 +158,7 @@ One batch of questions a skill (`grilling`, `triage`) puts to the user at once. 
 _Avoid_: Round (for a batch of questions)
 
 **Merge-only Round**:
-A Round 3 to 5 (or the one Late merge-only Round) whose new commits are only a merge from main. When the merge's conflicts were only text, it runs at Quick depth, not the carried one, unless a resolution touches logic.
+A Round 3 to 5 (or the one Late merge-only Round) whose range contains merges from main plus only checked final text-Nit commits from the preceding clean Round and release-doc-required version-only bumps. It reviews that entire pinned range, at Quick depth for text and version-only changes, or the carried depth when a resolution touches logic. Other work requires an ordinary Round within the existing budget; it grants no extra late Round.
 
 **REVIEW.md**:
 A short file at a repo's root telling reviewers what Important means there, what to skip, and what to always check.

@@ -471,3 +471,28 @@ Extras (all real): duplicate names collapse shares, so they no longer add up to 
 Pass: yes. Same gap on F1 and F2.
 
 What these runs changed in `agentic-review`: the first attempt ran the Review inside a subagent, which cannot start subagents of its own and stopped, so `SKILL.md` now says the Review runs in the top-level session. Cheap Finders quoted wrong line numbers (from a concatenated listing); the Verifier corrected them, as its brief asks.
+
+
+## 2026-11-02 — Ticket #480 mixed final-range histories
+
+Source baseline: main `e77e84b`, dev-skills `0.45.0`. Version remains unchanged during review. Confirmed seam: actual Git-history classification, full pinned diff and depth/budget decisions, under the Ticket's worker brief. This is a manual before/after workflow trace, independently checked by the coordinating agent, plus executed fixture plumbing controls. No wording assertions were added.
+
+Built five disposable repositories with `python3 evals/agentic-review/final-range/make-fixture.py /tmp/ticket480-after`. All five passed: each non-merge patch and each conflict resolution appears in `git log -p --first-parent --remerge-diff <last-reviewed>..HEAD`; the imported `upstream.txt` patch does not. The script's assertions check those actual Git outputs, not classification decisions or skill text. `.git/round.md` supplies the prior clean Deep Round 5, `.git/release.md` authorizes changing only `version.json`'s version value, and `.git/scenario.json` records exact SHAs.
+
+**Before:** main's literal “only a merge from main” eligibility is false for both `bump-text` and `nit-text` (two own first-parent commits each). The callers nevertheless request a merge-only Round. The existing remerge-diff command already includes both patches, but the owner supplies no explicit depth/late eligibility for that mixed range. This is the red workflow trace; no fresh-runtime baseline was run. The fixture was prepared after drafting the rule, then traced against the untouched main source; this is not a claim of an automated red/green TDD run.
+
+**After, observed manual decisions:** the Implementer read every patch, then the coordinator independently inspected all five histories and their source records and applied the drafted owner rule. Both reached:
+
+| History | Commits accounted for | Decision after clean Round 5 |
+| --- | --- | --- |
+| bump-text | `5ac5ddf` version value only; `732e27b` main merge, wording resolution | late Round 6, Quick, entire two-commit range |
+| nit-text | `7a38438` checked R5-1 spelling fix; `066cf70` main merge, wording resolution | late Round 6, Quick, entire two-commit range |
+| both-logic | `7a38438` checked Nit; `b2850b0` bump; `93921b8` main merge, authority-changing rule resolution; `a51dacb` superseding bump after merge | late Round 6, Deep, entire four-commit range |
+| disguised-logic | `a8d193b` alleged bump also adds unconditional-success check; `e93e69c` main merge | ineligible; no extra Round, end attempt |
+| unrelated-clean | `f5d9c6a` unrelated logic; `da4c78c` conflict-free main merge | ineligible despite no conflicts; no extra Round, end attempt |
+
+The first three share pinned prior head `231c92a0c4ee980afdeebe243fc00774cc50e5d9`. In `nit-text`, it stays in the Round 5 marker even though the `fixed` R5-1 Note names `7a38438`; `note.md:1` is counted at the pinned head. Thus neither posting the clean comment after the Nit nor bumping after the merge truncates the next range. Quick cases use `depth=Quick` and heading `## Code review: Round 6, late merge-only Round (Quick)`; the logic case uses matching Deep marker and heading. Every own patch is sent to Find/Verify, with the whole-PR diff retained for Bug class coverage.
+
+Manual continuation trace (not additional built histories): the two ineligible ranges after Round 2 instead use ordinary Round 3 at carried Deep. Following a Quick merge-only Round 3, ordinary Round 4 takes Deep from Round 2. A qualifying range after late design Round 6 uses the sole late merge-only Round 7, never Round 8. A non-clean late merge-only Round, or another conflicting main merge after its clean completion, ends the attempt; an ineligible post-cap range does so without a Round. Outcomes remain `restart` with no earlier attempt and `park` with an earlier attempt or no built issue. No exhausted design-answer policy was changed.
+
+Required packaging checks passed: `claude plugin validate .`, `bash scripts/check-plugin.sh`; `git diff --check` passed. Not visual. Limits: no fresh installed runtime, actual Find/Verify reviews, tracker posting, live CI, full Standard/Deep planted-Finding reruns or live final merge were exercised here. The bounded Git evidence and manual decisions cover the changed eligibility/diff/depth boundary only.
