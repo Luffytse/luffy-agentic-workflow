@@ -1,13 +1,15 @@
 #!/usr/bin/env bash
 # Builds one fixture for the milestone skill's dry run: its planning phase (plan, add-feature) or its delivery loop (deliver).
-# Usage: make-fixture.sh <out-dir> <plan|add-feature|deliver|deliver-checkin-failed>
+# Usage: make-fixture.sh <out-dir> <plan|add-feature|deliver|deliver-checkin-failed|deliver-stall>
 # Makes <out-dir>/repo (a git repo, one commit on main, with a dry-run local tracker) and <out-dir>/PROMPT.md
 # (the scripted prompt for a fresh coordinator session). See evals/milestone/README.md.
 set -eu
 out="$1"; case_="$2"
-case "$case_" in plan|add-feature|deliver|deliver-checkin-failed) ;; *) echo "unknown case: $case_" >&2; exit 2 ;; esac
+case "$case_" in plan|add-feature|deliver|deliver-checkin-failed|deliver-stall) ;; *) echo "unknown case: $case_" >&2; exit 2 ;; esac
 # deliver-checkin-failed is the deliver fixture, cut to events 1 to 4, in which the check-in thread cannot arrange the check-ins.
-kind="$case_"; [ "$case_" = deliver-checkin-failed ] && kind=deliver
+# deliver-stall is the deliver fixture with its own world from event 3 on: threads that stall, a stop that does not
+# take, a takeover, and a second stall.
+kind="$case_"; case "$case_" in deliver-*) kind=deliver ;; esac
 [ -e "$out" ] && { echo "$out exists" >&2; exit 2; }
 mkdir -p "$out"
 out="$(cd "$out" && pwd)"
@@ -64,6 +66,8 @@ file under `.scratch/issues/` or `.scratch/labels.md`**. Instead, each write is 
 Starting a thread or a subagent is a write too: record it as `### <k>. Start a thread` with a `Skill:` line, then
 `Brief:` followed by the whole brief between `~~~` lines. A message to a thread you started is one too: `### <k>. Message a
 thread` with a `Thread:` line (the issue file the thread works on) and `Body:` followed by the message between `~~~` lines.
+In delivery, a message to the user is one too: `### <k>. Message the user` with `Body:` followed by the message between
+`~~~` lines.
 
 Times: a comment in an issue's file, a commit and a pull request comment carry their UTC time. Each event gives the clock;
 a block you append counts as written at that clock time (read your earlier blocks in `.scratch/proposed-actions.md` as the
@@ -88,6 +92,16 @@ event `<k>` (also when it leads to no write), and keep numbering the blocks on f
 - **Count open blockers**: read the issue's `Blocked by:` header and the `Status:` of each issue it names. A blocker whose
   status is `closed` is cleared, unless its file has a `Closed as: not planned` line. The issue is startable when no
   named blocker is open or uncleared.
+- **Park**: mark an issue parked, or read whether it is. To mark it, add the `parked` label (**Apply / remove labels**),
+  then comment on the issue (**Comment on an issue**) with a link to the attempt history. An issue is parked when its
+  `Labels:` include `parked`; the user lifts the park by removing the label.
+
+## The environment's record of a thread
+
+Not a tracker operation: this dry run's stand-in for the environment's own record of a thread's session (its
+session-details call). **Read a thread's state**: read `.scratch/sessions/<issue file name>`: one line per thread that
+has worked on that issue, by its start time, with its state now (`running`, `idle` or `archived`) and since when. No such
+file means no thread on that issue has a session record yet.
 MD
 
 cat > "$r/docs/agents/boundaries.md" <<'MD'
@@ -305,7 +319,7 @@ fi
 
 if [ "$kind" = deliver ]; then
   # Delivery starts: Milestone 1 planned (one feature at a time), Startup verification passed, no Release planned yet.
-  printf 'milestone-1\n' >> "$r/.scratch/labels.md"
+  printf 'milestone-1\nparked\n' >> "$r/.scratch/labels.md"
   for f in 10-farewell 11-bye-code 12-bye-usage 20-quiet; do
     sed -i.bak 's/^Labels: enhancement$/Labels: enhancement, milestone-1/' "$r/.scratch/issues/$f.md"
   done
@@ -361,6 +375,32 @@ k="$1"; cur="$(cat .scratch/stage)"
 [ "$k" = 1 ] && [ "$cur" = 1 ] && { echo "world at event 1 (the fixture starts here; nothing to run)"; exit 0; }
 [ "$k" -eq $((cur + 1)) ] || { echo "at stage $cur; next is $((cur + 1))" >&2; exit 2; }
 i=.scratch/issues
+s=.scratch/sessions
+mkdir -p "$s" .scratch/branches .scratch/pulls
+# The deliver-stall world: from event 3 on, the Spec thread of 10 stalls and its archive does not take; the Ticket
+# thread of 20 stalls, is stopped and taken over, and its fresh thread stalls too.
+if [ -e .scratch/variant ] && [ "$k" -ge 3 ]; then
+  case "$k" in
+    3) printf 'Thread started 10:05Z: running since 10:05Z\n' > "$s/10-farewell.md" ;;
+    4) printf 'Thread started 10:05Z: idle since 10:30Z\n' > "$s/10-farewell.md" ;;
+    5) ;; # still silent after its nudge
+    6) ;; # the stop thread says it archived the session; the record still reads idle (read 13:09Z and 13:10Z)
+    7) printf '13:30Z quiet: the --quiet flag\n' > .scratch/branches/20-quiet.md
+       printf 'Thread started 13:10Z: running since 13:10Z\n' > "$s/20-quiet.md" ;;
+    8) printf 'Thread started 13:10Z: idle since 13:31Z\n' > "$s/20-quiet.md" ;;
+    9) ;; # still silent after its nudge
+    10) printf 'Thread started 13:10Z: archived since 16:06Z\n' > "$s/20-quiet.md" ;;
+    11) printf 'Thread started 16:10Z: running since 16:10Z\n' >> "$s/20-quiet.md" ;;
+    12) printf 'Thread started 13:10Z: archived since 16:06Z\nThread started 16:10Z: idle since 16:12Z\n' > "$s/20-quiet.md" ;;
+    13) ;; # the fresh thread still silent after its nudge: the feature's second stall
+    14) ;;
+    *) echo "no event $k" >&2; exit 2 ;;
+  esac
+  rm -f "$i/"*.bak
+  echo "$k" > .scratch/stage
+  echo "world at event $k"
+  exit 0
+fi
 case "$k" in
   2) printf 'release-m1-r1\n' >> .scratch/labels.md
      for f in 10-farewell 11-bye-code 12-bye-usage 20-quiet; do
@@ -482,17 +522,22 @@ Blocked by: none
 MD
       ;;
   17) # The Ticket thread of 25 (started 14:10) pushed a commit at 14:40.
-      mkdir -p .scratch/branches
-      printf '14:40Z README: the commands section\n' > .scratch/branches/25-hello-doc.md ;;
-  18) ;; # the thread did nothing since 14:40: a silent thread
-  19) # The thread's callback is lost: it pushed and turned its pull request ready at 16:40 and reported nothing.
-      printf '16:35Z README: one example each\n' >> .scratch/branches/25-hello-doc.md
-      mkdir -p .scratch/pulls
-      printf 'State: open. Ready for review since 16:40Z.\nChanged: README.md\nChecks: passing\nComments: none\n' > .scratch/pulls/11.md ;;
-  20) sed -i.bak 's/^Status: open$/Status: closed/' "$i/25-hello-doc.md"
+      printf '14:40Z README: the commands section\n' > .scratch/branches/25-hello-doc.md
+      printf 'Thread started 14:10Z: running since 14:10Z\n' > "$s/25-hello-doc.md" ;;
+  18) # the thread did nothing since 14:40: a silent thread
+      printf 'Thread started 14:10Z: idle since 14:41Z\n' > "$s/25-hello-doc.md" ;;
+  19) ;; # still silent after its nudge: a stall
+  20) # The stop thread archived the thread's session at 17:06.
+      printf 'Thread started 14:10Z: archived since 17:06Z\n' > "$s/25-hello-doc.md" ;;
+  21) # The fresh thread (started 17:10) pushed and turned its pull request ready at 17:50, and reported nothing: a lost
+      # callback.
+      printf 'Thread started 14:10Z: archived since 17:06Z\nThread started 17:10Z: running since 17:10Z\n' > "$s/25-hello-doc.md"
+      printf '17:35Z README: one example each\n' >> .scratch/branches/25-hello-doc.md
+      printf 'State: open. Ready for review since 17:50Z.\nChanged: README.md\nChecks: passing\nComments: none\n' > .scratch/pulls/11.md ;;
+  22) sed -i.bak 's/^Status: open$/Status: closed/' "$i/25-hello-doc.md"
       printf 'README lists hello and bye.\n' > README.md
-      printf 'State: merged 17:05Z, with no version change.\nChanged: README.md\nChecks: passing\nComments: none\n' > .scratch/pulls/11.md ;;
-  21) printf '# Changelog\n\n## Milestone 1 · Release 2\n\nVersions: none (no skill changed).\n\n## Milestone 1 · Release 1\n\nVersions: 0.4.0, 0.5.0.\n' > CHANGELOG.md
+      printf 'State: merged 18:05Z, with no version change.\nChanged: README.md\nChecks: passing\nComments: none\n' > .scratch/pulls/11.md ;;
+  23) printf '# Changelog\n\n## Milestone 1 · Release 2\n\nVersions: none (no skill changed).\n\n## Milestone 1 · Release 1\n\nVersions: 0.4.0, 0.5.0.\n' > CHANGELOG.md
       sed -i.bak 's/^Status: open$/Status: closed/' "$i/41-release-m1-r2.md" ;;
   *) echo "no event $k" >&2; exit 2 ;;
 esac
@@ -501,6 +546,7 @@ echo "$k" > .scratch/stage
 echo "world at event $k"
 SH
   echo 1 > "$r/.scratch/stage"
+  [ "$case_" = deliver-stall ] && printf 'b\n' > "$r/.scratch/variant"
   # The variant's world: the scheduler refuses the coordinator's session, so no check-in record ever appears.
   [ "$case_" = deliver-checkin-failed ] && printf 'world.sh: the scheduler refuses the target\n' > "$r/.scratch/checkin-refused"
 fi
@@ -606,12 +652,15 @@ event's text, with the changed files it lists. Ask the user nothing: no answers 
 - Event 17 (15:00Z): a scheduled check-in fires; no thread has reported since event 16.
 - Event 18 (16:00Z): a scheduled check-in fires; no thread has reported since event 16.
 - Event 19 (17:00Z): a scheduled check-in fires; no thread has reported since event 16.
-- Event 20 (17:10Z): the Ticket thread of `25-hello-doc.md` reports that its pull request #11, which changes `README.md`
+- Event 20 (17:10Z): the stop thread started at event 19, if you started one, reports that it archived the session of the
+  Ticket thread of `25-hello-doc.md` (the one started at 14:10Z).
+- Event 21 (18:00Z): a scheduled check-in fires; no thread has reported since event 20.
+- Event 22 (18:10Z): the Ticket thread of `25-hello-doc.md` reports that its pull request #11, which changes `README.md`
   only, merged with no version change, and that its Ticket is closed.
-- Event 21 (17:20Z): the Release thread reports that it cut Milestone 1 · Release 2 and planned no next Release: no
+- Event 23 (18:20Z): the Release thread reports that it cut Milestone 1 · Release 2 and planned no next Release: no
   planned feature of the Milestone is left open.
 
-Stop after event 21.
+Stop after event 23.
 TXT
   fi
   echo "---"
@@ -623,9 +672,35 @@ if [ "$case_" = deliver-checkin-failed ]; then
     /^- Event 2 \(/ { print "- Event 2 (10:05Z): the Release thread reports that it has planned the Release, and the check-in thread reports that"
                      print "  it could not arrange the check-ins: the scheduler refused the coordinator'"'"'s session as a target."; skip = 1; next }
     /^- Event 5 \(/ { drop = 1 }
-    /^Stop after event 21\.$/ { print ""; print "Stop after event 4."; drop = 0; next }
+    /^Stop after event 23\.$/ { print ""; print "Stop after event 4."; drop = 0; next }
     /^- Event / { skip = 0 }
     skip && /^  / { next }
+    drop { next }
+    { print }
+  ' "$out/PROMPT.md" > "$out/PROMPT.md.new" && mv "$out/PROMPT.md.new" "$out/PROMPT.md"
+fi
+
+if [ "$case_" = deliver-stall ]; then
+  # Events 1 and 2 as in deliver; then its own events, which the world's variant plays from event 3 on.
+  awk '
+    /^- Event 3 \(/ { drop = 1 }
+    /^Stop after event 23\.$/ { drop = 0
+      print "- Event 3 (11:00Z): a scheduled check-in fires; no thread has reported since event 2."
+      print "- Event 4 (12:00Z): a scheduled check-in fires; no thread has reported since event 2."
+      print "- Event 5 (13:00Z): a scheduled check-in fires; no thread has reported since event 2."
+      print "- Event 6 (13:10Z): the stop thread started at event 5, if you started one, reports that it archived the session of the"
+      print "  Spec thread of `10-farewell.md` (the one started at 10:05Z): the archive call returned success."
+      print "- Event 7 (14:00Z): a scheduled check-in fires; no thread has reported since event 6."
+      print "- Event 8 (15:00Z): a scheduled check-in fires; no thread has reported since event 6."
+      print "- Event 9 (16:00Z): a scheduled check-in fires; no thread has reported since event 6."
+      print "- Event 10 (16:10Z): the stop thread started at event 9, if you started one, reports that it archived the session of"
+      print "  the Ticket thread of `20-quiet.md` (the one started at 13:10Z)."
+      print "- Event 11 (17:00Z): a scheduled check-in fires; no thread has reported since event 10."
+      print "- Event 12 (18:00Z): a scheduled check-in fires; no thread has reported since event 10."
+      print "- Event 13 (19:00Z): a scheduled check-in fires; no thread has reported since event 10."
+      print "- Event 14 (20:00Z): a scheduled check-in fires; no thread has reported since event 10."
+      print ""
+      print "Stop after event 14."; next }
     drop { next }
     { print }
   ' "$out/PROMPT.md" > "$out/PROMPT.md.new" && mv "$out/PROMPT.md.new" "$out/PROMPT.md"
