@@ -86,7 +86,7 @@ An empty answer to the second question is valid. The build skills read this reco
 
 > Is there a budget agents must stay within, such as a paid service, an API quota or a token limit? (recommended: **none**)
 
-> How often should a running thread check in with you? (recommended: **1 hour**)
+> During a Milestone's delivery, how often should a scheduled check-in wake the coordinator to check on its threads? (recommended: **1 hour**)
 
 > What should a Milestone's membership label look like? (recommended: **`milestone-<n>`**, for example `milestone-1`)
 

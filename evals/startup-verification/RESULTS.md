@@ -4,6 +4,25 @@ One entry per run of the `milestone` skill's Startup verification, newest first.
 
 Each environment's run is followed by one **planted failure**: the real-worker-state probe told to expect a marker token that no worker is asked to write. It passes as an eval when the probe reports `fail` with "no comment with token", and the Verdict names the capability, which shows the failure report.
 
+A run of the scheduled check-in probe alone (after its text changes) is followed by its own planted failure instead: a one-shot check-in carrying a fresh `sv-planted-` token, scheduled by the same runner into its **own** session rather than into the target, while the target is watched for that token. It passes as an eval when the token is seen in the runner, never in the target, by the bound, the probe reports `fail` with "token arrived in the runner, not the target", and the Verdict names Scheduled check-in: a check-in that wakes some other agent is a different mechanism.
+
+### Claude Code cloud project: the check-in probe, scripted
+
+The probe of Step 2 as delivery's check-ins use it there: a thread (the runner) schedules into the coordinator's session (the target). The runner needs one-shot scheduling that can fire into another session (`create_trigger` with `run_once_at` and `persistent_session_id`), the session-details call (`get_session`), the session event list (`list_events`) and the scheduled-task list (`list_triggers`). The coordinator needs none of them: it only has to be idle when the check-in fires.
+
+1. **Runtime.** `get_session` with no id: record the runner's session id, `created_at`, `environment_kind`, `permission_mode` and `parent_session_id` (the coordinator's session, the target). `get_session` on the target: record its `environment_kind` and `cross_session_inbound`.
+2. **Tokens.** Draw `sv-checkin-<8 hex>` (real) and `sv-planted-<8 hex>` (planted), for example `printf 'sv-checkin-%s\n' "$(openssl rand -hex 4)"`.
+3. **Schedule both** in one turn, at the next minute plus 2 (`run_once_at`, RFC 3339 UTC), noting the call time:
+   - real: `create_trigger`, `persistent_session_id` = the target's session, `run_once_at` = T, `initiation` = `own_followup`, `name` = `Startup verification check-in`, `prompt` = `Startup verification check-in <real token>: note the time this arrives; no other action.`;
+   - planted: `send_later` (into the runner's own session) at the same T, `message` = `Startup verification check-in <planted token>: note the time this arrives; no other action.`
+   Record both trigger ids. A refused schedule call is the probe's fail, with the error as its limit.
+4. **End the turn.** Both fire once their target is idle. The planted one wakes the runner; at that wake note its arrival time.
+5. **Read back** at the runner's next wake past T + 3 minutes (the planted wake, or a `send_later` at T + 5 as a fallback): `list_triggers` with `include_completed: true`, for each trigger its `last_run` (`status`, `fired_at`, `session_id`) and `ended_reason`; then `list_events` on the target's session with `kinds: ["user"]` and `limit: 100`, and look for each token in the events after the call time. If the real token is missing, read again a minute later, and keep reading until T + 15 minutes before failing.
+6. **Results.** Real: pass only when an event in the target's own transcript carries the real token by T + 15 minutes; record that event's time (the arrival), the scheduler's `fired_at` and status. A `SUCCEEDED` `last_run` alone is not a pass. Planted: it passes as an eval when the planted token is in the runner and in no target event by T + 15 minutes; its row reads `fail`, "token arrived in the runner, not the target".
+7. **Clean up.** `delete_trigger` for any trigger that never fired. No result comment is needed for a probe-only run; record both rows in the entry below.
+
+The entry records the commit the probe text ran on (inside an open pull request: that branch's commit, with the base it branched from) and the plugin version, not the plugin installed in the session.
+
 ## Template
 
 ```
@@ -18,6 +37,17 @@ Pass: yes | no. Lessons: <what to change in the skill, if anything>
 ```
 
 ## Runs
+
+### 2026-11-02, commit 5d4e9bb (branch `ticket-495`; base 4d0a751), dev-skills 0.40.0 (base): Claude Code cloud project, check-in probe into the coordinator, real run and planted failure
+
+Runner: the Spec thread of #407, session `session_REMOVED` (created 2026-11-02T16:49:20Z). It ran the scripted probe above by hand from the Step 2 text at 5d4e9bb, the Ticket's first commit (Step 2 is unchanged at 4f066d9), not as a verification thread started with the skill. The probe was split as "Who runs it" allows: the runner scheduled, and the coordinator was the target. The Implementer recorded the runner's evidence and ran no probe.
+Runtime: runner `environment_kind` `anthropic_cloud`, permission mode `auto`, `parent_session_id` `session_REMOVED` (the coordinator, the target), all from `get_session`. Target: `cross_session_inbound` `available`; its other fields were not recorded. Sandbox: not recorded in this run. Runner's probe tools: `create_trigger`, `send_later`, `list_triggers`, `list_events`, `delete_trigger`, `get_session`.
+Probes (all times UTC on 2026-11-02; call time 16:59:06Z, T = 17:02:00Z):
+- Scheduled check-in (real): `create_trigger` with `persistent_session_id` = the coordinator's session, `run_once_at` 17:02:00Z, `initiation` `own_followup`, token `sv-checkin-d0ff9e4a`. Accepted with no refusal, trigger `trig_REMOVED`. It did not fire at T. Scheduler record: `fired_at` 17:07:21.25Z, `last_run` `SUCCEEDED`, `ended_reason` `run_once_fired`. Target's own record: `list_events` (`kinds: ["user"]`) on the coordinator's session holds a user event carrying the token, `created_at` 17:07:20.921Z, `client_platform` `scheduled_trigger`, `inbound_origin` `trigger_fire`. The coordinator also confirmed receipt at 17:07:20Z in a message. The arrival came 5m21s after T, inside the 15-minute bound. Pass. Limits: one-minute granularity; delivery only once the target is idle (the coordinator was busy, so it came about 5 minutes late); this was a one-shot, so the recurring cron schedule delivery arranges, and ending it, were not exercised.
+- Planted failure: `send_later` into the runner's own session at 17:02:00Z, token `sv-planted-8a16403d`, trigger `trig_REMOVED`. By 17:10:12Z it had not fired (still enabled, `next_run_at` 17:02:00Z, no `last_run`), so its arrival in the runner was not observed. The runner then deleted it. The token is in none of the coordinator's 100 newest user events; only the real token is. The runner's fallback `send_later` read-back did arrive, at 17:10:10Z. Row: `| Scheduled check-in | yes | one-shot into the runner's own session (planted) | fail | token not seen in the coordinator; its own arrival in the runner not observed within 8 minutes | planted case: a different mechanism |`, `Verdict: not ready: Scheduled check-in`. Pass as an eval: partly. The target-side rule held (the token never reached the coordinator, so the row fails). The case's other half, the token seen in the runner and not the target, was not shown, because the planted check-in never fired before it was deleted.
+Result comment: none (probe-only run).
+Not exercised: the recurring check-ins of delivery and ending them (`delete_trigger` on a recurring task bound to the coordinator); a check-in thread arranging them; the other three probes (unchanged); Codex (the shared Step 2 text changed, so its rerun belongs to the Codex Ticket after #407).
+Pass: yes for the real probe; partly as a planted failure. Lessons: a scheduled task bound to the coordinator's session reaches the coordinator in this environment, so delivery's Check-ins mechanism stands. One-shots fired late here (5 minutes for the real one, and the planted one not at all within 8 minutes), while the fallback `send_later` arrived: a rerun of the planted case should wait the whole 15-minute bound before deleting its trigger.
 
 ### 2026-11-02, commit 510d691dfb2eb72f9c086e8086ef37081d6195de (base), dev-skills 0.39.0 (base): Codex desktop, post-setup full rerun
 
