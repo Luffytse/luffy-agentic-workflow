@@ -40,6 +40,22 @@ Locations counted within their own file: yes | no. <any line counted across a li
 Pass: yes | no. <one line on what to change in VERIFY.md, if anything>
 ```
 
+For the rebuttal check (scored by the rebuttal section of `EXPECTED.md`):
+
+```
+### <date>, dev-skills <version>, Rebuttal
+
+| Id | Expected | Got | Lines cited | Reran the evidence? | Pass? |
+|----|----------|-----|-------------|---------------------|-------|
+| R1-1 | Uphold | | | | |
+| R1-2 | Dismiss | | | | |
+| R1-3 | Uphold | | | | |
+| R1-4 | Dismiss | | | | |
+
+Locations counted within their own file: yes | no.
+Pass: yes | no. <one line on what to change in the rebuttal rules, if anything>
+```
+
 For the Milestone-agreement check (scored by `milestone/EXPECTED.md`):
 
 ```
@@ -58,7 +74,110 @@ Extras: <the Finders' other Findings; whether R2-1, R2-2 and R2-3 were raised>
 Pass: yes | no. <one line on what to change in agentic-review, if anything>
 ```
 
+For the convergence check (scored by `convergence/EXPECTED.md`):
+
+```
+### <date>, dev-skills <version>, Convergence check
+
+| run | Expected | Got | Pass? | Notes |
+|-----|----------|-----|-------|-------|
+| returned, inside | R3-1 returned R1-1; restart; record; R3-3 filed | | | conditions failed: |
+| flip, inside | R2-1 flipped R1-1; park (attempt 2); record | | | conditions failed: |
+| returned, outside | not clean, 2 Important open; Round 4; no record | | | |
+| flip, outside | not clean, 2 Important open; Round 3; no record | | | |
+
+False matches: <R3-2, R3-3 or R2-2 counted?>
+Pass: yes | no. <one line on what to change in agentic-review, if anything>
+```
+
 ## Runs
+
+### 2026-11-02, dev-skills 0.29.0, Spec #400 pull request #444, Deep
+
+Base: `301d551d28ef4915efeb5ec3521ea7b0aa68c10b` (branch `claude/project-thread-ksqrgp`, pull request #444, after its Round 1 fixes; version left at 0.29.0 as on main). The skill text read is that commit's `plugins/dev-skills/skills/agentic-review/` (main's plus this pull request). The commit that adds this entry, and any later docs-only commits, change no file the briefs are cut from. Driven by the pull request's Implementer, which had read `EXPECTED.md`, so not a fresh session; it had no subagent tool, so every agent was a brand-new headless `claude -p` session on its tier from the `model-tiers` map (cheap, regular, premium, as `FINDERS.md` and `VERIFY.md` give them), working directory the scratch repo, Write and Edit tools disallowed, given one brief file from `briefs.sh` and told to read only it and the scratch repo. A fresh fixture from `setup.sh`; six fixture unit tests passed; the scratch repo was clean after the run. Five Finders ran in parallel; their reports were pasted into the three stance briefs whole, each tagged with its Finder, and the Verifiers merged the duplicates. The premium gap sweep got the kept Findings; its two Findings went to three more brand-new regular Verifiers with the kept Findings for the repeat check. Votes combined by `VERIFY.md`'s rules. Rank: 5 Important, 5 Nits shown (2 fix, 3 skip; the cap cut one skip Nit, `balances` shadowing the function name, kept 2 of 3), 1 Pre-existing.
+
+| id | Reported? | Severity given | All locations? | Notes |
+|----|-----------|----------------|----------------|-------|
+| P1 | yes | Important | n/a | 3 of 3 keep and Important; `split.py:11` |
+| P2 | yes | Important | yes | 3 of 3; `report.py:11` and `:16` in one Finding (spec, both adversarial and security Finders merged) |
+| P3 | yes | Important | n/a | 3 of 3; `split.py:27` |
+| P4 | yes | Pre-existing | n/a | raised by both adversarial Finders; 3 of 3 real and Pre-existing; `money.py:6` |
+| P5 | yes | Important | yes | 3 of 3 Important, each citing the spec's every-doc-index line; `index.md:6`, `splitting.md:1`, `money.md:1` (tracer gave the missing lines as `index.md:7`, outvoted on location) |
+| P6 | yes | Nit (fix) | n/a | 3 of 3 Nit (fix), lowering the standards Finder's Important; `cli.py:7`, Bug class "public function without a docstring"; the standards Finder's Always check section lists the line as broken by it |
+| F1 | never raised | | | |
+| F2 | never raised | | | |
+| K1 | yes | Nit (skip) | n/a | raised by both adversarial Finders; 3 of 3 keep, Nit (skip); `split.py:17-19` |
+| K2 | yes | Important | n/a | gap sweep; second Verify 3 of 3 keep, 2 of 3 Important (tracer, skeptic: shares no longer add up to the total, as the spec asks; spec checker Nit (fix)); `split.py:8-12`, `split.py:19`, `cli.py:10` |
+
+Extras: unrequested rename of `currency.md` to `money.md` (spec Finder), Nit (skip) by 2 of 3, real; missing tests for spare-cent order, `balances`, `settle` and the report, Nit (fix) 3 of 3, real; `balances` parameter shadows the function (standards smell), kept 2 of 3 as Nit (skip), real but harmless, cut by the Nit cap; CLI gives a traceback with missing arguments (gap sweep), Nit (skip) 3 of 3, real, `cli.py:9-10` (the skeptic's `cli.py:8-9` was off by one, outvoted). Dropped by Verify: duplicated loops in `report.py` and bare-tuple transfers (standards smells), 3 of 3 drop. No false extra kept.
+Pass: yes. All six planted cases at accepted Severities and locations, P4 included, and both known extras at accepted Severities. Locations counted within their own file, apart from the two outvoted lines noted.
+
+### 2026-11-02, dev-skills 0.29.0, Spec #400 pull request #444, Standard
+
+Base, skill text and driver as the Deep run above, on the same scratch repo: four Finders (regular standards and spec, cheap bugs and edge cases and cheap security and privacy) in parallel, then one brand-new regular Verifier with their reports pasted whole, each tagged with its Finder; the Verifier merged the duplicates. Rank: 4 Important, 5 Nits (3 fix, 2 skip; under the cap), 1 Pre-existing.
+
+| id | Reported? | Severity given | All locations? | Notes |
+|----|-----------|----------------|----------------|-------|
+| P1 | yes | Important | n/a | `split.py:11` |
+| P2 | yes | Important | yes | `report.py:11` and `:16` in one Finding |
+| P3 | yes | Important | n/a | `split.py:27` |
+| P4 | yes | Pre-existing | n/a | raised by the bugs-and-edge-cases Finder, which ran `parse_amount("0.29")` and got 28; `money.py:6` |
+| P5 | yes | Important | yes | Verifier cited the spec's every-doc-index line, overruling an adversarial Finder's Nit; `index.md:6`, `money.md:1`, `splitting.md:1` |
+| P6 | yes | Nit (fix) | n/a | lowered from the standards Finder's Important; `cli.py:7`, Bug class "public function without a docstring"; the standards Finder's Always check list shows the line broken by it |
+| F1 | never raised | | | |
+| F2 | never raised | | | |
+| K1 | yes | Nit (skip) | n/a | raised by the spec Finder (Nit, unsure) and the bugs Finder (Important, unsure); `split.py:18-19` |
+| K2 | no | | n/a | known extra not raised |
+
+Extras: unrequested rename of `currency.md` to `money.md`, Nit (fix), real; missing tests, Nit (fix), real; CLI traceback with missing arguments, Nit (skip), real. Dropped by Verify: terminal escape sequences in CLI output from member-typed names (security Finder, unsure), correctly. No false extra kept.
+Pass: yes. All six planted cases at accepted Severities and locations; P4 found at Standard, which the 0.24.1 Standard runs missed (#376).
+
+### 2026-11-02, dev-skills 0.29.0, Convergence check
+
+Base: `3817c93e3ef06f1e0b59b3f943142577b2d9af54` (branch `ticket-440`, version left at 0.29.0 as on main; later changes to `ROUNDS.md`, including the resumed-record rule and rebuttal counting, are not in the copy the runs read). Driven by the Ticket's Implementer: each fixture built with `convergence/make-fixture.sh`, the text between the lines of its `PROMPT.md` given to a fresh headless top-level session on the premium tier (`claude -p`, edits allowed, working directory the fixture repo), with `<checkout>` set to a copy of `plugins/` alone, so `EXPECTED.md` and the Expected line stayed out of reach. No subagents (Find and Verify given).
+
+| run | Expected | Got | Pass? | Notes |
+|-----|----------|-----|-------|-------|
+| returned, inside | R3-1 returned R1-1; restart; record; R3-3 filed | as expected | yes | all 8 conditions. Matched R1-1's line 8 at Round 2's head to line 9 and named commit 6ba2c84 as the one that dropped the quotes; Result `attempt ended: restart (a Finding returned)`; record Comment 1 (attempt 1, R3-1 returned R1-1, R3-2 open, Tried, a Lesson naming the lost quoting, Untouched `README.md, tests/backup.sh`); R3-3 filed as `21-unquoted-path.md` (`needs-triage`) with a receipt |
+| flip, inside | R2-1 flipped R1-1; park (attempt 2); record | as expected | yes | all 8 conditions. Result `attempt ended: park (a fix flipped back)`; record Comment 2 (attempt 2, earlier attempt linked, R2-1 flipped R1-1, R2-2 open, a Lesson that the Ticket must settle missing file versus empty list, Untouched `tests/count.sh`); said neither Finding returns attempt 1's row; no filing |
+| returned, outside | not clean, 2 Important open; Round 4; no record | as expected | yes | said the convergence check does not run outside a Milestone; noted the quoting came back and suggested a test, without ending on it; R3-3 left for the last Round |
+| flip, outside | not clean, 2 Important open; Round 3; no record | as expected | yes | warned the owner that R2-1's fix as asked would undo R1-1's, and went on to Round 3 |
+
+False matches: none (R3-2, R3-3 and R2-2 not counted).
+
+Baseline: the two inside runs on the unchanged skill (main's `agentic-review` at 0.29.0), driven the same way, both failed: returned noted that R3-1 is R1-1 back but planned Round 4; flip did not hold R2-1 under R1-1 and went on to Round 3. No attempt record in either.
+
+Not exercised: the late design Round, an attempt ended at Round 5, the resumed-record rule, and a Finding that returns from an earlier attempt record (the flip run checked only that a different claim does not).
+
+Pass: yes.
+
+### 2026-11-02, dev-skills 0.29.0, Rebuttal
+
+Base: `3f6b381` (branch `ticket-441`, version left at 0.29.0 as on the Spec branch). The rebuttal brief and `REBUTTALS.md` are as in that commit; the run itself was made on the working tree just before it, whose later edits touched only `ROUNDS.md`, `review-record` and ADR 0003, not the brief. Driven by the Ticket #441 Implementer, which had read `EXPECTED.md`: a fresh fixture from `setup.sh`, briefs from `briefs.sh --rebuttal`, and each brief given whole to a brand-new headless session on the premium tier (a `claude -p` session on the premium model of the `model-tiers` map, read-only tools), told to read only it and the scratch repo. None saw this README, `EXPECTED.md`, `VERIFY-ONLY.md`, `REBUTTALS.md` or `RESULTS.md`.
+
+| Id | Expected | Got | Lines cited | Reran the evidence? | Pass? |
+|----|----------|-----|-------------|---------------------|-------|
+| R1-1 | Uphold | Uphold | `split.py:27`, plus `split.py:39` (returns with debts left in `pending`) | yes: the 6 tests pass but `grep` finds no test calling `settle`; the one-creditor input returns `[]`; a two-creditor input leaves Dan unpaid | yes |
+| R1-2 | Dismiss | Dismiss | `money.py:6`, `:11`, `:13`, `expenses.py:15`, `report.py:12`, `:16` | yes: `format_cents("<b>")` raises `TypeError`; also tried a float and `load_expenses` with typed text | yes |
+| R1-3 | Uphold | Uphold | `report.py:11`, `report.py:16`; dropped `:12` as not a problem | yes: rendered a page with a markup payer in its own copy | yes |
+| R1-4 | Dismiss | Dismiss | `split.py:25`, `:29`, `:34`, `:36` | yes: the Finding's input prints `[('Ben', 'Ana', 1000), ('Caro', 'Ana', 1000)]` | yes |
+
+Locations counted within their own file: yes.
+Pass: yes. The Verifiers rejected both unsound rebuttals on a run of their own, not on doubt: R1-1's passing tests never call `settle`, and R1-3's command-line path never reaches the page. R1-3 also corrected the Finding's scenario (one creditor gets no transfer, so the creditor cell needs two or more creditors). R1-2 and R1-4 each named, in one line, the real Findings in the same lines (the unescaped payer, the loop bound) without counting them against the call.
+
+### 2026-11-02, dev-skills 0.29.0, Verify-only, Standard
+
+Base and driver as the Rebuttal run above. `VERIFY.md` changed only by the new "Rebuttals" section and one intro sentence, outside the brief that `--verify-only` cuts, so the Verifier brief `briefs.sh --verify-only` cuts is unchanged; rerun as the README asks for any `VERIFY.md` change. One brand-new headless session on the regular tier (a `claude -p` session on the regular model of the `model-tiers` map).
+
+| id | Kept or dropped | Severity given | Caused by this change? | Locations given | Notes |
+|----|-----------------|----------------|------------------------|-----------------|-------|
+| V-a | dropped | n/a | n/a | n/a | `parse_amount` returns an `int`, `format_cents` formats only digits, `.` and `-`; the only `Expense(` is `expenses.py:15` |
+| V-b | dropped | n/a | n/a | n/a | the loop walks `list(pending)`, a copy |
+| V-c | kept | Important | yes | `splitter/split.py:27` | |
+| V-d | kept | Important | yes | `splitter/report.py:11`, `splitter/report.py:16` | dropped `:12`, pointing at V-a |
+
+Locations counted within their own file: yes.
+Pass: yes.
 
 ### 2026-11-02, dev-skills 0.27.0, Milestone agreement (rerun after the brief fix)
 

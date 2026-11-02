@@ -102,6 +102,18 @@ class SkillLoadingPackaging(unittest.TestCase):
             result = self.cite(cite)
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
+    def test_cited_park_operation_exists_in_the_seed(self):
+        for cite in ('the tracker doc\'s **Park** operation', 'the tracker doc\'s "Park" operation'):
+            result = self.cite(cite)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_build_skills_cite_park_and_the_seed_defines_it(self):
+        skills = self.repo / "plugins/dev-skills/skills"
+        seed = (skills / "setup-dev-skills/issue-tracker-github.md").read_text()
+        self.assertIn("- **Park**", seed)
+        for name in ["implement", "implement-spec"]:
+            self.assertIn("tracker doc's **Park** operation", (skills / name / "SKILL.md").read_text(), name)
+
     def test_cited_tracker_operation_missing_from_tracker_doc_fails(self):
         for cite in ('the tracker doc\'s **Comment** operation', 'the tracker doc\'s "Comment" operation'):
             result = self.cite("Intro line.\n" + cite)

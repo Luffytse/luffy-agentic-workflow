@@ -57,7 +57,7 @@ The label of the optional agent-only triage role: it marks an issue for one codi
 _Avoid_: assignee, owner
 
 **Milestone**:
-A product goal the user sets (for example "M3 Trip planning"), written down in one Milestone issue: the goal, the features to deliver by its end, their acceptance criteria, what is excluded and any budget (a limit on one of the project's paid or limited resources, such as a paid API key). It holds one or more Releases, which the agents plan, and it closes when the user accepts it at the Milestone review. An issue belongs to it, and its pull request is **inside the Milestone**, when the issue (for a Spec's pull request, the Spec) carries the Milestone's membership label in the form the **Boundary record** names; the Milestone issue carries the same label. Inside a Milestone a build thread merges its own pull request unless it crosses a boundary, the repo's own rules say a person merges it, or, until a later change replaces them, the Review hit the 5-Round cap or an agreed design answer had no Round left (ADR 0004).
+A product goal the user sets (for example "M3 Trip planning"), written down in one Milestone issue: the goal, the features to deliver by its end, their acceptance criteria, what is excluded and any budget (a limit on one of the project's paid or limited resources, such as a paid API key). It holds one or more Releases, which the agents plan, and it closes when the user accepts it at the Milestone review. An issue belongs to it, and its pull request is **inside the Milestone**, when the issue (for a Spec's pull request, the Spec) carries the Milestone's membership label in the form the **Boundary record** names; the Milestone issue carries the same label. Inside a Milestone a build thread merges its own pull request unless it crosses a boundary or the repo's own rules say a person merges it (ADR 0004). A review that will not settle there is parked, not brought to the user.
 _Avoid_: epic, sprint
 
 **Release**:
@@ -110,8 +110,26 @@ _Avoid_: section, module
 One run of the `agentic-review` skill, in three stages: find candidate Findings, verify them, then rank the survivors. It has two entry points: a pull request (reviewed in Rounds), or the diff since a fixed point (a commit, branch, tag or merge-base; it also reads uncommitted work). The second kind is one Review, not a Round; a Ticket check is that kind, one Review at Quick depth over a Ticket branch's diff.
 
 **Round**:
-One Review plus the fix commits that follow it (the final commit of "fix" Nits is not reviewed by another Round). Rounds 1 and 2 are **full-PR Rounds**; Rounds 3 to 5 are **commit Rounds**, which review only the commits added since the last Round (for a merge from main, only what it changed in the pull request).
+One Review plus the fix commits that follow it (the final commit of "fix" Nits is not reviewed by another Round). Rounds 1 and 2 are **full-PR Rounds**; Rounds 3 to 5 are **commit Rounds**, which review only the commits added since the last Round (for a merge from main, only what it changed in the pull request). Inside a Milestone a Late design Round may follow Round 5, and the Rounds belong to one Attempt.
 _Avoid_: pass, iteration
+
+**Late design Round**:
+Inside a Milestone, the one Round after Round 5 (Round 6) that reviews an agreed design answer that changes the pull request and came when Round 5 had run. At most one per attempt; it keeps the attempt's history.
+
+**Convergence check**:
+Inside a Milestone, the check after Rank from Round 2 on: an Important caused by the change **returned** when it matches, by Rank's match rule, a row already marked `fixed` (or, across attempts, makes the same claim in the same file as a returned or flipped row of an earlier attempt record), and **flipped** when its fix would undo an earlier row's fix. Either one ends the attempt.
+_Avoid_: loop detection
+
+**Attempt**:
+Inside a Milestone, one build of a change and the Rounds that review it. It ends when the convergence check finds a returned or flipped Finding, or Round 5 or the late design Round is not clean; the Review then reports **restart** (the first attempt) or **park** (a later one) to its caller. The build thread carries out a restart: it closes the pull request, keeps the untouched parts (a lone Ticket splits off those that stand alone; a Spec keeps, on a fresh Spec branch, the landed Tickets whose files are all untouched and shared with no other landed Ticket, and whose blockers are kept) and rebuilds the rest once from main, in a new pull request whose Rounds start at Round 1. A park is carried out by the build thread too: see **Parked**.
+
+**Attempt record**:
+The comment a Review writes on the issue the pull request builds (the lone Ticket, or the Spec) when an attempt ends, in the shape `review-record` owns: the attempt number, the pull request, the Rounds, the Findings it ended on, what was tried, the lesson and the untouched files. It follows the problem: a later attempt reads every earlier one. A Spec thread also writes one on a Ticket it parks after the Ticket's third Ticket check.
+_Avoid_: retry log
+
+**Parked**:
+Inside a Milestone, the state of an issue whose build gave up because its review would not settle: a pull request whose second attempt ended (the Review's `park` outcome), or a Ticket whose third Ticket check still has an Important open. The build thread marks the issue with the tracker doc's **Park** operation (the `parked` label and a comment linking the attempt history), leaves the pull request unmerged and tells the user once. Other work goes on; the tickets a parked Ticket blocks are not started. It waits on the user, who lifts it by removing the label. Outside a Milestone nothing is parked: the pull request or Ticket goes to the user.
+_Avoid_: stuck, shelved, deferred
 
 **Question round**:
 One batch of questions a skill (`grilling`, `triage`) puts to the user at once. Not a Round, and not a Review: the skills' "round" without a capital R means this.
@@ -132,7 +150,7 @@ A reviewer agent that looks for problems and reports candidate Findings. The **s
 _Avoid_: reviewer (too broad), scanner
 
 **Verifier**:
-An agent that checks each candidate Finding against the code and makes the final call on it. On Deep, three Verifiers take different stances: **tracer**, **skeptic** and **spec checker**.
+An agent that checks each candidate Finding against the code and makes the final call on it. On Deep, three Verifiers take different stances: **tracer**, **skeptic** and **spec checker**. Inside a Milestone, a **rebuttal Verifier** (premium tier) decides a fixer's **rebuttal**, its evidence that an open Important is wrong: it dismisses the Finding or upholds it, and an upheld one cannot be rebutted again.
 _Avoid_: judge, triage agent
 
 **Finding**:

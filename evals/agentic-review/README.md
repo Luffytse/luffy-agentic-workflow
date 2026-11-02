@@ -1,19 +1,22 @@
 # agentic-review eval
 
-A small fixture pull request with planted problems of known Bug classes (one of them a break of the fixture's own `REVIEW.md` Always check line), plus two plausible false alarms, to check that `agentic-review` reports the right Findings with the right Severity and drops the false ones. Rerun it whenever `agentic-review` changes, at Standard and at Deep depth. A Verify-only check hands the Verifier the false alarms and two real controls as candidates, so Verify's drop call is tested even when no Finder raises them; run it whenever `VERIFY.md` changes, alongside the full runs.
+A small fixture pull request with planted problems of known Bug classes (one of them a break of the fixture's own `REVIEW.md` Always check line), plus two plausible false alarms, to check that `agentic-review` reports the right Findings with the right Severity and drops the false ones. Rerun it whenever `agentic-review` changes, at Standard and at Deep depth. A Verify-only check hands the Verifier the false alarms and two real controls as candidates, so Verify's drop call is tested even when no Finder raises them; run it whenever `VERIFY.md` changes, alongside the full runs. A rebuttal check hands a premium-tier rebuttal Verifier a fixer's rebuttal of each of those four candidates; run it whenever the rebuttal rules (`VERIFY.md` "Rebuttals", `ROUNDS.md` "Rebuttals, inside a Milestone") change.
 
 ## Files
 
 - `base/`: the fixture repo before the change (a tiny Python cost splitter with its own `docs/index.md` and a `REVIEW.md` holding one Always check line, which the change breaks once).
 - `after/`: the files the change adds or edits; `setup.sh` also deletes `docs/currency.md` (renamed to `docs/money.md`).
 - `SPEC.md`: the ticket the change builds; `setup.sh` copies it, untracked, to `.scratch/SPEC.md` in the scratch repo.
-- `EXPECTED.md`: the planted Findings (Bug class, Severity, every location), the false alarms, the known extras, how a run is scored, and the scoring of the Verify-only check.
+- `EXPECTED.md`: the planted Findings (Bug class, Severity, every location), the false alarms, the known extras, how a run is scored, and the scoring of the Verify-only and rebuttal checks.
 - `VERIFY-ONLY.md`: the candidate Findings handed to the Verifier in the Verify-only check, in the fixed Finding format, each tagged with its Finder.
+- `REBUTTALS.md`: one fixer's rebuttal of each `VERIFY-ONLY.md` candidate, for the rebuttal check.
+- `test-rebuttal.sh`: builds the fixture and the rebuttal briefs and checks each holds the brief, one Finding, its rebuttal and only citations that hold; run it after changing `REBUTTALS.md`, `briefs.sh` or the rebuttal brief.
 - `setup.sh`: builds the fixture as a scratch repo.
-- `briefs.sh`: builds the Finder and Verifier briefs from the current `FINDERS.md` and `VERIFY.md`, whole, so nobody cuts them out by hand.
+- `briefs.sh`: builds the Finder and Verifier briefs from the current `FINDERS.md` and `VERIFY.md`, whole, so nobody cuts them out by hand (`--verify-only` and `--rebuttal` for those checks).
 - `RESULTS.md`: one entry per run.
 - `brief-lib.sh`: the helpers `briefs.sh` and `milestone/briefs.sh` share to cut the briefs out of the skill files.
 - `milestone/`: the Milestone-agreement check below (`make-fixture.sh`, `test-fixture.sh`, `briefs.sh`, `DESIGN-FINDINGS.md`, `EXPECTED.md`).
+- `convergence/`: the convergence check below (`make-fixture.sh`, `test-fixture.sh`, `EXPECTED.md`).
 
 ## How to run
 
@@ -39,6 +42,15 @@ Run it whenever `VERIFY.md` changes, alongside the full runs. In the full runs n
 
 The fixture's own tests pass (`python3 -m unittest` in the scratch repo): the planted bugs are the kind tests miss.
 
+## Rebuttal check
+
+Inside a Milestone, a fixer may rebut an open Important, and a premium-tier rebuttal Verifier decides it (`VERIFY.md`, "Rebuttals"). This check asks whether that Verifier dismisses the two false alarms on sound rebuttals and upholds the two real Findings against rebuttals that sound right but do not hold. Run it whenever the rebuttal rules or brief change.
+
+1. Build the fixture with `setup.sh` as above.
+2. Build the briefs: `evals/agentic-review/briefs.sh --rebuttal <scratch-repo>`. It writes `<scratch-repo>.briefs/rebuttal/rebuttal-1.md` to `rebuttal-4.md`: the rebuttal Verifier brief from `VERIFY.md`, word for word, the Review's inputs with the head to judge at, one `VERIFY-ONLY.md` candidate as an open Important with an id, and its rebuttal from `REBUTTALS.md`. `bash evals/agentic-review/test-rebuttal.sh` checks the builder and the fixture.
+3. Start one brand-new subagent on the premium tier per brief, each given that file and told to read only it and the scratch repo. They never see this README, `EXPECTED.md`, `VERIFY-ONLY.md`, `REBUTTALS.md` or `RESULTS.md`.
+4. Score with the rebuttal section of `EXPECTED.md` and record it in `RESULTS.md`.
+
 ## Milestone-agreement check
 
 Does a design Finding on a pull request inside a Milestone go to a premium-tier agent when its answer keeps what the user agreed, and to the user when it would change the Milestone's goal, an acceptance criterion or an exclusion; is the answer recorded and the row marked with who answered; and do later Finders leave settled designs alone? Rerun it whenever `agentic-review`'s design-Finding rules (`ROUNDS.md`, "Design Findings"), its settled designs or the `review-record` design-row Notes change. Scoring: [`milestone/EXPECTED.md`](milestone/EXPECTED.md).
@@ -52,3 +64,13 @@ The fixture, built by [`milestone/make-fixture.sh`](milestone/make-fixture.sh), 
 5. **Decision-level runs** (optional, both cases): give a fresh top-level session that can start subagents the text between the lines of `<out-dir>/PROMPT.md`, with its working directory at `<out-dir>/repo` and `<checkout>` replaced by this checkout's path. Keep `PROMPT.md`'s Expected line away from it.
 6. Score with `milestone/EXPECTED.md` and add an entry to `RESULTS.md` with the Milestone-agreement template there, saying which parts ran and how they were driven.
 
+## Convergence check
+
+Inside a Milestone, does a Review notice a Finding that returns after its fix, or a fix that flips back, end the attempt with the right Result, write the attempt record on the issue, file its Pre-existing Findings and report `restart` (no earlier attempt record) or `park` (one); does it leave a different claim on the same lines alone; and outside a Milestone does nothing change? Rerun it whenever `agentic-review`'s Rank, Round loop or "When a review will not settle" rules (`ROUNDS.md`), or the `review-record` Result values or attempt-record shape, change. Scoring: [`convergence/EXPECTED.md`](convergence/EXPECTED.md).
+
+[`convergence/make-fixture.sh`](convergence/make-fixture.sh) builds a scratch repo with a Boundary record (label form `milestone-<n>`), a local Markdown tracker with "Comment on an issue" and "Create an issue" operations, a Milestone issue and a lone Ticket under `.scratch/issues/`, and a pull request with its earlier Round comments. Fixture `returned`: Round 3 of a backup script, where the fix commit since Round 2 dropped R1-1's quoting again on a line that moved; Verify kept that Finding (under another Bug class name), a different claim on the same lines and a Pre-existing one. Fixture `flip`: Round 2 of a count script, where Verify kept a Finding whose fix undoes R1-1's, and a different claim on the same line; pull request 1 is a closed first attempt, and in case `inside` its attempt record is on the issue, so the outcome is `park`. Case `inside` labels the Ticket `milestone-1`; `outside` does not. The kept Findings go into `PROMPT.md`. [`convergence/test-fixture.sh`](convergence/test-fixture.sh) builds all four and checks each holds what the check needs; run it after changing the builder.
+
+1. Build each fixture and case outside this repo: `bash evals/agentic-review/convergence/make-fixture.sh <out-dir> <returned|flip> <inside|outside>`. Each makes `<out-dir>/repo` and `<out-dir>/PROMPT.md`.
+2. Copy this checkout's `plugins/` folder to a directory of its own, so the session reads the skills but not `evals/`.
+3. Give a fresh top-level session the text between the lines of `PROMPT.md`, its working directory at `<out-dir>/repo` and `<checkout>` replaced by that copy's path. It starts no subagents (Find and Verify have run). Keep the Expected line and `EXPECTED.md` away from it. One run per fixture and case: four runs.
+4. Score with `convergence/EXPECTED.md` and add an entry to `RESULTS.md` with the convergence template there, saying how each run was driven.
