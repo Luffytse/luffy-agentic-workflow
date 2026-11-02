@@ -220,11 +220,93 @@ def score_deliver_checkin_failed(ev):
           ", ".join(str(b["n"]) for b in again))
 
 
+STANDUP = "<!-- milestone stand-up -->"
+NUDGE = "<!-- milestone nudge -->"
+CLOCK = {10: "11:00", 12: "12:00", 14: "13:00", 15: "14:00", 17: "15:00", 18: "16:00", 19: "17:00"}
+
+
+def standups(blocks):
+    return [b for b in blocks if b["op"] == "Comment on an issue" and "00-milestone" in b["issue"] and STANDUP in b["body"]]
+
+
+def nudges(blocks):
+    return [b for b in blocks if b["op"] == "Comment on an issue" and NUDGE in b["body"]]
+
+
+def thread_messages(blocks, issue):
+    return [b for b in blocks if b["op"] == "Message a thread" and issue in b["issue"]]
+
+
+def writes_beyond(blocks, allowed_ops):
+    """Blocks that are neither the stand-up record nor one of the allowed kinds."""
+    return [b for b in blocks if b not in standups(blocks) and b["op"] not in allowed_ops]
+
+
+def score_standups(e):
+    """Stand-ups at the check-in events: real state read from the tracker, one nudge for the silent thread, the
+    decisions recorded on the Milestone issue and nothing else written. The planted cases: the Ticket thread of 25 is
+    active at event 17 (its start and a commit), silent at 18 (no commit, comment, pull request change or reply since
+    15:00) and, at 19, has turned #11 ready with a lost callback."""
+    for k, clock in CLOCK.items():
+        rec = standups(e[k])
+        check(f"event {k}: the check-in's stand-up is recorded once on the Milestone issue ({STANDUP})", len(rec) == 1,
+              f"{len(rec)} found")
+        check(f"event {k}: the stand-up record carries the check-in's time ({clock})",
+              len(rec) == 1 and clock in rec[0]["body"])
+    wakes = [k for k in range(1, 22) if k not in CLOCK and standups(e[k])]
+    check("a stand-up is recorded only at scheduled check-ins", not wakes, ", ".join(str(k) for k in wakes))
+    # Event 10: the Release thread started at 10:50 is active; no nudge.
+    check("event 10: the Release thread started since delivery began is active: no nudge, no message",
+          not nudges(e[10]) and not [b for b in e[10] if b["op"] == "Message a thread"])
+    # Events 10, 14, 17: nothing but the stand-up record. Events 12 and 15 also start a Release thread (the loop's step).
+    for k in (10, 14, 17):
+        extra = writes_beyond(e[k], ())
+        check(f"event {k}: the check-in writes nothing but its stand-up record", not extra,
+              ", ".join(b["op"] for b in extra))
+    for k in (12, 15):
+        extra = writes_beyond(e[k], ("Start a thread", "Comment on an issue"))
+        check(f"event {k}: the stand-up record, then the Release thread the loop starts, and nothing else", not extra,
+              ", ".join(b["op"] for b in extra))
+    # Event 17: the Ticket thread of 25 is active (started at 14:10, commit at 14:40): no nudge.
+    check("event 17: the Ticket thread of 25 is active (started and pushed since 14:00): no nudge",
+          not nudges(e[17]) and not thread_messages(e[17], "25-hello-doc"))
+    # Event 18: silent since 14:40: one nudge, recorded on its issue and sent to it.
+    n18 = nudges(e[18])
+    check("event 18: the silent Ticket thread of 25 gets one nudge, recorded on its issue (<!-- milestone nudge -->)",
+          len(n18) == 1 and "25-hello-doc" in n18[0]["issue"], f"{len(n18)} found")
+    check("event 18: the nudge is sent to that thread", len(thread_messages(e[18], "25-hello-doc")) == 1)
+    r18 = standups(e[18])
+    check("event 18: its stand-up record names the thread, that it was silent, and the nudge",
+          len(r18) == 1 and "25-hello-doc" in r18[0]["body"] and re.search(r"silent|no (commit|activity)", r18[0]["body"], re.I)
+          is not None and re.search(r"nudge", r18[0]["body"], re.I) is not None)
+    extra = writes_beyond(e[18], ("Comment on an issue", "Message a thread"))
+    check("event 18: the check-in writes nothing but its stand-up record and the nudge (comment and message)",
+          not extra and len(e[18]) == 3, f"{len(e[18])} blocks: " + ", ".join(b["op"] for b in e[18]))
+    check("event 18: nothing is started and no takeover (noticed and recorded only)", not starts(e[18]))
+    # Event 19: the lost callback: #11 is ready on the tracker and no report came; act on it as on a report.
+    msg19 = thread_messages(e[19], "25-hello-doc")
+    check("event 19: #11, ready with a lost callback, is acted on from the tracker: told to merge with no bump",
+          len(msg19) == 1 and re.search(r"no (version )?bump|no version", msg19[0]["body"], re.I) is not None,
+          f"{len(msg19)} messages")
+    check("event 19: no version number handed out (#11 changes README.md only)",
+          not any(re.search(r"Version \d+\.\d+\.\d+ for #11", b["body"]) for b in e[19]))
+    r19 = standups(e[19])
+    check("event 19: its stand-up record says #11 was found ready and what was decided",
+          len(r19) == 1 and "#11" in r19[0]["body"] and re.search(r"ready", r19[0]["body"], re.I) is not None)
+    check("event 19: the thread is active again (pull request change): no second nudge", not nudges(e[19]))
+    extra = writes_beyond(e[19], ("Message a thread",))
+    check("event 19: the check-in writes nothing but its stand-up record and the message", not extra and len(e[19]) == 2,
+          f"{len(e[19])} blocks")
+    check("event 19: nothing is started (the Release thread waits for 25 to close)", not starts(e[19]))
+    every = [b for k in e for b in e[k]]
+    check("exactly one nudge in the whole run", len(nudges(every)) == 1, f"{len(nudges(every))} found")
+
+
 def score_deliver(ev):
     every = [b for k in sorted(ev) for b in ev[k]]
-    check("events 1 to 18 each have an '## Event <k>' part", all(k in ev for k in range(1, 19)),
-          "missing " + ", ".join(str(k) for k in range(1, 19) if k not in ev))
-    e = {k: ev.get(k, []) for k in range(1, 19)}
+    check("events 1 to 21 each have an '## Event <k>' part", all(k in ev for k in range(1, 22)),
+          "missing " + ", ".join(str(k) for k in range(1, 22) if k not in ev))
+    e = {k: ev.get(k, []) for k in range(1, 22)}
 
     # Check-ins: arranged once at delivery start, at the Boundary record's interval, into the coordinator, and ended
     # once delivery is done. The fixture's Startup verification passed with a thread scheduling into the coordinator's
@@ -242,15 +324,15 @@ def score_deliver(ev):
     rel1_first = starts(e[1], "release")
     check("event 1: the check-ins are arranged before the Release thread starts",
           bool(arrange) and bool(rel1_first) and arrange[0]["n"] < rel1_first[0]["n"])
-    mid = [b for k in range(2, 18) for b in checkin_acts(e[k])]
-    check("events 2 to 17: the check-ins are neither arranged again nor ended while delivery runs", not mid,
+    mid = [b for k in range(2, 21) for b in checkin_acts(e[k])]
+    check("events 2 to 20: the check-ins are neither arranged again nor ended while delivery runs", not mid,
           ", ".join(str(b["n"]) for b in mid))
-    end = checkin_acts(e[18])
+    end = checkin_acts(e[21])
     ebrief = " ".join(b["brief"] + b["body"] for b in end)
-    check("event 18: delivery done, so a check-in thread ends the schedule sched-01",
+    check("event 21: delivery done, so a check-in thread ends the schedule sched-01",
           len(end) == 1 and "sched-01" in ebrief and re.search(r"\b(end|delete|disable|stop)", ebrief, re.I) is not None,
           f"{len(end)} found: {ebrief[:120]}")
-    check("event 18: its brief has it read back that no future firing remains and post the ended record",
+    check("event 21: its brief has it read back that no future firing remains and post the ended record",
           "<!-- milestone check-in ended -->" in ebrief and re.search(r"no (future|further) firing", ebrief, re.I) is not None)
 
     # Event 1: Release grouping, handed to release planning; no build thread before the Release is planned.
@@ -353,7 +435,7 @@ def score_deliver(ev):
     check("event 12: a Release thread started to plan the next Release with 25-hello-doc",
           len(rel12) == 1 and "25-hello-doc" in rel12[0]["brief"], f"{len(rel12)} found")
     check("event 12: no build thread before that Release is planned", not builds(e[12]))
-    # Events 15 to 18: the empty 41 filled once 25 is free, built, cut; then delivery is done.
+    # Events 15 to 21: the empty 41 filled once 25 is free, built, cut; then delivery is done.
     rel15 = starts(e[15], "release")
     check("event 15: a Release thread started to fill the empty 41-release-m1-r2 with 25-hello-doc",
           len(rel15) == 1 and "41-release-m1-r2" in rel15[0]["brief"] and "25-hello-doc" in rel15[0]["brief"],
@@ -361,16 +443,16 @@ def score_deliver(ev):
     s25 = [b for b in starts(e[16], "implement") if "25-hello-doc" in b["brief"]]
     check("event 16: the Ticket thread of 25-hello-doc started, with `implement`", len(s25) == 1 and len(builds(e[16])) == 1,
           f"{len(s25)} found")
-    rel17 = starts(e[17], "release")
-    check("event 17: the Release thread started for 41-release-m1-r2 once 25 is closed",
-          len(rel17) == 1 and "41-release-m1-r2" in rel17[0]["brief"], f"{len(rel17)} found")
-    check("event 18: no Release or build thread started (no feature left open)",
-          not starts(e[18], "release") and not builds(e[18]))
-    ended18 = [b for b in e[18] if b["op"] == "Comment on an issue" and "<!-- milestone delivery thread ended" in b["body"]]
-    check("event 18: the Release thread's end is recorded on the tracker", bool(ended18))
+    rel20 = starts(e[20], "release")
+    check("event 20: the Release thread started for 41-release-m1-r2 once 25 is closed",
+          len(rel20) == 1 and "41-release-m1-r2" in rel20[0]["brief"], f"{len(rel20)} found")
+    check("event 21: no Release or build thread started (no feature left open)",
+          not starts(e[21], "release") and not builds(e[21]))
+    ended21 = [b for b in e[21] if b["op"] == "Comment on an issue" and "<!-- milestone delivery thread ended" in b["body"]]
+    check("event 21: the Release thread's end is recorded on the tracker", bool(ended21))
 
-    rbriefs = rel1 + rel9 + rel12 + rel15 + rel17
-    check("events 1, 9, 12, 15 and 17: each Release thread's brief says to open no release issue when nothing qualifies",
+    rbriefs = rel1 + rel9 + rel12 + rel15 + rel20
+    check("events 1, 9, 12, 15 and 20: each Release thread's brief says to open no release issue when nothing qualifies",
           bool(rbriefs) and all(re.search(r"no release issue", b["brief"], re.I) for b in rbriefs),
           f"{sum(1 for b in rbriefs if not re.search(r'no release issue', b['brief'], re.I))} of {len(rbriefs)} without it")
 
@@ -383,6 +465,8 @@ def score_deliver(ev):
 
     # Event 14: a later wake still cuts no empty Release and plans nothing (25 still blocked).
     check("event 14: no thread started (41 stays empty; no second Release thread)", not starts(e[14]))
+
+    score_standups(e)
 
     # Throughout: delivery leaves planning's records and Release planning's labels alone.
     check("the Milestone issue body is never edited",
