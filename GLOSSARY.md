@@ -65,14 +65,14 @@ A named step inside a Milestone (for example "Milestone 1 · Release 1"), and th
 _Avoid_: sprint, version bump
 
 **Release planning**:
-The step that picks the next Release's goal and features: the agent proposes, the user decides, and only approved issues get the label.
+The step that picks the next Release's goal and features: the agent proposes, the user decides, and only approved issues get the label. Inside a Milestone (a Boundary record naming a Milestone label form and an open Milestone issue) agents decide it with no approval: the Milestone's planned, unblocked features in its issue's order (at most 5, the user alone raising the cap) plus the maintenance fixes the Triage batch and Release-end Retro planning chose (outside the cap), after both; a feature the Milestone issue does not list is proposed to the user, never labelled.
 _Avoid_: release triage
 
 **Triage batch**:
 Inside a Milestone (a Boundary record naming a Milestone label form and an open Milestone issue), the run of `triage` that the caller makes at the end of a Release: agents decide every open `needs-triage` issue against the Milestone without asking the user per issue, record each decision on the issue, and post one `## Triage batch` summary comment on the release issue for the Milestone review. A blocker of a feature being built now and a security or data-loss risk are triaged at once instead: one issue, any time inside a Milestone, by whoever sees it, with no Release named, and listed in the next batch's summary; a decision that crosses a boundary or changes the Milestone's agreement goes to the user. Outside a Milestone `triage` waits on the user as before.
 
 **Release thread**:
-A project thread that cuts a Release (its `CHANGELOG.md` entry, the whole-Release check and, where the release doc says Releases bump, the bump pull request) and then runs the next Release planning, with the `release` skill.
+A project thread that cuts a Release (its `CHANGELOG.md` entry, the whole-Release check and, where the release doc says Releases bump, the bump pull request) and then runs the next Release planning, with the `release` skill. Inside a Milestone it first runs the Triage batch and the Release-end Retro planning for that Release, so the planning sees their maintenance fixes.
 
 **Build thread**:
 A project thread that builds a Spec or a lone Ticket: a Spec thread or a Ticket thread.
