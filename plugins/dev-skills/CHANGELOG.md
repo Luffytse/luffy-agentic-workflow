@@ -2,6 +2,23 @@
 
 What each version of `dev-skills` brought, newest first. Each pull request that changes a skill bumps the version, and each Release adds one entry here covering everything since the last Release: its goal, the versions it delivered, the issues it shipped, and what a project using the plugin must do when something breaks. Entries up to 0.25.0 are one per version, when only a Release bumped it.
 
+## Milestone 1 · Release 1 (2026-11-02)
+
+Per-PR versions are in place and agents merge inside the Milestone's boundaries, so most later pieces of Milestone 1 need nothing from the user.
+
+Versions: 0.26.0, 0.27.0, 0.28.0, 0.29.0. Commits: bdc7696..7d04de2.
+
+- Per-PR skill versions and sprint Releases in ADR 0008 and CLAUDE.md (Milestone 1, piece 0 + A1) (#391)
+- release: cut a Release without a bump pull request when pull requests bump the version (Milestone 1, piece A2) (#397)
+- Spec: boundaries and merge authority (Milestone 1, piece B1) (#398)
+- Per-PR bumps in the build skills (#398, Ticket 1 of 3) (#421), absorbing #416 and #418
+- Boundary record (#398, Ticket 2 of 3) (#422)
+- Merge authority inside a Milestone (#398, Ticket 3 of 3) (#423)
+- agentic-review: inside a Milestone, a premium-tier agent answers design Findings (Milestone 1, piece B3) (#399)
+- Ship the Model tier map in the plugin so any agent can look up its model (#344)
+
+Also merged: a `check-plugin.sh` check that every tracker operation a skill cites is a bold bullet in the tracker doc seed (#434).
+
 ## 0.25.0 (2026-11-01)
 
 Give shared rules one authoritative home, while fixing review-completion and release-recovery bugs that could undermine the workflow.
