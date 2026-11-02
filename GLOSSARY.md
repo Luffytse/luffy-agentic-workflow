@@ -81,7 +81,7 @@ A named step inside a Milestone (for example "Milestone 1 · Release 1"), and th
 _Avoid_: sprint, version bump
 
 **Release planning**:
-The step that picks the next Release's goal and features: the agent proposes, the user decides, and only approved issues get the label. Inside a Milestone (a Boundary record naming a Milestone label form and an open Milestone issue) agents decide it with no approval: the Milestone's planned, unblocked features in its issue's order (at most 5, the user alone raising the cap) plus the maintenance fixes the Triage batch and Release-end Retro planning chose (outside the cap), after both; a feature the Milestone issue does not list is proposed to the user, never labelled.
+The step that picks the next Release's goal and features: the agent proposes, the user decides, and only approved issues get the label. Inside a Milestone (a Boundary record naming a Milestone label form and an open Milestone issue) agents decide it with no approval: the Milestone's planned, open features carrying no release label, not parked and unblocked, in its issue's order (at most 5, the user alone raising the cap) plus the maintenance fixes the Triage batch and Release-end Retro planning chose (outside the cap), after both; a feature the Milestone issue does not list is proposed to the user, never labelled.
 _Avoid_: release triage
 
 **Triage batch**:
