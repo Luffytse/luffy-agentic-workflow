@@ -25,7 +25,7 @@ The probes install nothing and change no settings, branch, label or file of the 
 - one **marker** comment on the Milestone issue, written by the probe worker, and one more if the loaded-skill-version probe uses a worker thread;
 - one throwaway **stop worker**, started by the confirmed-stop probe only to be stopped: it writes only token lines to a file in a scratch directory, and its brief ends it after 15 minutes, so it cannot outlive the run even if the stop fails;
 - files in a scratch directory outside the project;
-- one result comment on the Milestone issue, posted once by the runner in Step 6 (with no Milestone issue yet, handed on to be posted once it exists).
+- one result comment on the Milestone issue, posted once by the runner in Step 6 (with no Milestone issue yet, only the rerun once the issue exists posts it).
 
 Each probe uses a fresh **token**: a prefix and random hex (`sv-checkin-`, `sv-worker-`, `sv-stop-` or `sv-version-` followed by 8 hex characters), so evidence from an earlier run never passes this one.
 
@@ -37,7 +37,7 @@ Record, from the runtime's own reports (a session-details call, the environment,
 
 - **Action:** schedule one one-shot check-in to the runner itself, carrying the token, at the earliest time the scheduler allows (at most 10 minutes out). Note the scheduled time, then end the turn: many schedulers deliver only once the runner is idle.
 - **Pass:** the check-in arrives in the runner carrying the token, by the scheduled time plus 15 minutes. Record the arrival time, and the scheduler's own record of the firing if it keeps one.
-- **Fail:** the schedule call errors, or the token has not arrived by that bound. The schedule call succeeding is not a pass. If the runner is woken by anything else past the bound with no check-in seen, record the fail then. If nothing wakes it, the coordinator records the fail: a verification thread that has not reported by the bound has failed this probe. A coordinator that is itself the runner records the fail at its next wake, or when the user next writes, whichever comes first.
+- **Fail:** the schedule call errors, or the token has not arrived by that bound. The schedule call succeeding is not a pass. If the runner is woken by anything else past the bound with no check-in seen, record the fail then. If nothing wakes it, the coordinator records the fail: a verification thread that has not reported by the bound has failed this probe. A coordinator that is itself the runner records the fail at its first wake past the bound, whether that wake is its own or the user writing, if no check-in was seen.
 
 ### Step 3: Probe the real worker state
 
@@ -64,7 +64,7 @@ A **fresh thread** is one whose session started after the plugin's last change o
 
 ### Step 6: Post the result
 
-Post one comment on the Milestone issue in this shape (with no Milestone issue yet, hand the comment to whoever writes it, to post once it exists). The shape stays: one row per probe.
+Post one comment on the Milestone issue in this shape (with no Milestone issue yet, post nothing and hand nothing on: Steps 3 and 5 have failed, the whole verification is rerun once the issue exists, and only that rerun's comment is posted). The shape stays: one row per probe.
 
 ```
 ## Startup verification
