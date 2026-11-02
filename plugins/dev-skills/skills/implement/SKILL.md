@@ -13,6 +13,7 @@ Fetch the ticket from the issue tracker and state its title. If the reference is
 
 - If it is a Spec, or a Ticket under one, stop and use `implement-spec` for the Spec instead.
 - Use the tracker doc's **Count open blockers** operation and its completion rules. If any blocker remains uncleared, stop and tell the user (or the coordinator) which.
+- Read whether the ticket is parked with the tracker doc's **Park** operation. If it is, stop and tell the user (or the coordinator): it waits on the user, and the user lifts the park.
 
 Start at `docs/index.md` and open only the docs that fit the ticket (with no index, fall back to `GLOSSARY.md` or `GLOSSARY-MAP.md`, and `docs/adr/`).
 
@@ -56,6 +57,8 @@ Before each Round, fetch main. If it moved, have the same Implementer merge main
 
 Route the workflow's fixes to the same Implementer by message; it fixes, commits and pushes, or, where `agentic-review` allows a rebuttal, sends one with its evidence in place of a fix. Return its commit, evidence and any rebuttals to `agentic-review` and continue that workflow through its completion, including its final fix and filing actions. Review policy and completion belong to `agentic-review`; the merge decision below remains yours.
 
+The workflow reports the outcome `park`, with the link to the attempt record, when the Review will not settle and an earlier attempt has already failed on this Ticket (it does so only inside a Milestone). Then the pull request is **parked**: leave it open and unmerged, skip step 7, and do not bring it to the user as a merge decision. Mark the Ticket parked with the tracker doc's **Park** operation, giving the attempt record and the pull request as the history. Then tell the user once, in one message, which is your step 8 report: that the Ticket is parked, why (the attempt record's cause and lesson, in a line or two), and the links to the pull request and the attempt record. Send no earlier or second message about it. The build ends there as reported; the retro (step 9) waits until the pull request lands.
+
 ## 7. Merge, or bring it to the user
 
 First decide whether the pull request is **inside a Milestone**. Read the Boundary record (the one the repo's `CLAUDE.md` or `AGENTS.md` points to, usually `docs/agents/boundaries.md`) for its Milestone label form. The pull request is inside a Milestone when the ticket carries a label in that form; then read the Milestone issue (the issue that carries the same label and holds the Milestone's goal) for allowed or forbidden actions of its own, which win over the record's for this ticket. With no Boundary record, or no label in its form on the ticket, the pull request is outside a Milestone.
@@ -63,9 +66,7 @@ First decide whether the pull request is **inside a Milestone**. Read the Bounda
 **Inside a Milestone**, bring the pull request to the user, and do not merge it, only if any of these holds:
 
 - it crosses a boundary: it takes, or its merge would take, an action that the Milestone issue forbids or says needs the user's approval, or one the Boundary record says needs the user's approval and the Milestone issue does not explicitly allow; or its Door is one-way and, for any of its irreversible actions, the Milestone issue does not explicitly allow agents to take it (or, where the Milestone issue does not mention it, the record does not);
-- the repo's own rules (its `CLAUDE.md`, the project instructions, its docs) say a person merges it;
-- the Review ended with Result "5-Round cap reached" (Round 5 was not clean; a clean Round 5 is a clean Round like any other);
-- an agreed answer to a design Finding that changes the pull request came when no Round is left to review it.
+- the repo's own rules (its `CLAUDE.md`, the project instructions, its docs) say a person merges it.
 
 Deep depth alone does not stop the merge, and neither does a change to an ADR, the glossary, a `CLAUDE.md` or a `REVIEW.md`. When you merge such a change yourself, list it for the Milestone review: before the merge, add a line to the pull request body naming each ADR, glossary, `CLAUDE.md` and `REVIEW.md` file it changes (`Milestone review: <files>`), and name them in your report (step 8). When you merge a pull request on which an agent answered design Findings (`agentic-review` lists them, each by its row id and the link to its record), the same line names each answer too (`Milestone review: <files>; design answers: <id> <link>, ...`, without the files part when no such file changed), and so does your report.
 
@@ -85,8 +86,8 @@ When you bring the pull request to the user, name what stops the merge, so the u
 
 ## 8. Report
 
-Tell the user (or the coordinator) the pull request link and the outcome: merged with its commit, or waiting for the user and why. Inside a Milestone, also list each ADR, glossary, `CLAUDE.md` and `REVIEW.md` file a merge of yours changed, and each agent design answer on it, for the Milestone review.
+Tell the user (or the coordinator) the pull request link and the outcome: merged with its commit, waiting for the user and why, or parked with the link to its attempt record and why it would not settle (the one message of step 6). Inside a Milestone, also list each ADR, glossary, `CLAUDE.md` and `REVIEW.md` file a merge of yours changed, and each agent design answer on it, for the Milestone review.
 
 ## 9. Run the retro
 
-Run the `retro` skill on this thread once the pull request is merged and its issue is closed, so the retro looks back on finished work. If you handed the pull request to the user, report as in step 8, stay open, and run the retro after they merge it or tell you that it is merged; if they drop it or close it unmerged, ask whether they want a retro on what happened. If it finds a repeated Bug class to turn into a check, a regular-tier Implementer builds the check on a branch off main, in its own worktree made as in step 2, briefed as in step 3 (you still write no code), and you open its pull request with `pr` and run the `agentic-review` Rounds as in steps 5 to 7. Merge it under step 7's two forms, with the ticket's Milestone membership (the check's pull request has no issue of its own): inside a Milestone, a check that changes `REVIEW.md` is merged by you and listed for the Milestone review; outside one, a check that changes `REVIEW.md` goes to the user, not merged by you. Tell the user (or the coordinator) the retro's outcome.
+Run the `retro` skill on this thread once the pull request is merged and its issue is closed, so the retro looks back on finished work. A parked pull request has not finished: run no retro until the user lifts the park and it lands. If you handed the pull request to the user, report as in step 8, stay open, and run the retro after they merge it or tell you that it is merged; if they drop it or close it unmerged, ask whether they want a retro on what happened. If it finds a repeated Bug class to turn into a check, a regular-tier Implementer builds the check on a branch off main, in its own worktree made as in step 2, briefed as in step 3 (you still write no code), and you open its pull request with `pr` and run the `agentic-review` Rounds as in steps 5 to 7. Merge it under step 7's two forms, with the ticket's Milestone membership (the check's pull request has no issue of its own): inside a Milestone, a check that changes `REVIEW.md` is merged by you and listed for the Milestone review; outside one, a check that changes `REVIEW.md` goes to the user, not merged by you. Tell the user (or the coordinator) the retro's outcome.

@@ -57,7 +57,7 @@ The label of the optional agent-only triage role: it marks an issue for one codi
 _Avoid_: assignee, owner
 
 **Milestone**:
-A product goal the user sets (for example "M3 Trip planning"), written down in one Milestone issue: the goal, the features to deliver by its end, their acceptance criteria, what is excluded and any budget (a limit on one of the project's paid or limited resources, such as a paid API key). It holds one or more Releases, which the agents plan, and it closes when the user accepts it at the Milestone review. An issue belongs to it, and its pull request is **inside the Milestone**, when the issue (for a Spec's pull request, the Spec) carries the Milestone's membership label in the form the **Boundary record** names; the Milestone issue carries the same label. Inside a Milestone a build thread merges its own pull request unless it crosses a boundary, the repo's own rules say a person merges it, or, until a later change replaces them, the Review hit the 5-Round cap or an agreed design answer had no Round left (ADR 0004).
+A product goal the user sets (for example "M3 Trip planning"), written down in one Milestone issue: the goal, the features to deliver by its end, their acceptance criteria, what is excluded and any budget (a limit on one of the project's paid or limited resources, such as a paid API key). It holds one or more Releases, which the agents plan, and it closes when the user accepts it at the Milestone review. An issue belongs to it, and its pull request is **inside the Milestone**, when the issue (for a Spec's pull request, the Spec) carries the Milestone's membership label in the form the **Boundary record** names; the Milestone issue carries the same label. Inside a Milestone a build thread merges its own pull request unless it crosses a boundary or the repo's own rules say a person merges it (ADR 0004). A review that will not settle there is parked, not brought to the user.
 _Avoid_: epic, sprint
 
 **Release**:
@@ -121,11 +121,15 @@ Inside a Milestone, the check after Rank from Round 2 on: an Important caused by
 _Avoid_: loop detection
 
 **Attempt**:
-Inside a Milestone, one build of a change and the Rounds that review it. It ends when the convergence check finds a returned or flipped Finding, or Round 5 or the late design Round is not clean; the Review then reports **restart** (the first attempt) or **park** (a later one) to its caller.
+Inside a Milestone, one build of a change and the Rounds that review it. It ends when the convergence check finds a returned or flipped Finding, or Round 5 or the late design Round is not clean; the Review then reports **restart** (the first attempt) or **park** (a later one) to its caller. A park is carried out by the build thread: see **Parked**.
 
 **Attempt record**:
-The comment a Review writes on the issue the pull request builds (the lone Ticket, or the Spec) when an attempt ends, in the shape `review-record` owns: the attempt number, the pull request, the Rounds, the Findings it ended on, what was tried, the lesson and the untouched files. It follows the problem: a later attempt reads every earlier one.
+The comment a Review writes on the issue the pull request builds (the lone Ticket, or the Spec) when an attempt ends, in the shape `review-record` owns: the attempt number, the pull request, the Rounds, the Findings it ended on, what was tried, the lesson and the untouched files. It follows the problem: a later attempt reads every earlier one. A Spec thread also writes one on a Ticket it parks after the Ticket's third Ticket check.
 _Avoid_: retry log
+
+**Parked**:
+Inside a Milestone, the state of an issue whose build gave up because its review would not settle: a pull request whose second attempt ended (the Review's `park` outcome), or a Ticket whose third Ticket check still has an Important open. The build thread marks the issue with the tracker doc's **Park** operation (the `parked` label and a comment linking the attempt history), leaves the pull request unmerged and tells the user once. Other work goes on; the tickets a parked Ticket blocks are not started. It waits on the user, who lifts it by removing the label. Outside a Milestone nothing is parked: the pull request or Ticket goes to the user.
+_Avoid_: stuck, shelved, deferred
 
 **Question round**:
 One batch of questions a skill (`grilling`, `triage`) puts to the user at once. Not a Round, and not a Review: the skills' "round" without a capital R means this.

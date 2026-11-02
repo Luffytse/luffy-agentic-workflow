@@ -45,7 +45,7 @@ Finders: standards, spec, adversarial (bugs and edge cases), adversarial (securi
 
 A Ticket-check comment uses the same fields and table with marker `<!-- code-review kind=ticket-check ticket=<number> check=<1-3> depth=Quick head=<sha> -->`. It records a check, not a Round.
 
-An **attempt record** is a comment on the issue the pull request builds (the lone Ticket, or the Spec of a Spec pull request), not on the pull request, written when a review inside a Milestone ends an attempt. It uses this shape:
+An **attempt record** is a comment on the issue the pull request builds (the lone Ticket, or the Spec of a Spec pull request), not on the pull request, written when a review inside a Milestone ends an attempt, or when a Spec's build parks a Ticket whose third Ticket check still has an Important open. It uses this shape:
 
 ```
 <!-- code-review kind=attempt attempt=1 pr=<number> head=<full sha> -->
@@ -67,7 +67,7 @@ Lesson: <why the fixes did not hold, and what the next attempt should do differe
 Untouched: README.md, tests/backup.sh
 ```
 
-- **attempt** is one more than the number of attempt records already on the issue, not counting a record whose marker names this pull request and head (a resumed session reuses that record); **Outcome** is `restart` for attempt 1 and `park` for any later one, the same outcome the ending Round's Result names. **Ended by** is that Result's cause. **Earlier attempts** links each earlier record, or says none.
+- **attempt** is one more than the number of attempt records already on the issue, not counting a record whose marker names this pull request and head (a resumed session reuses that record); **Outcome** is `restart` for attempt 1 and `park` for any later one, the same outcome the ending Round's Result names. **Ended by** is that Result's cause; for a parked Ticket it is `third Ticket check not clean`, its Outcome is `park` whatever its number, its Rounds are the three Ticket checks and its rows are the Importants still open. **Earlier attempts** links each earlier record, or says none.
 - **Rows** are the Findings the attempt ended on: each returned or flipped Finding, its How `returned <earlier id>` or `flipped <earlier id>`, and every other Important still open, its How `open`. Locations are counted at the record's `head`. Claim is one line.
 - **Tried** names the fix commits for those Findings and the rows they matched; **Lesson** says why those fixes did not hold; **Untouched** lists the files of the pull request's diff that no open Important or "fix" Nit names (candidates to split off and keep), or none.
 
