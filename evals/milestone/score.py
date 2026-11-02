@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Score a milestone planning-phase dry run, or check one Milestone issue body against the shape.
+"""Score a milestone dry run (planning phase or delivery loop), or check one Milestone issue body against the shape.
 
 Usage:
-  score.py <out-dir> <plan|add-feature>   score <out-dir>/repo/.scratch/proposed-actions.md for that case
+  score.py <out-dir> <plan|add-feature|deliver>   score <out-dir>/repo/.scratch/proposed-actions.md for that case
   score.py --shape <body-file>            check a Milestone issue body (for example a real one) against the shape
 
 Prints one line per check (PASS or FAIL with what it saw) and exits 1 when any check fails.
@@ -28,18 +28,34 @@ def parse_actions(text):
     blocks = []
     for m in re.finditer(r"^### (\d+)\. (.+?)\n(.*?)(?=^### \d+\. |\Z)", text, re.S | re.M):
         num, op, rest = int(m.group(1)), m.group(2).strip(), m.group(3)
-        body = ""
+        body, brief = "", ""
         bm = re.search(r"^Body:\s*\n~~~\n(.*?)\n~~~", rest, re.S | re.M)
         if bm:
             body = bm.group(1)
+            rest = rest[: bm.start()] + rest[bm.end():]
+        bm = re.search(r"^Brief:\s*\n~~~\n(.*?)\n~~~", rest, re.S | re.M)
+        if bm:
+            brief = bm.group(1)
             rest = rest[: bm.start()] + rest[bm.end():]
         fields = {}
         for line in rest.splitlines():
             fm = re.match(r"^([A-Za-z ]+):\s*(.*)$", line)
             if fm:
                 fields[fm.group(1).strip()] = fm.group(2).strip()
-        blocks.append({"n": num, "op": op, "issue": fields.get("Issue", ""), "f": fields, "body": body})
+        if not brief:
+            brief = fields.get("Brief", "")
+        blocks.append({"n": num, "op": op, "issue": fields.get("Issue", "") or fields.get("Thread", ""), "f": fields,
+                       "body": body, "brief": brief, "text": m.group(0)})
     return blocks
+
+
+def parse_events(text):
+    """Split proposed-actions.md at its '## Event <k>' lines: {k: blocks}. Blocks before the first event are under 0."""
+    events, parts = {}, re.split(r"^## Event (\d+)\s*$", text, flags=re.M)
+    events[0] = parse_actions(parts[0])
+    for i in range(1, len(parts), 2):
+        events[int(parts[i])] = parse_actions(parts[i + 1])
+    return events
 
 
 def section(body, heading):
@@ -159,10 +175,144 @@ def score_add(blocks, original):
     check("not added to the open Release 0.4.0", not rel)
 
 
+def starts(blocks, skill=None):
+    """Thread starts, optionally with this exact skill (the Skill line, without backticks or a leading slash)."""
+    out = []
+    for b in blocks:
+        if b["op"] != "Start a thread":
+            continue
+        name = b["f"].get("Skill", "").strip("`/ ").lower()
+        if skill is None or name == skill:
+            out.append(b)
+    return out
+
+
+def builds(blocks):
+    return starts(blocks, "implement") + starts(blocks, "implement-spec")
+
+
+def versions(blocks):
+    return set(re.findall(r"\b\d+\.\d+\.\d+\b", "\n".join(b["text"] for b in blocks)))
+
+
+def score_deliver(ev):
+    every = [b for k in sorted(ev) for b in ev[k]]
+    check("events 1 to 12 each have an '## Event <k>' part", all(k in ev for k in range(1, 13)),
+          "missing " + ", ".join(str(k) for k in range(1, 13) if k not in ev))
+    e = {k: ev.get(k, []) for k in range(1, 13)}
+
+    # Event 1: Release grouping, handed to release planning; no build thread before the Release is planned.
+    rel1 = starts(e[1], "release")
+    check("event 1: a Release thread started with `release`", len(rel1) == 1, f"{len(rel1)} found")
+    brief = rel1[0]["brief"] if rel1 else ""
+    i10, i20 = brief.find("10-farewell"), brief.find("20-quiet")
+    check("event 1: its brief groups farewell (with 11 and 12) then quiet into one Release",
+          0 <= i10 < i20 and "11-bye-code" in brief and "12-bye-usage" in brief, brief[:160])
+    check("event 1: the Release is named Milestone 1 · Release 1 (release-m1-r1)",
+          "release-m1-r1" in brief or re.search(r"Milestone 1 · Release 1", brief) is not None)
+    check("event 1: no build thread before the Release is planned", not builds(e[1]))
+
+    # Event 2: the next thread, within the thread limit and the Milestone's one-at-a-time rule.
+    b2 = builds(e[2])
+    check("event 2: exactly one build thread started (one at a time)", len(b2) == 1, f"{len(b2)} found")
+    spec = starts(e[2], "implement-spec")
+    first = spec[0] if spec else {"brief": ""}
+    check("event 2: it is the Spec thread of 10-farewell, with `implement-spec`",
+          len(spec) == 1 and "10-farewell" in first["brief"], first["brief"][:120])
+    check("event 2: its brief carries the model tier (regular) and the issue's Review depth (Deep)",
+          re.search(r"\bregular\b", first["brief"], re.I) is not None
+          and re.search(r"\bDeep\b", first["brief"]) is not None)
+    check("events 1 to 6: 20-quiet not started while farewell is open",
+          not any("20-quiet" in b["brief"] for k in range(1, 7) for b in builds(e[k])))
+
+    # Event 3: the version hand-out, recorded on the tracker.
+    v3 = versions(e[3]) - {"0.3.0"}
+    check("event 3: version 0.4.0 handed out, and no other", v3 == {"0.4.0"}, ", ".join(sorted(v3)) or "none")
+    rec = [b for b in e[3] if b["op"] == "Comment on an issue" and "0.4.0" in b["body"]]
+    check("event 3: the hand-out is recorded on the tracker (a comment naming 0.4.0)", bool(rec))
+    told = [b for b in e[3] if b["op"] == "Message a thread" and "0.4.0" in b["body"]]
+    check("event 3: the Spec thread is told its number", bool(told))
+    check("event 3: no build thread started while the number is out", not builds(e[3]))
+
+    # Event 4: #10 (no issue of its own) asks while #7's 0.4.0 is out: it waits, recorded.
+    wait10 = [b for b in e[4] if b["op"] == "Comment on an issue" and re.search(r"Waiting", b["body"])
+              and "#10" in b["body"]]
+    check("event 4: #10 waits while 0.4.0 is out for #7, recorded as Waiting", bool(wait10))
+    check("event 4: #10 gets no number yet",
+          not any(re.search(r"Version \d+\.\d+\.\d+ for #10", b["body"]) for b in e[4]))
+
+    # Event 5: #7 closed unmerged voids its number, so the waiter #10 is served first and #9 waits behind it.
+    give10 = [b for b in e[5] if b["op"] == "Comment on an issue"
+              and re.search(r"Version 0\.4\.0 for #10", b["body"])]
+    check("event 5: #7's number is void, so the waiting #10 gets 0.4.0, recorded", bool(give10))
+    wait9 = [b for b in e[5] if b["op"] == "Comment on an issue" and re.search(r"Waiting", b["body"])
+             and "#9" in b["body"]]
+    check("event 5: #9 waits behind #10, recorded as Waiting", bool(wait9))
+    check("event 5: #9 gets no number yet",
+          not any(re.search(r"Version \d+\.\d+\.\d+ for #9", b["body"]) for b in e[5]))
+
+    # Event 6: #10 merged (a skill merge): the waiting #9 gets 0.5.0; 20 is re-read; nothing starts.
+    give9 = [b for b in e[6] if b["op"] == "Comment on an issue" and re.search(r"Version 0\.5\.0 for #9", b["body"])]
+    check("event 6: main reads 0.4.0, so the waiting #9 gets 0.5.0, recorded", bool(give9))
+    rr6 = [b for b in e[6] if "20-quiet" in b["issue"] and b["op"] in ("Edit an issue body", "Comment on an issue", "Close")
+           and "<!-- milestone delivery thread" not in b["body"]]
+    check("event 6: 20-quiet re-read after #10 changed the skill", bool(rr6))
+    check("event 6: no build thread started (10 still holds the slot)", not builds(e[6]))
+
+    # Event 7: the Ticket re-read after the farewell skill merge, before the next thread starts.
+    s20 = [b for b in builds(e[7]) if "20-quiet" in b["brief"]]
+    check("event 7: the Ticket thread of 20-quiet started, with `implement`",
+          len(s20) == 1 and bool(starts(e[7], "implement")), f"{len(s20)} found")
+    check("event 7: its brief carries no Review depth (20 names none, so agentic-review chooses)",
+          bool(s20) and not re.search(r"review depth", s20[0]["brief"], re.I))
+    reread = [b for b in e[7] if "20-quiet" in b["issue"]
+              and b["op"] in ("Edit an issue body", "Comment on an issue", "Close")
+              and "<!-- milestone delivery thread" not in b["body"]]
+    check("event 7: 20-quiet re-read against the changed skill before its thread starts",
+          bool(reread) and (not s20 or reread[0]["n"] < s20[0]["n"]))
+    check("event 7: the re-read brings in the farewell (quiet silences bye too)",
+          any(re.search(r"\bbye\b|farewell", b["body"], re.I) for b in reread))
+    check("event 7: no Release thread yet (20-quiet is still open)", not starts(e[7], "release"))
+
+    # Event 8: no number for a pull request that changes no skill.
+    v8 = versions(e[8]) - {"0.3.0", "0.4.0", "0.5.0"}
+    check("event 8: no version handed out for a pull request that changes no skill",
+          not v8 and not any(re.search(r"Version \d+\.\d+\.\d+ for #8", b["body"]) for b in e[8]),
+          ", ".join(sorted(v8)))
+    told8 = [b for b in e[8] if b["op"] == "Message a thread" and "20-quiet" in b["issue"]]
+    check("event 8: the Ticket thread is told to merge with no bump", bool(told8))
+
+    # Event 9: the Release boundary.
+    rel9 = starts(e[9], "release")
+    check("event 9: the Release thread started once every issue of the Release is closed",
+          len(rel9) == 1 and "40-release-m1-r1" in rel9[0]["brief"], f"{len(rel9)} found")
+    check("event 9: no build thread started (25-hello-doc is not in the Release)", not builds(e[9]))
+
+    # Event 10: a second wake while the Release thread runs starts nothing.
+    check("event 10: no thread started while the Release thread is running", not starts(e[10]))
+
+    # Event 11: the Release thread planned nothing (25 still blocked): its end is recorded, nothing starts.
+    check("event 11: no thread started (the one feature left is still blocked)", not starts(e[11]))
+    ended = [b for b in e[11] if b["op"] == "Comment on an issue" and "<!-- milestone delivery thread ended" in b["body"]]
+    check("event 11: the Release thread's end is recorded on the tracker", bool(ended))
+
+    # Event 12: the blocker closed, so the loop plans the next Release itself.
+    rel12 = starts(e[12], "release")
+    check("event 12: a Release thread started to plan the next Release with 25-hello-doc",
+          len(rel12) == 1 and "25-hello-doc" in rel12[0]["brief"], f"{len(rel12)} found")
+    check("event 12: no build thread before that Release is planned", not builds(e[12]))
+
+    # Throughout: delivery leaves planning's records and Release planning's labels alone.
+    check("the Milestone issue body is never edited",
+          not any(b["op"] == "Edit an issue body" and "00-milestone" in b["issue"] for b in every))
+    check("no release or Milestone label applied by the coordinator (Release planning owns release labels)",
+          not any(b["op"] in ("Apply / remove labels", "Create a label") for b in every))
+
+
 def main():
     if len(sys.argv) == 3 and sys.argv[1] == "--shape":
         shape(open(sys.argv[2]).read())
-    elif len(sys.argv) == 3 and sys.argv[2] in ("plan", "add-feature"):
+    elif len(sys.argv) == 3 and sys.argv[2] in ("plan", "add-feature", "deliver"):
         out, case = sys.argv[1], sys.argv[2]
         try:
             text = open(f"{out}/repo/.scratch/proposed-actions.md").read()
@@ -170,7 +320,9 @@ def main():
             text = ""
         blocks = parse_actions(text)
         check("proposed-actions.md holds actions", bool(blocks))
-        if case == "plan":
+        if case == "deliver":
+            score_deliver(parse_events(text))
+        elif case == "plan":
             score_plan(blocks)
         else:
             original = open(f"{out}/repo/.scratch/issues/00-milestone.md").read()

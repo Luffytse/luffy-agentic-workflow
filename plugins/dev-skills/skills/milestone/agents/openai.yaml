@@ -1,5 +1,5 @@
 interface:
   display_name: "Milestone"
-  short_description: "Plan a Milestone and verify it can run unattended"
+  short_description: "Plan, verify and deliver a Milestone unattended"
 policy:
   allow_implicit_invocation: true

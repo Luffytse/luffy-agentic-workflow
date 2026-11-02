@@ -1,6 +1,6 @@
 ---
 name: milestone
-description: "Plan and start a Milestone: write the Milestone issue with the user (goal, features with acceptance criteria, exclusions, budget, boundaries, membership label), add a feature mid-Milestone, and run Startup verification, which proves in this environment that a scheduled check-in fires, that a worker's real state can be read back from the tracker, that a stopped worker is confirmed stopped and that a fresh thread loads main's skill version, before autonomous delivery starts. Use when the user asks for a Milestone or to add a feature to one, when a Milestone is about to start autonomous delivery, or when the user asks whether this environment can run a Milestone unattended."
+description: "Plan, start and deliver a Milestone: write the Milestone issue with the user (goal, features with acceptance criteria, exclusions, budget, boundaries, membership label) and add a feature mid-Milestone; run Startup verification, which proves in this environment that a scheduled check-in fires, that a worker's real state can be read back from the tracker, that a stopped worker is confirmed stopped and that a fresh thread loads main's skill version; then run delivery as the coordinator: group the features into Releases, start build threads within the limits and in order, hand out version numbers, re-read open Tickets after a skill merge and start each Release thread. Use when the user asks for a Milestone or to add a feature to one, when a Milestone is about to start or is running autonomous delivery, or when the user asks whether this environment can run a Milestone unattended."
 ---
 
 # Milestone
@@ -9,7 +9,7 @@ A **Milestone** is a product goal the user sets, written down in one Milestone i
 
 1. **Planning**, with the user: the Milestone issue is written and every feature in it is labelled.
 2. **Startup verification**, once the Milestone issue exists: proof that this environment can run delivery unattended.
-3. **Delivery**: agents build the planned features. It starts only once both phases before it are done (see "Delivery").
+3. **Delivery**, run by the coordinator: it groups the planned features into Releases, starts build threads within the limits and in order, hands out version numbers, re-reads open Tickets after a skill merge and starts each Release thread. It starts only once both phases before it are done (see "Delivery").
 
 **No Milestone.** A project is inside a Milestone only while its Milestone issue is open: an open issue carrying a label in the Boundary record's Milestone label form, whose body is the Milestone rather than a feature. Until the user asks for one, this skill changes nothing: the project's own instructions and the other skills behave as they do with no Milestone.
 
@@ -165,4 +165,72 @@ Delivery does not start until the user says how to go on. With every essential c
 
 ## Delivery
 
-Delivery starts only when both hold: planning has settled, and the Startup verification result comment on the Milestone issue reads `Verdict: ready`. Until then nothing is built, labelled for a Release or started as a build thread for this Milestone; a `not ready` verdict waits on the user, as Step 7 of Startup verification says. Delivery's own steps (grouping the planned features into Releases, starting build threads, handing out version numbers) are not part of this skill yet; until they are, once both hold, the coordinator delivers as the project's own instructions say.
+Delivery starts only when both hold: planning has settled, and the Startup verification result comment on the Milestone issue reads `Verdict: ready`. Until then nothing is built, labelled for a Release or started as a build thread for this Milestone; a `not ready` verdict waits on the user, as Step 7 of Startup verification says.
+
+The coordinator then runs delivery as a **loop**. Each time it wakes (delivery starting, a thread reporting or asking, a scheduled check-in, the user writing), it reads the state afresh, as "Read the state" says, and takes every step below that the state calls for: first what the wake brings to steps 3 and 4 (a number to hand out, a merge to check, a re-read), then step 5, then steps 1 and 2. What a thread says it did is a reason to read, never the state itself. The project's own instructions add only what is the project's: its thread limit, its model tier map, what else a brief carries, and its own extra rules; where they say nothing, this loop is the whole job. Checking in on a thread that has gone quiet, and taking over from it, are not part of this skill yet.
+
+Do every tracker read and write with the tracker doc's operations, cited by name below. A **delivery thread** is one this loop starts: a Release thread, a planning thread, or a build thread. Record each start on the tracker as you make it: a comment (**Comment on an issue**) on the issue the thread works on, whose first line is `<!-- milestone delivery thread -->` and whose second names the thread, its skill, its model tier and any Review depth its brief carries. A build thread's record goes on the issue it builds (a Spec thread's and a `to-tickets` thread's on the Spec's own issue; for related issues, each issue's own); a Release thread's on the release issue it cuts, or, for a Release thread that only plans, on the Milestone issue. A feature has **started** when its first issue (the Spec's own issue, the lone Ticket, or the first of its related issues) has a record. A feature already being built when the loop first runs, by a thread started before it, gets its record then, from that thread's report or an open pull request for it, before any slot is counted. When a delivery thread reports that it ended without the result this loop waits for (a Release thread that planned no Release, for example), record that too, in a comment whose first line is `<!-- milestone delivery thread ended -->`.
+
+- A **build thread is running** while the issue it builds has its record and is open and not parked. A `to-tickets` thread is running until the Spec's Tickets read back; its Spec thread then starts in the same slot.
+- A **Release thread is running** from its record until an open release issue naming this Milestone, created after the record, reads back, or until an ended record follows it.
+
+### Read the state
+
+At each wake, read:
+
+- the **Milestone issue** (**Read an issue**): its features in order and its order rule (one at a time, or up to some number at once);
+- the **release doc** (the one the project's `CLAUDE.md` or `AGENTS.md` points to, usually `docs/agents/release.md`): its bump mode, its version file, what it says bumps, and its Release name and label forms;
+- the **current Release**: the open release issue whose `**Milestone:**` line names this Milestone issue, and every issue carrying its label, open and closed (**List issues**, filtered by that label);
+- for each maintenance fix and feature of the current Release, in its build order (step 2): whether each of its issues is open, whether it is parked (**Park**), whether it is unblocked (**Count open blockers**), and its delivery-thread record;
+- on a report of a merge or a request for a version number, or while a `Waiting:` hand-out record has no number after it, the pull request (its changed files and whether it merged) and the version file on the main branch, freshly fetched.
+
+### 1. Plan a Release
+
+When no open release issue names this Milestone, no Release thread is running, and the grouping below is not empty, group the Milestone's features into a Release and hand it to the `release` skill's Release planning, which owns the scope rule and the release labels. That is the first Release when delivery has just started (no release issue names this Milestone yet, open or closed), and a later one when the last Release was cut and planned nothing because every feature left was blocked or parked, and one has since become free. Every other Release is planned by the Release thread of the one before it (step 5). The **grouping**: the Milestone's planned features that are still open, carry no release label, are not parked and are unblocked, in the Milestone issue's order, at most 5 (only the user raises the cap, and only for one Release), never passing over a qualifying feature to take a later one; a feature blocked only by one taken earlier in the same group qualifies. A Spec counts with its Tickets, as one feature.
+
+Start one Release thread with the `release` skill, at the tier that skill names, briefed with the Milestone issue, the release doc, and your grouping in order (each feature with its issues), and with what was cut before: for the first Release, that no Release of this Milestone has been cut yet, so there is no Triage batch or Release-end Retro planning to read and the plan is the feature scope only; for a later one, the last release issue cut, whose Triage batch and Release-end Retro planning it reads. It labels the issues and opens the release issue; you label nothing. Start no build thread until its report, then read the release issue and the issues carrying its label back from the tracker: from then on they are the current Release. If they differ from your grouping, tell the user in one line how; the release issue stands.
+
+### 2. Start build threads
+
+The **slots** are the smaller of the project's thread limit and the Milestone issue's order rule (one at a time is one slot; up to k at once is k slots); with neither, one. Each running build thread takes a slot. While a re-read is due (step 4) or a Release thread is running, start no build thread.
+
+The current Release's **build order** is its maintenance fixes (the release issue's "Maintenance fixes" list, each a lone Ticket), in the order the release issue gives and, where it gives none, before the features, since each fixes something a feature relies on or is severe; then its features, in the Milestone issue's order. While a slot is free, start the **next** one: the first in that build order that is open, has not started, is not parked and is unblocked. A started feature of related issues, once the issue its last thread built has closed, continues with its next open issue in the same slot, before any later one. Under one at a time, the next starts only once each one before it in the build order has closed or is parked: a parked one waits on the user and holds no slot. One still blocked by an open issue waits; a later one may take a free slot meanwhile only where the order rule allows several at once.
+
+The thread follows the feature's kind:
+
+- a **Spec** whose Tickets are filed (its sub-issues, or issues naming it as their parent): a Spec thread with `implement-spec`;
+- a **Spec** with no Tickets yet: first a planning thread with `to-tickets`, which takes the feature's slot; its Spec thread starts once the Tickets read back from the tracker;
+- a **lone Ticket**: a Ticket thread with `implement`, for the Ticket and the issues it absorbs;
+- **related issues** treated as one feature: one Ticket thread with `implement` per issue, one after another in the feature's order, in the feature's one slot.
+
+Every brief carries: the skill; a link to the issue; a link to the Milestone issue, so the thread knows it is inside it; the **model tier** (the issue's Model tier line, regular when it has none); a **Review depth** only when the issue or the user names one (with none, leave it out, so `agentic-review` chooses the depth); and what the project's instructions add. Start the thread on the model its tier maps to: load `model-tiers` by name for the model each tier is in your coding agent; the project's own tier map overrides it. Record the start as above.
+
+### 3. Hand out version numbers
+
+A build thread asks for a version number just before it merges a pull request. Hand one out only where the release doc's bump mode says **pull requests bump**. Where it says Releases bump, or there is no release doc, tell the thread to merge with no version change: the Release's own bump covers it.
+
+Where pull requests bump:
+
+1. **Does it bump?** Read the pull request's changed files. If it changes nothing the release doc says bumps, give no number and tell the thread to merge with no bump.
+2. **One at a time.** A number is **out** while main's version file has not reached it, its pull request is open, and the thread it was handed to is running. Read the version file on main and the hand-out records on the current Release's issues (and on a pull request that builds no issue, where its record is): a record is out when all three hold. A record whose pull request closed unmerged, or whose issue or pull request is parked, is void, and so is one whose thread has ended. While one is out, hand out none: record the request on the same issue, in the same comment form with the second line `Waiting: <pull request> asked while <number> was out.`, and tell the thread to wait. At the first wake when no number is out (a void one counts as not out) and a waiting request has no number after it, hand out to the waiting requests, one at a time, in the order they asked. So pull requests that bump merge one at a time, each on top of the one before.
+3. **The number** is the version on main raised by the part the release doc's rule gives for what this pull request changes, or, where the release doc gives no such rule, the part the `release` skill's bump-size rule gives. Record it first, on the issue the pull request builds (for a Spec pull request, the Spec; for one that builds no issue, the pull request itself), in a comment (**Comment on an issue**) whose first line is `<!-- milestone version hand-out -->` and whose second reads `Version <number> for <pull request>: merge it next, with the bump as its last commit, as the release doc says.` Then tell the thread its number.
+4. **A repeat.** A thread that asks again because main's version moved under it gets a new number from the new main, recorded the same way; its earlier record says nothing more and is void.
+5. **After the merge**, read the version file on main. It should read the number. If it reads anything else, hand out no further number and tell the merging thread to put main right first.
+
+### 4. Re-read Tickets after a skill merge
+
+A **skill merge** is a merged pull request that changed a skill the project's threads load (its `SKILL.md` or a file in its folder). Right after one, before any further thread starts, re-read the open issues of the Milestone (carrying its membership label) that no running thread is building, whose body names the changed skill or a file the merge changed. A running thread keeps the skill version it started with until its Ticket or Spec is done.
+
+Read each against main's new text of the skill, then:
+
+- where the change makes the issue wrong or incomplete, update it: read the whole body (**Read an issue**), write it whole back with only that change and a one-line note naming the merge, and read it back. A change to the issue's acceptance criteria that would change the Milestone's agreement (its goal, acceptance or exclusions) goes to the user instead, one question, and that feature waits for the answer;
+- where the change makes it obsolete, close it (**Close**) with a note naming the merge;
+- otherwise comment (**Comment on an issue**) that it was re-read after the merge and still fits.
+
+Then read the blockers again (**Count open blockers**) and take the next start from what they now say. Where the project runs `triage` (its instructions say so), start a thread with `triage` for the re-read instead, briefed with the merge, the changed skill, the version main now reads, the issues above, and the three outcomes above to take for each one (update it with its re-read note, close it as obsolete with its note, or comment that it still fits, with a change to the agreement going to the user), and start nothing further until its report.
+
+### 5. Start the Release thread
+
+When every issue carrying the current Release's label is closed, the Release is done. If a Release thread is already running (as defined above), it is cutting this Release: start none. Otherwise start one Release thread with the `release` skill, at the tier that skill names, briefed with the release issue and the Milestone issue. It runs the Triage batch and the Release-end Retro planning for this Release, cuts it, and plans the next Release from the Milestone issue's order; that skill says how. Record the start on the release issue. Start no build thread until it reports; then read the new release issue back, as in step 1, and go on from step 2.
+
+When the Release thread reports that it planned no Release, record that it ended (above) and read the Milestone issue's features. With none left open, delivery is done: tell the user in one line, with the Milestone issue's link. The Milestone review follows; its report is not part of this skill yet. With some still open (each blocked or parked), tell the user which, with what holds each; step 1 plans the next Release once one of them is free.
