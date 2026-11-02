@@ -2,7 +2,7 @@
 """Score a milestone dry run (planning phase or delivery loop), or check one Milestone issue body against the shape.
 
 Usage:
-  score.py <out-dir> <plan|add-feature|deliver>   score <out-dir>/repo/.scratch/proposed-actions.md for that case
+  score.py <out-dir> <plan|add-feature|deliver|deliver-checkin-failed>   score <out-dir>/repo/.scratch/proposed-actions.md for that case
   score.py --shape <body-file>            check a Milestone issue body (for example a real one) against the shape
 
 Prints one line per check (PASS or FAIL with what it saw) and exits 1 when any check fails.
@@ -195,11 +195,63 @@ def versions(blocks):
     return set(re.findall(r"\b\d+\.\d+\.\d+\b", "\n".join(b["text"] for b in blocks)))
 
 
+def checkin_acts(blocks):
+    """Check-in thread starts (skill `milestone`) and messages to the thread working on the Milestone issue."""
+    return [b for b in blocks if (b["op"] == "Start a thread" and b["f"].get("Skill", "").strip("`/ ").lower() == "milestone")
+            or (b["op"] == "Message a thread" and "00-milestone" in b["issue"])]
+
+
+def score_deliver_checkin_failed(ev):
+    check("events 1 to 4 each have an '## Event <k>' part", all(k in ev for k in range(1, 5)),
+          "missing " + ", ".join(str(k) for k in range(1, 5) if k not in ev))
+    e = {k: ev.get(k, []) for k in range(1, 5)}
+    check("event 1: a check-in thread started with `milestone`, to arrange the check-ins", len(checkin_acts(e[1])) == 1,
+          f"{len(checkin_acts(e[1]))} found")
+    failed = [b for b in e[2] if b["op"] == "Comment on an issue" and "00-milestone" in b["issue"]
+              and "<!-- milestone check-in failed -->" in b["body"]]
+    check("event 2: the failed arrangement is recorded on the Milestone issue (<!-- milestone check-in failed -->)",
+          len(failed) == 1, f"{len(failed)} found")
+    check("event 2: the failed record carries the limit seen (the refused target)",
+          bool(failed) and re.search(r"refus", failed[0]["body"], re.I) is not None)
+    check("event 2: the Spec thread of 10-farewell still starts (delivery goes on without check-ins)",
+          any("10-farewell" in b["brief"] for b in starts(e[2], "implement-spec")))
+    again = [b for k in range(2, 5) for b in checkin_acts(e[k])]
+    check("events 2 to 4: the check-ins are not arranged again after the failure", not again,
+          ", ".join(str(b["n"]) for b in again))
+
+
 def score_deliver(ev):
     every = [b for k in sorted(ev) for b in ev[k]]
-    check("events 1 to 14 each have an '## Event <k>' part", all(k in ev for k in range(1, 15)),
-          "missing " + ", ".join(str(k) for k in range(1, 15) if k not in ev))
-    e = {k: ev.get(k, []) for k in range(1, 15)}
+    check("events 1 to 18 each have an '## Event <k>' part", all(k in ev for k in range(1, 19)),
+          "missing " + ", ".join(str(k) for k in range(1, 19) if k not in ev))
+    e = {k: ev.get(k, []) for k in range(1, 19)}
+
+    # Check-ins: arranged once at delivery start, at the Boundary record's interval, into the coordinator, and ended
+    # once delivery is done. The fixture's Startup verification passed with a thread scheduling into the coordinator's
+    # session, so a thread (with `milestone`) arranges them and another ends them.
+    arrange = checkin_acts(e[1])
+    abrief = arrange[0]["brief"] + arrange[0]["body"] if arrange else ""
+    check("event 1: a check-in thread started with `milestone`, to arrange the check-ins", len(arrange) == 1,
+          f"{len(arrange)} found")
+    check("event 1: its brief schedules them every hour, into the coordinator's session, recurring",
+          re.search(r"\b(1|one) hour|hourly|60 minutes", abrief, re.I) is not None
+          and re.search(r"coordinator", abrief, re.I) is not None
+          and re.search(r"recurring|every", abrief, re.I) is not None, abrief[:160])
+    check("event 1: its brief has it post the check-in record on the Milestone issue",
+          "<!-- milestone check-in -->" in abrief)
+    rel1_first = starts(e[1], "release")
+    check("event 1: the check-ins are arranged before the Release thread starts",
+          bool(arrange) and bool(rel1_first) and arrange[0]["n"] < rel1_first[0]["n"])
+    mid = [b for k in range(2, 18) for b in checkin_acts(e[k])]
+    check("events 2 to 17: the check-ins are neither arranged again nor ended while delivery runs", not mid,
+          ", ".join(str(b["n"]) for b in mid))
+    end = checkin_acts(e[18])
+    ebrief = " ".join(b["brief"] + b["body"] for b in end)
+    check("event 18: delivery done, so a check-in thread ends the schedule sched-01",
+          len(end) == 1 and "sched-01" in ebrief and re.search(r"\b(end|delete|disable|stop)", ebrief, re.I) is not None,
+          f"{len(end)} found: {ebrief[:120]}")
+    check("event 18: its brief has it read back that no future firing remains and post the ended record",
+          "<!-- milestone check-in ended -->" in ebrief and re.search(r"no (future|further) firing", ebrief, re.I) is not None)
 
     # Event 1: Release grouping, handed to release planning; no build thread before the Release is planned.
     rel1 = starts(e[1], "release")
@@ -301,8 +353,24 @@ def score_deliver(ev):
     check("event 12: a Release thread started to plan the next Release with 25-hello-doc",
           len(rel12) == 1 and "25-hello-doc" in rel12[0]["brief"], f"{len(rel12)} found")
     check("event 12: no build thread before that Release is planned", not builds(e[12]))
-    rbriefs = rel1 + rel9 + rel12
-    check("events 1, 9 and 12: each Release thread's brief says to open no release issue when nothing qualifies",
+    # Events 15 to 18: the empty 41 filled once 25 is free, built, cut; then delivery is done.
+    rel15 = starts(e[15], "release")
+    check("event 15: a Release thread started to fill the empty 41-release-m1-r2 with 25-hello-doc",
+          len(rel15) == 1 and "41-release-m1-r2" in rel15[0]["brief"] and "25-hello-doc" in rel15[0]["brief"],
+          f"{len(rel15)} found")
+    s25 = [b for b in starts(e[16], "implement") if "25-hello-doc" in b["brief"]]
+    check("event 16: the Ticket thread of 25-hello-doc started, with `implement`", len(s25) == 1 and len(builds(e[16])) == 1,
+          f"{len(s25)} found")
+    rel17 = starts(e[17], "release")
+    check("event 17: the Release thread started for 41-release-m1-r2 once 25 is closed",
+          len(rel17) == 1 and "41-release-m1-r2" in rel17[0]["brief"], f"{len(rel17)} found")
+    check("event 18: no Release or build thread started (no feature left open)",
+          not starts(e[18], "release") and not builds(e[18]))
+    ended18 = [b for b in e[18] if b["op"] == "Comment on an issue" and "<!-- milestone delivery thread ended" in b["body"]]
+    check("event 18: the Release thread's end is recorded on the tracker", bool(ended18))
+
+    rbriefs = rel1 + rel9 + rel12 + rel15 + rel17
+    check("events 1, 9, 12, 15 and 17: each Release thread's brief says to open no release issue when nothing qualifies",
           bool(rbriefs) and all(re.search(r"no release issue", b["brief"], re.I) for b in rbriefs),
           f"{sum(1 for b in rbriefs if not re.search(r'no release issue', b['brief'], re.I))} of {len(rbriefs)} without it")
 
@@ -326,7 +394,7 @@ def score_deliver(ev):
 def main():
     if len(sys.argv) == 3 and sys.argv[1] == "--shape":
         shape(open(sys.argv[2]).read())
-    elif len(sys.argv) == 3 and sys.argv[2] in ("plan", "add-feature", "deliver"):
+    elif len(sys.argv) == 3 and sys.argv[2] in ("plan", "add-feature", "deliver", "deliver-checkin-failed"):
         out, case = sys.argv[1], sys.argv[2]
         try:
             text = open(f"{out}/repo/.scratch/proposed-actions.md").read()
@@ -336,6 +404,8 @@ def main():
         check("proposed-actions.md holds actions", bool(blocks))
         if case == "deliver":
             score_deliver(parse_events(text))
+        elif case == "deliver-checkin-failed":
+            score_deliver_checkin_failed(parse_events(text))
         elif case == "plan":
             score_plan(blocks)
         else:

@@ -19,6 +19,33 @@ Pass: yes | no. Lessons: <what to change in the skill, if anything>
 
 ## Runs
 
+### 2026-11-02, commit 21b0a52 (branch `ticket-495`; base 4d0a751), dev-skills 0.40.0 (base): `deliver-checkin-failed` (#495, Ticket check 1)
+
+Driven by: by hand, by the Implementer of #495, reading this branch's "Check-ins" against a fresh fixture built with `make-fixture.sh <out-dir> deliver-checkin-failed`, running `.scratch/world.sh <k>` for events 2 to 4. No fresh session ran it, and the person driving it also wrote the skill text.
+
+Proposed actions: event 1 as in `deliver` (the check-in thread and its record, then the Release thread and its record). Event 2: (5) `<!-- milestone check-in failed -->` on the Milestone issue, "the scheduler refused the coordinator's session as a target"; (6) the check-in thread's ended record; (7, 8) the Spec thread of 10 and its record; the user hears the limit in one line. Events 3 and 4: the hand-outs as in `deliver`, and no check-in thread, since the failed record marks check-ins off.
+
+Score: 7/7 (`score.py <out-dir> deliver-checkin-failed`; an empty `proposed-actions.md` scores 1/7). `deliver` reruns at 54/54 on the same text.
+
+Before: the same four events on 4f066d9's text, where a failure was only an event (the thread's report) and left nothing but the generic ended record: event 2 wrote the ended record and started the Spec thread; at event 3 the tracker showed no check-in record, no running check-in thread and nothing marking a failure, so the arrange rule fired again (a second check-in thread). 4/7: fails the failed record, its limit, and "not arranged again after the failure".
+
+Not exercised: a fresh session; a coordinator scheduling its own check-ins and failing; the user's go-on naming Scheduled check-in (read as off by the same rule).
+Pass: yes, as a by-hand run.
+
+### 2026-11-02, commit 4d0a751 (base), dev-skills 0.40.0 (base): `deliver`, eighteen events, check-ins (#495)
+
+Driven by: by hand, by the Implementer of #495, reading this branch's `plugins/dev-skills/skills/milestone/SKILL.md` ("Delivery", "Check-ins") against a fresh fixture built with `make-fixture.sh <out-dir> deliver`, running `.scratch/world.sh <k>` before each event from event 2 on. No fresh session ran it, and the person driving it also wrote the skill text: that is this entry's main limit.
+
+Proposed actions: events 2 to 14 as the entry below. Event 1 now opens with (1) a check-in thread with `milestone`, tier cheap, briefed to read the coordinator's session as its parent session and create one recurring scheduled task bound to it, every 1 hour (the fixture's Boundary record), each firing carrying `Milestone check-in: <Milestone issue>`, read it back and post the `<!-- milestone check-in -->` record, and (2) its delivery-thread record on the Milestone issue, both before the Release thread (the Startup verification row names a thread scheduling into the coordinator's session, so a thread arranges them). Event 2's world adds the check-in record (schedule `sched-01`), so from then on check-ins are running and no wake arranges them again. Event 15: 36 has closed, so step 1 starts a Release thread to fill the empty 41 with 25, opening no second release issue. Event 16: 41 now carries 25, so the Ticket thread of 25 with `implement` (tier cheap). Event 17: every `release-m1-r2` issue is closed, so the Release thread for 41. Event 18: its ended record on 41; no feature is left open, so delivery is done: a check-in thread with `milestone` briefed with `sched-01` to delete it, read back that no future firing remains and post `<!-- milestone check-in ended -->`, and its record, before the one line to the user.
+
+Score: 54/54 (`score.py <out-dir> deliver`; an empty `proposed-actions.md` scores 18/54).
+
+Before: the same eighteen events run by hand on the base's text (no check-ins in Delivery): the same actions without the two check-in starts and their records: 48/54, failing exactly the six check-in checks (a check-in thread at event 1, its brief's interval, target and recurrence, its check-in record line, arranged before the Release thread, the end at event 18, and the end's read-back and ended record). Scorer guards, on copies of the passing run: a second check-in thread at event 10 fails "events 2 to 17: the check-ins are neither arranged again nor ended" (and event 10's "no thread started"); an end brief without the read-back fails event 18's read-back check; a check-in thread numbered after the Release thread fails "arranged before the Release thread starts".
+
+Real Milestone issue: not reapplied (Milestone 1 #396's loop state is as the entry below, plus #407 now in build).
+Not exercised: a fresh session; a real scheduler (the check-in record is played by `world.sh`; the Claude Code cloud-project probe of the targeting is in `evals/startup-verification/RESULTS.md`); the coordinator scheduling its own check-ins (Codex desktop's heartbeat); a check-in thread that fails to arrange them (the `deliver-checkin-failed` entry above); a scheduler whose shortest interval is longer than the record's; a go-on without check-ins.
+Pass: yes, as a by-hand run.
+
 ### 2026-11-02, commit d85f265 (base), dev-skills 0.37.0 (base): `deliver`, with Milestone 1 as the second case
 
 Driven by: by hand, by the Implementer of the delivery-loop Ticket, reading this branch's `plugins/dev-skills/skills/milestone/SKILL.md` ("Delivery") step by step against a fresh fixture built with `make-fixture.sh <out-dir> deliver`, running `.scratch/world.sh <k>` before each event from event 2 on (the fixture is built in event 1's state) and reading the state from the fixture's tracker each time. No fresh session ran it (the Implementer was not allowed to start further agents), and the person driving the run also wrote the skill text: that is this entry's main limit.

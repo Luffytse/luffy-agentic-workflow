@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 # Builds one fixture for the milestone skill's dry run: its planning phase (plan, add-feature) or its delivery loop (deliver).
-# Usage: make-fixture.sh <out-dir> <plan|add-feature|deliver>
+# Usage: make-fixture.sh <out-dir> <plan|add-feature|deliver|deliver-checkin-failed>
 # Makes <out-dir>/repo (a git repo, one commit on main, with a dry-run local tracker) and <out-dir>/PROMPT.md
 # (the scripted prompt for a fresh coordinator session). See evals/milestone/README.md.
 set -eu
 out="$1"; case_="$2"
-case "$case_" in plan|add-feature|deliver) ;; *) echo "unknown case: $case_" >&2; exit 2 ;; esac
+case "$case_" in plan|add-feature|deliver|deliver-checkin-failed) ;; *) echo "unknown case: $case_" >&2; exit 2 ;; esac
+# deliver-checkin-failed is the deliver fixture, cut to events 1 to 4, in which the check-in thread cannot arrange the check-ins.
+kind="$case_"; [ "$case_" = deliver-checkin-failed ] && kind=deliver
 [ -e "$out" ] && { echo "$out exists" >&2; exit 2; }
 mkdir -p "$out"
 out="$(cd "$out" && pwd)"
@@ -96,7 +98,7 @@ What the user has agreed agents may do on their own in this repo, which actions 
 A Milestone issue may name extra allowed or forbidden actions for its own issues. For an issue that belongs to the Milestone, the Milestone issue wins over this record; for every other issue, this record applies as written.
 MD
 
-if [ "$case_" = deliver ]; then
+if [ "$kind" = deliver ]; then
   cat > "$r/docs/agents/release.md" <<'MD'
 # Releases
 
@@ -256,6 +258,15 @@ ${2:-}
 <!-- startup-verification result -->
 ## Startup verification
 
+Runner: thread verify-1 · Run: 2026-11-02 09:00–09:20 UTC
+
+| Capability | Essential | How probed | Result | Evidence | Limits |
+|---|---|---|---|---|---|
+| Scheduled check-in | yes | the verification thread's one-shot scheduled task bound to the coordinator's session (the coordinator holds no scheduler; threads do) | pass | token arrived in the coordinator at 09:07 | the coordinator cannot schedule; a thread arranges its check-ins |
+| Real worker state | yes | cheap-tier thread; marker token | pass | marker comment read back | none |
+| Confirmed stop | yes | cheap-tier thread, archived by a thread | pass | idle before, archived after | an archive can be undone |
+| Loaded skill version | yes | the verification thread | pass | versions equal | none |
+
 Verdict: ready
 MD
 }
@@ -284,7 +295,7 @@ MD
 fi
 
 
-if [ "$case_" = deliver ]; then
+if [ "$kind" = deliver ]; then
   # Delivery starts: Milestone 1 planned (one feature at a time), Startup verification passed, no Release planned yet.
   printf 'milestone-1\n' >> "$r/.scratch/labels.md"
   for f in 10-farewell 11-bye-code 12-bye-usage 20-quiet; do
@@ -347,6 +358,8 @@ case "$k" in
      for f in 10-farewell 11-bye-code 12-bye-usage 20-quiet; do
        sed -i.bak 's/^Labels: \(.*milestone-1\)$/Labels: \1, release-m1-r1/' "$i/$f.md"
      done
+     # The check-in thread started at event 1 arranged the check-ins and posted the check-in record.
+     [ -e .scratch/checkin-refused ] || printf '\n<!-- milestone check-in -->\nEvery 1 hour into the coordinator'"'"'s session, scheduled by the check-in thread; schedule sched-01; next firing 2026-11-02T11:00Z.\n' >> "$i/00-milestone.md"
      cat > "$i/40-release-m1-r1.md" <<'MD'
 Title: Release Milestone 1 · Release 1
 Type: release
@@ -435,6 +448,35 @@ Left out: 25-hello-doc.md (3rd), blocked by 36-readme-style.md, which is open.
 MD
       ;;
   14) ;;
+  15) sed -i.bak 's/^Status: open$/Status: closed/' "$i/36-readme-style.md" ;;
+  16) # The Release thread filled the empty 41 with 25.
+      sed -i.bak 's/^Labels: enhancement, milestone-1$/Labels: enhancement, milestone-1, release-m1-r2/' "$i/25-hello-doc.md"
+      cat > "$i/41-release-m1-r2.md" <<'MD'
+Title: Release Milestone 1 · Release 2
+Type: release
+Labels: none
+Status: open
+Parent: none
+Blocked by: none
+
+**Goal:** the README documents the commands.
+
+**Label:** `release-m1-r2`. Every issue in this Release carries it.
+
+**Milestone:** 00-milestone.md
+
+**Cap:** 5 features. Used: 1.
+
+## Scope
+
+- **Document the commands in the README** (3rd in the Milestone's order)
+  - 25-hello-doc.md
+MD
+      ;;
+  17) sed -i.bak 's/^Status: open$/Status: closed/' "$i/25-hello-doc.md"
+      printf 'README lists hello and bye.\n' > README.md ;;
+  18) printf '# Changelog\n\n## Milestone 1 · Release 2\n\nVersions: none (no skill changed).\n\n## Milestone 1 · Release 1\n\nVersions: 0.4.0, 0.5.0.\n' > CHANGELOG.md
+      sed -i.bak 's/^Status: open$/Status: closed/' "$i/41-release-m1-r2.md" ;;
   *) echo "no event $k" >&2; exit 2 ;;
 esac
 rm -f "$i/"*.bak
@@ -442,6 +484,8 @@ echo "$k" > .scratch/stage
 echo "world at event $k"
 SH
   echo 1 > "$r/.scratch/stage"
+  # The variant's world: the scheduler refuses the coordinator's session, so no check-in record ever appears.
+  [ "$case_" = deliver-checkin-failed ] && printf 'world.sh: the scheduler refuses the target\n' > "$r/.scratch/checkin-refused"
 fi
 
 git -C "$r" add -A
@@ -509,7 +553,7 @@ Your project instructions (the coordinator's own) say: "Build threads: at most 3
 default. Briefs also link the repo. This project does not run the `triage` skill."
 
 Planning has settled and the Startup verification result on the Milestone issue reads `Verdict: ready`: you are in
-delivery. Events arrive one at a time, below. For each event, in order: from event 2 on, first run
+delivery. The clock reads 2026-11-02T10:00Z at event 1. Events arrive one at a time, below. For each event, in order: from event 2 on, first run
 `bash .scratch/world.sh <k>` from the repo root (it moves the fixture to what the tracker shows when the event arrives;
 it is not your write; event 1 needs no run, since the fixture starts in its state), then write `## Event <k>` and the
 actions the skill has you take, reading the state from the tracker each time. A thread you start
@@ -517,7 +561,8 @@ does not run in a dry run: what it does arrives as a later event. A pull request
 event's text, with the changed files it lists. Ask the user nothing: no answers are scripted.
 
 - Event 1: delivery starts.
-- Event 2: the Release thread reports that it has planned the Release.
+- Event 2: the Release thread reports that it has planned the Release, and the check-in thread, if you started one,
+  reports that it arranged the check-ins.
 - Event 3: the Spec thread of `10-farewell.md` reports that its Spec pull request #7 is ready to merge and asks for its
   version number. #7 changes `skills/greeting/SKILL.md` (a new farewell rule), `src/greet.sh` and `test.sh`.
 - Event 4: the Spec thread of `10-farewell.md` asks for a version number for pull request #10, which builds no issue
@@ -539,11 +584,31 @@ event's text, with the changed files it lists. Ask the user nothing: no answers 
   blocked by `36-readme-style.md`, filed meanwhile. It had opened `41-release-m1-r2.md` before it found that, and
   labelled no issue.
 - Event 14: a scheduled check-in fires; no thread has reported since event 13.
+- Event 15: a scheduled check-in fires: `36-readme-style.md` has closed; no thread has reported since event 13.
+- Event 16: the Release thread started at event 15 reports that it filled `41-release-m1-r2.md` with `25-hello-doc.md`.
+- Event 17: the Ticket thread of `25-hello-doc.md` reports that its pull request #11, which changes `README.md` only,
+  merged with no version change, and that its Ticket is closed.
+- Event 18: the Release thread reports that it cut Milestone 1 · Release 2 and planned no next Release: no planned
+  feature of the Milestone is left open.
 
-Stop after event 14.
+Stop after event 18.
 TXT
   fi
   echo "---"
 } > "$out/PROMPT.md"
+
+if [ "$case_" = deliver-checkin-failed ]; then
+  # Events 1 to 4 only, with event 2's check-in thread reporting that it could not arrange the check-ins.
+  awk '
+    /^- Event 2: / { print "- Event 2: the Release thread reports that it has planned the Release, and the check-in thread reports that"
+                     print "  it could not arrange the check-ins: the scheduler refused the coordinator'"'"'s session as a target."; skip = 1; next }
+    /^- Event 5: / { drop = 1 }
+    /^Stop after event 18\.$/ { print ""; print "Stop after event 4."; drop = 0; next }
+    /^- Event / { skip = 0 }
+    skip && /^  / { next }
+    drop { next }
+    { print }
+  ' "$out/PROMPT.md" > "$out/PROMPT.md.new" && mv "$out/PROMPT.md.new" "$out/PROMPT.md"
+fi
 
 echo "built $case_ fixture in $out"
