@@ -67,7 +67,7 @@ First decide whether the pull request is **inside a Milestone**. Read the Bounda
 - the Review ended with Result "5-Round cap reached" (Round 5 was not clean; a clean Round 5 is a clean Round like any other);
 - an agreed answer to a design Finding that changes the pull request came when no Round is left to review it.
 
-Deep depth alone does not stop the merge, and neither does a change to an ADR, the glossary, a `CLAUDE.md` or a `REVIEW.md`. When you merge such a change yourself, list it for the Milestone review: before the merge, add a line to the pull request body naming each ADR, glossary, `CLAUDE.md` and `REVIEW.md` file it changes (`Milestone review: <files>`), and name them in your report (step 8).
+Deep depth alone does not stop the merge, and neither does a change to an ADR, the glossary, a `CLAUDE.md` or a `REVIEW.md`. When you merge such a change yourself, list it for the Milestone review: before the merge, add a line to the pull request body naming each ADR, glossary, `CLAUDE.md` and `REVIEW.md` file it changes (`Milestone review: <files>`), and name them in your report (step 8). When you merge a pull request on which an agent answered design Findings (`agentic-review` lists them, each by its row id and the link to its record), the same line names each answer too (`Milestone review: <files>; design answers: <id> <link>, ...`, without the files part when no such file changed), and so does your report.
 
 **Outside a Milestone**, bring the pull request to the user, and do not merge it, if any of these holds:
 
@@ -85,7 +85,7 @@ When you bring the pull request to the user, name what stops the merge, so the u
 
 ## 8. Report
 
-Tell the user (or the coordinator) the pull request link and the outcome: merged with its commit, or waiting for the user and why. Inside a Milestone, also list each ADR, glossary, `CLAUDE.md` and `REVIEW.md` file a merge of yours changed, for the Milestone review.
+Tell the user (or the coordinator) the pull request link and the outcome: merged with its commit, or waiting for the user and why. Inside a Milestone, also list each ADR, glossary, `CLAUDE.md` and `REVIEW.md` file a merge of yours changed, and each agent design answer on it, for the Milestone review.
 
 ## 9. Run the retro
 

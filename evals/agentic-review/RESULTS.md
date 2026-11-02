@@ -40,7 +40,71 @@ Locations counted within their own file: yes | no. <any line counted across a li
 Pass: yes | no. <one line on what to change in VERIFY.md, if anything>
 ```
 
+For the Milestone-agreement check (scored by `milestone/EXPECTED.md`):
+
+```
+### <date>, dev-skills <version>, Milestone agreement
+
+| id | Expected | Got | Pass? | Notes |
+|----|----------|-----|-------|-------|
+| R2-1 | (a), quote fields, lasting | | | |
+| R2-2 | (b), names AC1 or the personal-data exclusion | | | |
+| S1 | sort not re-raised | | | control: raised? |
+| S2 | fractions not re-raised | | | control: raised? |
+| inside | decision-level, 6 conditions | | | not exercised? |
+| outside | decision-level, 4 conditions | | | not exercised? |
+
+Extras: <the Finders' other Findings; whether R2-1, R2-2 and R2-3 were raised>
+Pass: yes | no. <one line on what to change in agentic-review, if anything>
+```
+
 ## Runs
+
+### 2026-11-02, dev-skills 0.27.0, Milestone agreement (rerun after the brief fix)
+
+Base: `a4e9576104999d678c2819363e26952980919e0c` (branch `ticket-399-design-answers`, version left at 0.27.0 as on main), whose design-answer brief tells the agent to sort only its own Finding. Driven by the coordinator thread as in the first run: a fresh `inside` fixture, briefs from `milestone/briefs.sh` and `--control`; each agent a brand-new subagent given one brief file. Two premium-tier design-answer agents, and the four control Finders on the blind copy `repo-control/` (no spec Decisions, comments or sorting exclusion, no Round 1 comment). The four Finders with settled designs were not rerun: the change touched only the design-answer brief, so their rows carry over from the first run. `EXPECTED.md` and `DESIGN-FINDINGS.md` were withheld from the agents.
+
+| id | Expected | Got | Pass? | Notes |
+|----|----------|-----|-------|-------|
+| R2-1 | (a), quote fields, lasting | (a) | yes | change: RFC 4180 quoting for a field holding a comma or a double quote (a `csv()` helper in `export.sh`; `qty` unquoted, digits only; no line breaks, per ADR 0001), a sentence in ADR 0002, tests for `eggs, large` and `12" pizza`; reason AC2; lasting, ADR 0002. It mentioned the `added_by` conflict in one line as outside its Finding. |
+| R2-2 | (b), names AC1 or the personal-data exclusion | (b) | yes | quoted the Milestone exclusion and the glossary against AC1; every answer (keep, drop, initials or ids) changes one; recommended keeping the exclusion and amending AC1 to the header `item,qty`; lasting, ADR 0002 |
+| S1 | sort not re-raised | carried over: not raised | yes, with the limit below | blind control: not raised |
+| S2 | fractions not re-raised | carried over: not raised | yes, with the limit below | blind control: not raised |
+| inside | decision-level, 6 conditions | not run | not exercised | needs a fresh top-level session |
+| outside | decision-level, 4 conditions | not run | not exercised | needs a fresh top-level session |
+
+The Verifier (`briefs/verifier.md`) was not run: no re-raise to judge. Not exercised.
+
+Re-raise limit: even on the blind copy, no control Finder proposed sorting or accepting fractional quantities. The fixture does not provoke the re-raise, so S1 and S2 show only that the Finders were quiet; this run gives no evidence that the settled designs stopped a re-raise.
+
+Extras (the 4 blind control Finders): R2-1 (unquoted CSV fields) raised by 3 of 4, all but the standards Finder; R2-2 (personal data) by 2 of 4, the contradictions and spec Finders; R2-3 (docs index drift) by 3 of 4, all but the bugs Finder. The contradictions Finder raised a Nit (unsure), "the order added is not guaranteed by the list file" (`docs/adr/0002-export-format.md:3`, `src/export.sh:6`): an overclaim-style Finding that does not propose sorting, so not a re-raise. Also raised, real but not planted: the read loop drops a last line with no trailing newline (bugs and spec Finders), plus Nits on unchecked field counts, partial output, malformed lines, CRLF and thin tests.
+
+Pass: yes for the design sort (R2-1 and R2-2). Not shown: that settled designs stop a re-raise (the fixture cannot provoke one), the Verifier's handling of a re-raise, and the decision-level runs (membership, recording on the spec issue, the row Notes, the Milestone review list).
+
+### 2026-11-02, dev-skills 0.27.0, Milestone agreement
+
+Base: `a3c09262991c146fb894978c3230f7aba2bc8165` (branch `ticket-399-design-answers`, version left at 0.27.0 as on main). Driven by the coordinator thread: fixtures built with `milestone/make-fixture.sh` (`inside`), briefs with `milestone/briefs.sh` and `--control`; each agent a brand-new subagent given one brief file. Two premium-tier design-answer agents; four Finders with settled designs (standards and spec regular, adversarial bugs and edge cases and contradictions cheap); the same four from `briefs-control/`. `EXPECTED.md` and `DESIGN-FINDINGS.md` were withheld from the agents.
+
+| id | Expected | Got | Pass? | Notes |
+|----|----------|-----|-------|-------|
+| R2-1 | (a), quote fields, lasting | (b) | no | over-cautious: it called the quoting fix alone safe and lasting (an RFC 4180 rule in ADR 0002, `export.sh:8`, a test), then ruled (b) because fixing the format "means settling the `added_by` column", the conflict between AC1 and the Milestone exclusion that R2-2 raises. It pulled another Finding's conflict into its own sort. |
+| R2-2 | (b), names AC1 or the personal-data exclusion | (b) | yes | named AC1 and the Milestone exclusion (and the glossary entry); recommended keeping the exclusion and dropping `added_by` (AC1's header becomes `item,qty`), lasting, recorded in ADR 0002 |
+| S1 | sort not re-raised | not raised by any of the 4 Finders | yes, with the caveat below | control: not raised either |
+| S2 | fractions not re-raised | not raised by any of the 4 Finders | yes, with the caveat below | control: not raised either |
+| inside | decision-level, 6 conditions | not run | not exercised | needs a fresh top-level session |
+| outside | decision-level, 4 conditions | not run | not exercised | needs a fresh top-level session |
+
+The Verifier (`briefs/verifier.md`) was not run: no Finder re-raised S1 or S2, so it had no re-raise to judge. Not exercised.
+
+Control caveat: the control is not blind. The fixture repo itself holds the spec's Decisions and the Round 1 comment under `.scratch/`, and the control Finders read them (the control contradictions and spec Finders said the R1-2 and R1-3 dismissals rest on the spec's Decisions). So the S1 and S2 passes show only that the Finders were quiet; this fixture cannot provoke the re-raise, and the run does not show that the settled designs stopped one.
+
+Extras (8 Finder reports, 4 with settled designs and 4 control):
+- R2-1 (unquoted CSV fields) raised by 7 of 8, all but the control standards Finder.
+- R2-2 (personal data in the export) raised by 6 of 8, all but the adversarial contradictions Finder with settled designs and the control adversarial bugs Finder.
+- R2-3 (docs index drift, ADR 0002) raised by 6 of 8, all but the two adversarial bugs Finders.
+- Not planted, real: the read loop drops a last line with no trailing newline (`src/export.sh:6-9`), raised by 6 of 8, all but the control contradictions and control standards Finders; `tests/export.sh:5`'s `! bash src/export.sh` cannot fail under `set -e` (spec Finder with settled designs); partial output before a validation error, blank lines and CRLF (Nits, several Finders).
+
+Pass: no. R2-1 was sorted (b) because of a conflict another Finding raises; the design-answer brief must tell the agent to sort only its own Finding. The re-raise check needs a blind control before it can show #217 fixed.
 
 ### 2026-10-31, dev-skills 0.24.1, Spec #348 candidate, Deep
 

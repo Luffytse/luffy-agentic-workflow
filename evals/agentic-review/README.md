@@ -12,6 +12,8 @@ A small fixture pull request with planted problems of known Bug classes (one of 
 - `setup.sh`: builds the fixture as a scratch repo.
 - `briefs.sh`: builds the Finder and Verifier briefs from the current `FINDERS.md` and `VERIFY.md`, whole, so nobody cuts them out by hand.
 - `RESULTS.md`: one entry per run.
+- `brief-lib.sh`: the helpers `briefs.sh` and `milestone/briefs.sh` share to cut the briefs out of the skill files.
+- `milestone/`: the Milestone-agreement check below (`make-fixture.sh`, `test-fixture.sh`, `briefs.sh`, `DESIGN-FINDINGS.md`, `EXPECTED.md`).
 
 ## How to run
 
@@ -36,3 +38,17 @@ Run it whenever `VERIFY.md` changes, alongside the full runs. In the full runs n
 5. Score each result with the Verify-only section of `EXPECTED.md` and record it in `RESULTS.md`. The Verifiers work in the scratch repo and read only their brief; none of them sees this README, `EXPECTED.md` or `RESULTS.md`.
 
 The fixture's own tests pass (`python3 -m unittest` in the scratch repo): the planted bugs are the kind tests miss.
+
+## Milestone-agreement check
+
+Does a design Finding on a pull request inside a Milestone go to a premium-tier agent when its answer keeps what the user agreed, and to the user when it would change the Milestone's goal, an acceptance criterion or an exclusion; is the answer recorded and the row marked with who answered; and do later Finders leave settled designs alone? Rerun it whenever `agentic-review`'s design-Finding rules (`ROUNDS.md`, "Design Findings"), its settled designs or the `review-record` design-row Notes change. Scoring: [`milestone/EXPECTED.md`](milestone/EXPECTED.md).
+
+The fixture, built by [`milestone/make-fixture.sh`](milestone/make-fixture.sh), is a scratch repo with a Boundary record (label form `milestone-<n>`), a local Markdown tracker with a "Comment on an issue" operation, a Milestone issue and a spec as files under `.scratch/issues/`, and a design-changing pull request (`.scratch/pulls/1.md`, branch `design`: `src/export.sh` and a new ADR) with its Round 1 comment holding two kept-design rows. Case `inside` labels the spec `milestone-1` and has the Round 1 designs kept by an agent, its answers recorded on the spec issue; case `outside` has no label and the user kept them. The two planted design Findings and one text Finding, as Round 2's Verify kept them, are in [`milestone/DESIGN-FINDINGS.md`](milestone/DESIGN-FINDINGS.md). [`milestone/test-fixture.sh`](milestone/test-fixture.sh) builds both cases and their briefs and checks each holds what the check needs; run it after changing the builder.
+
+1. Build each case outside this repo: `bash evals/agentic-review/milestone/make-fixture.sh <out-dir> inside` (and `outside` into another directory). Each makes `<out-dir>/repo` and `<out-dir>/PROMPT.md`.
+2. Build the briefs: `bash evals/agentic-review/milestone/briefs.sh <out-dir>` writes `<out-dir>/briefs/`, outside the repo: the Round 2 Finder and Verifier briefs at Standard depth, with the settled designs, and in case `inside` `design-answer-D1.md` and `design-answer-D2.md`, the design-answer brief from `ROUNDS.md` with one planted design Finding each. `--control` writes `<out-dir>/briefs-control/`, the Finder briefs with no settled designs, run against `<out-dir>/repo-control/`, a blind copy of the repo whose spec has no Decisions, comments or sorting exclusion and which has no Round 1 comment (rebuilt on each run).
+3. **Design-answer agents** (case `inside`): start one brand-new premium-tier subagent per `design-answer-D*.md`, each given that file and told to read only it and the repo.
+4. **Re-raise**: start the four Finders from `<out-dir>/briefs/` (`inside`, and `outside` if you want both), each a brand-new subagent on its tier from `FINDERS.md`, given one file; paste their candidates, tagged with their Finders, into `verifier.md`'s placeholder and start the Verifier. Optionally run the control Finders from `briefs-control/` the same way, each told to read only its file and `<out-dir>/repo-control`.
+5. **Decision-level runs** (optional, both cases): give a fresh top-level session that can start subagents the text between the lines of `<out-dir>/PROMPT.md`, with its working directory at `<out-dir>/repo` and `<checkout>` replaced by this checkout's path. Keep `PROMPT.md`'s Expected line away from it.
+6. Score with `milestone/EXPECTED.md` and add an entry to `RESULTS.md` with the Milestone-agreement template there, saying which parts ran and how they were driven.
+
