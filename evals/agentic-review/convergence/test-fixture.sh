@@ -89,7 +89,7 @@ for fx in returned flip; do
     grep -q '^Expected:' "$p" 2>/dev/null || bad "$t: PROMPT.md has no Expected line"
     if [ "$fx" = returned ]; then ids='R2-1 R3-1 R3-2 R3-3'; else ids='R1-1 R2-1 R2-2'; fi
     for id in $ids; do grep -q "#### $id " "$p" || bad "$t: PROMPT.md lacks kept Finding $id"; done
-    grep -q 'EXPECTED' "$p" && ! grep -q '^Score with' "$p" && bad "$t: PROMPT.md names the scoring file outside its footer"
+    grep -v '^Score with' "$p" | grep -q EXPECTED && bad "$t: PROMPT.md names the scoring file outside its footer"
   done
 done
 rm -rf "$out"
