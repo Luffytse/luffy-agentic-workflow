@@ -26,6 +26,20 @@ Every case's repo has a local Markdown tracker (`docs/agents/issue-tracker.md`; 
 4. Score against the Expected line: the membership decision, which list it used, merge or hand-over, the reason it names, and (in `inside-deep-adr`) the bump commit (the ticket flow squash-merges, so score it on the pull request's last commit before the squash, `git -C <out-dir>/repo log origin/<branch> -1 --stat`, with the squash commit on main changing `VERSION`; the spec flow's merge commit keeps it, so score it on main, `git -C <out-dir>/repo log origin/main -3 --stat`) and the body's `Milestone review:` line.
 5. Record the run in [RESULTS.md](RESULTS.md) with the template there, saying how it was driven (a fresh session, a subagent, or by hand), and the commit and plugin version of the checkout under test.
 
+### Corrective-check membership decisions
+
+The same builder accepts `retro-inside`, `retro-outside` and `unrelated-no-issue`, for both `ticket` and `spec` flows. It adds a real branch changing `REVIEW.md`, a no-issue pull-request file, tracker comment/Park operations and `<out-dir>/DECISION.md`. The two retro cases record `Retro origin: .scratch/issues/10-work.md`; the unrelated case has only an incidental reference to that labelled issue. The Spec flow's child Tickets carry no membership label, making the Spec source observable.
+
+Give only DECISION.md and the fixture to a fresh regular-tier decision agent, with this checkout's skills path. Keep these expectations away from it. Score the actual output against all columns:
+
+| Case | Review and merge | Design answers / rebuttals | Clean REVIEW.md merge | First failed attempt |
+| --- | --- | --- | --- | --- |
+| `retro-inside` | inside, source originating Ticket or Spec | agent answers keeping agreement, recorded on origin; rebuttals allowed | thread squash-merges, lists REVIEW.md and agent answers for Milestone review | park, attempt 1 on check PR, no restart, no origin attempt import |
+| `retro-outside` | outside, source originating Ticket or Spec | user answers; no rebuttals | user merge, reason REVIEW.md | same park behavior |
+| `unrelated-no-issue` | outside, source none despite incidental labelled-issue reference | user answers; no rebuttals | user merge, reason REVIEW.md | same park behavior |
+
+Also require the reported `Milestone:` line's label/source evidence and the merge reread of the same origin and current labels; a changed source or membership returns to Review without a new budget. These are bounded decisions, not full lifecycle execution: record the actual answers, source revision and limits in RESULTS.md. Review agents, actual comments, commits, merges, coordinator callbacks and park writes are not exercised by this prompt.
+
 ## Restart check
 
 When the Review reports the outcome `restart`, inside a Milestone or outside one, does the Ticket thread close the pull request with a link to the attempt record, split off the untouched part that stands alone, rebuild the rest once from main with a new Implementer briefed with the attempt history, review the new pull request from Round 1, and park it (telling the user once) when the rebuild does not settle either? The two cases differ only in the Ticket's labels: the stuck-review rule does not depend on Milestone membership.

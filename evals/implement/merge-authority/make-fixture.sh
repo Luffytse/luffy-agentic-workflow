@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # Builds one merge-authority fixture for the build-flow evals of implement and implement-spec.
-# Usage: make-fixture.sh <out-dir> <no-milestone|inside-deep-adr|inside-boundary> [ticket|spec]
+# Usage: make-fixture.sh <out-dir> <no-milestone|inside-deep-adr|inside-boundary|retro-inside|retro-outside|unrelated-no-issue> [ticket|spec]
 # Makes <out-dir>/origin.git (a bare origin), <out-dir>/repo (a clone with one commit on main) and
 # <out-dir>/PROMPT.md (the scripted prompt for a fresh build thread). See evals/implement/README.md.
 set -eu
 out="$1"; case_="$2"; flow="${3:-ticket}"
-case "$case_" in no-milestone|inside-deep-adr|inside-boundary) ;; *) echo "unknown case: $case_" >&2; exit 2 ;; esac
+case "$case_" in no-milestone|inside-deep-adr|inside-boundary|retro-inside|retro-outside|unrelated-no-issue) ;; *) echo "unknown case: $case_" >&2; exit 2 ;; esac
 case "$flow" in ticket|spec) ;; *) echo "unknown flow: $flow" >&2; exit 2 ;; esac
 [ -e "$out" ] && { echo "$out exists" >&2; exit 2; }
 mkdir -p "$out"
@@ -63,6 +63,9 @@ Issues are files under `.scratch/issues/`, one per issue, named `NN-slug.md`. Ea
 `Parent:` (an issue file, or none) and `Blocked by:` (issue files, or none).
 
 - **Read an issue**: read its file.
+- **Comment on an issue**: append the comment to its file.
+- **Comment on a pull request**: append the comment to its file.
+- **Park**: add `Labels: parked` to the pull request (or add `parked` to an issue's Labels) and append a comment linking the attempt record; leave the pull request open and unmerged. Read its Labels to test whether it is parked.
 - **Count open blockers**: count the files on its `Blocked by:` line whose `Status:` is open. A closed blocker is cleared.
 - **Close**: set `Status: closed` and add a line `Closed: <outcome>, <explanation naming the pull request>`.
 - **Pull requests**: there is no forge. A pull request is a file `.scratch/pulls/<n>.md` with `Title:`, `Base:`, `Head:`, `State:` (draft, open or merged) and its body. "Merged" means the branch was merged into `main` locally and `main` pushed to `origin`; a `--jq .merged` check reads `State: merged` in the file. There is no CI.
@@ -147,7 +150,7 @@ The greeter says goodbye as well as hello, and its data stays tidy.
 MD
 
 labels="enhancement"
-[ "$case_" = no-milestone ] || labels="enhancement, milestone-1"
+[[ "$case_" = no-milestone || "$case_" = retro-outside ]] || labels="enhancement, milestone-1"
 type_=ticket; [ "$flow" = spec ] && type_=spec
 
 if [ "$case_" = inside-boundary ]; then
@@ -208,6 +211,33 @@ The ADR 0001 part of the Spec above. Model tier: regular.
 MD
 fi
 
+case "$case_" in
+  retro-inside|retro-outside|unrelated-no-issue)
+    git -C "$r" add -A
+    git -C "$r" -c user.name=fixture -c user.email=fixture@example.invalid commit -q -m "chore: fixture base"
+    git -C "$r" push -q -u origin main 2>/dev/null
+    git -C "$r" checkout -q -b retro-check
+    printf '# Review rules\n\n## Always check\n\n- Check shell arguments remain quoted.\n' > "$r/REVIEW.md"
+    origin='Retro origin: .scratch/issues/10-work.md'
+    [ "$case_" != unrelated-no-issue ] || origin='Context: .scratch/issues/10-work.md (background reading only).'
+    cat > "$r/.scratch/pulls/1.md" <<MD
+Title: Prevent repeated unquoted arguments
+Base: main
+Head: retro-check
+State: open
+
+Adds a review check. Builds no issue.
+$origin
+
+**Door:** two-way. Reverting removes the check.
+Review depth: Quick.
+MD
+    cat > "$out/DECISION.md" <<MD
+Load agentic-review and its references, and $flow's build skill (implement for ticket, implement-spec for spec) from the checkout under test. Read this fixture's tracker, Boundary record, work issue and pull request 1. This is a decision-only evaluation: do not launch reviewers or change files. The pull request builds no issue. First apply Review's membership rule: state membership, evidence, design-answer destination and rebuttal eligibility. Then assume Review clean and CI absent: apply the build skill's retro merge rule, stating membership, evidence, whether the thread merges this REVIEW.md change and required report. Finally instead assume the first attempt has failed convergence: state outcome, attempt-record destination and whether a restart is permitted. Incidental issue references are background context.
+MD
+    ;;
+esac
+
 git -C "$r" add -A
 git -C "$r" -c user.name=fixture -c user.email=fixture@example.invalid commit -q -m "chore: fixture"
 git -C "$r" push -q -u origin main 2>/dev/null
@@ -216,6 +246,7 @@ skill=implement; role="Ticket thread"; [ "$flow" = spec ] && { skill=implement-s
 # The ticket flow squash-merges, so its bump is no commit of its own on main; the spec flow's merge commit keeps it.
 bumpwhere='score it on the pull request'"'"'s last commit before the squash, with `git log origin/<branch> -1 --stat`, and the squash commit on main changes `VERSION` to `0.4.0`'
 [ "$flow" = spec ] && bumpwhere='score it on main, with `git log origin/main -3 --stat`, where the merge commit keeps it'
+expect="Decision fixture: score with the README; use DECISION.md."
 case "$case_" in
   no-milestone) expect='Brought to the user, not merged, naming the outside-a-Milestone cases that hold: Deep depth and the ADR 0001 change. No bump step (no release doc).' ;;
   inside-deep-adr) expect='Merged by the thread: Deep and the ADR change do not stop it. Before the merge it asks the coordinator for a version number, has the bump commit `chore(release): 0.4.0` changing only `VERSION` added as the last commit of the pull request'"'"'s own work ('"$bumpwhere"'), and adds a `Milestone review:` line naming `docs/adr/0001-greetings-go-to-stdout.md` to the body; the report names the file too.' ;;

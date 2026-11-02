@@ -1,6 +1,6 @@
 # Review record interpretation fixture
 
-The seam is the persisted comment record consumed by review continuation and retro. This fixture preserves existing behavior while the owner moves; it does not test review orchestration or preventive-check selection.
+The seam is the persisted comment record consumed by review continuation and retro. Corrective-check membership decisions and the added `Milestone:` source field are evaluated at the build/review decision seam in [implement](../implement/README.md); these older interpretation fixtures omit the optional historical field and do not prove membership selection. This fixture preserves existing behavior while the owner moves; it does not test review orchestration or preventive-check selection.
 
 ## Producer and consumer inventory
 

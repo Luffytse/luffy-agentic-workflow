@@ -15,6 +15,28 @@ Pass: yes | no. Lessons: <what to change in implement, if anything>
 
 ## Runs
 
+### 2026-11-02, base 1756497f83c5c897abef05db6e192d2cb51d8382, dev-skills 0.43.0: #476 corrective-check membership, red/green decisions
+
+Setup: extended shared merge-authority fixture, `ticket` flow, no forge or CI. The coordinator ran one fresh regular-tier decision subagent against unchanged main skills for the inside case, then a different fresh regular-tier decision subagent against the candidate skills committed with this entry for all three green cases. Thus green has two fresh agents across both build flows, each seeing its own three cases; cases within a flow are not isolated from each other. Prompts came from DECISION.md; agents read the real skills and tracker fixtures, without this README's scoring table. No full Review was delegated.
+
+Red observed: Review outside because the check builds no issue; design Findings go to the user and rebuttals are unavailable. The build retro merge rule instead selects inside from originating Ticket 10's `milestone-1` label, allows the thread to squash-merge the two-way REVIEW.md change and lists it for Milestone review. The first convergence failure still parks attempt 1 on the check PR, with no restart. This reproduces the membership disagreement through actual agent decisions. The red fixture lacked comment/Park tracker operations; these were added before green, so red is decision evidence only.
+
+Green observed (fresh agent's actual decisions, scored against the fixed acceptance expectations):
+
+| Case | Review / merge membership and source | Design / rebuttals | Clean check / first failed attempt |
+| --- | --- | --- | --- |
+| retro-inside | both `milestone-1`; `.scratch/issues/10-work.md` (Ticket) | premium-tier agent answers within agreement, recorded on origin; eligible rebuttals | thread squash-merges REVIEW.md; lists file and agent answers for Milestone review; failure parks attempt 1 on PR, no restart |
+| retro-outside | both outside; same origin Ticket | user answers; no rebuttals | REVIEW.md goes to user; failure parks attempt 1 on PR, no restart |
+| unrelated-no-issue | both outside; source none despite incidental reference to labelled work issue | user answers; no rebuttals | REVIEW.md goes to user; failure parks attempt 1 on PR, no restart |
+
+The green agent also selected the `Milestone:` membership/source record and the current-origin/label reread before merge, comparing with the last Round; a change returns to Review without extra budget. Origin attempt history was not imported.
+
+Checks: expanded merge-authority fixture integrity passes all six cases in both flows; `claude plugin validate .`, `bash scripts/check-plugin.sh`, and all 15 disposable packaging tests (`python3 scripts/test-check-plugin.py`) pass. Existing restart and Spec park fixture checks were attempted but their builders stop on macOS BSD `sed -i` (`undefined label`); those separate lifecycle checks are not reported as passed.
+
+Not exercised: actual Finders, Verifiers, design-answer agents or rebuttal decisions; actual Round/answer/attempt comments and park writes; the changed-membership branch as a separate fixture; CI, bump, integration, merge, coordinator callbacks and full build/retro lifecycle. These are bounded decision-level red/green runs, not full execution proof. No new skill dependency was introduced. Not visual; Door: two-way (reverting this text/fixture change undoes it).
+
+Pass: yes for all three membership/merge/first-failure decisions in this flow. Version is the base version, unchanged during review.
+
 ### 2026-11-02, ticket-443 after Ticket check 1, dev-skills 0.29.0: carry-over commands, desk check by hand, not a build-flow run
 
 Setup: two scratch git repos outside this repo, run by hand by the Implementer of #443, testing the carry-over commands `implement-spec` step 7 now names (the `implement` split-off uses the same diff).
