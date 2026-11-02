@@ -198,7 +198,7 @@ A spec's PR lists the spec and every ticket that has landed on its branch, not e
 
 Describe whether it's a one-way or two-way door. You can walk back through two-way doors, but not one-way doors. A PR that is cheap to roll back is lower risk. Changes that involve destructive actions or hard-to-reverse decisions are one-way doors.
 
-Decide with one test: would reverting the PR's commits undo everything the change did, including anything outside git? If not, it is a one-way door. For example: a data migration, deleted data, a public interface others depend on, a message sent outside the project, a published release. Mark it plainly as `**Door:** one-way`, with one line on what a revert would not undo, so a reader or merging agent can find it. A one-way door is not self-merged.
+Decide with one test: would reverting the PR's commits undo everything the change did, including anything outside git? If not, it is a one-way door. For example: a data migration, deleted data, a public interface others depend on, a message sent outside the project, a published release. A version bump merged with the PR, where each pull request bumps the version, is not a published release: a revert walks it back with the next version number. Mark it plainly as `**Door:** one-way`, with one line on what a revert would not undo, so a reader or merging agent can find it. Outside a Milestone a one-way door is not self-merged; inside one, the repo's Boundary record and the Milestone issue decide whether its merging thread may merge it (the build skills' merge step).
 
 A PR that collects several tickets (a spec's PR) carries each ticket's Door call into its body, and is one-way if any ticket's Door is, naming those tickets.
 

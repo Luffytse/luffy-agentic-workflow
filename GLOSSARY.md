@@ -57,7 +57,7 @@ The label of the optional agent-only triage role: it marks an issue for one codi
 _Avoid_: assignee, owner
 
 **Milestone**:
-A product goal the user sets (for example "M3 Trip planning"), written down in one Milestone issue: the goal, the features to deliver by its end, their acceptance criteria, what is excluded and any budget (a limit on one of the project's paid or limited resources, such as a paid API key). It holds one or more Releases, which the agents plan, and it closes when the user accepts it at the Milestone review.
+A product goal the user sets (for example "M3 Trip planning"), written down in one Milestone issue: the goal, the features to deliver by its end, their acceptance criteria, what is excluded and any budget (a limit on one of the project's paid or limited resources, such as a paid API key). It holds one or more Releases, which the agents plan, and it closes when the user accepts it at the Milestone review. An issue belongs to it, and its pull request is **inside the Milestone**, when the issue (for a Spec's pull request, the Spec) carries the Milestone's membership label in the form the **Boundary record** names; the Milestone issue carries the same label. Inside a Milestone a build thread merges its own pull request unless it crosses a boundary, the repo's own rules say a person merges it, or, until a later change replaces them, the Review hit the 5-Round cap or an agreed design answer had no Round left (ADR 0004).
 _Avoid_: epic, sprint
 
 **Release**:
@@ -144,11 +144,11 @@ How much a Finding matters. **Important** must be fixed before the change is mer
 _Avoid_: priority, blocker
 
 **Door**:
-How hard a change is to walk back. A **one-way door** is a change that reverting its commits would not fully undo, including anything outside git (a data migration, deleted data, a public interface others depend on, a message sent outside the project, a published release); a **two-way door** is one a revert does undo. The `pr` skill records the call as `**Door:**` in the pull request body, and a pull request behind a one-way door is not self-merged.
+How hard a change is to walk back. A **one-way door** is a change that reverting its commits would not fully undo, including anything outside git (a data migration, deleted data, a public interface others depend on, a message sent outside the project, a published release); a **two-way door** is one a revert does undo. Where each pull request bumps the version, the bump merged with it is not a published release: ADR 0008 walks a bad change back with a revert that takes the next number, so the bump alone keeps a pull request two-way; a Release that publishes a version, where Releases bump, is one-way. The `pr` skill records the call as `**Door:**` in the pull request body. Outside a Milestone, a pull request behind a one-way door is not self-merged; inside one, the **Boundary record** and the Milestone issue decide: a one-way door whose irreversible action they allow agents to take is an agent merge (ADR 0004).
 _Avoid_: risk level
 
 **Boundary record**:
-A repo's agent doc, `docs/agents/boundaries.md`, written with the user by `setup-dev-skills`: which irreversible actions agents may take, which actions need the user's approval (the list may be empty), the resource budget, the check-in interval (default one hour) and the form of a Milestone's membership label (for example `milestone-<n>`). Skills will read it instead of a fixed list; until the merge lists and the **Door** entry change, they still govern merges. A Milestone issue may add allowed or forbidden actions for its own issues and wins over the record for them.
+A repo's agent doc, `docs/agents/boundaries.md`, written with the user by `setup-dev-skills`: which irreversible actions agents may take, which actions need the user's approval (the list may be empty), the resource budget, the check-in interval (default one hour) and the form of a Milestone's membership label (for example `milestone-<n>`). Inside a Milestone, the build skills read it instead of a fixed list to decide whether a pull request crosses a boundary and so goes to the user; outside one, the build skills' outside-a-Milestone merge list governs (ADR 0004). A Milestone issue may add allowed or forbidden actions for its own issues and wins over the record for them.
 _Avoid_: permissions file, policy
 
 **Bug class**:

@@ -12,7 +12,20 @@ Every piece of work starts as a GitHub issue: a spec is one issue, its tickets a
 
 ## When the user must review
 
-The thread merges its own pull request once the review is clean and CI is green, unless any of these holds; then it brings the pull request to the user:
+The thread merges its own pull request once the review is clean and CI is green, unless it must bring it to the user. Which cases send it to the user depends on whether the pull request is inside a Milestone (amended 2026-11-01, Spec #398, from [#385](https://github.com/Luffytse/luffy-dev-skills/issues/385#issuecomment-6556848716): Deep is a review depth, not an approval, and [boundaries are per repo](https://github.com/Luffytse/luffy-dev-skills/issues/385#issuecomment-6564185667)).
+
+**Membership.** A pull request is inside a Milestone when its issue (for a spec's pull request, the spec) carries the Milestone's membership label, in the form the repo's **Boundary record** (`docs/agents/boundaries.md`, written by `setup-dev-skills`) names; the Milestone issue carries the same label. With no Boundary record, or no such label, the pull request is outside a Milestone. A retro's check pull request, which has no issue of its own, takes the membership of the ticket or spec whose thread opened it.
+
+**Inside a Milestone**, the thread brings the pull request to the user only if:
+
+- it crosses a boundary: it takes, or its merge would take, an action the Milestone issue or the Boundary record says needs the user's approval, or it is a one-way door (below) whose irreversible action neither allows agents to take; the Milestone issue's allowed and forbidden actions win over the record's for its own issues;
+- the repo's own rules (its `CLAUDE.md`, the project instructions, its docs) say a person merges it;
+- the review ended with Result "5-Round cap reached";
+- an agreed answer to a design Finding that changes the pull request came with no Round left to review it.
+
+The last two stay until the stuck-review ladder (Milestone 1 piece B4, #400) replaces them. Deep depth alone, and a change to an ADR, the glossary, a `CLAUDE.md` or a `REVIEW.md`, are agent merges; the thread lists each such file it merged in the pull request body (`Milestone review: <files>`) and in its report, so the user can read them at the Milestone review.
+
+**Outside a Milestone**, the list is the one this ADR has always had: the thread brings the pull request to the user if any of these holds:
 
 - it ran at Deep depth (security, money, deleting data);
 - it is a **one-way door**: reverting the change would not undo it (a data migration, deleted data, a public interface others depend on, a message sent outside the project). Each Implementer says so with its evidence, the `pr` skill marks it on the pull request, and a spec's pull request is a one-way door if any of its tickets is;
@@ -22,15 +35,19 @@ The thread merges its own pull request once the review is clean and CI is green,
 
 A repo's own rules may add cases; the skills name only the general ones.
 
-The user then merges, or tells the thread to. This follows the Claude Code team's practice of setting human review by the risk of the change, not by who wrote it.
+Where each pull request bumps the version ([ADR 0008](0008-each-skill-change-bumps-the-plugin-version.md)), the bump merged with it is not a published release, and it does not make the pull request a one-way door on its own: a bad change is walked back by a revert that takes the next number. A Release that publishes a version, where Releases bump, still is one.
+
+Either way, a thread that brings a pull request to the user names what stops the merge (the boundary and where it is listed, the rule and its file, the case on the list, or the review's Result), so the user can decide quickly. The user then merges, or tells the thread to. This follows the Claude Code team's practice of setting human review by the risk of the change, not by who wrote it.
 
 ## Considered options
 
 - **Upstream's `implement` as-is:** the session builds and commits to the current branch itself, with no pull request. Its context fills with code, and nothing reaches the user for review.
 - **Dropping `implement-spec`** in favour of one thread per ticket: the user preferred one thread per spec, with subagents doing the tickets and one review over the whole spec.
 - **Always asking the user to merge:** safe, but the user becomes the bottleneck on low-risk work.
+- **Keeping Deep depth and ADR, glossary, `CLAUDE.md` and `REVIEW.md` changes as user merges inside a Milestone:** most such merges need no decision from the user, who reads them at the Milestone review instead; Deep adds scrutiny, not a wait (2026-11-01, #385).
 
 ## Consequences
 
+- `implement` and `implement-spec` read the Boundary record and the issue's labels in their merge step and pick the inside or outside list; a Milestone's agent merges of ADR, glossary, `CLAUDE.md` and `REVIEW.md` changes are listed for the Milestone review (#423).
 - `implement` and `implement-spec` are rewritten as coordinator skills. `to-tickets` adds a model tier to each ticket, `pr` gains an Evidence section and a one-way-door marker, and `to-tickets` and `wayfinder` end by offering `setup-project`. All of these are Patches (`PATCHES.md`).
 - A new skill, `setup-project`, writes the project instructions that tell the coordinator how to brief build threads (which skill, model tier, repo, review depth). It runs `grilling` inside, so it asks at most 3 questions at a time. The user runs it by hand, and `wayfinder` and `to-tickets` offer it to the user at their end only when planning added a repo, a kind of thread or a standing rule. The instructions say how threads work and carry the user's tier-to-model map; they never hold the state of the work, and tell the coordinator to find open specs, plannings and tickets on the tracker. Once the user approves the text, the thread sends it to the coordinator, which saves it.

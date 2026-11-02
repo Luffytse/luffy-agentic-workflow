@@ -82,7 +82,7 @@ Then ask whether the bump pull request (Releases bump) or the bump commit (pull 
 
 > Which actions must come to you for approval, for example deleting production or customer data? (recommended: **none** for a repo with no data of value, else ask the user to name them)
 
-An empty answer to the second question is valid. Skills will read this record in place of a fixed list, so never add actions the user did not name.
+An empty answer to the second question is valid. The build skills read this record in place of a fixed list when they decide who merges inside a Milestone, so never add actions the user did not name.
 
 > Is there a budget agents must stay within, such as a paid service, an API quota or a token limit? (recommended: **none**)
 

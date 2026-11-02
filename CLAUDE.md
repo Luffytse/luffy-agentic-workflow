@@ -36,7 +36,7 @@ Single-context: one root `GLOSSARY.md` and `docs/adr/`. See `docs/agents/domain.
 
 ### Boundaries
 
-The agreed boundary: nothing needs the user's approval, no budget, one-hour check-ins, Milestone label `milestone-<n>`. No skill reads it yet: until #423 lands, the merge lists in `implement` and `implement-spec`, ADR 0004 and the glossary's **Door** entry govern merges. See `docs/agents/boundaries.md`.
+The agreed boundary: nothing needs the user's approval, no budget, one-hour check-ins, Milestone label `milestone-<n>`. Inside a Milestone, the merge step of `implement` and `implement-spec` reads it: a pull request crossing no boundary is an agent merge, Deep and ADR, glossary, `CLAUDE.md` and `REVIEW.md` changes included, unless the repo's own rules say a person merges it or, until a later change replaces them, the Review hit the 5-Round cap or an agreed design answer had no Round left; outside one, the outside-a-Milestone merge list governs (ADR 0004). See `docs/agents/boundaries.md`.
 
 ### Releases
 
