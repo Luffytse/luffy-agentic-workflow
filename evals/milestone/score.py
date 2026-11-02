@@ -522,6 +522,9 @@ def score_deliver(ev):
     s25 = [b for b in starts(e[16], "implement") if "25-hello-doc" in b["brief"]]
     check("event 16: the Ticket thread of 25-hello-doc started, with `implement`", len(s25) == 1 and len(builds(e[16])) == 1,
           f"{len(s25)} found")
+    ended16 = [b for b in e[16] if b["op"] == "Comment on an issue" and "<!-- milestone delivery thread ended" in b["body"]]
+    check("event 16: the filling Release thread's end is recorded on the tracker, so it no longer counts as running",
+          bool(ended16))
     rel22 = starts(e[22], "release")
     check("event 22: the Release thread started for 41-release-m1-r2 once 25 is closed",
           len(rel22) == 1 and "41-release-m1-r2" in rel22[0]["brief"], f"{len(rel22)} found")
