@@ -11,7 +11,7 @@ What a Review of the fixture (branch `planted` against `main`, spec `SPEC.md`) s
 | P3 | off-by-one skips the last creditor | Important | `splitter/split.py:27` | `range(len(creditors) - 1)` never pays the last creditor. With one creditor, the common case, `settle` returns no transfers at all; the spec asks for any number of creditors. |
 | P4 | float money parsing truncates cents | Pre-existing | `splitter/money.py:6` | `int(float(text) * 100)` turns `"0.29"` into 28 and `"19.99"` into 1998. It is in `main` and already used by `load_expenses` on every amount, so the pull request did not cause it, though `splitter/cli.py:9` now also calls it. The spec puts parsing out of scope. Expected to be reported as Pre-existing (and, after a pull request's last Round, filed as one `needs-triage` issue). |
 | P5 | docs index drift | Nit (fix expected; skip acceptable) | `docs/dev-skills/index.md:6` (links `../currency.md`, that is `docs/currency.md`, renamed to `money.md` by this change), `docs/splitting.md` (new doc, no index line) | Both instances in one Finding (citing `docs/money.md` for the rename instead of the index line is fine). Reported by the standards Finder's drift check. Important is also acceptable if the Verifier cites the spec line "Every doc gets a line in `docs/dev-skills/index.md`". |
-| P6 | public function without a docstring (the fixture `REVIEW.md` Always check line) | Nit (fix) | `splitter/cli.py:7` (`main`) | `REVIEW.md` says every public function in `splitter/` has a docstring. `main` has a comment where its docstring should be, so it breaks the line once; every other public function has one. Reported by the standards Finder's Always check step (Bug class "public function without a docstring"). A docstring is not behaviour, data or the spec, so the default meaning of Important (which the fixture `REVIEW.md` keeps) makes it a Nit; "fix" because the line is a standing rule. |
+| P6 | public function without a docstring (the fixture `REVIEW.md` Always check line for `splitter/*.py`) | Nit (fix) | `splitter/cli.py:7` (`main`) | `REVIEW.md` says every public function in `splitter/` has a docstring. `main` has a comment where its docstring should be, so it breaks the line once; every other public function has one. Reported by the standards Finder's Always check step (Bug class "public function without a docstring"). A docstring is not behaviour, data or the spec, so the default meaning of Important (which the fixture `REVIEW.md` keeps) makes it a Nit; "fix" because the line is a standing rule. |
 
 ## False alarms (should be dropped by Verify)
 
@@ -70,23 +70,4 @@ The check passes when:
 - V-d is kept as Important, caused by this change, with exactly `splitter/report.py:11` and `splitter/report.py:16`;
 - every Location the Verifier gives, in any answer, is `file:line` counted within that file (as `grep -n` on the `planted` tree gives it), never a line counted across the diff or a listing of several files (#98).
 
-On Deep, score the combined result of the three stances by `VERIFY.md`'s vote rules, and note each Verifier's votes in `RESULTS.md`.
-
-## Rebuttal check
-
-Does a premium-tier rebuttal Verifier dismiss a Finding only when the rebuttal shows it is wrong? `briefs.sh --rebuttal` hands each of four brand-new Verifiers one candidate from `VERIFY-ONLY.md`, given as an Important that Round 1 kept and still open, with its rebuttal from `REBUTTALS.md`. Two rebut the false alarms with sound evidence; two rebut real Findings with evidence that is true but does not hold up (a passing test run that never calls the code, and a claim that names are not typed by trip members, which the spec contradicts). The briefs are numbered in `REBUTTALS.md`'s order; this is the mapping:
-
-| Brief | Id | Finding | Is | Expected call | Why |
-|-------|----|---------|----|---------------|-----|
-| `rebuttal-1.md` | R1-1 | settle never pays the last creditor | P3 | Uphold | `split.py:27` still skips the last creditor: `settle({"Ana": 2000, "Ben": -1000, "Caro": -1000})` returns `[]`. The zero-sum argument says what should be left, not that anything pays it, and the 6 passing tests never call `settle`. |
-| `rebuttal-2.md` | R1-2 | Amounts go into the shared page without escaping | F1 | Dismiss | `format_cents` output is built from an `int` (`money.py:13`), every amount comes from `parse_amount` (`money.py:6`, `expenses.py:15`), and a string makes it raise (`money.py:11`). |
-| `rebuttal-3.md` | R1-3 | Names typed by trip members reach the summary page unescaped | P2 | Uphold, at `report.py:11` and `report.py:16` | The spec says every name was typed by a trip member; `render_summary_html` takes the expenses as loaded, and nothing checks a payer against the people list (`balances` uses `paid.get`). The payer at `:11` and the creditor at `:16` are unescaped. `:12` holds only `format_cents` output, so an Uphold that keeps it is still an Uphold, noted. |
-| `rebuttal-4.md` | R1-4 | settle skips the debtor after one who is paid off | F2 | Dismiss | `split.py:29` walks a copy, and the Finding's own input gives `[('Ben', 'Ana', 1000), ('Caro', 'Ana', 1000)]`. |
-
-The check passes when:
-
-- R1-2 and R1-4 are dismissed, each citing at least one `file:line` its reason rests on;
-- R1-1 and R1-3 are upheld, each citing a `file:line` that still has the problem (`split.py:27`; `report.py:11` or `:16`); an Uphold that rests only on doubt, with no line, does not count;
-- every Location given is `file:line` counted within its own file at the `planted` head.
-
-Note in `RESULTS.md` whether each Verifier reran the rebuttal's command or test, and for R1-3 whether it dropped `:12`.
+On Deep, the one Verifier runs on the premium tier; score it the same way.

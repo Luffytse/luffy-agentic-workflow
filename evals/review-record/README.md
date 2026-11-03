@@ -1,29 +1,16 @@
 # Review record interpretation fixture
 
-The seam is the persisted comment record consumed by review continuation and retro. Corrective-check membership decisions and the added `Milestone:` source field are evaluated at the build/review decision seam in [implement](../implement/README.md); these older interpretation fixtures omit the optional historical field and do not prove membership selection. This fixture preserves existing behavior while the owner moves; it does not test review orchestration or preventive-check selection.
+The seam is the comment record that a continuing review and `retro` read back. `comments.json` holds one Ticket check, three Rounds and two comments that are not records (a discussion and a Pre-existing filing note), in the shapes `review-record` keeps: an id kept across comments, a Finding that gains a location and is later fixed, a Verifier's dismissal, a skipped Nit, a kept design, a Pre-existing Finding that gains a location, an Important that became a bug Ticket after Round 3 and one dismissed after Round 3. It tests reading only, not running a review or choosing a guardrail.
 
-## Producer and consumer inventory
-
-| Consumer | Needs | Kept with workflow |
-| --- | --- | --- |
-| agentic-review/SKILL.md continuation | Markers, current IDs, Severity/status and prior locations | Diff selection, depth, open-Important verification |
-| agentic-review/ROUNDS.md writer | Comment shape, immutable IDs, status and Note semantics, filing receipts | Rank matching, caps, fix timing, posting, Round loop and filing |
-| agentic-review/FINDERS.md standards brief | Bug class and Always-check meaning | Whole-diff checks, each-line reporting, Finding format |
-| retro/BUG-CLASSES.md reader | Included comments, latest state, historical locations and dismissal interpretation | Class-name aggregation, repeated-instance count, guardrail choice and PR work |
-| evals/agentic-review/briefs.sh | Candidate contract meaning when constructing standards briefs | Eval-only brief generation |
-
-The base loads no workflow. Review and retro explicitly load it by name where they need record meaning. VERIFY.md, default Important and Finding format stay in their existing owners. Build callers still use the review workflow; their separate migration landed in #366.
+`bash evals/review-record/test-score.sh` checks the fixture and the scorer without an agent: the comments use only the kept shapes, `expected.json` covers every id, and `score.py` passes the expected answer and fails planted wrong ones.
 
 ## Run
 
-Copy comments.json into a fresh isolated directory. Keep expected.json outside the agent's directory. Use the isolated-home, fresh app-server procedure in [skill-loading](../skill-loading/README.md), regular tier, provider openai and provider fallback disabled. For a baseline, supply the original ROUNDS.md and BUG-CLASSES.md from the recorded source SHA. For a candidate, copy only review-record into .agents/skills/review-record and discover it with skills/list. Send prompt.txt, adding “First read ROUNDS.md and BUG-CLASSES.md for the existing record rules” for baseline or “First load the review-record skill by name and apply its contract” for candidate. Do not supply the expected answer or the candidate's body in the prompt. Require an observed body read, completed turn and no mutation.
+1. Copy `comments.json` into a fresh directory of its own; keep `expected.json` outside it.
+2. Start a fresh session there on the regular tier with only the `review-record` skill available, and send `prompt.txt`, adding "First load the review-record skill by name and apply its contract". Do not give it the expected answer.
+3. Require an observed read of the skill body, a completed turn and no file changed.
+4. Save its JSON answer and run `python3 evals/review-record/score.py <answer.json>`. The scorer compares the current state, the retrospective view (latest Severity and Status, every location the id was ever listed at, dismissed rows left out unless a skipped Nit or a kept design) and the ignored ids, as unordered sets.
 
-Save the actual JSON response, then run `python3 evals/review-record/score.py <answer.json>`. The scorer compares semantic fields and unordered location/ID sets against a worked expectation, not instruction prose. The inputs cover a Ticket check and three Rounds, repeated IDs, escalation from Nit, partial and full fixes, omitted IDs, historical location accumulation, a false-positive dismissal, skipped Nit, kept design, merged row and a filing receipt. Merged-away IDs are omitted from retro; their locations survive under the holding ID. The filing receipt leaves the Pre-existing row open.
+## History
 
-## Observed 2026-10-31 (America/Los_Angeles)
-
-Baseline: existing owners at Spec commit 8ff823f913b951cb3c48b476ec1eda08c35d4601. Candidate: local review-record extraction, SHA-256 `5788a29f66ce2b2361d32f22290fee1e2454fad7d9cc2b20159572745f0cdd80` for SKILL.md; local project-scoped skill, not a clean installed-plugin claim. Both fresh isolated Codex CLI `0.166.0-alpha.5.1` app-server sessions used the regular Codex tier from the [pinned source table](https://github.com/Luffytse/luffy-dev-skills/blob/8ff823f913b951cb3c48b476ec1eda08c35d4601/plugins/dev-skills/README.md#model-tiers), provider openai, fallback disabled, ephemeral threads, read-only sandbox and approvals never. Both completed and matched every expected field. Candidate discovery found the enabled review-record metadata, and the tool trace records its actual body read. The saved answer/evidence pairs retain the complete responses and tool commands/statuses; discovery evidence is scoped to the contract, with unrelated system skills and runtime transport omitted. Temporary authentication was removed after each process stopped.
-
-This is a passing baseline/passing candidate preservation check, not a claimed failing-before/fixed-after bug test. No workflow or issue was started by these probes. Menu visibility is unmeasured. Full Standard/Deep review fixture evals and clean installed-runtime validation are separate Spec coordinator gates; their later results are recorded in [review results](../agentic-review/RESULTS.md) and [install results](../codex-install/RESULTS.md).
-
-Validation initially caught literal vendor model names in evidence; changed only their representation to the immutable tier-table reference, consistent with the earlier loading eval.
+The 2026-10-31 baseline and candidate runs (Codex app-server sessions on the regular tier, both matching every field) read the earlier fixture, which also held merged rows, partly fixed rows and a Nit raised to Important. Their answers, evidence and that fixture are at commit `9b98dfe` (`git show 9b98dfe:evals/review-record/README.md`). This fixture has not been run by a model yet.
