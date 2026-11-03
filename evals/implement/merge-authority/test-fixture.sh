@@ -68,5 +68,11 @@ for flow in ticket spec; do
     [ "$flow" = spec ] && { grep -q '^Type: spec' "$issue" || bad "$flow/$case: work issue is not a Spec"; }
   done
 done
+# The skills under test hold one merge rule: both name the listing line, and implement-spec keeps no inside/outside merge list.
+skills="$here/../../../plugins/dev-skills/skills"
+for s in implement implement-spec; do
+  grep -q 'Agent-merged rules:' "$skills/$s/SKILL.md" || bad "$s: SKILL.md does not name the Agent-merged rules: line"
+  grep -qiE 'Milestone review:|(inside|outside) a Milestone\*{0,2}, bring' "$skills/$s/SKILL.md" && bad "$s: SKILL.md keeps the old line name or an inside/outside merge list"
+done
 rm -rf "$out"
 [ "$fail" = 0 ] && echo "OK: merge-authority fixtures" || exit 1

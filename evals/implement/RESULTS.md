@@ -25,7 +25,7 @@ Owed: one fresh regular-tier model run of each changed case. It could not happen
 
 Not exercised: everything a model run covers; steps 1 to 6 and the real bump commit and merge in any case.
 
-Pass: n/a (a desk check; model runs owed). Lessons: none yet. The `implement-spec` flow of the same fixture still expects the old skill text until #574 changes `implement-spec`, so its merge-authority runs are not valid until then.
+Pass: n/a (a desk check; model runs owed). Lessons: none yet. The `implement-spec` flow of the same fixture still expects the old skill text until #574 changes `implement-spec`, so its merge-authority runs are not valid until then. [Note: #574 has since landed on the Spec branch, so the spec flow is valid.]
 
 ### 2026-11-02, base 1756497f83c5c897abef05db6e192d2cb51d8382, dev-skills 0.43.0: #476 corrective-check membership, red/green decisions
 
