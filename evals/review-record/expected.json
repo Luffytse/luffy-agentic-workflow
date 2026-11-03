@@ -118,10 +118,16 @@
       "locations": [
         "src/style.ts:2"
       ]
+    },
+    "R3-1": {
+      "severity": "Important",
+      "status": "dismissed",
+      "locations": [
+        "src/cache.ts:1"
+      ]
     }
   },
   "ignored_ids": [
-    "R1-1",
-    "R3-1"
+    "R1-1"
   ]
 }

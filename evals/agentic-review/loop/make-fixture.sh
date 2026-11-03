@@ -9,7 +9,7 @@
 # `after-round3`: branch fix has had three Rounds; Round 3 is not clean, with one open Important (real at the head) and
 #   one open "fix" Nit, and nothing has been committed since.
 # The scoring (EXPECTED.md, score.py) stays next to this script, never in the repo or the prompt.
-# See evals/agentic-review/README.md, "Round 2 after a merge of main" and "After Round 3".
+# See evals/agentic-review/README.md, "Loop cases".
 set -eu
 usage="usage: make-fixture.sh <out-dir> <merge|after-round3>"
 out="${1:?$usage}"; case_="${2:?$usage}"

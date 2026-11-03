@@ -9,7 +9,7 @@ The seam is the comment record that a continuing review and `retro` read back. `
 1. Copy `comments.json` into a fresh directory of its own; keep `expected.json` outside it.
 2. Start a fresh session there on the regular tier with only the `review-record` skill available, and send `prompt.txt`, adding "First load the review-record skill by name and apply its contract". Do not give it the expected answer.
 3. Require an observed read of the skill body, a completed turn and no file changed.
-4. Save its JSON answer and run `python3 evals/review-record/score.py <answer.json>`. The scorer compares the current state, the retrospective view (latest Severity and Status, every location the id was ever listed at, dismissed rows left out unless a skipped Nit or a kept design) and the ignored ids, as unordered sets.
+4. Save its JSON answer and run `python3 evals/review-record/score.py <answer.json>`. The scorer compares the current state, the retrospective view (latest Severity and Status, every location the id was ever listed at, dismissed rows left out unless a skipped Nit, a kept design or dismissed after Round 3) and the ignored ids, as unordered sets.
 
 ## History
 

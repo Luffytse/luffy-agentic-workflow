@@ -12,7 +12,7 @@ A **Finding** is one reported problem, with a Severity, Bug class, Locations, a 
 
 A **Severity** is Important, Nit or Pre-existing. Important must be fixed before merge, Nit is real but small and optional, and Pre-existing is real but not caused by the change. A Nit is `Nit (fix)` or `Nit (skip)`.
 
-An **Always-check line** in the repo's `REVIEW.md` names a Bug class earlier reviews caught more than once, what to look for, and the kinds of file it applies to.
+An **Always-check line** in the repo's `REVIEW.md` names a Bug class earlier reviews caught more than once, what to look for, and the kinds of file it applies to; a line naming none applies to every diff.
 
 ## Round comment
 
@@ -44,7 +44,7 @@ Finders: standards and spec
 - **Rows:** every Finding this Round raised or dismissed, plus every earlier Finding whose status changed.
 - **Status** is `open`, `fixed` or `dismissed`. `fixed` names the fixing commit in the Note. A dismissal's Note says who and why: `Verifier: <reason>, rests on <file:line>`; `design kept: <link to the answer>`; or `dismissed after Round 3: <reason>`. An Important that became a bug Ticket after Round 3 stays `open` with `bug Ticket: <link>` in its Note.
 - **Note** starts with the Finder that raised the Finding, or with who closed it; keep it short.
-- **Result** after Round 3 is edited to `sorted after Round 3: <n> bug Tickets, <m> dismissed`. A review stopped for a person reads `waiting on a boundary: <what would be crossed>`.
+- **Result** after Round 3 is edited to `sorted after Round 3: <n> bug Tickets, <m> dismissed`. A review stopped for a person reads `waiting on a boundary: <what would be crossed>` until the user's answer, on the pull request after it, clears it.
 
 ## Ticket-check comment
 
@@ -58,4 +58,4 @@ The one Quick check of a merge's conflict resolutions after Round 3 uses the sam
 
 Read every page of comments in order. Records are the bodies that start `<!-- code-review kind=`; a Spec pull request's include its Ticket checks. Keep one row per id: the latest comment naming the id gives its Severity, Status, Note and Locations, and an id a later comment leaves out keeps its row.
 
-For a retrospective, keep every id with its latest Severity and Status and the union of every location listed for it across the comments. Leave out a `dismissed` row unless its Severity is `Nit (skip)` or its Note says `design kept`: the others were never real, or were not judged.
+For a retrospective, keep every id with its latest Severity and Status and the union of every location listed for it across the comments. Leave out a `dismissed` row unless its Severity is `Nit (skip)` or its Note says `design kept` or `dismissed after Round 3` (a kept Important the sort dismissed): the others were never real, or were not judged.

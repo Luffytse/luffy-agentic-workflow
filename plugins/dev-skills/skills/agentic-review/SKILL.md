@@ -13,7 +13,7 @@ description: "Review a pull request, or the changes since a fixed point (commit,
 
 Record `git rev-parse HEAD` as the head. Confirm every ref resolves and the diff is not empty, so a bad ref fails here.
 
-**Continuing.** Read the pull request's comments first. One that already has a Round 1 or later comment is past Round 0: load `review-rounds` by name and run its next Round at the level of the latest Round comment.
+**Continuing.** Read the pull request's comments first. One that already has a Round 1 or later comment is past Round 0: load `review-rounds` by name and continue as its "Resuming" section says, at the level of the latest Round comment.
 
 ## 2. Read what sizes it
 

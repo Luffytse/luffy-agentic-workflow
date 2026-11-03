@@ -37,6 +37,14 @@ In Round 1, gather these and pass them on to Rounds 2 and 3; re-read only a sour
 4. **Rank** yourself. Two Findings match when they are in the same file and make the same claim. Merge matching Findings into one, keeping every location and Finder. A Finding matching an earlier open one keeps that id. Drop one matching an earlier dismissed Finding, unless the code at its locations changed since. Sort Important, then Nit, then Pre-existing; report at most 5 Nits, "fix" ones first.
 5. **Post** the Round comment and report to your caller under `## Important`, `## Nits` and `## Pre-existing`, each Finding with its id, Bug class, locations, claim and failure scenario.
 
+## Resuming
+
+A session that finds Round comments already posted continues from the latest one:
+
+- **Its Result reads `waiting on a boundary: …`:** the user's answer clears it. Look for that answer on the pull request after the comment; with none, ask the user and wait. Then continue the step that was waiting, as the answer says, and record a spoken answer as a pull request comment.
+- **Round 1 or 2:** not clean, run the next Round; clean, the review is over (ready to merge).
+- **Round 3:** there is no next Round. If its Result does not yet read `sorted after Round 3`, do the sort below; if it does, the review is over: ready to merge, with any bug Tickets as the remaining work.
+
 ## The loop
 
 A Round is **clean** when no Important is open after its Verify.
@@ -50,16 +58,16 @@ A last commit that changes only a version field and its changelog entry needs no
 
 ## After Round 3
 
-Start one brand-new premium-tier agent with the open Importants, the spec and the Boundary record. For each open Important it chooses one, and you carry it out:
+Start one brand-new premium-tier agent with the open Importants whose Note names no bug Ticket yet, the spec and the Boundary record. For each it chooses one, and you carry it out, one row at a time, editing that row's Note on the Round 3 comment as soon as it is done, so a rerun files no Ticket twice:
 
-- **Bug Ticket:** create an issue with the tracker's "Create an issue" operation, holding the Finding's claim, `file:line`, failure scenario and a link to the pull request, with the `bug` category and `ready-for-agent` state labels the repo's triage-labels doc maps. Your caller works it straight away, as its own Ticket.
-- **Dismiss:** with a one-line reason.
+- **Bug Ticket:** create an issue with the tracker's "Create an issue" operation, holding the Finding's claim, `file:line`, failure scenario and a link to the pull request, with the `bug` category and `ready-for-agent` state labels the repo's triage-labels doc maps; the row's Note becomes `bug Ticket: <link>`. Your caller works it straight away, as its own Ticket.
+- **Dismiss:** with a one-line reason; the row becomes `dismissed`, `dismissed after Round 3: <reason>`.
 
-Open Nits are dropped. Edit the Round 3 comment with each row's Note and the sorted Result. The pull request is then ready to merge.
+Open Nits are dropped. Last, edit the Round 3 comment's Result to the sorted one. The pull request is then ready to merge.
 
 ## Design Findings
 
-A design Finding questions the design itself: a gap in the agreed behaviour, two rules that conflict, a case the design leaves open. Its fix would record a decision. For each, start one brand-new premium-tier agent with the Finding, the spec with its comments, and the decision records and glossary lines it touches. It answers within what the spec agreed: **keep the design** (the row is dismissed, `design kept: <link>`), or **a change** the owner makes, fixed in the next Round. Record each answer as a comment on the spec issue with the tracker's "Comment on an issue" operation (on the pull request when it builds no issue). A change answered in or after Round 3 becomes a bug Ticket. List the design answers in your report to your caller.
+A design Finding questions the design itself: a gap in the agreed behaviour, two rules that conflict, a case the design leaves open. Its fix would record a decision. For each, start one brand-new premium-tier agent with the Finding, the spec with its comments, and the decision records and glossary lines it touches. It answers within what the spec agreed: **keep the design** (the row is dismissed, `design kept: <link>`), or **a change** the owner makes, fixed in the next Round. Record each answer as a comment on the spec issue with the tracker's "Comment on an issue" operation (on the pull request when it builds no issue). A change answered in or after Round 3 becomes a bug Ticket. List the design answers in your report to your caller, each by its row id and the link to its record.
 
 ## Merges from main
 
@@ -67,7 +75,7 @@ A merge's conflict resolutions are new commits, and the next Round reviews them,
 
 ## When a person is needed
 
-Only when a fix, a design answer, a bug Ticket or the merge would cross something the project's Boundary record lists. Then set the Round comment's Result to `waiting on a boundary: <what would be crossed>`, and tell your caller which Finding and which boundary. Nothing else stops the review for a person.
+Only when a fix, a design answer, a bug Ticket or the merge would cross something the project's Boundary record lists. Then set the Round comment's Result to `waiting on a boundary: <what would be crossed>`, and tell your caller which Finding and which boundary. The user's answer clears it (see Resuming). Nothing else stops the review for a person.
 
 ## Pre-existing Findings
 

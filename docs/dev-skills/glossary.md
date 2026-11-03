@@ -167,10 +167,10 @@ An owner's written case, with evidence (`file:line`, a command and its output), 
 _Avoid_: rebuttal (the earlier, removed rule)
 
 **Design Finding**:
-A Finding that questions the design itself (a gap in the agreed behaviour, two rules in conflict, a case left open). A premium-tier agent answers it within what the spec agreed (a pull request that builds no issue is its own spec), recorded on the spec issue: keep the design, or a change fixed in the next Round, or, in or after Round 3, a bug Ticket. The answers are listed for the Milestone review.
+A Finding that questions the design itself (a gap in the agreed behaviour, two rules in conflict, a case left open). A premium-tier agent answers it within what the spec agreed (a pull request that builds no issue is its own spec), recorded as a comment on the spec issue, or on the pull request when it builds no issue: keep the design, or a change fixed in the next Round, or, in or after Round 3, a bug Ticket. The answers are listed for the Milestone review.
 
 **Waiting on a boundary**:
-The one way a Review stops for a person: a fix, a design answer, a bug Ticket or the merge would cross something the **Boundary record** lists. The Round comment's Result says what would be crossed, and the build thread brings the pull request to the user.
+The one way a Review stops for a person: a fix, a design answer, a bug Ticket or the merge would cross something the **Boundary record** lists. The Round comment's Result says what would be crossed, and the build thread brings the pull request to the user. The user's answer clears it, and the step that was waiting goes on.
 
 **Question round**:
 One batch of questions a skill (`grilling`, `triage`) puts to the user at once. Not a Round, and not a Review: the skills' "round" without a capital R means this.
