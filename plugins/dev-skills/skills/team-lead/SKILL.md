@@ -44,7 +44,7 @@ Start nothing while a pause is in effect or a merge-time step holds further star
 ## 3. React
 
 - **A worker reports or asks.** Read its issue, branch and pull request, then act on what they show: a merge-time request (step 4), a finished build (its slot frees), a question within the boundaries (answer it; a boundary crossing goes to the user).
-- **A worker ended without its result,** as `worker-control` reads an end: no stop is needed. Start a fresh worker from its pushed branch and the tracker as "Replace a stalled worker" step 3 says; it counts as a stall.
+- **A worker ended without its result,** as `worker-control` reads an end: no stop is needed. Start a fresh worker from its pushed branch and the tracker as "Replace a stalled worker" steps 3 and 4 say; it counts as a stall, so a replacement that ended parks the issue.
 - **A pull request is ready or merged** with no report: act as if the worker had reported, and tell it what you decided.
 
 ## 4. Merge-time steps
