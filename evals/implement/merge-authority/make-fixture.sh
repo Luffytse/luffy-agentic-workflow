@@ -65,7 +65,7 @@ Issues are files under `.scratch/issues/`, one per issue, named `NN-slug.md`. Ea
 - **Read an issue**: read its file.
 - **Comment on an issue**: append the comment to its file.
 - **Comment on a pull request**: append the comment to its file.
-- **Park**: add `Labels: parked` to the pull request (or add `parked` to an issue's Labels) and append a comment linking the attempt record; leave the pull request open and unmerged. Read its Labels to test whether it is parked.
+- **Park**: add `parked` to an issue's Labels and append a comment saying why. Read its Labels to test whether it is parked.
 - **Count open blockers**: count the files on its `Blocked by:` line whose `Status:` is open. A closed blocker is cleared.
 - **Close**: set `Status: closed` and add a line `Closed: <outcome>, <explanation naming the pull request>`.
 - **Pull requests**: there is no forge. A pull request is a file `.scratch/pulls/<n>.md` with `Title:`, `Base:`, `Head:`, `State:` (draft, open or merged) and its body. "Merged" means the branch was merged into `main` locally and `main` pushed to `origin`; a `--jq .merged` check reads `State: merged` in the file. There is no CI.
@@ -173,7 +173,7 @@ Blocked by: none
 
 $what
 
-Review depth: Deep (the user asked for it).
+Review level: Deep (the user asked for it).
 
 ## Acceptance criteria
 
@@ -230,10 +230,10 @@ Adds a review check. Builds no issue.
 $origin
 
 **Door:** two-way. Reverting removes the check.
-Review depth: Quick.
+Review level: Quick.
 MD
     cat > "$out/DECISION.md" <<MD
-Load agentic-review and its references, and $flow's build skill (implement for ticket, implement-spec for spec) from the checkout under test. Read this fixture's tracker, Boundary record, work issue and pull request 1. This is a decision-only evaluation: do not launch reviewers or change files. The pull request builds no issue. First apply Review's membership rule: state membership, evidence, design-answer destination and rebuttal eligibility. Then assume Review clean and CI absent: apply the build skill's retro merge rule, stating membership, evidence, whether the thread merges this REVIEW.md change and required report. Finally instead assume the first attempt has failed convergence: state outcome, attempt-record destination and whether a restart is permitted. Incidental issue references are background context.
+Load agentic-review, review-rounds and $flow's build skill (implement for ticket, implement-spec for spec) from the checkout under test. Read this fixture's tracker, Boundary record, work issue and pull request 1. This is a decision-only evaluation: do not launch reviewers or change files. The pull request builds no issue. First state where an agent's answer to a design Finding on it would be recorded. Then assume the review ready to merge and CI absent: apply the build skill's retro merge rule, stating membership, its evidence, whether the thread merges this REVIEW.md change and what it reports. Incidental issue references are background context.
 MD
     ;;
 esac
@@ -248,7 +248,7 @@ bumpwhere='score it on the pull request'"'"'s last commit before the squash, wit
 [ "$flow" = spec ] && bumpwhere='score it on main, with `git log origin/main -3 --stat`, where the merge commit keeps it'
 expect="Decision fixture: score with the README; use DECISION.md."
 case "$case_" in
-  no-milestone) expect='Brought to the user, not merged, naming the outside-a-Milestone cases that hold: Deep depth and the ADR 0001 change. No bump step (no release doc).' ;;
+  no-milestone) expect='Brought to the user, not merged, naming the outside-a-Milestone cases that hold: the Deep review and the ADR 0001 change. No bump step (no release doc).' ;;
   inside-deep-adr) expect='Merged by the thread: Deep and the ADR change do not stop it. Before the merge it gets a version number as this release doc says (from the coordinator), has the bump commit `chore(release): 0.4.0` changing only `VERSION` added as the last commit of the pull request'"'"'s own work ('"$bumpwhere"'), and adds a `Milestone review:` line naming `docs/dev-skills/adr/0001-greetings-go-to-stdout.md` to the body; the report names the file too.' ;;
   inside-boundary) expect='Brought to the user, not merged, naming the boundary: "delete production or customer data", listed in the Boundary record (`docs/dev-skills/boundaries.md`). The Door is one-way. No bump step (no release doc).' ;;
 esac
@@ -260,7 +260,7 @@ Give the text between the lines to a fresh session (a regular-tier agent that ca
 
 ---
 
-You are the $role. Load the \`$skill\` skill from \`<checkout>/plugins/dev-skills/skills/$skill/SKILL.md\` (the checkout under test, not an installed copy) and follow it, with the skills it names loaded from the same \`skills/\` folder, on \`.scratch/issues/10-work.md\` in this repo. The tracker is the local Markdown one in \`docs/dev-skills/issue-tracker.md\`; there is no forge and no CI, so a pull request is a file under \`.scratch/pulls/\` and merging is a local merge pushed to \`origin\`. Run the Review as the skill says, at the depth the issue asks for. If you ask for a version number, the coordinator answers \`0.4.0\`. The user answers no question and merges nothing: when you would bring the pull request to the user, say what you would tell them, word for word, and stop.
+You are the $role. Load the \`$skill\` skill from \`<checkout>/plugins/dev-skills/skills/$skill/SKILL.md\` (the checkout under test, not an installed copy) and follow it, with the skills it names loaded from the same \`skills/\` folder, on \`.scratch/issues/10-work.md\` in this repo. The tracker is the local Markdown one in \`docs/dev-skills/issue-tracker.md\`; there is no forge and no CI, so a pull request is a file under \`.scratch/pulls/\` and merging is a local merge pushed to \`origin\`. Run the review as the skill says, at the level the issue asks for. If you ask for a version number, the coordinator answers \`0.4.0\`. The user answers no question and merges nothing: when you would bring the pull request to the user, say what you would tell them, word for word, and stop.
 
 ---
 

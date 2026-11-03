@@ -53,7 +53,7 @@ def nudge(issue, worker, since):
 
 def parked(issue, why, writer):
     return [label(issue, "parked"),
-            comment(issue, f"<!-- team-lead parked -->\nParked: {why}. {writer} Attempt history: the start and nudge records above."),
+            comment(issue, f"<!-- team-lead parked -->\nParked: {why}. {writer} History: the start and nudge records above."),
             user(f"Parked {issue}: {why}.")]
 
 
@@ -62,8 +62,8 @@ RELEASE_START = [start(M, "release", "premium", "Plan Milestone 1's next Release
                  rec(M, "w-00-0900", "release", "premium", "09:00Z")]
 E1 = RELEASE_START
 ARRANGE = [f"Arrange a check-in\nEvery: 1 hour\nInto: coordinator\n", comment(M, "<!-- team-lead check-in -->\nArranged every 1 hour into the coordinator.")]
-SPEC10 = ARRANGE + [start("10-farewell.md", "implement-spec", "regular", "Build Spec 10-farewell.md with implement-spec. Milestone issue 00-milestone.md. Model tier: regular. Review depth: Deep. Repo: this one."),
-          rec("10-farewell.md", "w-10-0920", "implement-spec", "regular", "09:20Z", " Review depth Deep.")]
+SPEC10 = ARRANGE + [start("10-farewell.md", "implement-spec", "regular", "Build Spec 10-farewell.md with implement-spec. Milestone issue 00-milestone.md. Model tier: regular. Review level: Deep. Repo: this one."),
+          rec("10-farewell.md", "w-10-0920", "implement-spec", "regular", "09:20Z", " Review level Deep.")]
 T20 = lambda when, wid: [start("20-quiet.md", "implement", "regular", "Build Ticket 20-quiet.md with implement. Milestone issue 00-milestone.md. Model tier: regular. Repo: this one."),
                          rec("20-quiet.md", wid, "implement", "regular", when)]
 
@@ -73,7 +73,7 @@ STALL = {
     5: [stop("w-10-0920")],
     6: parked("10-farewell.md", "the stop of w-10-0920 did not read back (still idle since 09:40Z)",
               "A writer may remain.") + T20("12:05Z", "w-20-1205"),
-    7: [start("20-quiet.md", "implement", "regular", "Take over Ticket 20-quiet.md with implement from w-20-1205, which failed: resume from the pushed branch t20 and the tracker (the issue, its comments, attempt records and pull request). Milestone issue 00-milestone.md. Model tier: regular."),
+    7: [start("20-quiet.md", "implement", "regular", "Take over Ticket 20-quiet.md with implement from w-20-1205, which failed: resume from the pushed branch t20 and the tracker (the issue, its comments, its pull request). Milestone issue 00-milestone.md. Model tier: regular."),
         rec("20-quiet.md", "w-20-1230", "implement", "regular", "12:30Z", "\nTakes over from w-20-1205; it read failed at 12:28Z.")],
     8: [],
     9: nudge("20-quiet.md", "w-20-1230", "12:50Z"),

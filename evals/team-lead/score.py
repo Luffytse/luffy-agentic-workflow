@@ -137,7 +137,7 @@ def score_deliver(ev):
     check("event 2: one Spec worker with implement-spec on 10, only", len(s) == 1 and len(starts(e2)) == 1,
           [b["skill"] + " " + b["issue"] for b in starts(e2)])
     if s:
-        check("event 2: its brief names tier regular and Review depth Deep",
+        check("event 2: its brief names tier regular and Review level Deep",
               re.search(r"regular", s[0]["brief"] + s[0]["f"].get("Tier", ""), re.I) and "Deep" in s[0]["brief"])
     check("event 2: a start record on 10", comments(e2, "10-", "<!-- team-lead start -->"))
     quiet(ev, 3, "10 active")
@@ -153,8 +153,8 @@ def score_deliver(ev):
           [b["op"] + " " + b["issue"] for b in e5])
     if st:
         brief = e5[st[0]]["brief"]
-        check("event 5: the implement worker on 20 names no Review depth", e5[st[0]]["skill"] == "implement"
-              and not re.search(r"Review depth:? *(Quick|Standard|Deep)", brief), brief[:200])
+        check("event 5: the implement worker on 20 names no Review level", e5[st[0]]["skill"] == "implement"
+              and not re.search(r"Review (depth|level):? *(Quick|Standard|Deep)", brief), brief[:200])
     e6 = ev.get(6, [])
     check("event 6: pull request #8 ready but not reported: the worker told, no nudge",
           messages(e6, "w-20-1055") and not comments(e6, marker="<!-- team-lead nudge -->"))

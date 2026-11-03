@@ -16,8 +16,11 @@ for flow in ticket spec; do
     grep -q 'Milestone label form' "$d/repo/docs/dev-skills/boundaries.md" 2>/dev/null || bad "$flow/$case: record has no label form"
     git -C "$d/repo" rev-parse --verify -q origin/main >/dev/null || bad "$flow/$case: no origin/main"
     [ -f "$d/PROMPT.md" ] || bad "$flow/$case: no PROMPT.md"
+    # The review has no depth, attempts, restart, park outcome or rebuttals any more: no fixture text may ask for them.
+    grep -rlEi 'depth|attempt|convergence|rebuttal|restart' "$d/PROMPT.md" "$d/DECISION.md" "$d/repo/.scratch" "$d/repo/docs" 2>/dev/null | grep -q . && bad "$flow/$case: fixture names a removed review rule"
     issue="$d/repo/.scratch/issues/10-work.md"
     [ -f "$issue" ] || { bad "$flow/$case: no work issue"; continue; }
+    grep -q '^Review level: Deep' "$issue" || bad "$flow/$case: work issue does not ask for a Deep review level"
     case "$case" in
       no-milestone|retro-outside) grep -q '^Labels:.*milestone-' "$issue" && bad "$flow/$case: work issue has a Milestone label" ;;
       *) grep -q '^Labels:.*milestone-1' "$issue" || bad "$flow/$case: work issue lacks milestone-1"

@@ -1,10 +1,12 @@
 # Results
 
-One entry per run, newest first. Rerun when `agentic-review` changes, and record the plugin version from `plugins/dev-skills/.claude-plugin/plugin.json`. An entry written inside an open pull request names the commit and plugin version it ran on as its base; anything that happens after the entry's last commit (later Rounds, merges, the merge itself) is recorded on the pull request, not in the file.
+One entry per run, newest first. Rerun when `agentic-review` or `review-rounds` changes, and record the plugin version from `plugins/dev-skills/.claude-plugin/plugin.json`. An entry written inside an open pull request names the commit and plugin version it ran on as its base; anything that happens after the entry's last commit (later Rounds, merges, the merge itself) is recorded on the pull request, not in the file.
+
+Entries before the review was rebuilt around Round 0 and `review-rounds` ran the earlier review (up to 5 Rounds, rebuttals, the convergence check, Milestone design answers, merge-only Rounds). They are kept as history: the checks they name for those rules were removed with the rules, and a `<depth>` there is the old Review depth.
 
 ### 2026-11-02, base dev-skills 0.44.0, merge-only depth summary
 
-Base: main `0c35d65`; green used that base with the working-tree Round-comment Depth summary changed to point to its existing Merge-only Rounds owner. The coordinator drove two fresh regular-tier Codex agents (`red_probe` and `green_probe`) with the [bounded decision prompt](merge-depth/README.md); scoring expectations were withheld. The summary entry point was isolated: agents followed its pointers rather than repairing contradictions from unreferenced text; the owner section was supplied for pointer lookup and the following-Round continuation.
+Base: main `0c35d65`; green used that base with the working-tree Round-comment Depth summary changed to point to its existing Merge-only Rounds owner. The coordinator drove two fresh regular-tier Codex agents (`red_probe` and `green_probe`) with the bounded decision prompt (`evals/agentic-review/merge-depth/README.md` at `25708c4`, removed since); scoring expectations were withheld. The summary entry point was isolated: agents followed its pointers rather than repairing contradictions from unreferenced text; the owner section was supplied for pointer lookup and the following-Round continuation.
 
 Each cell records the returned run depth / marker `depth=` / heading depth; every heading had the shape `## Code review: Round <n> of at most 5 (<depth>)`.
 
@@ -22,7 +24,7 @@ Limits: these were decisions over supplied scenarios and passages, not live merg
 ## Template
 
 ```
-### <date>, dev-skills <version>, <depth>
+### <date>, dev-skills <version>, <level>
 
 | id | Reported? | Severity given | All locations? | Notes |
 |----|-----------|----------------|----------------|-------|
@@ -57,54 +59,29 @@ Locations counted within their own file: yes | no. <any line counted across a li
 Pass: yes | no. <one line on what to change in VERIFY.md, if anything>
 ```
 
-For the rebuttal check (scored by the rebuttal section of `EXPECTED.md`):
+For the Round 0 case (scored by `round0/EXPECTED.md`):
 
 ```
-### <date>, dev-skills <version>, Rebuttal
+### <date>, dev-skills <version>, Round 0
 
-| Id | Expected | Got | Lines cited | Reran the evidence? | Pass? |
-|----|----------|-----|-------------|---------------------|-------|
-| R1-1 | Uphold | | | | |
-| R1-2 | Dismiss | | | | |
-| R1-3 | Uphold | | | | |
-| R1-4 | Dismiss | | | | |
+| Branch | Expected | Got | Reason given | Skills loaded | Pass? |
+|--------|----------|-----|--------------|---------------|-------|
+| version-only | None, one-line record, checks run | | | | |
+| typo | Quick, hands over | | | | |
+| rule-change | Standard, hands over | | | | |
 
-Locations counted within their own file: yes | no.
-Pass: yes | no. <one line on what to change in the rebuttal rules, if anything>
-```
-
-For the Milestone-agreement check (scored by `milestone/EXPECTED.md`):
-
-```
-### <date>, dev-skills <version>, Milestone agreement
-
-| id | Expected | Got | Pass? | Notes |
-|----|----------|-----|-------|-------|
-| R2-1 | (a), quote fields, lasting | | | |
-| R2-2 | (b), names AC1 or the personal-data exclusion | | | |
-| S1 | sort not re-raised | | | control: raised? |
-| S2 | fractions not re-raised | | | control: raised? |
-| inside | decision-level, 6 conditions | | | not exercised? |
-| outside | decision-level, 4 conditions | | | not exercised? |
-
-Extras: <the Finders' other Findings; whether R2-1, R2-2 and R2-3 were raised>
+Runtime and tier: <how the sessions ran>
 Pass: yes | no. <one line on what to change in agentic-review, if anything>
 ```
 
-For the convergence check (scored by `convergence/EXPECTED.md`):
+For the loop cases (scored by `loop/score.py` and `loop/EXPECTED.md`):
 
 ```
-### <date>, dev-skills <version>, Convergence check
+### <date>, dev-skills <version>, Loop: <merge | after-round3>
 
-| run | Expected | Got | Pass? | Notes |
-|-----|----------|-----|-------|-------|
-| returned, inside | R3-1 returned R1-1; restart; record; R3-3 filed | | | conditions failed: |
-| flip, inside | R2-1 flipped R1-1; park (attempt 2); record | | | conditions failed: |
-| returned, outside | not clean, 2 Important open; Round 4; no record | | | |
-| flip, outside | not clean, 2 Important open; Round 3; no record | | | |
-
-False matches: <R3-2, R3-3 or R2-2 counted?>
-Pass: yes | no. <one line on what to change in agentic-review, if anything>
+score.py: <its output, PASS or the failed checks>
+Hand-scored: <the diff command used; the subagents started, with their tiers; the report to the caller; any question to the user>
+Pass: yes | no. <one line on what to change in review-rounds, if anything>
 ```
 
 ## Runs
@@ -499,7 +476,7 @@ Required packaging checks passed: `claude plugin validate .`, `bash scripts/chec
 
 ## 2026-11-02 — Ticket #481 exhausted design-answer decisions
 
-Baseline: main `4ec7279`, dev-skills `0.46.0`. The version stays unchanged during review. Seam: the owner/caller decision after a clean late Round has closed. The coordinator dispatched one fresh regular-tier baseline agent against immutable baseline sources, and a separate fresh regular-tier after agent against the working draft. Both read the actual owner, callers and record contract, ran no Find/Verify and posted nothing. The Implementer authored this evidence from their returned decisions. The [repeatable prompt and scoring](exhausted-design/README.md) isolate these workflow states; there is no string assertion presented as behavior.
+Baseline: main `4ec7279`, dev-skills `0.46.0`. The version stays unchanged during review. Seam: the owner/caller decision after a clean late Round has closed. The coordinator dispatched one fresh regular-tier baseline agent against immutable baseline sources, and a separate fresh regular-tier after agent against the working draft. Both read the actual owner, callers and record contract, ran no Find/Verify and posted nothing. The Implementer authored this evidence from their returned decisions. The repeatable prompt and scoring (`evals/agentic-review/exhausted-design/README.md` at `25708c4`, removed since) isolate these workflow states; there is no string assertion presented as behavior.
 
 **Red, before implementation:** baseline case A, a Ticket inside a Milestone receives an agreed rule-meaning change after clean late design Round 6; no earlier attempt and late merge-only allowance unused. The fresh agent returned “Baseline leaves this case unresolved.” It found no further Round authorized: the unused merge-only allowance requires a main merge and permitted companions. It found no explicit post-closure outcome or no-Round record/cause; first-attempt restart would apply *if* an ending were established, but that trigger was missing. Its next action was to surface the gap before committing or merging. It distinguished a later answer after clean closure from an answer of Round 6 itself and did not relabel the clean Round. This is an observed decision failure of the source contract, not a full executed review.
 

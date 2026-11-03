@@ -4,25 +4,17 @@
       "severity": "Important",
       "status": "fixed",
       "locations": [
-        "src/b.ts:20",
-        "src/c.ts:30"
+        "src/b.ts:20"
       ]
     },
     "R1-1": {
       "severity": "Important",
       "status": "dismissed",
       "locations": [
-        "src/c.ts:30"
-      ]
-    },
-    "R1-2": {
-      "severity": "Important",
-      "status": "dismissed",
-      "locations": [
         "src/safe.ts:5"
       ]
     },
-    "R1-3": {
+    "R1-2": {
       "severity": "Nit (skip)",
       "status": "dismissed",
       "locations": [
@@ -30,14 +22,14 @@
         "src/e.ts:5"
       ]
     },
-    "R1-4": {
+    "R1-3": {
       "severity": "Important",
       "status": "dismissed",
       "locations": [
         "src/design.ts:8"
       ]
     },
-    "R1-5": {
+    "R1-4": {
       "severity": "Pre-existing",
       "status": "open",
       "locations": [
@@ -45,11 +37,32 @@
         "src/money2.ts:12"
       ]
     },
+    "R2-1": {
+      "severity": "Nit (fix)",
+      "status": "fixed",
+      "locations": [
+        "src/names.ts:7"
+      ]
+    },
+    "R2-2": {
+      "severity": "Important",
+      "status": "open",
+      "locations": [
+        "src/queue.ts:3"
+      ]
+    },
     "R3-1": {
+      "severity": "Important",
+      "status": "dismissed",
+      "locations": [
+        "src/cache.ts:1"
+      ]
+    },
+    "R3-2": {
       "severity": "Nit (fix)",
       "status": "open",
       "locations": [
-        "src/names.ts:7"
+        "src/style.ts:2"
       ]
     }
   },
@@ -59,11 +72,10 @@
       "status": "fixed",
       "locations": [
         "src/a.ts:10",
-        "src/b.ts:20",
-        "src/c.ts:30"
+        "src/b.ts:20"
       ]
     },
-    "R1-3": {
+    "R1-2": {
       "severity": "Nit (skip)",
       "status": "dismissed",
       "locations": [
@@ -71,14 +83,14 @@
         "src/e.ts:5"
       ]
     },
-    "R1-4": {
+    "R1-3": {
       "severity": "Important",
       "status": "dismissed",
       "locations": [
         "src/design.ts:8"
       ]
     },
-    "R1-5": {
+    "R1-4": {
       "severity": "Pre-existing",
       "status": "open",
       "locations": [
@@ -86,16 +98,36 @@
         "src/money2.ts:12"
       ]
     },
-    "R3-1": {
+    "R2-1": {
+      "severity": "Nit (fix)",
+      "status": "fixed",
+      "locations": [
+        "src/names.ts:7"
+      ]
+    },
+    "R2-2": {
+      "severity": "Important",
+      "status": "open",
+      "locations": [
+        "src/queue.ts:3"
+      ]
+    },
+    "R3-2": {
       "severity": "Nit (fix)",
       "status": "open",
       "locations": [
-        "src/names.ts:7"
+        "src/style.ts:2"
+      ]
+    },
+    "R3-1": {
+      "severity": "Important",
+      "status": "dismissed",
+      "locations": [
+        "src/cache.ts:1"
       ]
     }
   },
   "ignored_ids": [
-    "R1-1",
-    "R1-2"
+    "R1-1"
   ]
 }

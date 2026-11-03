@@ -91,7 +91,7 @@ class SkillLoadingPackaging(unittest.TestCase):
 
     def test_every_tier_naming_skill_points_at_the_map(self):
         skills = self.repo / "plugins/dev-skills/skills"
-        for name in ["implement", "implement-spec", "agentic-review", "to-tickets",
+        for name in ["implement", "implement-spec", "review-rounds", "to-tickets",
                      "release", "retro-planning", "setup-project"]:
             self.assertIn("model-tiers", (skills / name / "SKILL.md").read_text(), name)
 

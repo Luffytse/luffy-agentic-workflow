@@ -5,7 +5,7 @@ A Claude Code and Codex plugin marketplace, named `luffy-dev`. Each plugin lives
 - `dai-portal-data`: tooling for the local DAI Portal Postgres database.
 - `dev-skills`: the development skill set used across projects, skills that began as Matt Pocock's, now our own, plus our own review pipeline. See `docs/dev-skills/adr/`.
 
-Words used here (Finder, Verifier, Finding, Bug class, Review depth, Model tier and so on) are defined in `docs/dev-skills/glossary.md`. Decisions are in `docs/dev-skills/adr/`. Start at `docs/dev-skills/index.md`, which says which doc to read for what.
+Words used here (Finder, Verifier, Finding, Bug class, Review level, Model tier and so on) are defined in `docs/dev-skills/glossary.md`. Decisions are in `docs/dev-skills/adr/`. Start at `docs/dev-skills/index.md`, which says which doc to read for what.
 
 ## Working rules
 
@@ -56,7 +56,7 @@ Single-context: one `docs/dev-skills/glossary.md` and `docs/dev-skills/adr/`. Se
 
 ### Boundaries
 
-The agreed boundary: nothing needs the user's approval, no budget, one-hour check-ins, Milestone label `milestone-<n>`. Inside a Milestone, the merge step of `implement` and `implement-spec` reads it: a pull request crossing no boundary is an agent merge, Deep and ADR, glossary, `CLAUDE.md` and `REVIEW.md` changes included, unless the repo's own rules say a person merges it (a review that will not settle is parked, not brought to the user); outside one, the outside-a-Milestone merge list governs (ADR 0004). See `docs/dev-skills/boundaries.md`.
+The agreed boundary: nothing needs the user's approval, no budget, one-hour check-ins, Milestone label `milestone-<n>`. Inside a Milestone, the merge step of `implement` and `implement-spec` reads it: a pull request crossing no boundary is an agent merge, Deep and ADR, glossary, `CLAUDE.md` and `REVIEW.md` changes included, unless the repo's own rules say a person merges it (a review still open after Round 3 sorts its open Importants into bug Tickets, not brought to the user); outside one, the outside-a-Milestone merge list governs (ADR 0004). See `docs/dev-skills/boundaries.md`.
 
 ### Releases
 

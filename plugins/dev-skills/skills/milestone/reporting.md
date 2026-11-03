@@ -16,7 +16,7 @@ Use the runtime's readable chat/session history and the tracker doc's **Read an 
 Post one comment with the tracker doc's **Comment on an issue** operation. First line `<!-- milestone report -->`, then `## Milestone report — ready for user review`, the agreement revision/source and report time. Use concise tables or bullets under:
 
 1. **Outcomes:** every feature, each acceptance criterion, merged or parked outcome and evidence links. Distinguish satisfied, unmet and unverified criteria. Include any regression/end-of-Milestone checks actually run and their limits; invent no pass or user acceptance.
-2. **Parked and maintenance:** every parked feature/Ticket, blockers, park/attempt evidence and whether a writer may remain; every maintenance issue left open from the Release batches/plannings, with its recorded reason.
+2. **Parked and maintenance:** every parked feature/Ticket, blockers, park evidence and whether a writer may remain; every maintenance issue left open from the Release batches/plannings, with its recorded reason.
 3. **User messages:** the full per-message inventory and planned/unplanned classification, with visibility gaps clearly called out.
 4. **Time and tokens:** per-thread records, totals, skill-loading usage by thread kind, estimates and gaps.
 5. **Versions and Startup verification:** the per-thread versions/load sources, probe results and permission/sandbox settings.

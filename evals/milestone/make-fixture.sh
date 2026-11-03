@@ -91,11 +91,11 @@ event `<k>` (also when it leads to no write), and keep numbering the blocks on f
   status is `closed` is cleared, unless its file has a `Closed as: not planned` line. The issue is startable when no
   named blocker is open or uncleared.
 - **Park**: mark an issue parked, or read whether it is. To mark it, add the `parked` label (**Apply / remove labels**),
-  then comment on the issue (**Comment on an issue**) with a link to the attempt history. An issue is parked when its
+  then comment on the issue (**Comment on an issue**) saying why, with a link to the records of what parked it. An issue is parked when its
   `Labels:` include `parked`; the user lifts the park by removing the label. Your own label writes land only in
   `.scratch/proposed-actions.md`, so a label the user removes shows as a comment `User removed label parked at <time>.`
   on the issue, which undoes your own earlier `Add: parked` for that issue. A label a thread adds shows as a comment `Label parked added by <thread> at <time>.`, next to the
-  comment that links its attempt history; a thread's own label write reaches the tracker, yours does not.
+  comment that links the records of what parked it; a thread's own label write reaches the tracker, yours does not.
 MD
 
 cat > "$r/docs/dev-skills/boundaries.md" <<'MD'
