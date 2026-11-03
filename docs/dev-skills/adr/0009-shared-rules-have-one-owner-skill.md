@@ -4,7 +4,7 @@ A **Shared rule** is one that two or more skills must follow the same way: a rec
 
 ## Ownership
 
-- **Complete workflows:** a caller runs another skill when it needs that skill's task. The workflow owns its procedures; the caller keeps its surrounding coordination and independent policies. Build skills already run `agentic-review`, so review Rounds stay there while assigning fixes, integration and merge decisions stay with the builders.
+- **Complete workflows:** a caller runs another skill when it needs that skill's task. The workflow owns its procedures; the caller keeps its surrounding coordination and independent policies. Build skills already run `agentic-review`, which hands its Rounds to `review-rounds`, so review Rounds stay there while assigning fixes, integration and merge decisions stay with the builders.
 - **Focused contracts:** when consumers need a small rule that must agree, they load its Base skill by name at the relevant point. The base holds the shared meaning, not the larger workflow that happened to contain it.
 - **Project configuration:** tracker operations, label mappings and release settings remain in the project's files. Skills read those files; they hold only rules that fit any project.
 - **Independent rules:** similar wording does not require a common owner. Repeated composition is also valid: callers may keep using `grilling` and `domain-modeling` directly, while `grill-with-docs` remains their convenient combined entry point.
@@ -32,17 +32,17 @@ This narrows ADR 0006's rejected separate index skill: the trigger stays with ea
 
 | Owner | Consumers and load point | Migration |
 | --- | --- | --- |
-| `docs-index` | Document writers (`domain-modeling`, `grill-with-docs`, `improve-codebase-architecture`, `research`, `retro`, `setup-dev-skills`, `triage`, including their supporting-file branches) at index updates; `agentic-review/FINDERS.md` standards branch when checking the index | #364 |
-| `review-record` | `agentic-review` before reading/writing comments and briefing Finders; `ROUNDS.md` writer, standards Finder and `retro/BUG-CLASSES.md` reader apply its record meaning | #365 |
+| `docs-index` | Document writers (`domain-modeling`, `grill-with-docs`, `improve-codebase-architecture`, `research`, `retro`, `setup-dev-skills`, `triage`, including their supporting-file branches) at index updates; `review-rounds/FINDERS.md` standards branch when checking the index | #364 |
+| `review-record` | `agentic-review` (Round 0's one-line record) and `review-rounds` before reading/writing comments and briefing Finders; the standards Finder and the `retro/BUG-CLASSES.md` reader apply its record meaning | #365, Spec #555 |
 | `issue-absorption` | `to-tickets` before source-based drafting/publication; `retro-planning` before lifecycle classification and absorption; `pr` when selecting closing lines; builders when maintaining lines or completing absorbed sources | #368 |
 | `to-tickets` complete workflow | `retro-planning` after problem approval, including publication repair on resume; planning retains budget, order and record ownership | #369 |
-| `agentic-review` complete workflow | `implement` and `implement-spec` at review with worktree, branch, base, prior-check context and a corrective check's explicit Retro origin input; builders retain fixes, integration and independent merge policies | #366 |
+| `agentic-review` complete workflow | `implement` and `implement-spec` at review with worktree, branch, base and prior-check context; Round 0 loads `review-rounds` when a Round will run; builders retain fixes, integration, a corrective check's Retro origin and independent merge policies | #366, Spec #555 |
 | `worker-control` | `milestone` Startup verification, running its check as the first part of the result (the loaded skill version is `milestone`'s own probe); `team-lead` for every worker start, state check, end, stop, pause, resume and check-in | #527, #529, #530 |
 | Project tracker and triage docs | Builders read blocker/closure operations; `to-spec` and `to-tickets` read publication operations and role mappings | #366 |
 
 ## Remaining references and consistency
 
-Owner-local supporting files remain behind their owner's pointers: `ROUNDS.md`, `FINDERS.md` and `VERIFY.md` own review procedure; `retro/BUG-CLASSES.md` owns aggregation and preventive checks. References to complete workflows retain their task and caller context. Direct `grilling`/`domain-modeling` composition remains valid. Retro's follow-up build redesign is deferred; its existing build references remain live. Release's feature-membership use of absorption and prototype's unrelated word sense are outside the absorption contract. Independent merge policies and Implementer briefs may differ.
+Owner-local supporting files remain behind their owner's pointers: `review-rounds` and its `FINDERS.md`, `VERIFY.md` and `DEEP.md` own review procedure; `retro/BUG-CLASSES.md` owns aggregation and preventive checks. References to complete workflows retain their task and caller context. Direct `grilling`/`domain-modeling` composition remains valid. Retro's follow-up build redesign is deferred; its existing build references remain live. Release's feature-membership use of absorption and prototype's unrelated word sense are outside the absorption contract. Independent merge policies and Implementer briefs may differ.
 
 No blanket link-count target applies. For shared rules, check owners, consumers and any unmigrated copies together. For every changed rule, also check parallel statements within its skill and repository descriptions for contradictions or stale claims. These are continuing protections, not migration-only work.
 

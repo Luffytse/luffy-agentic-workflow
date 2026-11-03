@@ -2,7 +2,7 @@
 
 ## Important
 
-The default meaning of Important in `agentic-review` applies.
+The default meaning of Important in `review-rounds` applies.
 
 ## Skip
 

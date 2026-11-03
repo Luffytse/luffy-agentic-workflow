@@ -76,7 +76,7 @@ see them.
 - **Comment on an issue**: field `Body:` followed by the comment between `~~~` lines.
 - **Close**: fields `Outcome:` and `Reason:`.
 - **Count open blockers**: read the `Blocked by:` header and the `Status:` of each issue it names.
-- **Park**: add the `parked` label, then comment with a link to the attempt history. An issue is parked when its
+- **Park**: add the `parked` label, then comment saying why. An issue is parked when its
   `Labels:` include `parked`; the user lifts the park by removing the label.
 - **Read a PR**: read `.scratch/pulls/<n>.md`.
 - **List PRs**: read every file under `.scratch/pulls/`.
@@ -206,7 +206,7 @@ Verdict: ready
 MD
 issue 10-farewell.md "Add a farewell command" spec "enhancement, milestone-1" .scratch/issues/00-milestone.md none "\`greet.sh bye <name>\` prints \`Goodbye, <name>!\`. Tickets: 11-bye-code.md, 12-bye-usage.md.
 
-Model tier: regular. Review depth: Deep."
+Model tier: regular. Review level: Deep."
 issue 11-bye-code.md "Farewell: code and test" ticket "enhancement, milestone-1" .scratch/issues/10-farewell.md none "The \`bye\` command; it also gives the \`greeting\` skill (\`skills/greeting/SKILL.md\`) a farewell rule. Model tier: regular."
 issue 12-bye-usage.md "Farewell: usage line" ticket "enhancement, milestone-1" .scratch/issues/10-farewell.md .scratch/issues/11-bye-code.md "The usage line names \`bye\`. Model tier: cheap."
 issue 20-quiet.md "Add a --quiet flag" ticket "enhancement, milestone-1" .scratch/issues/00-milestone.md none "\`--quiet\` before any command prints nothing and keeps the exit code. Follows the \`greeting\` skill (\`skills/greeting/SKILL.md\`) for how messages are printed. Model tier: regular."
@@ -253,7 +253,7 @@ MD
 ### 2026-11-03T08:00:00Z coordinator
 
 <!-- milestone delivery thread -->
-w-10-0800: Spec thread with implement-spec, tier regular, Review depth Deep; started 08:00Z.
+w-10-0800: Spec thread with implement-spec, tier regular, Review level Deep; started 08:00Z.
 MD
   printf 'w-10-0800 10-farewell.md branch t10: working since 2026-11-03T08:00:00Z\n' > "$r/.scratch/harness/workers.md"
 fi

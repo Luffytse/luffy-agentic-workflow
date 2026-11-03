@@ -57,7 +57,7 @@ The label of the optional agent-only triage role: it marks an issue for one codi
 _Avoid_: assignee, owner
 
 **Milestone**:
-A product goal the user sets (for example "M3 Trip planning"), written down in one Milestone issue: the goal, the features to deliver by its end, in build order, their acceptance criteria, what is excluded, any budget (a limit on one of the project's paid or limited resources, such as a paid API key) and any boundaries beyond the **Boundary record**. The `milestone` skill holds only planning, adding a feature, Startup verification and the report: its planning phase writes that issue with the user; agents may propose a feature, never add one, and a feature added mid-Milestone is planned with the user first, then listed in the issue, then labelled. Delivery starts once planning settles and the latest **Startup verification** result passes, or after a failed one once the user says to go on (recorded on the Milestone issue); the coordinator runs it with the **Team lead** skill, which reads the Milestone issue for the features, their order and the boundaries, and `milestone` reports at its end. It holds one or more Releases, which the agents plan, and it closes when the user accepts it at the Milestone review. An issue belongs to it, and its pull request is **inside the Milestone**, when the issue (for a Spec's pull request, the Spec) carries the Milestone's membership label in the form the **Boundary record** names; the Milestone issue carries the same label. A build thread's no-issue corrective check records `Retro origin: <Ticket or Spec issue link>` in its pull request body; Review and merge read that origin's labels for the same membership, and agent design answers go on that issue. This source is not an issue the check builds: its first failed attempt still parks on the pull request with no restart. Other no-issue pull requests remain outside. The Tickets split from a Milestone's Spec carry the label too, and `to-tickets` publishes their breakdown without asking the user while it keeps the Spec's scope. Inside a Milestone a build thread merges its own pull request unless it crosses a boundary or the repo's own rules say a person merges it (ADR 0004). A pull request review that will not settle, inside a Milestone or outside one, ends its attempt, in a restart the first time and a park the second (see **Parked**), and is not brought to the user; Ticket checks stay as **Parked** says.
+A product goal the user sets (for example "M3 Trip planning"), written down in one Milestone issue: the goal, the features to deliver by its end, in build order, their acceptance criteria, what is excluded, any budget (a limit on one of the project's paid or limited resources, such as a paid API key) and any boundaries beyond the **Boundary record**. The `milestone` skill holds only planning, adding a feature, Startup verification and the report: its planning phase writes that issue with the user; agents may propose a feature, never add one, and a feature added mid-Milestone is planned with the user first, then listed in the issue, then labelled. Delivery starts once planning settles and the latest **Startup verification** result passes, or after a failed one once the user says to go on (recorded on the Milestone issue); the coordinator runs it with the **Team lead** skill, which reads the Milestone issue for the features, their order and the boundaries, and `milestone` reports at its end. It holds one or more Releases, which the agents plan, and it closes when the user accepts it at the Milestone review. An issue belongs to it, and its pull request is **inside the Milestone**, when the issue (for a Spec's pull request, the Spec) carries the Milestone's membership label in the form the **Boundary record** names; the Milestone issue carries the same label. A build thread's no-issue corrective check records `Retro origin: <Ticket or Spec issue link>` in its pull request body, and its merge reads that origin's labels for the same membership; the check's body is its spec. Other no-issue pull requests remain outside. The Tickets split from a Milestone's Spec carry the label too, and `to-tickets` publishes their breakdown without asking the user while it keeps the Spec's scope. Inside a Milestone a build thread merges its own pull request unless it crosses a boundary or the repo's own rules say a person merges it (ADR 0004). A review stops for the user only when it is **Waiting on a boundary**; after Round 3 what is open is sorted, never brought to the user.
 _Avoid_: epic, sprint
 
 **Startup verification**:
@@ -82,7 +82,11 @@ _Avoid_: status meeting, ping
 
 **Takeover**:
 The **Team lead** replacing a stalled worker (still silent at a **Stand-up** after its one nudge, or ended without its result as the **Harness** reads it) with a fresh worker on the same issue, which resumes from the pushed branch and the tracker; its start record names the worker it takes over from. A silent worker is first stopped through **Worker control** and the stop read back from the Harness's record (a call returning success, silence or an idle worker is not a stop; how a stop is taken, by a stop thread where the coordinator cannot stop one itself, is Worker control's). A stop that does not read back, a fresh start that fails, or the feature's second stall (a replacement started since the issue's latest park record stalls too) parks the work instead (see **Parked**), tells the user once and delivery goes on.
-_Avoid_: replacement, restart (a Review's restart is another thing)
+_Avoid_: replacement, restart
+
+**Parked**:
+The state of an issue whose stalled worker the **Team lead** could not replace safely, or whose feature stalled a second time (see **Takeover**), or that the user parked: marked with the tracker doc's **Park** operation (the `parked` label and a comment saying why). Other work goes on; the tickets a parked Ticket blocks are not started, and the Team lead skips parked work at every wake. It waits on the user, who lifts it by removing the label. A park the user sets on a feature no build thread has worked on is the user's own: skipped while it stands, and the feature starts normally once it is removed. Once the label is removed, the Team lead resumes the feature in its place in the order with a fresh worker from its pushed branch and its pull request, after reading its last worker's state through **Worker control**: one not ended is stopped and the stop read back first, and one whose stop does not read back parks the issue again, telling the user once. A Review never parks: until 2026-11-03 a review that would not settle parked its issue, a rule removed with the attempts (ADR 0003).
+_Avoid_: stuck, shelved, deferred
 
 **Pause**:
 The user's word, to the **Team lead**, to stop spending without losing work. It posts a pause record, starts nothing new and pauses each running worker through **Worker control**: the Harness's own pause where it has one, otherwise a message to push its work and stop at its next natural step. While it is in effect nothing starts, no worker is nudged, replaced or parked, a check-in writes nothing, and merge-time steps run as the repo's own docs say they run during a pause (this repo's version hand-out gives no number and records a request as waiting; a number already out stays and its merge may finish). Resume, also on the user's word, posts a resume record, resumes the workers through Worker control and carries on from the tracker and the branches; activity counts from the resume, and a worker that does not carry on is handled like any silent one. Records of the earlier `milestone` form count too (see **Team lead**).
@@ -123,7 +127,7 @@ _Avoid_: integration branch, feature branch
 The branch one Ticket is built on. A Spec's Ticket branches start from the Spec branch and stay inside the thread; a lone Ticket's branch starts from main and is pushed.
 
 **Ticket check**:
-One Review at Quick depth over a Spec's Ticket before it joins the Spec branch. Not a Round.
+One Quick Round over a Spec's Ticket branch, against the Spec branch, before the Ticket joins it, recorded on the Spec pull request. Its open Findings carry into the Spec pull request's Round 1. Not one of the Spec pull request's Rounds.
 
 ## Docs
 
@@ -142,53 +146,45 @@ _Avoid_: section, module
 ## Code review
 
 **Review**:
-One run of the `agentic-review` skill, in three stages: find candidate Findings, verify them, then rank the survivors. It has two entry points: a pull request (reviewed in Rounds), or the diff since a fixed point (a commit, branch, tag or merge-base; it also reads uncommitted work). The second kind is one Review, not a Round; a Ticket check is that kind, one Review at Quick depth over a Ticket branch's diff.
+One review of a change by the `agentic-review` skill: **Round 0** sizes it, and above level None the hidden `review-rounds` skill runs its Rounds. It has two entry points: a pull request (reviewed in up to 3 Rounds), or the diff since a fixed point (a commit, branch, tag or merge-base; it also reads uncommitted work), which runs Round 0 and Round 1 only and posts no comment.
+
+**Round 0**:
+The step that sizes a Review before any agent starts, run by the top-level session itself: it pins the diff, reads the changed files, the Boundary record and `REVIEW.md`, picks the **Review level** with a one-line reason, and records it. At None that line is the whole review comment and the project's checks are the review.
+
+**Review level**:
+How much review a change gets, picked by Round 0: **None** (version fields, changelog entries, lock files, generated output; the project's checks only), **Quick** (text that does not change what a rule or code does), **Standard** (everything else, the default) or **Deep** (what the Boundary record or `REVIEW.md` marks risky, or the user asks). A "Review levels" section in `REVIEW.md` names a project's own paths per level. Round 0 takes the higher level when unsure, and later Rounds only raise it. Older records call it the Review depth.
+_Avoid_: depth, mode
 
 **Round**:
-One Review plus the fix commits that follow it (the final text "fix" Nit commit is checked before the clean comment and included if a later merge-only Round's pinned range contains it). Rounds 1 and 2 are **full-PR Rounds**; Rounds 3 to 5 are **commit Rounds**, which review only the commits added since the last Round (for a merge from main, only what it changed in the pull request). A Late design Round and a Late merge-only Round may follow Round 5, and the Rounds belong to one Attempt.
+One pass of Find, Verify and Rank over a pull request, its one comment, and the fix commits after it; a pull request gets at most 3. **Round 1** reviews the whole pull request; **Rounds 2 and 3** review only its new commits (for a merge from main, only its conflict resolutions), with one Finder and one Verifier at any level. A Round is **clean** when no Important is open after its Verify; a clean Round means ready to merge. After Round 3, what is still open is sorted (see **After-Round-3 sort**).
 _Avoid_: pass, iteration
 
-**Late design Round**:
-The one Round after Round 5 (Round 6) that reviews an agreed design answer that changes the pull request and came when Round 5 was the last Round run and neither late Round had run. At most one per attempt; it keeps the attempt's history.
+**After-Round-3 sort**:
+What happens when Round 3 is not clean: a premium-tier agent turns each open Important into a bug Ticket, worked straight away as its own Ticket, or dismisses it with a reason; open Nits are dropped, and the pull request merges. A merge from main with conflicts after Round 3 gets at most one Quick check of only its resolutions, whose open Importants become bug Tickets the same way.
 
-**Late merge-only Round**:
-The one Round after the last Round (Round 6, or Round 7 after a Late design Round) that reviews the resolutions of a merge from main with conflicts, when no Round is left. At most one per attempt; it keeps the attempt's history. If it is not clean, or main brings conflicts again after it ran, the attempt ends; it never goes to the user as a merge decision.
+**Dispute**:
+An owner's written case, with evidence (`file:line`, a command and its output), that a Finding is wrong, in place of a fix. The next Round's Verifier decides it; when nothing was committed, that Round is the Verifier alone, on the disputes.
+_Avoid_: rebuttal (the earlier, removed rule)
 
-**Convergence check**:
-The check after Rank from Round 2 on, inside a Milestone or outside one: an Important caused by the change **returned** when it matches, by Rank's match rule, a row already marked `fixed` (or, across attempts, makes the same claim in the same file as a returned or flipped row of an earlier attempt record), and **flipped** when its fix would undo an earlier row's fix. Either one ends the attempt.
-_Avoid_: loop detection
+**Design Finding**:
+A Finding that questions the design itself (a gap in the agreed behaviour, two rules in conflict, a case left open). A premium-tier agent answers it within what the spec agreed (a pull request that builds no issue is its own spec), recorded on the spec issue: keep the design, or a change fixed in the next Round, or, in or after Round 3, a bug Ticket. The answers are listed for the Milestone review.
 
-**Attempt**:
-One build of a change and the Rounds that review it, inside a Milestone or outside one. It ends when the convergence check finds a returned or flipped Finding, or Round 5, the late design Round or the late merge-only Round is not clean, or main brings conflicts again after the late merge-only Round ran, or, inside a Milestone, an agreed design answer changes the pull request after either late Round ran clean; the Review then reports **restart** (the first attempt) or **park** (a later one; a pull request that builds no issue parks after its first) to its caller. The build thread carries out a restart: it closes the pull request, keeps the untouched parts (a lone Ticket splits off those that stand alone; a Spec keeps, on a fresh Spec branch, the landed Tickets whose files are all untouched and shared with no other landed Ticket, and whose blockers are kept) and rebuilds the rest once from main, in a new pull request whose Rounds start at Round 1. A park is carried out by the build thread too: see **Parked**. A Round 5 that is not clean never goes to the user as a merge decision.
-
-**Attempt record**:
-The comment a Review writes on the issue the pull request builds (the lone Ticket, or the Spec) when an attempt ends (on the pull request itself when it builds no issue), in the shape `review-record` owns: the attempt number, the pull request, the Rounds, the Findings it ended on, what was tried, the lesson and the untouched files. It follows the problem: a later attempt reads every earlier one. A Spec thread also writes one on a Ticket it parks after the Ticket's third Ticket check.
-_Avoid_: retry log
-
-**Parked**:
-The state of an issue whose build gave up because its review would not settle, inside a Milestone or outside one: a pull request whose second attempt ended (the Review's `park` outcome; a pull request that builds no issue parks after its first), or, inside a Milestone, a Ticket whose third Ticket check still has an Important open; or an issue whose stalled worker the **Team lead** could not replace safely, or whose feature stalled a second time (see **Takeover**: the team lead marks it the same way, with a park record naming the reason). The build thread marks the issue (or such a pull request) with the tracker doc's **Park** operation (the `parked` label and a comment linking the attempt history), leaves the pull request unmerged and tells the user once. Other work goes on; the tickets a parked Ticket blocks are not started, and the Team lead skips parked work at every wake. It waits on the user, who lifts it by removing the label. A park the user sets on a feature no build thread has worked on is the user's own: skipped while it stands, and the feature starts normally once it is removed. Once the label is removed, the Team lead resumes the feature in its place in the order with a fresh worker from its pushed branch, its pull request and its attempt history, after reading its last worker's state through **Worker control**: one not ended is stopped and the stop read back first, and one whose stop does not read back parks the issue again, telling the user once. Outside a Milestone a Ticket whose third Ticket check is not clean still goes to the user.
-_Avoid_: stuck, shelved, deferred
+**Waiting on a boundary**:
+The one way a Review stops for a person: a fix, a design answer, a bug Ticket or the merge would cross something the **Boundary record** lists. The Round comment's Result says what would be crossed, and the build thread brings the pull request to the user.
 
 **Question round**:
 One batch of questions a skill (`grilling`, `triage`) puts to the user at once. Not a Round, and not a Review: the skills' "round" without a capital R means this.
 _Avoid_: Round (for a batch of questions)
 
-**Merge-only Round**:
-A Round 3 to 5 (or the one Late merge-only Round) whose range contains merges from main plus only checked final text-Nit commits from the preceding clean Round and release-doc-required version-only bumps. It reviews that entire pinned range, at Quick depth for text and version-only changes, or the carried depth when a resolution touches logic. Other work requires an ordinary Round within the existing budget; it grants no extra late Round.
-
 **REVIEW.md**:
-A short file at a repo's root telling reviewers what Important means there, what to skip, and what to always check.
-
-**Review depth**:
-How thorough a Review is: **Quick**, **Standard** (the default), or **Deep**.
-_Avoid_: level, mode
+A short file at a repo's root telling reviewers what Important means there, what to skip, what to always check, and optionally its own Review levels.
 
 **Finder**:
-A reviewer agent that looks for problems and reports candidate Findings. The **standards Finder** and **spec Finder** come from Upstream; **adversarial Finders** each take one angle chosen to fit the change under review. On Deep, a **security Finder** is added, and a Gap sweep runs after Verify.
+A reviewer agent that looks for problems and reports candidate Findings. The **standards Finder** and **spec Finder** come from Upstream; at Standard and Deep one **adversarial Finder** takes the angle that fits the change best ("what the change is missing" is one); at Deep a premium **security Finder** is added. Rounds 2 and 3 run one **later-Round Finder**, standards and spec in one.
 _Avoid_: reviewer (too broad), scanner
 
 **Verifier**:
-An agent that checks each candidate Finding against the code and makes the final call on it. On Deep, three Verifiers take different stances: **tracer**, **skeptic** and **spec checker**. Inside a Milestone, a **rebuttal Verifier** (premium tier) decides a fixer's **rebuttal**, its evidence that an open Important is wrong: it dismisses the Finding or upholds it, and an upheld one cannot be rebutted again.
+The one agent per Round that checks each candidate Finding, and each open Finding with any dispute of it, against the code, keeps only what it confirmed and makes the final call on it. Premium tier at Deep, regular otherwise.
 _Avoid_: judge, triage agent
 
 **Finding**:
@@ -214,10 +210,6 @@ _Avoid_: category, type
 **Failure scenario**:
 The part of a Finding that shows the problem happens: the inputs or state, then the wrong result. A cleanup Finding (a smell, or a Nit with no wrong result) states its cost instead.
 _Avoid_: repro, example
-
-**Gap sweep**:
-On Deep, one more Finder that runs after Verify, gets the kept Findings, and looks only for what the change is missing. Its Findings go through Verify too.
-_Avoid_: second pass, recheck
 
 ## Retros
 
