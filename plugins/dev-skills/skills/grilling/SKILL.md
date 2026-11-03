@@ -25,7 +25,7 @@ Word each question so "yes" accepts your recommended answer.
 
 A question that changes or extends an existing rule opens, before the options, with one line saying what the rule does today and why it exists, citing the ADR or doc. The user should never have to ask what a rule is for.
 
-A recommendation that rests on a fact nobody has checked waits for that fact, or is marked as a guess.
+A recommendation that rests on a fact nobody has checked waits for that fact, or is marked as a guess. A status (open, closed, merged, waiting, a version) read from memory, a brief or an earlier read counts as unchecked until it is re-read from the tracker or the repo at the time of asking.
 
 Each round the user answers reshapes the tree: settled decisions push the frontier outward and unblock questions that depended on them. Recompute the frontier and ask the next round. A question whose answer depends on another question still open in this round belongs to a _later_ round, not this one.
 
