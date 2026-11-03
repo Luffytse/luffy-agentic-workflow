@@ -56,7 +56,7 @@ Single-context: one `docs/dev-skills/glossary.md` and `docs/dev-skills/adr/`. Se
 
 ### Boundaries
 
-The agreed boundary: nothing needs the user's approval, no budget, one-hour check-ins, Milestone label `milestone-<n>`. The merge step of `implement` and `implement-spec` reads it for every pull request, inside a Milestone or not: a pull request crossing no boundary is an agent merge, Deep and ADR, glossary, `CLAUDE.md` and `REVIEW.md` changes included, unless the repo's own rules say a person merges it (a review still open after Round 3 sorts its open Importants into bug Tickets, not brought to the user), and no Boundary record means an empty one (ADR 0004). See `docs/dev-skills/boundaries.md`.
+The agreed boundary: nothing needs the user's approval, no budget, one-hour check-ins, Milestone label `milestone-<n>`. The merge step of `implement` and `implement-spec` reads it for every pull request, inside a Milestone or not: a pull request crossing no boundary is an agent merge, Deep and ADR, glossary, `CLAUDE.md`, `AGENTS.md` and `REVIEW.md` changes included, unless the repo's own rules say a person merges it (a review still open after Round 3 sorts its open Importants into bug Tickets, not brought to the user), and no Boundary record means an empty one (ADR 0004). See `docs/dev-skills/boundaries.md`.
 
 ### Releases
 

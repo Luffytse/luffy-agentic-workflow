@@ -21,7 +21,7 @@ Changed cases (fixture builder `make-fixture.sh`, `ticket` flow): `no-milestone`
 
 Checked: `bash evals/implement/merge-authority/test-fixture.sh` failed before the skill and builder edits (new cases unknown, old `Milestone review:` line and hand-over Expected for `no-milestone`) and passes after, for both flows. Desk check, by the #573 Implementer, who wrote the step 7 text: each case's fixture read against the new step 7 gives the Expected line (empty record when `boundaries.md` is absent; Milestone issue read only when the ticket carries `milestone-1`; Deep and the ADR change never stop a merge; one-way Door with the deletion unallowed by the record, or by an empty one, goes to the user).
 
-Owed: one fresh regular-tier model run of each changed case. It could not happen here: the session has no subagent tool, and starting a separate `claude -p` session to act as the thread was refused by the environment's permission classifier. Run each case per the README (decision-level is enough) and record it above this entry, before the Spec pull request merges.
+Owed: one fresh regular-tier model run of each changed case. It could not happen here: the session has no subagent tool, and starting a separate `claude -p` session to act as the thread was refused by the environment's permission classifier. Run each case per the README (decision-level is enough) and record it above this entry. The Spec pull request merges with these runs still owed, so they are a follow-up after the merge.
 
 Not exercised: everything a model run covers; steps 1 to 6 and the real bump commit and merge in any case.
 
