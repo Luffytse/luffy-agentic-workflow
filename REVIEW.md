@@ -26,6 +26,7 @@ Each line names where it came from and the files it applies to, in the form `(fi
 ## Review levels
 
 - Standard: plugin skill text, under `plugins/dev-skills/skills/`.
-- Quick: `evals/` alone, `docs/` alone, `plugins/dev-skills/CHANGELOG.md`.
+- Quick: `plugins/dev-skills/CHANGELOG.md`, and a change under `docs/` or `evals/` alone that edits no rule and no code (prose, links, results entries, typos).
+- Standard: a change under `docs/` that edits a rule (the glossary, an ADR, the Boundary record, the release, tracker or label docs) and alters what the rule says, not only its wording, and a change under `evals/` that edits eval code (scorers, fixture builders, tests, briefs) or an expected-results file.
 - None: the `version` lines of `plugins/*/.claude-plugin/plugin.json` and `plugins/*/.codex-plugin/plugin.json`.
 - Any other path, and a diff that mixes levels, follows the defaults in `agentic-review` (the higher level wins).
