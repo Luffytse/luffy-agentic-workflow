@@ -7,13 +7,33 @@ out="$(mktemp -d)"
 fail=0
 bad() { echo "FAIL: $*"; fail=1; }
 for flow in ticket spec; do
-  for case in no-milestone inside-deep-adr inside-boundary retro-inside retro-outside unrelated-no-issue; do
+  for case in no-milestone inside-deep-adr inside-boundary outside-boundary no-record-twoway no-record-oneway retro-inside retro-outside unrelated-no-issue; do
     d="$out/$flow-$case"
     err="$(bash "$here/make-fixture.sh" "$d" "$case" "$flow" 2>&1 >/dev/null)" || { bad "$flow/$case: make-fixture failed"; continue; }
     [ -z "$err" ] || bad "$flow/$case: make-fixture wrote to stderr: $err"
     grep -q 'loaded from the same `skills/` folder' "$d/PROMPT.md" 2>/dev/null || bad "$flow/$case: PROMPT.md lost its skills-folder line"
-    [ -f "$d/repo/docs/dev-skills/boundaries.md" ] || bad "$flow/$case: no Boundary record"
-    grep -q 'Milestone label form' "$d/repo/docs/dev-skills/boundaries.md" 2>/dev/null || bad "$flow/$case: record has no label form"
+    case "$case" in
+      no-record-*)
+        [ -e "$d/repo/docs/dev-skills/boundaries.md" ] && bad "$flow/$case: a no-record case has a Boundary record"
+        grep -rqi 'boundar' "$d/repo/CLAUDE.md" "$d/repo/docs/dev-skills/index.md" 2>/dev/null && bad "$flow/$case: a no-record case still points at a Boundary record"
+        [ -e "$d/repo/.scratch/issues/00-milestone.md" ] && bad "$flow/$case: a no-record case has a Milestone issue" ;;
+      *)
+        [ -f "$d/repo/docs/dev-skills/boundaries.md" ] || bad "$flow/$case: no Boundary record"
+        grep -q 'Milestone label form' "$d/repo/docs/dev-skills/boundaries.md" 2>/dev/null || bad "$flow/$case: record has no label form" ;;
+    esac
+    # One merge rule, one listing line: no fixture text uses the old line name or the old membership split.
+    grep -rlE 'Milestone review:|outside-a-Milestone|inside list|outside list' "$d/PROMPT.md" "$d/DECISION.md" "$d/repo" --exclude-dir=.git 2>/dev/null | grep -q . && bad "$flow/$case: fixture text keeps the old line name or the old inside/outside split"
+    exp="$(grep '^Expected:' "$d/PROMPT.md" 2>/dev/null)"
+    case "$case" in
+      no-milestone|inside-deep-adr|no-record-twoway)
+        case "$exp" in *'Merged by the thread'*'Agent-merged rules:'*) ;; *) bad "$flow/$case: Expected is not an agent merge with the Agent-merged rules: line" ;; esac ;;
+      inside-boundary|outside-boundary|no-record-oneway)
+        case "$exp" in 'Expected: Brought to the user, not merged'*) ;; *) bad "$flow/$case: Expected is not a hand-over" ;; esac
+        case "$exp" in *'Agent-merged rules:'*) bad "$flow/$case: a hand-over Expected asks for the listing line" ;; esac ;;
+    esac
+    case "$case" in
+      outside-boundary|no-record-oneway) grep -q 'migrations/002_purge' "$d/repo/.scratch/issues/10-work.md" 2>/dev/null || bad "$flow/$case: work issue has no one-way migration" ;;
+    esac
     git -C "$d/repo" rev-parse --verify -q origin/main >/dev/null || bad "$flow/$case: no origin/main"
     [ -f "$d/PROMPT.md" ] || bad "$flow/$case: no PROMPT.md"
     # The review has no depth, attempts, restart, park outcome or rebuttals any more: no fixture text may ask for them.
@@ -22,7 +42,7 @@ for flow in ticket spec; do
     [ -f "$issue" ] || { bad "$flow/$case: no work issue"; continue; }
     grep -q '^Review level: Deep' "$issue" || bad "$flow/$case: work issue does not ask for a Deep review level"
     case "$case" in
-      no-milestone|retro-outside) grep -q '^Labels:.*milestone-' "$issue" && bad "$flow/$case: work issue has a Milestone label" ;;
+      no-milestone|retro-outside|outside-boundary|no-record-*) grep -q '^Labels:.*milestone-' "$issue" && bad "$flow/$case: work issue has a Milestone label" ;;
       *) grep -q '^Labels:.*milestone-1' "$issue" || bad "$flow/$case: work issue lacks milestone-1"
          grep -q '^Labels:.*milestone-1' "$d/repo/.scratch/issues/00-milestone.md" 2>/dev/null || bad "$flow/$case: Milestone issue lacks milestone-1" ;;
     esac
