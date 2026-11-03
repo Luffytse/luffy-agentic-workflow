@@ -62,7 +62,15 @@ class SkillLoadingPackaging(unittest.TestCase):
         self.check(1)
 
     def test_missing_boundary_record_fails(self):
-        (self.repo / "docs/agents/boundaries.md").unlink()
+        (self.repo / "docs/dev-skills/boundaries.md").unlink()
+        self.check(1)
+
+    def test_missing_release_doc_fails(self):
+        (self.repo / "docs/dev-skills/release.md").unlink()
+        self.check(1)
+
+    def test_person_name_in_glossary_fails(self):
+        self.plant("docs/dev-skills/glossary.md", "Ask Lu" + "fei.\n")
         self.check(1)
 
     def plant(self, rel, text="Run it on Son" + "net.\n"):

@@ -52,10 +52,10 @@ class Fixture:
 
     def __init__(self, root, tracker_doc=MARKDOWN_TRACKER_DOC):
         self.repo = pathlib.Path(root) / "repo"
-        (self.repo / "docs/agents").mkdir(parents=True)
+        (self.repo / "docs/dev-skills").mkdir(parents=True)
         (self.repo / ".scratch/issues").mkdir(parents=True)
         (self.repo / ".scratch/pulls").mkdir(parents=True)
-        (self.repo / "docs/agents/issue-tracker.md").write_text(tracker_doc)
+        (self.repo / "docs/dev-skills/issue-tracker.md").write_text(tracker_doc)
         run(["git", "init", "-q", "-b", "main"], self.repo)
         self.commit("main", "2026-11-03T09:00:00Z", "start")
 
@@ -402,7 +402,7 @@ class UnknownTracker(unittest.TestCase):
     def test_no_tracker_doc_falls_back_to_reading_by_hand(self):
         with tempfile.TemporaryDirectory() as tmp:
             f = Fixture(tmp)
-            (f.repo / "docs/agents/issue-tracker.md").unlink()
+            (f.repo / "docs/dev-skills/issue-tracker.md").unlink()
             out = f.snapshot("id=w25;issue=25;branch=t25;started=2026-11-03T14:10:00Z")
             self.assertEqual(out.returncode, 3, out.stdout + out.stderr)
             self.assertEqual(rows(out.stdout)["w25"]["Verdict"], "read by hand")

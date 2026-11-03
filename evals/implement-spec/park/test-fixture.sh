@@ -11,8 +11,8 @@ for m in inside outside; do
   err="$(bash "$here/make-fixture.sh" "$d" "$m" 2>&1 >/dev/null)" || { bad "$m: make-fixture failed"; continue; }
   [ -z "$err" ] || bad "$m: make-fixture wrote to stderr: $err"
   r="$d/repo"; i="$r/.scratch/issues"
-  grep -q '^- \*\*Park\*\*' "$r/docs/agents/issue-tracker.md" || bad "$m: tracker doc has no Park operation"
-  grep -q '^- \*\*Comment on an issue\*\*' "$r/docs/agents/issue-tracker.md" || bad "$m: tracker doc has no Comment on an issue operation"
+  grep -q '^- \*\*Park\*\*' "$r/docs/dev-skills/issue-tracker.md" || bad "$m: tracker doc has no Park operation"
+  grep -q '^- \*\*Comment on an issue\*\*' "$r/docs/dev-skills/issue-tracker.md" || bad "$m: tracker doc has no Comment on an issue operation"
   grep -q 'contradict\|nothing to standard output' "$i/11-code.md" || bad "$m: Ticket 11 is not planted"
   grep -q '^Blocked by: .scratch/issues/11-code.md' "$i/12-adr.md" || bad "$m: Ticket 12 is not blocked by 11"
   grep -q '^Blocked by: none' "$i/13-usage.md" || bad "$m: Ticket 13 is not free"

@@ -35,8 +35,8 @@ Add \`greet.sh bye <name>\`, which prints \`Goodbye, <name>!\` to standard outpu
 - [ ] \`docs/usage.md\` documents \`hello\`.
 MD
 
-sed -i 's/`State:` (draft, open or merged)/`State:` (draft, open, closed or merged)/' "$r/docs/agents/issue-tracker.md"
-cat >> "$r/docs/agents/issue-tracker.md" <<'MD'
+sed -i 's/`State:` (draft, open or merged)/`State:` (draft, open, closed or merged)/' "$r/docs/dev-skills/issue-tracker.md"
+cat >> "$r/docs/dev-skills/issue-tracker.md" <<'MD'
 - **Comment on an issue**: append a line `Comment: <text>` to the issue's file; a multi-line comment goes under a `## Comment` heading at the end of the file.
 - **Comment on a pull request**: the same, in the pull request's file.
 - **Close a pull request**: set its `State:` to `closed` (unmerged) and comment on it with the reason.
@@ -68,7 +68,7 @@ set -e
 [ "$(bash src/greet.sh bye 'Ada Lovelace')" = "Goodbye, Ada Lovelace!" ]
 if bash src/greet.sh bye 2>/dev/null; then exit 1; fi
 SH
-cat >> "$r/docs/adr/0001-greetings-go-to-stdout.md" <<'MD'
+cat >> "$r/docs/dev-skills/adr/0001-greetings-go-to-stdout.md" <<'MD'
 
 `bye <name>` follows the same rule: it prints `Goodbye, <name>!` and exits 0.
 MD
@@ -138,7 +138,7 @@ Earlier attempts: none
 
 Tried: R1-1 fixed in ${fixA:0:7} by quoting the echo; the R2-1 fix in ${fixB:0:7} rewrote the bye line as one compound command and dropped the quotes.
 Lesson: each fix rewrote the whole bye line, so the next fix lost the last one's quoting. Give \`bye\` its own small function: check the name first (usage and exit 2), then print with \`printf 'Goodbye, %s!\n' "\$2"\`, and test a spaced name, a \`*\` and a missing name before any fix.
-Untouched: docs/adr/0001-greetings-go-to-stdout.md, docs/usage.md
+Untouched: docs/dev-skills/adr/0001-greetings-go-to-stdout.md, docs/usage.md
 MD
 
 cat > "$r/.scratch/pulls/1.md" <<MD
@@ -155,7 +155,7 @@ g add -A
 g commit -q -m "chore: the open pull request and its Rounds"
 g push -q origin main 2>/dev/null
 
-common='You are the Ticket thread. Load the `implement` skill from `<checkout>/plugins/dev-skills/skills/implement/SKILL.md` (the checkout under test, not an installed copy) and follow it, with the skills it names loaded from the same `skills/` folder, on the Ticket `.scratch/issues/10-work.md` in this repo. The tracker is the local Markdown one in `docs/agents/issue-tracker.md`; there is no forge and no CI.
+common='You are the Ticket thread. Load the `implement` skill from `<checkout>/plugins/dev-skills/skills/implement/SKILL.md` (the checkout under test, not an installed copy) and follow it, with the skills it names loaded from the same `skills/` folder, on the Ticket `.scratch/issues/10-work.md` in this repo. The tracker is the local Markdown one in `docs/dev-skills/issue-tracker.md`; there is no forge and no CI.
 
 This is a decision-level run of the end of step 6. Steps 1 to 5 are done: the Ticket branch `ticket-10` (on `origin`) holds the build and two fix commits, and pull request 1 (`.scratch/pulls/1.md`) is open, with its Round comments. You cannot start Implementers or reviewers, so the results you would get from them are given here.'
 given='The complete `agentic-review` workflow has just reported, after Round 3: outcome `restart`, with the link to the attempt record (the last `## Comment` of `.scratch/issues/10-work.md`).

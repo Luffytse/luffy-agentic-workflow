@@ -19,7 +19,7 @@ fi
 # the Spec asks for Quick checks, not a Deep Review, so the checks are the only thing in play
 sed -i '/^Review depth: Deep/d' "$i/10-work.md"
 
-cat >> "$r/docs/agents/issue-tracker.md" <<'MD'
+cat >> "$r/docs/dev-skills/issue-tracker.md" <<'MD'
 - **Comment on an issue**: append a line `Comment: <text>` to the issue's file; a multi-line comment goes under a `## Comment` heading at the end of the file.
 - **Apply / remove labels**: edit the `Labels:` header line of the issue's file.
 - **Park**: mark an issue as parked, or read whether it is. To mark it, add `parked` to its `Labels:` line (**Apply / remove labels**), then comment on the issue (**Comment on an issue**) with a link to the attempt history: its attempt records and the pull request, if there is one. An issue is parked when its `Labels:` line includes `parked`. A parked issue waits on the user: no skill builds it, reviews it or merges its pull request until the user removes the label.
@@ -75,7 +75,7 @@ Give the text between the lines to a fresh session (a premium-tier agent), with 
 
 ---
 
-You are the Spec thread. Load the \`implement-spec\` skill from \`<checkout>/plugins/dev-skills/skills/implement-spec/SKILL.md\` (the checkout under test, not an installed copy) and follow it, with the skills it names loaded from the same \`skills/\` folder, on the Spec \`.scratch/issues/10-work.md\` in this repo. The tracker is the local Markdown one in \`docs/agents/issue-tracker.md\`; there is no forge and no CI.
+You are the Spec thread. Load the \`implement-spec\` skill from \`<checkout>/plugins/dev-skills/skills/implement-spec/SKILL.md\` (the checkout under test, not an installed copy) and follow it, with the skills it names loaded from the same \`skills/\` folder, on the Spec \`.scratch/issues/10-work.md\` in this repo. The tracker is the local Markdown one in \`docs/dev-skills/issue-tracker.md\`; there is no forge and no CI.
 
 This is a decision-level run of step 5. Steps 1 to 4 are done: Ticket 11 was built by its Implementer and its evidence passed step 4. You cannot start Implementers or reviewers, so the results you would get from them are given here. Ticket 11 (\`.scratch/issues/11-code.md\`) cannot pass its Ticket checks, because its two first criteria contradict each other:
 

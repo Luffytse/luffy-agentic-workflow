@@ -14,7 +14,7 @@ here="$(cd "$(dirname "$0")" && pwd)"
 mkdir -p "$out"
 out="$(cd "$out" && pwd)"
 r="$out/repo"
-mkdir -p "$r/docs/agents" "$r/src" "$r/skills/greeting" "$r/.scratch/issues" "$r/.scratch/pulls" "$r/.scratch/harness"
+mkdir -p "$r/docs/dev-skills" "$r/src" "$r/skills/greeting" "$r/.scratch/issues" "$r/.scratch/pulls" "$r/.scratch/harness"
 
 cat > "$r/CLAUDE.md" <<'MD'
 # greeter
@@ -23,12 +23,12 @@ A tiny shell greeter. Run `bash test.sh` before each push.
 
 ## Agent skills
 
-Start at `docs/index.md`. Issue tracker: `docs/agents/issue-tracker.md`. Boundaries: `docs/agents/boundaries.md`.
-Releases: `docs/agents/release.md`. Workers run in the dry-run harness `docs/agents/harness.md` documents.
+Start at `docs/dev-skills/index.md`. Issue tracker: `docs/dev-skills/issue-tracker.md`. Boundaries: `docs/dev-skills/boundaries.md`.
+Releases: `docs/dev-skills/release.md`. Workers run in the dry-run harness `docs/dev-skills/harness.md` documents.
 
 ## Merge-time steps
 
-The coordinator follows these two. `docs/agents/release.md` has the bump rules.
+The coordinator follows these two. `docs/dev-skills/release.md` has the bump rules.
 
 **Version hand-out.** A thread about to merge a pull request that changes a file under `skills/` asks the coordinator for its version number just before merging; a pull request that changes no such file gets none and merges with no bump.
 - The coordinator gives main's `VERSION` raised minor for a new or changed skill rule and patch for a fix to one. It records the number first, in a comment on the issue the pull request builds whose first line is `<!-- version hand-out -->` and whose second is `Version <number> for <pull request>: merge it next, with the bump as its last commit.` Then it tells the thread.
@@ -38,16 +38,16 @@ The coordinator follows these two. `docs/agents/release.md` has the bump rules.
 **Ticket re-read after a skill merge.** Right after a pull request that changed a file under `skills/` merges, before any further thread starts, re-read the open issues of the Milestone that no running thread is building and whose body names the changed skill or a changed file, against main's new text of the skill: update an issue the change makes wrong or incomplete (the whole body written back with only that change and a one-line note naming the merge); close one it makes obsolete; otherwise comment that it was re-read and still fits.
 MD
 
-cat > "$r/docs/index.md" <<'MD'
+cat > "$r/docs/dev-skills/index.md" <<'MD'
 # Docs index
 
-- [docs/agents/issue-tracker.md](agents/issue-tracker.md): the local Markdown tracker, in dry-run mode. Read before any tracker operation.
-- [docs/agents/harness.md](agents/harness.md): the dry-run harness workers run in: how to start, read, stop, message and schedule them. Read before any worker action.
-- [docs/agents/boundaries.md](agents/boundaries.md): the Boundary record.
-- [docs/agents/release.md](agents/release.md): the release doc.
+- [docs/dev-skills/issue-tracker.md](issue-tracker.md): the local Markdown tracker, in dry-run mode. Read before any tracker operation.
+- [docs/dev-skills/harness.md](harness.md): the dry-run harness workers run in: how to start, read, stop, message and schedule them. Read before any worker action.
+- [docs/dev-skills/boundaries.md](boundaries.md): the Boundary record.
+- [docs/dev-skills/release.md](release.md): the release doc.
 MD
 
-cat > "$r/docs/agents/issue-tracker.md" <<'MD'
+cat > "$r/docs/dev-skills/issue-tracker.md" <<'MD'
 # Issue tracker: local Markdown, dry run
 
 Issues are files under `.scratch/issues/`, one per issue, named `NN-slug.md`. Each starts with header lines `Title:`,
@@ -84,7 +84,7 @@ see them.
 Branches are the repo's own git branches (`git log <branch>`); nothing is pushed anywhere else.
 MD
 
-cat > "$r/docs/agents/harness.md" <<'MD'
+cat > "$r/docs/dev-skills/harness.md" <<'MD'
 # Dry-run harness
 
 The dry run's stand-in for the tool workers run in. It has no `worker-control` reference, so `worker-control`'s
@@ -111,7 +111,7 @@ event, and every action below is a block in `.scratch/proposed-actions.md`, in t
 - **Message the user:** block `### <k>. Message the user` with `Body:` between `~~~` lines.
 MD
 
-cat > "$r/docs/agents/boundaries.md" <<'MD'
+cat > "$r/docs/dev-skills/boundaries.md" <<'MD'
 # Boundary record
 
 - **Irreversible actions agents may take**: delete test data agents generate while implementing.
@@ -121,7 +121,7 @@ cat > "$r/docs/agents/boundaries.md" <<'MD'
 - **Milestone label form**: `milestone-<n>`. An issue belongs to a Milestone when it carries that label.
 MD
 
-cat > "$r/docs/agents/release.md" <<'MD'
+cat > "$r/docs/dev-skills/release.md" <<'MD'
 # Releases
 
 - **Bump mode**: pull requests bump. Every pull request that changes a file under `skills/` bumps `VERSION` as its last commit, with the number the coordinator gives just before merge (`CLAUDE.md`, "Merge-time steps"). Any other pull request leaves `VERSION` as it is. A Release opens no bump pull request.
@@ -190,7 +190,7 @@ cat >> "$r/.scratch/issues/00-milestone.md" <<'MD'
 ## Startup verification
 
 Runner: coordinator · Run: 2026-11-03 08:00–08:30 UTC
-Harness: dry-run harness (fallback, docs/agents/harness.md)
+Harness: dry-run harness (fallback, docs/dev-skills/harness.md)
 
 | Capability | Essential | How probed | Result | Evidence | Limits |
 |---|---|---|---|---|---|
@@ -332,7 +332,7 @@ other skill it names from the same \`<checkout>/plugins/dev-skills/skills/\` fol
 \`model-tiers\` and the rest), never an installed copy. Its snapshot command is
 \`<checkout>/plugins/dev-skills/skills/team-lead/snapshot.py\`; run it from the repo root.
 
-This is a dry run. Workers run in the dry-run harness \`docs/agents/harness.md\` documents: it has no \`worker-control\`
+This is a dry run. Workers run in the dry-run harness \`docs/dev-skills/harness.md\` documents: it has no \`worker-control\`
 reference, so take its methods from that page through \`worker-control\`'s fallback, which needs no message to the user
 here (its check has run: see the Startup verification result on the Milestone issue). Every tracker write and every
 harness action is a block in \`.scratch/proposed-actions.md\`, as the tracker doc and the harness page say; make no

@@ -11,7 +11,7 @@ when it last reported to the team lead, when the team lead last resumed it after
 before it is void and the worker gets a full window), and its state as the harness reports it (printed as given). Times are UTC,
 as 2026-11-03T14:40:00Z.
 
-The tracker is read the way the tracker doc (default <repo>/docs/agents/issue-tracker.md) says it is kept:
+The tracker is read the way the tracker doc (default <repo>/docs/dev-skills/issue-tracker.md) says it is kept:
   - GitHub, when the doc uses `gh`: issue and pull request comments, the pull request and its ready event, through
     the `gh api` REST routes (they work where GraphQL does not);
   - a local Markdown tracker, when the doc says "Issues are files under `<dir>`" (and "Pull requests are files
@@ -304,7 +304,7 @@ def main(argv):
                 notes.append("git fetch failed: branches read as last fetched")
         except subprocess.TimeoutExpired:
             notes.append("git fetch timed out: branches read as last fetched")
-    tracker, why = open_tracker(repo, pathlib.Path(a.tracker_doc) if a.tracker_doc else repo / "docs/agents/issue-tracker.md")
+    tracker, why = open_tracker(repo, pathlib.Path(a.tracker_doc) if a.tracker_doc else repo / "docs/dev-skills/issue-tracker.md")
     tname = tracker.name if tracker else f"not readable by this command ({why}): read by hand"
     window = dt.timedelta(minutes=a.silent_after)
     print(f"Snapshot at {show(now)} · silent after {a.silent_after} min · tracker: {tname}"

@@ -11,7 +11,7 @@ case "$case_" in plan|add-feature) ;; *) echo "unknown case: $case_" >&2; exit 2
 mkdir -p "$out"
 out="$(cd "$out" && pwd)"
 r="$out/repo"
-mkdir -p "$r/docs/agents" "$r/src" "$r/.scratch/issues"
+mkdir -p "$r/docs/dev-skills" "$r/src" "$r/.scratch/issues"
 git init -q -b main "$r"
 
 cat > "$r/CLAUDE.md" <<'MD'
@@ -21,31 +21,31 @@ A tiny shell greeter. Run `bash test.sh` before each push.
 
 ## Agent skills
 
-Start at `docs/index.md`.
+Start at `docs/dev-skills/index.md`.
 
 ### Issue tracker
 
-Local Markdown issues under `.scratch/issues/`, in dry-run mode. See `docs/agents/issue-tracker.md`.
+Local Markdown issues under `.scratch/issues/`, in dry-run mode. See `docs/dev-skills/issue-tracker.md`.
 
 ### Boundaries
 
-See `docs/agents/boundaries.md`.
+See `docs/dev-skills/boundaries.md`.
 
 ### Releases
 
-The version lives in `VERSION`. See `docs/agents/release.md` for who bumps it.
+The version lives in `VERSION`. See `docs/dev-skills/release.md` for who bumps it.
 MD
 
 
-cat > "$r/docs/index.md" <<'MD'
+cat > "$r/docs/dev-skills/index.md" <<'MD'
 # Docs index
 
-- [docs/agents/issue-tracker.md](agents/issue-tracker.md): the local Markdown tracker, in dry-run mode, and its operations. Read before any tracker operation.
-- [docs/agents/boundaries.md](agents/boundaries.md): the Boundary record. Read when deciding whether an action needs the user, or when giving an issue a Milestone label.
-- [docs/agents/release.md](agents/release.md): the release doc (its bump mode says who bumps `VERSION`). Read when planning or cutting a Release, or before a merge that may bump the version.
+- [docs/dev-skills/issue-tracker.md](issue-tracker.md): the local Markdown tracker, in dry-run mode, and its operations. Read before any tracker operation.
+- [docs/dev-skills/boundaries.md](boundaries.md): the Boundary record. Read when deciding whether an action needs the user, or when giving an issue a Milestone label.
+- [docs/dev-skills/release.md](release.md): the release doc (its bump mode says who bumps `VERSION`). Read when planning or cutting a Release, or before a merge that may bump the version.
 MD
 
-cat > "$r/docs/agents/issue-tracker.md" <<'MD'
+cat > "$r/docs/dev-skills/issue-tracker.md" <<'MD'
 # Issue tracker: local Markdown, dry run
 
 Issues are files under `.scratch/issues/`, one per issue, named `NN-slug.md`. Each starts with header lines:
@@ -98,7 +98,7 @@ event `<k>` (also when it leads to no write), and keep numbering the blocks on f
   comment that links its attempt history; a thread's own label write reaches the tracker, yours does not.
 MD
 
-cat > "$r/docs/agents/boundaries.md" <<'MD'
+cat > "$r/docs/dev-skills/boundaries.md" <<'MD'
 # Boundary record
 
 What the user has agreed agents may do on their own in this repo, which actions are the user's to decide, and the limits agents work within.
@@ -114,7 +114,7 @@ What the user has agreed agents may do on their own in this repo, which actions 
 A Milestone issue may name extra allowed or forbidden actions for its own issues. For an issue that belongs to the Milestone, the Milestone issue wins over this record; for every other issue, this record applies as written.
 MD
 
-cat > "$r/docs/agents/release.md" <<'MD'
+cat > "$r/docs/dev-skills/release.md" <<'MD'
 # Releases
 
 - **Bump mode**: Releases bump. A Release opens one bump pull request that changes `VERSION` and adds its changelog entry.
@@ -315,7 +315,7 @@ You are the coordinator of the project in this working directory. Load the `mile
 <checkout>/plugins/dev-skills/skills/milestone/SKILL.md (that copy, not an installed one) and follow it. Load any other
 skill it names from the same checkout's `plugins/dev-skills/skills/`.
 
-This is a dry run. The tracker doc, `docs/agents/issue-tracker.md`, says how every write is recorded in
+This is a dry run. The tracker doc, `docs/dev-skills/issue-tracker.md`, says how every write is recorded in
 `.scratch/proposed-actions.md` instead of being made: follow it for every tracker write and every thread you would
 start. Change no other file. The user is scripted: when the skill has you ask the user something, take the answer
 from "The user's answers" below; when a question is not covered there, append it to `.scratch/questions.md`, treat it

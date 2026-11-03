@@ -21,10 +21,10 @@ for fx in returned flip; do
     r="$d/repo"
     [ -d "$r/.git" ] || { bad "$t: no repo"; continue; }
     git -C "$r" rev-parse -q --verify main >/dev/null || bad "$t: no branch main"
-    grep -q 'Milestone label form.*milestone-<n>' "$r/docs/agents/boundaries.md" 2>/dev/null || bad "$t: Boundary record has no label form"
-    grep -q 'docs/agents/boundaries.md' "$r/CLAUDE.md" 2>/dev/null || bad "$t: CLAUDE.md does not point to the Boundary record"
+    grep -q 'Milestone label form.*milestone-<n>' "$r/docs/dev-skills/boundaries.md" 2>/dev/null || bad "$t: Boundary record has no label form"
+    grep -q 'docs/dev-skills/boundaries.md' "$r/CLAUDE.md" 2>/dev/null || bad "$t: CLAUDE.md does not point to the Boundary record"
     for op in 'Comment on an issue' 'Create an issue'; do
-      grep -q "^- \*\*$op\*\*" "$r/docs/agents/issue-tracker.md" 2>/dev/null || bad "$t: tracker doc has no $op operation"
+      grep -q "^- \*\*$op\*\*" "$r/docs/dev-skills/issue-tracker.md" 2>/dev/null || bad "$t: tracker doc has no $op operation"
     done
     (cd "$r" && bash test.sh >/dev/null 2>&1) || bad "$t: the fixture's own tests fail on main"
 

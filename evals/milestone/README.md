@@ -10,7 +10,7 @@ Delivery is the `team-lead` skill's now (ADR 0010): its cases (`deliver`, `deliv
 
 Every case's repo is a tiny shell greeter with a Boundary record (label form `milestone-<n>`; sending messages to customers needs approval; budget none), a release doc (Releases bump `VERSION`), and two planned features that fit one Release: the Spec `10-farewell.md` with its Tickets `11-bye-code.md` and `12-bye-usage.md`, and the lone Ticket `20-quiet.md`. `30-colour.md` is a raw `needs-triage` request nobody has planned.
 
-The **dry run** lives in the fixture's tracker doc (`docs/agents/issue-tracker.md`): reads read the issue files, and every write (creating an issue or a label, editing a body, labelling, linking a sub-issue, commenting, closing, parking, starting a thread, messaging one) is appended as a numbered block to `.scratch/proposed-actions.md` instead of being made. The skill needs no dry-run mode of its own: it acts through the tracker doc's operations, and the fixture's tracker doc records them.
+The **dry run** lives in the fixture's tracker doc (`docs/dev-skills/issue-tracker.md`): reads read the issue files, and every write (creating an issue or a label, editing a body, labelling, linking a sub-issue, commenting, closing, parking, starting a thread, messaging one) is appended as a numbered block to `.scratch/proposed-actions.md` instead of being made. The skill needs no dry-run mode of its own: it acts through the tracker doc's operations, and the fixture's tracker doc records them.
 
 | Case | Starting state | The user asks | Expected |
 | --- | --- | --- | --- |

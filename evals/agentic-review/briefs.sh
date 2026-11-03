@@ -41,8 +41,8 @@ git -C "$scratch" rev-parse -q --verify main >/dev/null && git -C "$scratch" rev
 scratch="$(cd "$scratch" && pwd -P)" # absolute, no trailing slash, so the sibling output dir is outside the repo
 [ -f "$scratch/.scratch/SPEC.md" ] || { echo "no .scratch/SPEC.md in $scratch" >&2; exit 1; }
 review="$(git -C "$scratch" show planted:REVIEW.md)"
-git -C "$scratch" cat-file -e planted:docs/index.md ||
-  { echo "the fixture has no docs/index.md; the Standards Finder brief assumes it has one" >&2; exit 1; }
+git -C "$scratch" cat-file -e planted:docs/dev-skills/index.md ||
+  { echo "the fixture has no docs/dev-skills/index.md; the Standards Finder brief assumes it has one" >&2; exit 1; }
 printf '%s\n' "$review" | grep -q '^- \*\*' ||
   { echo "the fixture's REVIEW.md has no Always check line; the Standards Finder brief assumes it has one" >&2; exit 1; }
 
@@ -61,7 +61,7 @@ inputs="## Inputs for this Review
 - The commit list: \`git log --oneline main..planted\`. The base for \`git show main:<file>\` is \`main\`.
 - The spec: \`.scratch/SPEC.md\` in the scratch repo.
 - The settled designs: none (there is no earlier Round, and the spec records no decisions).
-- The standards-source files: the fixture has no \`CLAUDE.md\`, \`AGENTS.md\` or \`CODING_STANDARDS.md\`; its \`REVIEW.md\` is the whole list.
+- The standards-source files: the fixture has no \`CLAUDE.md\`, \`AGENTS.md\` or \`CONTRIBUTING.md\`; its \`REVIEW.md\` is the whole list.
 - \`REVIEW.md\`, as follows. It has an Always check line.
 
 \`\`\`

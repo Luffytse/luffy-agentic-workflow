@@ -4,7 +4,7 @@ A small fixture pull request with planted problems of known Bug classes (one of 
 
 ## Files
 
-- `base/`: the fixture repo before the change (a tiny Python cost splitter with its own `docs/index.md` and a `REVIEW.md` holding one Always check line, which the change breaks once).
+- `base/`: the fixture repo before the change (a tiny Python cost splitter with its own `docs/dev-skills/index.md` and a `REVIEW.md` holding one Always check line, which the change breaks once).
 - `after/`: the files the change adds or edits; `setup.sh` also deletes `docs/currency.md` (renamed to `docs/money.md`).
 - `SPEC.md`: the ticket the change builds; `setup.sh` copies it, untracked, to `.scratch/SPEC.md` in the scratch repo.
 - `EXPECTED.md`: the planted Findings (Bug class, Severity, every location), the false alarms, the known extras, how a run is scored, and the scoring of the Verify-only and rebuttal checks.

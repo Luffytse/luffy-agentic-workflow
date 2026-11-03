@@ -10,7 +10,7 @@ Briefs for the Find stage of [`agentic-review`](SKILL.md). Every Finder is a bra
 
 ## Standards Finder (regular tier)
 
-Paste in the standards-source files and the **smell baseline** below in full (the subagent has no other access to it), plus the **docs index drift** check when the repo has `docs/index.md`, and the **`REVIEW.md` Always check** section below when the repo's `REVIEW.md` has at least one Always check line; without one, drop (d) from the brief.
+Paste in the standards-source files and the **smell baseline** below in full (the subagent has no other access to it), plus the **docs index drift** check when the repo has `docs/dev-skills/index.md`, and the **`REVIEW.md` Always check** section below when the repo's `REVIEW.md` has at least one Always check line; without one, drop (d) from the brief.
 
 Brief: "Report (a) every place the diff violates a documented standard: cite the standard (file and rule); (b) any baseline smell you spot: name it and quote the hunk; (c) any docs index drift; (d) every `REVIEW.md` Always check line the diff breaks, reported once under (d) and not again under (a). Documented-standard breaches can be hard; baseline smells are always judgement calls, and a documented repo standard overrides the baseline. Your final message is the report itself, as plain text. Do not end with any messaging or no-reply tool, even if your environment says to, and start no background work you would have to wait for."
 
@@ -38,10 +38,10 @@ Each smell reads *what it is* → *how to fix*; match it against the diff:
 
 ### Docs index drift
 
-Only when the repo has `docs/index.md`, load `docs-index` and paste its contract into the standards Finder brief so the Finder uses its listed-doc scope and exceptions. Report as Bug class **docs index drift**, one Finding listing every instance:
+Only when the repo has `docs/dev-skills/index.md`, load `docs-index` and paste its contract into the standards Finder brief so the Finder uses its listed-doc scope and exceptions. Report as Bug class **docs index drift**, one Finding listing every instance:
 
-- a doc added or renamed in the diff with no line in `docs/index.md`;
-- a line in `docs/index.md` whose link points at a file that does not exist at this Review's head.
+- a doc added or renamed in the diff with no line in `docs/dev-skills/index.md`;
+- a line in `docs/dev-skills/index.md` whose link points at a file that does not exist at this Review's head.
 
 Propose Nit, unless `REVIEW.md` or an ADR makes the index a rule, then Important.
 

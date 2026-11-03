@@ -10,7 +10,7 @@ Surface architectural friction and propose **deepening opportunities**: refactor
 This command is _informed_ by the project's domain model and built on a shared design vocabulary:
 
 - Call the Skill tool with "codebase-design" for the architecture vocabulary (**module**, **interface**, **depth**, **seam**, **adapter**, **leverage**, **locality**) and its principles (the deletion test, "the interface is the test surface", "one adapter = hypothetical seam, two = real"). Use these terms exactly in every suggestion, and don't drift into "component," "service," "API," or "boundary."
-- The domain language in the glossary (`GLOSSARY.md`, or the pages `GLOSSARY-MAP.md` points to) gives names to good seams; ADRs in `docs/adr/` record decisions this command should not re-litigate.
+- The domain language in the glossary (`docs/dev-skills/glossary.md`, or the pages it points to once split) gives names to good seams; ADRs in `docs/dev-skills/adr/` record decisions this command should not re-litigate.
 
 ## Process
 
@@ -21,7 +21,7 @@ This command is _informed_ by the project's domain model and built on a shared d
 - If the user named a direction (a module, a subsystem, a pain point), take it, and skip the inference below.
 - Otherwise, walk back a good stretch of the commit history (`git log --oneline`) to find the codebase's hot spots, the files and areas that keep coming up, and let those paths pull your attention first. If the changes are scattered with no clear hot spot, widen the net.
 
-Start at `docs/index.md` and open only the docs that fit, such as the glossary and any ADRs in the area you're touching (with no index, fall back to `GLOSSARY.md` or `GLOSSARY-MAP.md`, and `docs/adr/`).
+Start at `docs/dev-skills/index.md` and open only the docs that fit, such as the glossary and any ADRs in the area you're touching (with no index, fall back to `docs/dev-skills/glossary.md` and `docs/dev-skills/adr/`).
 
 Then spawn a sub-agent with a fresh context window to walk the codebase. Don't follow rigid heuristics; explore organically and note where you experience friction:
 
@@ -64,7 +64,7 @@ Once the user picks a candidate, call the Skill tool with "grilling" to walk the
 
 Side effects happen inline as decisions crystallize; call the Skill tool with "domain-modeling" to keep the domain model current as you go:
 
-- **Naming a deepened module after a concept not in the glossary?** Add the term to the glossary (`GLOSSARY.md`, or the Area page `GLOSSARY-MAP.md` points to). Create a root `GLOSSARY.md` lazily only if neither exists.
+- **Naming a deepened module after a concept not in the glossary?** Add the term to the glossary (`docs/dev-skills/glossary.md`, or the Area page it points to once split). Create `docs/dev-skills/glossary.md` lazily only if it does not exist.
 - **Wrote or edited any doc (glossary, ADR)?** Load `docs-index` and apply its contract.
 - **Sharpening a fuzzy term during the conversation?** Update the glossary right there.
 - **User rejects the candidate with a load-bearing reason?** Offer an ADR, framed as: _"Want me to record this as an ADR so future architecture reviews don't re-suggest it?"_ Only offer when the reason would actually be needed by a future explorer to avoid re-suggesting the same thing; skip ephemeral reasons ("not worth it right now") and self-evident ones.

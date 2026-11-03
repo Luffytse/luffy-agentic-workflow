@@ -106,7 +106,7 @@ if [ "$inside" = 1 ] && [ "$control" = 0 ]; then
       printf '## The Milestone issue (`.scratch/issues/00-milestone.md`)\n\n```\n%s\n```\n\n' "$(cat "$milestone_file")"
       printf '## The spec, with its comments (`.scratch/issues/10-export.md`)\n\n```\n%s\n```\n\n' "$(cat "$spec_file")"
       printf '## The ADR and glossary lines the Finding touches\n\n'
-      for p in docs/adr/0001-the-list-is-a-text-file.md docs/adr/0002-export-format.md GLOSSARY.md; do
+      for p in docs/dev-skills/adr/0001-the-list-is-a-text-file.md docs/dev-skills/adr/0002-export-format.md docs/dev-skills/glossary.md; do
         printf '`%s` at the head:\n\n```\n%s\n```\n\n' "$p" "$(git -C "$r" show "design:$p")"
       done
       printf '## The diff commands\n\n%s\n\n' "$diffs"

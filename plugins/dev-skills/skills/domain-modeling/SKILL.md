@@ -1,6 +1,6 @@
 ---
 name: domain-modeling
-description: Build and sharpen a project's domain model. Use when discussing codebase terminology, writing or editing the glossary (GLOSSARY.md, GLOSSARY-MAP.md or its pages), or recording or editing an ADR.
+description: Build and sharpen a project's domain model. Use when discussing codebase terminology, writing or editing the glossary (docs/dev-skills/glossary.md or its Area pages), or recording or editing an ADR.
 ---
 
 # Domain Modeling
@@ -9,38 +9,43 @@ Actively build and sharpen the project's domain model as you design. This is the
 
 ## File structure
 
-Most repos have a single context:
+Every file this skill writes lives under `docs/dev-skills/`, the folder only the skills use, so it never mixes with the repo's own docs. Most repos have a single context:
 
 ```
 /
-├── GLOSSARY.md
 ├── docs/
-│   └── adr/
-│       ├── 0001-event-sourced-orders.md
-│       └── 0002-postgres-for-write-model.md
+│   └── dev-skills/
+│       ├── index.md
+│       ├── glossary.md
+│       └── adr/
+│           ├── 0001-event-sourced-orders.md
+│           └── 0002-postgres-for-write-model.md
 └── src/
 ```
 
-A repo whose glossary was split per Area has a `GLOSSARY-MAP.md` and `docs/glossary/<area>.md` pages instead of the root `GLOSSARY.md`, still with one `docs/adr/`:
+A repo whose glossary was split per Area keeps `docs/dev-skills/glossary.md` as the entry point, now the map, with one page per Area in `docs/dev-skills/glossary/`, still with one `docs/dev-skills/adr/`:
 
 ```
 /
-├── GLOSSARY-MAP.md
 ├── docs/
-│   ├── index.md
-│   ├── glossary/
-│   │   ├── ordering.md
-│   │   └── billing.md
-│   └── adr/
+│   └── dev-skills/
+│       ├── index.md
+│       ├── glossary.md               ← the map: one page per Area
+│       ├── glossary/
+│       │   ├── ordering.md
+│       │   └── billing.md
+│       └── adr/
+└── src/
 ```
 
-If a `GLOSSARY-MAP.md` exists at the root and points into `src/`, the repo has multiple contexts. The map points to where each one lives:
+If `docs/dev-skills/glossary.md` is a map that points into `src/`, the repo has multiple contexts. The map points to where each one lives, and each context keeps its glossary beside its code:
 
 ```
 /
-├── GLOSSARY-MAP.md
 ├── docs/
-│   └── adr/                          ← system-wide decisions
+│   └── dev-skills/
+│       ├── glossary.md               ← the map: one entry per context
+│       └── adr/                      ← system-wide decisions
 ├── src/
 │   ├── ordering/
 │   │   ├── GLOSSARY.md
@@ -50,20 +55,20 @@ If a `GLOSSARY-MAP.md` exists at the root and points into `src/`, the repo has m
 │       └── docs/adr/
 ```
 
-If the root `GLOSSARY.md` grows past about 10 KB (10,240 bytes; check with `wc -c`) when you add a term, split it per Area (see [Splitting the glossary](#splitting-the-glossary)). The repo still keeps one `docs/adr/`.
+If `docs/dev-skills/glossary.md` holds terms and grows past about 10 KB (10,240 bytes; check with `wc -c`) when you add a term, split it per Area (see [Splitting the glossary](#splitting-the-glossary)). The repo still keeps one `docs/dev-skills/adr/`.
 
-Create files lazily: only when you have something to write. If neither `GLOSSARY.md` nor a `GLOSSARY-MAP.md` exists, create a root `GLOSSARY.md` when the first term is resolved. If no `docs/adr/` exists, create it when the first ADR is needed.
+Create files lazily: only when you have something to write. If `docs/dev-skills/glossary.md` does not exist, create it when the first term is resolved. If no `docs/dev-skills/adr/` exists, create it when the first ADR is needed.
 
 ## Splitting the glossary
 
-Do this only in a repo with a single root `GLOSSARY.md`, when you are adding a term and that file is over about 10 KB. Check the size with `wc -c GLOSSARY.md`; do not split before then.
+Do this only in a single-context repo whose `docs/dev-skills/glossary.md` holds the terms, when you are adding a term and that file is over about 10 KB. Check the size with `wc -c docs/dev-skills/glossary.md`; do not split before then.
 
 1. Group the terms by Area (the same Areas the docs index uses).
-2. `git mv GLOSSARY.md` to the first Area's page (`docs/glossary/<area>.md`) so history follows, then move the other groups into their own pages. The root `GLOSSARY.md` goes away.
-3. Write `GLOSSARY-MAP.md` at the repo root, listing one page per Area (format in [GLOSSARY-FORMAT.md](./GLOSSARY-FORMAT.md)). Skills that already read `GLOSSARY-MAP.md` find the pages from it.
-4. Replace the `GLOSSARY.md` line in the docs index with a line linking `GLOSSARY-MAP.md`, and fix any other doc that links `GLOSSARY.md`. Load `docs-index` for the index update, including creation when absent.
+2. `git mv docs/dev-skills/glossary.md` to the first Area's page (`docs/dev-skills/glossary/<area>.md`) so history follows, then move the other groups into their own pages.
+3. Write a new `docs/dev-skills/glossary.md` as the map, listing one page per Area (format in [GLOSSARY-FORMAT.md](./GLOSSARY-FORMAT.md)). The entry point keeps its path, so skills that read `docs/dev-skills/glossary.md` find the pages from it.
+4. Change the glossary's line in the docs index to say it is now the map, add a line for each Area page, and fix any other doc that links a term's old place. Load `docs-index` for the index update, including creation when absent.
 
-If `GLOSSARY-MAP.md` already exists (split per Area, or a multi-context layout), add the term to the page the map points to for its Area or context; never create a root `GLOSSARY.md` or split again just because a map exists. A page that grows past about 10 KB splits again by sub-area, and the map gets the new page.
+If `docs/dev-skills/glossary.md` is already a map (split per Area, or a multi-context layout), add the term to the page the map points to for its Area or context; never put terms back into the map or split again just because a map exists. A page that grows past about 10 KB splits again by sub-area, and the map gets the new page.
 
 ## Keeping the docs index current
 
@@ -89,7 +94,7 @@ When the user states how something works, check whether the code agrees. If you 
 
 ### Update the glossary inline
 
-When a term is resolved, update the glossary (`GLOSSARY.md`, or the Area page `GLOSSARY-MAP.md` points to) right there. Don't batch these up: capture them as they happen. Use the format in [GLOSSARY-FORMAT.md](./GLOSSARY-FORMAT.md).
+When a term is resolved, update the glossary (`docs/dev-skills/glossary.md`, or the Area page it points to once it is the map) right there. Don't batch these up: capture them as they happen. Use the format in [GLOSSARY-FORMAT.md](./GLOSSARY-FORMAT.md).
 
 The glossary should be totally devoid of implementation details. Do not treat it as a spec, a scratch pad, or a repository for implementation decisions. It is a glossary and nothing else.
 

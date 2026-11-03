@@ -16,6 +16,22 @@ Pass: yes | no. Lessons: <what to change, if anything>
 
 ## Runs
 
+### 2026-11-03, commit 1b5a6ff, dev-skills 0.49.0 (base main 1a17cd7): fresh headless sessions after the docs/dev-skills/ move (#552)
+
+Setup: the README's scratch repo (made-up remote `https://github.com/example-org/scratch-app.git`, `README.md`, `package.json`, one commit) in a temporary directory. Each run was a fresh headless `claude -p` session with the checkout's plugin loaded by `--plugin-dir <checkout>/plugins/dev-skills` (the session's init record lists `dev-skills` at that path), tools limited to reading and writing files and read-only `git`, and the scripted answers given up front in the prompt, so the session logged the questions it would ask rather than holding a live conversation. Run 1 on the regular tier. Run 2, the re-run on run 1's committed result: two attempts on the regular tier stopped early on a model safeguard false positive before writing anything, and the third, on the premium tier, completed.
+
+Conversation: Sections A to F in order, each question with its recommended answer, then the scripted answer (GitHub; default labels, no agent-only labels; single-context; no own rules; Releases no, though it recommended yes for the `package.json` version; Section F's five values, the three given and the two recommended); create `CLAUDE.md`. Run 2 asked nothing new: Section F kept every existing value.
+
+File written (run 1): `docs/dev-skills/issue-tracker.md`, `docs/dev-skills/triage-labels.md`, `docs/dev-skills/domain.md`, `docs/dev-skills/boundaries.md` (the five values and the Milestone-issues section, the three given values in place of the placeholders) and `docs/dev-skills/index.md` (a line for each of the four, `REVIEW.md` linked as `../../REVIEW.md` with its "read when reviewing a change or adding an Always check line" line, and `README.md`); the starter `REVIEW.md` at the repo root; `CLAUDE.md` with the `## Agent skills` block, which starts "Start at `docs/dev-skills/index.md`", points each part at its `docs/dev-skills/` file and has a `### Boundaries` part. Nothing else was written under `docs/` or at the root; no release doc (Section E no); reachability, labels and settings "not checked: fixture".
+
+Re-run (run 2): "no change" for every file (the four `docs/dev-skills/` files, `REVIEW.md`, the `CLAUDE.md` block and `docs/dev-skills/index.md`); it wrote nothing, and `git status` on the scratch repo was clean afterwards.
+
+Also checked, in this repo: a fresh headless session loading the checkout's plugin the same way ran `to-tickets` as a dry run (read-only tools) on a one-line plan. Its first read was `docs/dev-skills/index.md`, then `docs/dev-skills/issue-tracker.md` (and the triage-label, Boundary record and release docs in `docs/dev-skills/`); it quoted the tracker doc's "Create an issue" and "Apply / remove labels" operations and published nothing.
+
+Not exercised: label creation and the settings report (no reachable remote), a live conversation, a re-run with a changed value, a multi-context repo, a glossary split, and the legacy `CONTEXT.md` offer.
+
+Pass: yes. Every file landed under `docs/dev-skills/`, `REVIEW.md` at the root, the block points at `docs/dev-skills/index.md`, and the re-run reported no change. Lessons: as in the 2026-11-01 run, the `### Boundaries` part summarised the approval, budget and check-in values but not the allowed action (that value is in the record only).
+
 ### 2026-11-01, commit 8802449 (base), dev-skills 0.26.0 (base): fresh subagent
 
 Setup: a subagent given only a copy of the `setup-dev-skills` folder (SKILL.md and its seeds) and the scripted answers of the README, in a scratch repo with a made-up GitHub remote. The answers were supplied up front, so it logged the questions it would ask rather than holding a live conversation. Run by the coordinator, reported to the Implementer of #422.

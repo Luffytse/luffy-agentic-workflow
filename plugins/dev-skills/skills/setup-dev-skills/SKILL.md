@@ -5,14 +5,14 @@ description: "Configure a GitHub repo for the dev-skills plugin: write its issue
 
 # Set up dev-skills
 
-Derived from Matt Pocock's setup skill; the seed files in this folder are mostly his text (MIT, see `LICENSE-mattpocock-skills` in the plugin folder). Scaffold the per-repo configuration the other skills read:
+Derived from Matt Pocock's setup skill; the seed files in this folder are mostly his text (MIT, see `LICENSE-mattpocock-skills` in the plugin folder). Scaffold the per-repo configuration the other skills read. Every file it writes lives in `docs/dev-skills/`, the one folder only the skills use, so it never mixes with the repo's own docs; only `REVIEW.md` and the `## Agent skills` block in `CLAUDE.md` or `AGENTS.md` go at the repo root, where reviewers and coding agents expect them:
 
-- **Issue tracker**: GitHub Issues, in `docs/agents/issue-tracker.md`.
-- **Labels**: the 5 state roles and 2 category roles that `triage` uses, the optional agent-only role (one label per coding agent) when the user wants it, the `wayfinder:*` labels and the `parked` label (the tracker doc's **Park** operation uses it), in `docs/agents/triage-labels.md` and on the repo.
-- **Domain docs**: where `GLOSSARY.md` and ADRs live and how skills read them, in `docs/agents/domain.md`, plus the `docs/index.md` that lists the docs.
+- **Issue tracker**: GitHub Issues, in `docs/dev-skills/issue-tracker.md`.
+- **Labels**: the 5 state roles and 2 category roles that `triage` uses, the optional agent-only role (one label per coding agent) when the user wants it, the `wayfinder:*` labels and the `parked` label (the tracker doc's **Park** operation uses it), in `docs/dev-skills/triage-labels.md` and on the repo.
+- **Domain docs**: where the glossary (`docs/dev-skills/glossary.md`) and ADRs (`docs/dev-skills/adr/`) live and how skills read them, in `docs/dev-skills/domain.md`, plus the `docs/dev-skills/index.md` that lists the docs.
 - **Review rules**: a starter `REVIEW.md` at the repo root, where the repo's own review rules go.
-- **Releases**: where the version lives, who bumps it (the bump mode), the changelog path, the release label prefix, and for pull-requests-bump repos the Release name form and the whole-Release check, that `release` reads, in `docs/agents/release.md`, for a repo that cuts versioned Releases.
-- **Boundaries**: which irreversible actions agents may take, which need the user's approval, the resource budget, the check-in interval and the Milestone label form, in the Boundary record, `docs/agents/boundaries.md`.
+- **Releases**: where the version lives, who bumps it (the bump mode), the changelog path, the release label prefix, and for pull-requests-bump repos the Release name form and the whole-Release check, that `release` reads, in `docs/dev-skills/release.md`, for a repo that cuts versioned Releases.
+- **Boundaries**: which irreversible actions agents may take, which need the user's approval, the resource budget, the check-in interval and the Milestone label form, in the Boundary record, `docs/dev-skills/boundaries.md`.
 - **GitHub settings**: checked and reported, never changed.
 
 This is a prompt-driven skill, not a deterministic script. Explore, present what you found, confirm with the user, then write. It runs the same way on a fresh repo and on a re-run; a re-run shows a diff first (step 3).
@@ -26,13 +26,13 @@ Read whatever exists; assume nothing:
 - `git remote -v`: which host and which `<owner>/<repo>`? Take it from either URL form, `https://github.com/<owner>/<repo>(.git)` or `git@github.com:<owner>/<repo>(.git)`, and drop a trailing `.git`. Only GitHub is supported. If the remote is not GitHub, tell the user the plugin does not support that tracker yet, and stop.
 - Is the repo reachable? Run `gh api repos/<owner>/<repo>`. Use this REST call, not `gh repo view`: some cloud sessions have `gh` without GraphQL, and `gh repo view`, `gh issue view` and `gh label list` fail there with "GraphQL is not available", and so do the other `gh issue` subcommands (list, create, comment, edit, close): use the session's GitHub tools or the `gh api repos/<owner>/<repo>/issues...` REST routes. A session without `gh` uses the GitHub tools it has for the same reads and writes. If the repo cannot be reached, stop and tell the user what is missing.
 - `AGENTS.md` and `CLAUDE.md` at the repo root: does either exist? Is there already an `## Agent skills` section?
-- `GLOSSARY.md` and `GLOSSARY-MAP.md` at the repo root, and the legacy `CONTEXT.md` / `CONTEXT-MAP.md`. If a legacy file exists, offer to `git mv` it to its `GLOSSARY` name and rewrite those names in `docs/agents/domain.md`.
-- `docs/adr/` and any `src/*/docs/adr/` directories.
-- `docs/agents/`: do earlier output files exist? If so this is a re-run.
-- `docs/agents/release.md`, and the files a Release would touch: a version file (such as `package.json`, `pyproject.toml`, `Cargo.toml` or a plugin manifest) and a `CHANGELOG.md`.
-- `docs/agents/boundaries.md`: does the Boundary record exist, and which values has it filled in?
+- `docs/dev-skills/glossary.md` (the glossary, or its map once split), and the legacy `CONTEXT.md` / `CONTEXT-MAP.md` at the repo root. If a legacy file exists, offer to `git mv` it to `docs/dev-skills/glossary.md` (a `CONTEXT-MAP.md` becomes the map).
+- `docs/dev-skills/adr/` and any `src/*/docs/adr/` directories.
+- `docs/dev-skills/`: do earlier output files exist? If so this is a re-run.
+- `docs/dev-skills/release.md`, and the files a Release would touch: a version file (such as `package.json`, `pyproject.toml`, `Cargo.toml` or a plugin manifest) and a `CHANGELOG.md`.
+- `docs/dev-skills/boundaries.md`: does the Boundary record exist, and which values has it filled in?
 - `REVIEW.md` at the repo root: does it exist, and which of its sections (Important, Skip, Always check) does it have? An existing one is left as it is (step 3).
-- `docs/index.md`: the docs index, if one exists, and the other docs it should list (`REVIEW.md`, `CODING_STANDARDS.md`, `CONTRIBUTING.md`, `.out-of-scope/`, README files).
+- `docs/dev-skills/index.md`: the docs index, if one exists, and the other docs it should list (`REVIEW.md`, `CONTRIBUTING.md` at the root, in `docs/` or in `.github/`, `docs/dev-skills/out-of-scope/`, README files).
 - The repo's labels: `gh api repos/<owner>/<repo>/labels --paginate --jq '.[].name'`.
 - Monorepo signals: a `pnpm-workspace.yaml`, a `workspaces` field in `package.json`, or a populated `packages/*` with its own `src/`. Their absence means single-context, which is almost every repo.
 
@@ -42,7 +42,7 @@ Done when each item above is a fact or "none".
 
 Summarise what is present and what is missing. Take the sections in order, one answer each, leading with the recommended answer so the user can accept it in a word. Skip a section when exploration settled it.
 
-**Section A: Issue tracker.** GitHub, from the remote. Record it in `docs/agents/issue-tracker.md` with the repo's `<owner>/<repo>` filled in. The seed carries a "PRs as a request surface" flag, defaulted **off**. Leave it off and do not raise it; a user who wants external PRs in the triage queue can flip it later.
+**Section A: Issue tracker.** GitHub, from the remote. Record it in `docs/dev-skills/issue-tracker.md` with the repo's `<owner>/<repo>` filled in. The seed carries a "PRs as a request surface" flag, defaulted **off**. Leave it off and do not raise it; a user who wants external PRs in the triage queue can flip it later.
 
 **Section B: Triage label vocabulary.** Ask one question:
 
@@ -52,11 +52,11 @@ The defaults are the 5 state roles, `needs-triage`, `needs-info`, `ready-for-age
 
 Then ask one more question:
 
-> Do you want labels that mark an issue for one coding agent only, so that the other agent leaves it alone? (recommended: **yes** when `docs/agents/triage-labels.md` already has agent rows or more than one coding agent works the repo, else **no**)
+> Do you want labels that mark an issue for one coding agent only, so that the other agent leaves it alone? (recommended: **yes** when `docs/dev-skills/triage-labels.md` already has agent rows or more than one coding agent works the repo, else **no**)
 
-On **no**, the seed's agent-only section is left out of `docs/agents/triage-labels.md`. On **yes**, ask the user for each agent's label string (suggest `<agent>-only`), and fill the seed's agent-only table with one row per agent. Never guess agent names.
+On **no**, the seed's agent-only section is left out of `docs/dev-skills/triage-labels.md`. On **yes**, ask the user for each agent's label string (suggest `<agent>-only`), and fill the seed's agent-only table with one row per agent. Never guess agent names.
 
-**Section C: Domain docs.** Default to **single-context** (one `GLOSSARY.md` and `docs/adr/` at the repo root); write it without asking. Offer **multi-context** (a root `GLOSSARY-MAP.md` pointing to per-context `GLOSSARY.md` files) only when exploration found monorepo signals.
+**Section C: Domain docs.** Default to **single-context** (one `docs/dev-skills/glossary.md` and one `docs/dev-skills/adr/`); write it without asking. Offer **multi-context** (`docs/dev-skills/glossary.md` as a map pointing to a glossary beside each context's code) only when exploration found monorepo signals.
 
 **Section D: The repo's own rules for build threads.** Ask one question:
 
@@ -98,14 +98,14 @@ On a re-run, fill the fresh draft of the record from the existing record's value
 
 Build every file from the seeds in this folder:
 
-- [issue-tracker-github.md](./issue-tracker-github.md) becomes `docs/agents/issue-tracker.md`
-- [triage-labels.md](./triage-labels.md) becomes `docs/agents/triage-labels.md`
-- [domain.md](./domain.md) becomes `docs/agents/domain.md`
-- [release.md](./release.md) becomes `docs/agents/release.md`, only when Section E was **yes**
-- [boundaries.md](./boundaries.md) becomes `docs/agents/boundaries.md`
+- [issue-tracker-github.md](./issue-tracker-github.md) becomes `docs/dev-skills/issue-tracker.md`
+- [triage-labels.md](./triage-labels.md) becomes `docs/dev-skills/triage-labels.md`
+- [domain.md](./domain.md) becomes `docs/dev-skills/domain.md`
+- [release.md](./release.md) becomes `docs/dev-skills/release.md`, only when Section E was **yes**
+- [boundaries.md](./boundaries.md) becomes `docs/dev-skills/boundaries.md`
 - [review.md](./review.md) becomes `REVIEW.md` at the repo root, but only when the repo has none, first run or re-run. An existing `REVIEW.md` (one `retro` made, or the user's own) is never drafted over: nothing in it is removed or rewritten, and only a missing section of Important, Skip and Always check is offered, alone, as a diff; with all three present, report "no change".
 - the `## Agent skills` block (step 4)
-- `docs/index.md`, new or updated, listing every `docs/agents/` file, `REVIEW.md` (with a "read when reviewing a change or adding an Always check line" line) and every other doc found while exploring, by loading `docs-index` and applying its contract
+- `docs/dev-skills/index.md`, new or updated, listing every `docs/dev-skills/` file, `REVIEW.md` (with a "read when reviewing a change or adding an Always check line" line) and every other doc found while exploring, by loading `docs-index` and applying its contract
 
 On a re-run, diff each draft against the file in the repo. Keep the values the earlier run filled in (the repo link, the label strings, the PR flag, the release doc's values, including its bump mode, Release name form and whole-Release check, and the Boundary record's values) and change only what drifted from the seeds. Show the user the diff, or "no change" per file. The rules the user gave in Section D are drafted into the diff of the file they go in (`CLAUDE.md` or `AGENTS.md`, or `REVIEW.md`) and shown before writing; adding a line to an existing `REVIEW.md` is an addition, not a rewrite. Let the user edit before anything is written.
 
@@ -120,23 +120,23 @@ If an `## Agent skills` block already exists in the chosen file, update it in pl
 ```markdown
 ## Agent skills
 
-Start at `docs/index.md`; it says which doc to read for what.
+Start at `docs/dev-skills/index.md`; it says which doc to read for what.
 
 ### Issue tracker
 
-[one-line summary of where issues are tracked]. See `docs/agents/issue-tracker.md`.
+[one-line summary of where issues are tracked]. See `docs/dev-skills/issue-tracker.md`.
 
 ### Triage labels
 
-[one-line summary of the label vocabulary, for example "5 state roles + 2 category roles: ...", plus the agent-only labels when the repo has them]. See `docs/agents/triage-labels.md`.
+[one-line summary of the label vocabulary, for example "5 state roles + 2 category roles: ...", plus the agent-only labels when the repo has them]. See `docs/dev-skills/triage-labels.md`.
 
 ### Domain docs
 
-[one-line summary of layout: "single-context" or "multi-context"]. See `docs/agents/domain.md`.
+[one-line summary of layout: "single-context" or "multi-context"]. See `docs/dev-skills/domain.md`.
 
 ### Releases
 
-[one-line summary: the version file, the bump mode (Releases bump or pull requests bump) and the release label prefix]. See `docs/agents/release.md`.
+[one-line summary: the version file, the bump mode (Releases bump or pull requests bump) and the release label prefix]. See `docs/dev-skills/release.md`.
 ```
 
 Leave out the `### Releases` part when the repo has no release doc.
@@ -146,10 +146,10 @@ Add a `### Boundaries` part to the block, after `### Domain docs` and before `##
 ```markdown
 ### Boundaries
 
-[one-line summary: what needs the user's approval ("nothing" if empty), the budget and the check-in interval]. See `docs/agents/boundaries.md`.
+[one-line summary: what needs the user's approval ("nothing" if empty), the budget and the check-in interval]. See `docs/dev-skills/boundaries.md`.
 ```
 
-Then write the approved files, and `docs/index.md` last.
+Then write the approved files, and `docs/dev-skills/index.md` last.
 
 **Create the labels.** Create every label the skills use that the repo lacks, whether or not `triage` is installed: the label string of each of the 5 state roles, `bug` and `enhancement`, each agent-only label from the table (only when Section B was **yes**), and `wayfinder:map`, `wayfinder:research`, `wayfinder:prototype`, `wayfinder:grilling`, `wayfinder:task` and `parked`. Use `gh api --method POST repos/<owner>/<repo>/labels -f name=<label>` (or the session's GitHub tools); `gh label create` needs GraphQL. Leave `retro`, `retro-planning` and the release labels alone: `retro`, `retro-planning` and `release` create them when first needed.
 
@@ -171,4 +171,4 @@ Done when each row is "ok", a failure with its effect, or "not checked" with the
 
 ### 6. Done
 
-Tell the user the setup is complete, which files changed, which labels were created, and the settings report. Mention they can edit `docs/agents/*.md` directly; re-run this skill to bring the files up to date after the plugin changes them, or to switch to other label names. Then, if the project's instructions do not yet cover this repo, offer `setup-project`, which drafts them for the coordinator.
+Tell the user the setup is complete, which files changed, which labels were created, and the settings report. Mention they can edit `docs/dev-skills/*.md` directly; re-run this skill to bring the files up to date after the plugin changes them, or to switch to other label names. Then, if the project's instructions do not yet cover this repo, offer `setup-project`, which drafts them for the coordinator.

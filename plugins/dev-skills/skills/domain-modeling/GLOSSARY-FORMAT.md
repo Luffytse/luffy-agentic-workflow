@@ -1,4 +1,4 @@
-# GLOSSARY.md Format
+# Glossary Format
 
 ## Structure
 
@@ -31,24 +31,24 @@ _Avoid_: Client, buyer, account
 
 ## Single glossary, or one page per Area
 
-A repo starts with one root `GLOSSARY.md`. When it passes about 10 KB, `domain-modeling` splits it into one page per Area at `docs/glossary/<area>.md`, with a root `GLOSSARY-MAP.md` listing the pages (see "Splitting the glossary" in [SKILL.md](./SKILL.md)). The root `GLOSSARY.md` is removed. A page uses the same structure as above, with the Area as its title. Load `docs-index` when updating the index after a glossary split.
+A repo starts with one glossary, `docs/dev-skills/glossary.md`. When it passes about 10 KB, `domain-modeling` splits it into one page per Area at `docs/dev-skills/glossary/<area>.md`, and `docs/dev-skills/glossary.md` becomes the map listing the pages (see "Splitting the glossary" in [SKILL.md](./SKILL.md)). The entry point keeps its path; only its content changes from terms to the map. A page uses the same structure as above, with the Area as its title. Load `docs-index` when updating the index after a glossary split.
 
-A map that points at `docs/glossary/` lists Area pages of one glossary. The map format below also covers multi-context repos, where the map points into `src/` and the pages live next to the code.
+A map that points at `docs/dev-skills/glossary/` lists Area pages of one glossary. The map format below also covers multi-context repos, where the map points into `src/` and the pages live next to the code.
 
 ## Single vs multi-context repos
 
-**Single context (most repos):** One `GLOSSARY.md` at the repo root.
+**Single context (most repos):** `docs/dev-skills/glossary.md` holds the terms.
 
-**Area pages or multiple contexts:** A `GLOSSARY-MAP.md` at the repo root lists the pages (Areas) or contexts, where they live, and how they relate to each other:
+**Area pages or multiple contexts:** `docs/dev-skills/glossary.md` is the map. It lists the pages (Areas) or contexts, where they live, and how they relate to each other:
 
 ```md
 # Glossary Map
 
 ## Contexts
 
-- [Ordering](./docs/glossary/ordering.md): receives and tracks customer orders
-- [Billing](./docs/glossary/billing.md): generates invoices and processes payments
-- [Fulfillment](./docs/glossary/fulfillment.md): manages warehouse picking and shipping
+- [Ordering](./glossary/ordering.md): receives and tracks customer orders
+- [Billing](./glossary/billing.md): generates invoices and processes payments
+- [Fulfillment](./glossary/fulfillment.md): manages warehouse picking and shipping
 
 ## Relationships
 
@@ -57,12 +57,12 @@ A map that points at `docs/glossary/` lists Area pages of one glossary. The map 
 - **Ordering ↔ Billing**: Shared types for `CustomerId` and `Money`
 ```
 
-(In a multi-context repo the links point at `./src/<context>/GLOSSARY.md` instead.)
+(In a multi-context repo the links point at `../../src/<context>/GLOSSARY.md` instead.)
 
 The skill infers which structure applies:
 
-- If `GLOSSARY-MAP.md` exists, read it. If it points into `src/`, the repo is multi-context; if it points at `docs/glossary/`, it lists Area pages of one glossary
-- If only a root `GLOSSARY.md` exists, single context
-- If neither exists, create a root `GLOSSARY.md` lazily when the first term is resolved
+- If `docs/dev-skills/glossary.md` is a map (it lists pages, not terms), read it. If it points into `src/`, the repo is multi-context; if it points at `docs/dev-skills/glossary/`, it lists Area pages of one glossary
+- If it holds terms, single context
+- If it does not exist, create it lazily when the first term is resolved
 
 When there are several pages, infer which one the current topic relates to. If unclear, ask which Area (or, in a multi-context repo, which context).

@@ -6,7 +6,7 @@ user-invocable: false
 
 # Docs Index
 
-Each repo keeps one **docs index**, `docs/index.md`. It lists the docs the skills keep in the repo, so an agent can open only the ones that fit its work instead of loading them all.
+Each repo keeps one **docs index**, `docs/dev-skills/index.md`, in the folder only the skills use. It lists the docs the skills keep in the repo and the repo's own docs an agent may need, inside that folder and outside it, so an agent can open only the ones that fit its work instead of loading them all.
 
 ## Format
 
@@ -18,23 +18,23 @@ Keep each line to one sentence of "what" and one "Read when". The "Read when" is
 
 ## What is listed
 
-Listed: glossary pages (or `GLOSSARY-MAP.md`), ADRs, `docs/agents/` setup files, `.out-of-scope/` notes, `REVIEW.md`, `CODING_STANDARDS.md`, `CONTRIBUTING.md`, README files, and research notes that are merged.
+Listed: the glossary `docs/dev-skills/glossary.md` (the map, once split) and its Area pages in `docs/dev-skills/glossary/`, ADRs in `docs/dev-skills/adr/`, the setup files in `docs/dev-skills/`, notes in `docs/dev-skills/out-of-scope/`, `REVIEW.md` at the repo root, `CONTRIBUTING.md` wherever the repo keeps it, README files, and research notes that are merged.
 
-In a multi-context repo, per-context glossaries and per-context ADR folders also get lines in the one root `docs/index.md`.
+In a multi-context repo, per-context glossaries and per-context ADR folders also get lines in the one `docs/dev-skills/index.md`.
 
 Not listed: `CLAUDE.md` and `AGENTS.md` files, `SKILL.md` files, code, and specs, tickets and review comments that live on the issue tracker. Research findings on a throwaway branch that is never merged get no line; a note committed to a branch that merges does. Test fixtures (data an eval or test runs against) are not listed either, even when they are Markdown files: the doc that describes a fixture gets a line, the fixture's own files get none.
 
 ## How agents read it
 
-Read `CLAUDE.md` (or `AGENTS.md`) and `docs/index.md`, then open only the docs whose line fits the work. If the repo has no `docs/index.md`, fall back to `GLOSSARY.md` (or `GLOSSARY-MAP.md`) and `docs/adr/`.
+Read `CLAUDE.md` (or `AGENTS.md`) and `docs/dev-skills/index.md`, then open only the docs whose line fits the work. If the repo has no `docs/dev-skills/index.md`, fall back to `docs/dev-skills/glossary.md` and `docs/dev-skills/adr/`.
 
 ## Update rule
 
-Any skill that creates or edits a doc updates `docs/index.md` in the same commit:
+Any skill that creates or edits a doc updates `docs/dev-skills/index.md` in the same commit:
 
 - A **new doc** gets a line under its Area.
 - An **edited doc** gets its line fixed if its subject changed.
 - A **superseded ADR's** line says which ADR replaced it.
 - A **deleted or renamed doc** has its line removed or re-pointed.
 
-If there is no `docs/index.md` when a skill writes a doc, create it in the same commit, with a line for every doc of the kinds listed above that already exists.
+If there is no `docs/dev-skills/index.md` when a skill writes a doc, create it in the same commit, with a line for every doc of the kinds listed above that already exists.

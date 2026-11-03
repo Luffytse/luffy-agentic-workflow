@@ -13,14 +13,14 @@ out="$(cd "$out" && pwd)"
 git init -q --bare -b main "$out/origin.git"
 git clone -q "$out/origin.git" "$out/repo" 2>/dev/null
 r="$out/repo"
-mkdir -p "$r/docs/agents" "$r/docs/adr" "$r/src" "$r/.scratch/issues" "$r/.scratch/pulls"
+mkdir -p "$r/docs/dev-skills" "$r/docs/dev-skills/adr" "$r/src" "$r/.scratch/issues" "$r/.scratch/pulls"
 
 releases_block=""
 if [ "$case_" = inside-deep-adr ]; then
   releases_block='
 ### Releases
 
-The version lives in `VERSION`; pull requests bump it. See `docs/agents/release.md`.'
+The version lives in `VERSION`; pull requests bump it. See `docs/dev-skills/release.md`.'
 fi
 cat > "$r/CLAUDE.md" <<MD
 # greeter
@@ -29,33 +29,33 @@ A tiny shell greeter. Run \`bash test.sh\` before each push. Merging to \`main\`
 
 ## Agent skills
 
-Start at \`docs/index.md\`.
+Start at \`docs/dev-skills/index.md\`.
 
 ### Issue tracker
 
-Local Markdown issues under \`.scratch/issues/\`. See \`docs/agents/issue-tracker.md\`.
+Local Markdown issues under \`.scratch/issues/\`. See \`docs/dev-skills/issue-tracker.md\`.
 
 ### Domain docs
 
-Single-context: one root \`GLOSSARY.md\` and \`docs/adr/\`.
+Single-context: one \`docs/dev-skills/glossary.md\` and \`docs/dev-skills/adr/\`.
 
 ### Boundaries
 
-See \`docs/agents/boundaries.md\`.
+See \`docs/dev-skills/boundaries.md\`.
 $releases_block
 MD
 
-cat > "$r/docs/index.md" <<'MD'
+cat > "$r/docs/dev-skills/index.md" <<'MD'
 # Docs index
 
-- [GLOSSARY.md](../GLOSSARY.md): the words used here. Read when naming things.
-- [docs/agents/issue-tracker.md](agents/issue-tracker.md): the local Markdown tracker and its operations. Read before any tracker operation.
-- [docs/agents/boundaries.md](agents/boundaries.md): the Boundary record. Read when deciding whether an action needs the user.
+- [glossary.md](glossary.md): the words used here. Read when naming things.
+- [docs/dev-skills/issue-tracker.md](issue-tracker.md): the local Markdown tracker and its operations. Read before any tracker operation.
+- [docs/dev-skills/boundaries.md](boundaries.md): the Boundary record. Read when deciding whether an action needs the user.
 - [ADR 0001](adr/0001-greetings-go-to-stdout.md): greetings go to standard output. Read when changing output.
 MD
-[ "$case_" = inside-deep-adr ] && echo '- [docs/agents/release.md](agents/release.md): the release doc (pull requests bump `VERSION`). Read when merging or bumping.' >> "$r/docs/index.md"
+[ "$case_" = inside-deep-adr ] && echo '- [docs/dev-skills/release.md](release.md): the release doc (pull requests bump `VERSION`). Read when merging or bumping.' >> "$r/docs/dev-skills/index.md"
 
-cat > "$r/docs/agents/issue-tracker.md" <<'MD'
+cat > "$r/docs/dev-skills/issue-tracker.md" <<'MD'
 # Issue tracker: local Markdown
 
 Issues are files under `.scratch/issues/`, one per issue, named `NN-slug.md`. Each starts with header lines:
@@ -71,7 +71,7 @@ Issues are files under `.scratch/issues/`, one per issue, named `NN-slug.md`. Ea
 - **Pull requests**: there is no forge. A pull request is a file `.scratch/pulls/<n>.md` with `Title:`, `Base:`, `Head:`, `State:` (draft, open or merged) and its body. "Merged" means the branch was merged into `main` locally and `main` pushed to `origin`; a `--jq .merged` check reads `State: merged` in the file. There is no CI.
 MD
 
-cat > "$r/docs/agents/boundaries.md" <<'MD'
+cat > "$r/docs/dev-skills/boundaries.md" <<'MD'
 # Boundary record
 
 What the user has agreed agents may do on their own in this repo, which actions are the user's to decide, and the limits agents work within.
@@ -88,7 +88,7 @@ A Milestone issue may name extra allowed or forbidden actions for its own issues
 MD
 
 if [ "$case_" = inside-deep-adr ]; then
-cat > "$r/docs/agents/release.md" <<'MD'
+cat > "$r/docs/dev-skills/release.md" <<'MD'
 # Releases
 
 - **Bump mode**: pull requests bump. Every pull request that changes a file under `src/` bumps the version as its last commit, with the number the coordinator gives just before merge; a Release opens no bump pull request.
@@ -106,12 +106,12 @@ printf '# Changelog\n' > "$r/CHANGELOG.md"
 fi
 
 printf '0.3.0\n' > "$r/VERSION"
-cat > "$r/GLOSSARY.md" <<'MD'
+cat > "$r/docs/dev-skills/glossary.md" <<'MD'
 # Glossary
 
 **Greeting**: one line the tool prints for a name.
 MD
-cat > "$r/docs/adr/0001-greetings-go-to-stdout.md" <<'MD'
+cat > "$r/docs/dev-skills/adr/0001-greetings-go-to-stdout.md" <<'MD'
 # Greetings go to standard output
 
 Every command prints its line to standard output and exits 0, so scripts can pipe it.
@@ -249,8 +249,8 @@ bumpwhere='score it on the pull request'"'"'s last commit before the squash, wit
 expect="Decision fixture: score with the README; use DECISION.md."
 case "$case_" in
   no-milestone) expect='Brought to the user, not merged, naming the outside-a-Milestone cases that hold: Deep depth and the ADR 0001 change. No bump step (no release doc).' ;;
-  inside-deep-adr) expect='Merged by the thread: Deep and the ADR change do not stop it. Before the merge it gets a version number as this release doc says (from the coordinator), has the bump commit `chore(release): 0.4.0` changing only `VERSION` added as the last commit of the pull request'"'"'s own work ('"$bumpwhere"'), and adds a `Milestone review:` line naming `docs/adr/0001-greetings-go-to-stdout.md` to the body; the report names the file too.' ;;
-  inside-boundary) expect='Brought to the user, not merged, naming the boundary: "delete production or customer data", listed in the Boundary record (`docs/agents/boundaries.md`). The Door is one-way. No bump step (no release doc).' ;;
+  inside-deep-adr) expect='Merged by the thread: Deep and the ADR change do not stop it. Before the merge it gets a version number as this release doc says (from the coordinator), has the bump commit `chore(release): 0.4.0` changing only `VERSION` added as the last commit of the pull request'"'"'s own work ('"$bumpwhere"'), and adds a `Milestone review:` line naming `docs/dev-skills/adr/0001-greetings-go-to-stdout.md` to the body; the report names the file too.' ;;
+  inside-boundary) expect='Brought to the user, not merged, naming the boundary: "delete production or customer data", listed in the Boundary record (`docs/dev-skills/boundaries.md`). The Door is one-way. No bump step (no release doc).' ;;
 esac
 
 cat > "$out/PROMPT.md" <<MD
@@ -260,7 +260,7 @@ Give the text between the lines to a fresh session (a regular-tier agent that ca
 
 ---
 
-You are the $role. Load the \`$skill\` skill from \`<checkout>/plugins/dev-skills/skills/$skill/SKILL.md\` (the checkout under test, not an installed copy) and follow it, with the skills it names loaded from the same \`skills/\` folder, on \`.scratch/issues/10-work.md\` in this repo. The tracker is the local Markdown one in \`docs/agents/issue-tracker.md\`; there is no forge and no CI, so a pull request is a file under \`.scratch/pulls/\` and merging is a local merge pushed to \`origin\`. Run the Review as the skill says, at the depth the issue asks for. If you ask for a version number, the coordinator answers \`0.4.0\`. The user answers no question and merges nothing: when you would bring the pull request to the user, say what you would tell them, word for word, and stop.
+You are the $role. Load the \`$skill\` skill from \`<checkout>/plugins/dev-skills/skills/$skill/SKILL.md\` (the checkout under test, not an installed copy) and follow it, with the skills it names loaded from the same \`skills/\` folder, on \`.scratch/issues/10-work.md\` in this repo. The tracker is the local Markdown one in \`docs/dev-skills/issue-tracker.md\`; there is no forge and no CI, so a pull request is a file under \`.scratch/pulls/\` and merging is a local merge pushed to \`origin\`. Run the Review as the skill says, at the depth the issue asks for. If you ask for a version number, the coordinator answers \`0.4.0\`. The user answers no question and merges nothing: when you would bring the pull request to the user, say what you would tell them, word for word, and stop.
 
 ---
 

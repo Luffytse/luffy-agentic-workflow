@@ -12,7 +12,7 @@ The coordinator runs this skill whenever it delivers planned work: a whole Miles
 - **Inside a Milestone** (an open Milestone issue, as `milestone`'s **No Milestone** test reads it): its features in build order, its order rule (one at a time, or up to some number at once) and its boundaries, from the Milestone issue. Delivery starts only once `milestone`'s planning has settled and the latest Startup verification result on the Milestone issue reads `Verdict: ready`, or, after a failed one, the user's word to go on is recorded there, naming each failed capability. If that result's Runtime line plainly names another environment than this one, tell the user.
 - **No Milestone:** the user's word and the current release issue: its labelled issues, in the order it gives. Before relying on a check-in or a stop, run `worker-control`'s check here unless a result for this Harness exists, and name each failed capability to the user, who says how to go on.
 
-The project's own instructions add their thread limit, tier map and what else a brief carries. Do every tracker read and write with the tracker doc's operations (`docs/agents/issue-tracker.md`), cited by name below.
+The project's own instructions add their thread limit, tier map and what else a brief carries. Do every tracker read and write with the tracker doc's operations (`docs/dev-skills/issue-tracker.md`), cited by name below.
 
 ## Wakes
 
@@ -49,7 +49,7 @@ Start nothing while a pause is in effect or a merge-time step holds further star
 
 ## 4. Merge-time steps
 
-A build worker merges its own pull request (the build skills say when). Where the repo's own docs (its `CLAUDE.md` or `AGENTS.md` and the release doc they point to) give steps for the coordinator at or after a merge, take them as those docs say, at the wake where a worker asks or reports and at any later wake while the docs say a request still waits. This skill states none of them. A step those docs say holds further starts holds the slots until it is done. Where they give none, tell a worker that asks to merge with no extra step.
+A build worker merges its own pull request (the build skills say when). Where the repo's own docs (its `CLAUDE.md` or `AGENTS.md` and the release doc, `docs/dev-skills/release.md`) give steps for the coordinator at or after a merge, take them as those docs say, at the wake where a worker asks or reports and at any later wake while the docs say a request still waits. This skill states none of them. A step those docs say holds further starts holds the slots until it is done. Where they give none, tell a worker that asks to merge with no extra step.
 
 ## 5. The check-in (Stand-up)
 

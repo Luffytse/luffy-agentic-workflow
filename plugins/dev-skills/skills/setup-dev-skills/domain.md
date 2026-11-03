@@ -4,48 +4,52 @@ How the engineering skills should consume this repo's domain documentation when 
 
 ## Before exploring, read these
 
-- **`docs/index.md`**: start here. It lists the repo's docs by Area, each with a "read when..." line. Open only the docs whose line fits your work.
-- If there is no `docs/index.md`, fall back to:
-  - **`GLOSSARY.md`** at the repo root, or **`GLOSSARY-MAP.md`** at the repo root if it exists: it points at one glossary page per Area (or per context). Read each one relevant to the topic.
-  - **`docs/adr/`**: read ADRs that touch the area you're about to work in. In multi-context repos, also check `src/<context>/docs/adr/` for context-scoped decisions.
+- **`docs/dev-skills/index.md`**: start here. It lists the repo's docs by Area, each with a "read when..." line. Open only the docs whose line fits your work.
+- If there is no `docs/dev-skills/index.md`, fall back to:
+  - **`docs/dev-skills/glossary.md`**: the glossary, or, once it is split, the map that points at one glossary page per Area (or per context). Read each one relevant to the topic.
+  - **`docs/dev-skills/adr/`**: read ADRs that touch the area you're about to work in. In multi-context repos, also check `src/<context>/docs/adr/` for context-scoped decisions.
 
 If any of these files don't exist, **proceed silently**. Don't flag their absence; don't suggest creating them upfront. The `domain-modeling` skill (reached via `grill-with-docs` and `improve-codebase-architecture`) creates them lazily when terms or decisions actually get resolved. When writing a doc, load `docs-index` and apply its contract.
 
 ## File structure
 
-Small repo (most repos):
+Every file the skills keep lives under `docs/dev-skills/`, so it never mixes with the repo's own docs. Small repo (most repos):
 
 ```
 /
-├── GLOSSARY.md
 ├── docs/
-│   ├── index.md
-│   └── adr/
-│       ├── 0001-<decision-title>.md
-│       └── 0002-<decision-title>.md
+│   └── dev-skills/
+│       ├── index.md
+│       ├── glossary.md
+│       └── adr/
+│           ├── 0001-<decision-title>.md
+│           └── 0002-<decision-title>.md
 └── src/
 ```
 
-Once `GLOSSARY.md` passes about 10 KB, `domain-modeling` splits it into one page per Area. The repo keeps one `docs/adr/`:
+Once `glossary.md` passes about 10 KB, `domain-modeling` splits it into one page per Area, and `glossary.md` stays the entry point as the map. The repo keeps one `docs/dev-skills/adr/`:
 
 ```
 /
-├── GLOSSARY-MAP.md                    ← lists one page per Area
 ├── docs/
-│   ├── index.md                       ← links GLOSSARY-MAP.md
-│   ├── glossary/
-│   │   ├── ordering.md
-│   │   └── billing.md
-│   └── adr/
+│   └── dev-skills/
+│       ├── index.md                   ← links glossary.md and each page
+│       ├── glossary.md                ← the map: one page per Area
+│       ├── glossary/
+│       │   ├── ordering.md
+│       │   └── billing.md
+│       └── adr/
 └── src/
 ```
 
-Multi-context repo (a `GLOSSARY-MAP.md` that points into `src/`):
+Multi-context repo (a `glossary.md` map that points into `src/`):
 
 ```
 /
-├── GLOSSARY-MAP.md
-├── docs/adr/                          ← system-wide decisions
+├── docs/
+│   └── dev-skills/
+│       ├── glossary.md                ← the map: one entry per context
+│       └── adr/                       ← system-wide decisions
 └── src/
     ├── ordering/
     │   ├── GLOSSARY.md

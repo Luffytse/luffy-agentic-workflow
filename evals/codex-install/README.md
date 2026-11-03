@@ -38,6 +38,6 @@ With app-server, create `thread/start` in the fixture with `ephemeral: true`, `a
 
 ## Record and clean up
 
-Add a dated entry to RESULTS with source/ref/SHA, CLI and model versions, install/list observations, the complete discovered set and comparison, exact interview turns, completion status, limitations, and issue links. File each actual portability problem in the user's tracker with `needs-triage` and `codex-only` when appropriate; follow [the tracker rules](../../docs/agents/issue-tracker.md), apply no release label, and fix no skill text in this eval change. If none occurs, say none; do not infer that unexercised skills work.
+Add a dated entry to RESULTS with source/ref/SHA, CLI and model versions, install/list observations, the complete discovered set and comparison, exact interview turns, completion status, limitations, and issue links. File each actual portability problem in the user's tracker with `needs-triage` and `codex-only` when appropriate; follow [the tracker rules](../../docs/dev-skills/issue-tracker.md), apply no release label, and fix no skill text in this eval change. If none occurs, say none; do not infer that unexercised skills work.
 
 Repeat with a second newly created home and fixture. Stop app-server processes and remove temporary authentication and other test material after recording sanitized evidence. Cleanup is reversible test housekeeping; the live installation remains untouched. No extra automated tests are needed for these documentation records.

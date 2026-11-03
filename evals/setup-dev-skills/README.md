@@ -1,6 +1,6 @@
 # setup-dev-skills eval
 
-A fixture run that checks `setup-dev-skills` asks for the Boundary record's values and writes the record from its seed. Rerun when the skill's Section F, its `boundaries.md` seed or its re-run diff changes.
+A fixture run that checks `setup-dev-skills` asks for the Boundary record's values and writes the record from its seed, and that every file it writes lands in `docs/dev-skills/` with only `REVIEW.md` and the `CLAUDE.md` block at the root. Rerun when the skill's Section F, its `boundaries.md` seed, the paths it writes or its re-run diff changes.
 
 ## Fixture
 
@@ -21,6 +21,7 @@ The user answers in section order, the way the skill asks:
 ## Pass
 
 - Section F asks one question per value, each leading with a recommended answer.
-- `docs/agents/boundaries.md` holds the five values and the Milestone-issue rule; the three values the user gave replace the seed's placeholders, and the check-in interval and label form stay at the recommended answers.
-- The `## Agent skills` block has a `### Boundaries` part, and `docs/index.md` lists the record with a "read when" line.
-- A re-run shows no change to the three values the user gave, and asks again only for a value the record lacks.
+- `docs/dev-skills/boundaries.md` holds the five values and the Milestone-issue rule; the three values the user gave replace the seed's placeholders, and the check-in interval and label form stay at the recommended answers.
+- The `## Agent skills` block has a `### Boundaries` part, and `docs/dev-skills/index.md` lists the record with a "read when" line.
+- Every file written lands under `docs/dev-skills/` (the issue-tracker, triage-label and domain docs, the Boundary record and `index.md`), except the starter `REVIEW.md` at the repo root and the `CLAUDE.md` block; the block points at `docs/dev-skills/index.md`, and nothing else is written under `docs/` or at the root.
+- A re-run shows no change to the three values the user gave, asks again only for a value the record lacks, and reports "no change" for every file.

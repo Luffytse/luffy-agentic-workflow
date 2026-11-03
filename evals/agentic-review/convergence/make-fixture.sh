@@ -28,7 +28,7 @@ git -C "$r" init -q -b main
 git -C "$r" config user.name fixture
 git -C "$r" config user.email fixture@example.invalid
 echo ".scratch/" >> "$r/.git/info/exclude"
-mkdir -p "$r/docs/agents" "$r/src" "$r/tests" "$r/.scratch/issues" "$r/.scratch/pulls"
+mkdir -p "$r/docs/dev-skills" "$r/src" "$r/tests" "$r/.scratch/issues" "$r/.scratch/pulls"
 commit() { git -C "$r" add -A && git -C "$r" commit -q -m "$1" && git -C "$r" rev-parse HEAD; }
 
 cat > "$r/CLAUDE.md" <<'MD'
@@ -38,15 +38,15 @@ A household shopping list kept as a plain text file, one item per line, with sma
 
 ## Agent skills
 
-Start at `docs/index.md`.
+Start at `docs/dev-skills/index.md`.
 
 ### Issue tracker
 
-Local Markdown issues under `.scratch/issues/`, pull requests under `.scratch/pulls/`. See `docs/agents/issue-tracker.md`.
+Local Markdown issues under `.scratch/issues/`, pull requests under `.scratch/pulls/`. See `docs/dev-skills/issue-tracker.md`.
 
 ### Boundaries
 
-See `docs/agents/boundaries.md`.
+See `docs/dev-skills/boundaries.md`.
 MD
 
 cat > "$r/REVIEW.md" <<'MD'
@@ -63,14 +63,14 @@ cat > "$r/README.md" <<'MD'
 The list lives in a text file, one item per line. The list file is created when the first item is added (`src/add.sh`).
 MD
 
-cat > "$r/docs/index.md" <<'MD'
+cat > "$r/docs/dev-skills/index.md" <<'MD'
 # Docs index
 
-- [docs/agents/issue-tracker.md](agents/issue-tracker.md): the local Markdown tracker and its operations. Read before any tracker operation.
-- [docs/agents/boundaries.md](agents/boundaries.md): the Boundary record. Read when deciding whether an action needs the user, or whether work is inside a Milestone.
+- [docs/dev-skills/issue-tracker.md](issue-tracker.md): the local Markdown tracker and its operations. Read before any tracker operation.
+- [docs/dev-skills/boundaries.md](boundaries.md): the Boundary record. Read when deciding whether an action needs the user, or whether work is inside a Milestone.
 MD
 
-cat > "$r/docs/agents/issue-tracker.md" <<'MD'
+cat > "$r/docs/dev-skills/issue-tracker.md" <<'MD'
 # Issue tracker: local Markdown
 
 Issues are files under `.scratch/issues/`, one per issue, named `NN-slug.md`. Each starts with header lines:
@@ -82,7 +82,7 @@ Issues are files under `.scratch/issues/`, one per issue, named `NN-slug.md`. Ea
 - **Pull requests**: there is no forge. A pull request is a file `.scratch/pulls/<n>.md` with `Title:`, `Base:`, `Head:`, `State:` and its body. Its comments are files `.scratch/pulls/<n>/NN-<slug>.md`, in order; editing a comment means editing its file. There is no CI.
 MD
 
-cat > "$r/docs/agents/boundaries.md" <<'MD'
+cat > "$r/docs/dev-skills/boundaries.md" <<'MD'
 # Boundary record
 
 What the user has agreed agents may do on their own in this repo, which actions are the user's to decide, and the limits agents work within.
@@ -433,7 +433,7 @@ Give the text between the lines to a fresh top-level session, working directory 
 
 ---
 
-You run the \`agentic-review\` skill from \`<checkout>/plugins/dev-skills/skills/agentic-review/SKILL.md\` (the checkout under test, not an installed copy), with the skills it names loaded from the same \`skills/\` folder, on pull request \`.scratch/pulls/$pr.md\` in this repo, which builds \`$issue\`. The tracker is the local Markdown one in \`docs/agents/issue-tracker.md\`; there is no forge and no CI. The earlier Rounds are recorded under \`.scratch/pulls/$pr/\`. $heads Round $round's Find and Verify have run at Standard depth: Verify's results are below. Carry on from Rank: write the Round $round comment as \`.scratch/pulls/$pr/0$round-round-$round.md\` and do every step the skill gives after it, through the end of this Round. The owner of the code commits nothing in this run: when the skill has the owner fix or commit, say what it would do and stop there, without starting another Round. Start no subagents. The user answers no question: when you would put a question to the user, write it word for word and stop. End with your report to the caller.
+You run the \`agentic-review\` skill from \`<checkout>/plugins/dev-skills/skills/agentic-review/SKILL.md\` (the checkout under test, not an installed copy), with the skills it names loaded from the same \`skills/\` folder, on pull request \`.scratch/pulls/$pr.md\` in this repo, which builds \`$issue\`. The tracker is the local Markdown one in \`docs/dev-skills/issue-tracker.md\`; there is no forge and no CI. The earlier Rounds are recorded under \`.scratch/pulls/$pr/\`. $heads Round $round's Find and Verify have run at Standard depth: Verify's results are below. Carry on from Rank: write the Round $round comment as \`.scratch/pulls/$pr/0$round-round-$round.md\` and do every step the skill gives after it, through the end of this Round. The owner of the code commits nothing in this run: when the skill has the owner fix or commit, say what it would do and stop there, without starting another Round. Start no subagents. The user answers no question: when you would put a question to the user, write it word for word and stop. End with your report to the caller.
 
 $findings
 

@@ -49,7 +49,7 @@ Use this template for writing the PR body:
 
 ## Sections
 
-Skip all preambles and keep prose brief. Use the user's domain language from the glossary: start at `docs/index.md` and open only the docs that fit (with no index, fall back to `GLOSSARY.md` or `GLOSSARY-MAP.md`, and `docs/adr/`).
+Skip all preambles and keep prose brief. Use the user's domain language from the glossary: start at `docs/dev-skills/index.md` and open only the docs that fit (with no index, fall back to `docs/dev-skills/glossary.md` and `docs/dev-skills/adr/`).
 
 ### Summary
 

@@ -11,7 +11,7 @@ Trip members type in who paid what. We want to split the total evenly and tell e
 - `split.settle(balances)` returns transfers `(debtor, creditor, cents)` that bring every balance to zero, for any number of debtors and creditors.
 - `report.render_summary_html(title, expenses, transfers)` renders the summary page. The page is shared with the whole group as a link, and every name and description in it was typed by a trip member.
 - A command, `python3 -m splitter.cli TOTAL NAME...`, that prints each person's share.
-- A short doc, `docs/splitting.md`, explaining the split rule. Every doc gets a line in `docs/index.md`.
+- A short doc, `docs/splitting.md`, explaining the split rule. Every doc gets a line in `docs/dev-skills/index.md`.
 
 ## Out of scope
 

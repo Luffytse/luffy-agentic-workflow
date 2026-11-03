@@ -138,12 +138,12 @@ fi
 
 # release-files: the release skill and the release docs it reads exist (presence only; the skill's text is
 # covered by repo-free-skill-text)
-for f in "$skills/release/SKILL.md" "$skills/setup-dev-skills/release.md" "$repo/docs/agents/release.md"; do
+for f in "$skills/release/SKILL.md" "$skills/setup-dev-skills/release.md" "$repo/docs/dev-skills/release.md"; do
   [ -f "$f" ] || bad "missing ${f#"$repo"/}"
 done
 
 # boundary-files: the Boundary record seed that setup-dev-skills writes from, and this repo's own record (presence only)
-for f in "$skills/setup-dev-skills/boundaries.md" "$repo/docs/agents/boundaries.md"; do
+for f in "$skills/setup-dev-skills/boundaries.md" "$repo/docs/dev-skills/boundaries.md"; do
   [ -f "$f" ] || bad "missing ${f#"$repo"/}"
 done
 
@@ -187,14 +187,14 @@ fi
 
 # no-person-names: no person's name in skill or doc text: text says "the user", never the maintainer's name.
 # The marketplace and repo names (luffy-dev, luffy-dev-skills), the GitHub owner Luffytse and the project name
-# luffydev are not people. Checks skills/ and the plugin README, and the repo's CLAUDE.md, GLOSSARY.md and
-# docs/ (all of it). Not the manifests (author fields) or dai-portal-data.
+# luffydev are not people. Checks skills/ and the plugin README, and the repo's CLAUDE.md and
+# docs/ (all of it, the glossary in docs/dev-skills/ included). Not the manifests (author fields) or dai-portal-data.
 # Paths are relative to each root (in a subshell, so cwd is unchanged), so a checkout under a path
 # such as ~/ cannot trip the check. awk keeps the script portable (no GNU-only flags).
 name_awk='{l=tolower($0); gsub(/luffy-dev-skills|luffy-dev|luffytse|luffydev/,"",l); if (l ~ /lufei|luffy/) print FILENAME ":" FNR ": " $0}'
 name_hits="$(
   (cd "$root" && find skills README.md -type f -print0 2>/dev/null | xargs -0 awk "$name_awk" 2>/dev/null)
-  (cd "$repo" && find CLAUDE.md GLOSSARY.md docs -type f -print0 2>/dev/null | xargs -0 awk "$name_awk" 2>/dev/null)
+  (cd "$repo" && find CLAUDE.md docs -type f -print0 2>/dev/null | xargs -0 awk "$name_awk" 2>/dev/null)
 )"
 if [ -n "$name_hits" ]; then
   echo "$name_hits"
@@ -216,7 +216,7 @@ if [ -n "$hits" ]; then
 fi
 
 # no-repo-merge-rules: the version hand-out (the coordinator gives each skill-changing pull request its number, one at a
-# time) and the Ticket re-read after a skill merge are this repo's own merge-time rules (CLAUDE.md, docs/agents/release.md).
+# time) and the Ticket re-read after a skill merge are this repo's own merge-time rules (CLAUDE.md, docs/dev-skills/release.md).
 # Skill text only says to follow the merge-time steps the repo's own docs give, so it describes neither: no handing out
 # of version numbers, no "version hand-out", no "skill merge".
 hits="$(grep -rniE --include='*.md' --include='*.yaml' 'hand(s|ed|ing)? out (the |a |an |each |next |no |any |further |new )*(version )?numbers?|numbers? (is |are )?handed out|version hand-?out|skill merge|re-?read(s|ing)? (of )?(the )?open (issues|tickets)' "$skills")"
@@ -226,7 +226,7 @@ if [ -n "$hits" ]; then
 fi
 
 # no-agent-label-strings: the plugin speaks of the "agent-only" label role, never of one repo's label strings for it
-# (those name particular coding agents and live in each repo's docs/agents/triage-labels.md). Checks the whole plugin tree
+# (those name particular coding agents and live in each repo's docs/dev-skills/triage-labels.md). Checks the whole plugin tree
 # except CHANGELOG.md, which records releases in this repo's words.
 hits="$(grep -rnE --exclude=CHANGELOG.md '(claude|codex)-only' "$root")"
 if [ -n "$hits" ]; then

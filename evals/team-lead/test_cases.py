@@ -58,7 +58,7 @@ def parked(issue, why, writer):
 
 
 M = "00-milestone.md"
-RELEASE_START = [start(M, "release", "premium", "Plan Milestone 1's next Release by the release skill's rule. Milestone issue 00-milestone.md, release doc docs/agents/release.md; no Release cut yet. If nothing qualifies, open no release issue and say so."),
+RELEASE_START = [start(M, "release", "premium", "Plan Milestone 1's next Release by the release skill's rule. Milestone issue 00-milestone.md, release doc docs/dev-skills/release.md; no Release cut yet. If nothing qualifies, open no release issue and say so."),
                  rec(M, "w-00-0900", "release", "premium", "09:00Z")]
 E1 = RELEASE_START
 ARRANGE = [f"Arrange a check-in\nEvery: 1 hour\nInto: coordinator\n", comment(M, "<!-- team-lead check-in -->\nArranged every 1 hour into the coordinator.")]

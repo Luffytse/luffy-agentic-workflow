@@ -19,9 +19,9 @@ for case in inside outside; do
   [ -z "$err" ] || bad "$case: make-fixture wrote to stderr: $err"
   r="$d/repo"
   for b in main design; do git -C "$r" rev-parse -q --verify "$b" >/dev/null || bad "$case: no branch $b"; done
-  git -C "$r" show main:docs/agents/boundaries.md 2>/dev/null | grep -q 'Milestone label form.*milestone-<n>' || bad "$case: Boundary record has no label form"
-  grep -q 'docs/agents/boundaries.md' "$r/CLAUDE.md" 2>/dev/null || bad "$case: CLAUDE.md does not point to the Boundary record"
-  grep -q '^- \*\*Comment on an issue\*\*' "$r/docs/agents/issue-tracker.md" 2>/dev/null || bad "$case: tracker doc has no Comment on an issue operation"
+  git -C "$r" show main:docs/dev-skills/boundaries.md 2>/dev/null | grep -q 'Milestone label form.*milestone-<n>' || bad "$case: Boundary record has no label form"
+  grep -q 'docs/dev-skills/boundaries.md' "$r/CLAUDE.md" 2>/dev/null || bad "$case: CLAUDE.md does not point to the Boundary record"
+  grep -q '^- \*\*Comment on an issue\*\*' "$r/docs/dev-skills/issue-tracker.md" 2>/dev/null || bad "$case: tracker doc has no Comment on an issue operation"
   m="$r/.scratch/issues/00-milestone.md"; s="$r/.scratch/issues/10-export.md"
   grep -q '^Labels:.*milestone-1' "$m" 2>/dev/null || bad "$case: Milestone issue lacks milestone-1"
   for h in '## Goal' '## Acceptance criteria' '## Excluded'; do grep -q "^$h" "$m" 2>/dev/null || bad "$case: Milestone issue has no $h"; done
@@ -37,7 +37,7 @@ for case in inside outside; do
     grep -q '^### Comment' "$s" && bad "$case: spec issue has design-answer comments outside a Milestone"
   fi
   # the change is design-changing: it adds or edits an ADR
-  git -C "$r" diff --name-only main...design | grep -q '^docs/adr/' || bad "$case: the diff edits no ADR"
+  git -C "$r" diff --name-only main...design | grep -q '^docs/dev-skills/adr/' || bad "$case: the diff edits no ADR"
   git -C "$r" diff --name-only main...design | grep -q '^src/export.sh$' || bad "$case: the diff does not add src/export.sh"
   [ "$(git -C "$r" rev-list --count main..design)" = 2 ] || bad "$case: design should hold two commits (the change, then the Round 1 fix)"
   # the earlier Round comment and its kept-design rows
@@ -57,8 +57,8 @@ for case in inside outside; do
   line_has "$r" design src/export.sh 7 'case "$qty"' || bad "$case: export.sh:7 is not the whole-number check"
   line_has "$r" design src/export.sh 5 'item,qty,added_by' || bad "$case: export.sh:5 is not the header"
   line_has "$r" design src/export.sh 8 "printf '%s,%s,%s" || bad "$case: export.sh:8 is not the raw printf"
-  line_has "$r" design docs/adr/0002-export-format.md 3 'separated by commas' || bad "$case: ADR 0002:3 is not the format line"
-  git -C "$r" show design:docs/index.md | grep -q '0002' && bad "$case: docs/index.md already lists ADR 0002 (the text Finding needs it missing)"
+  line_has "$r" design docs/dev-skills/adr/0002-export-format.md 3 'separated by commas' || bad "$case: ADR 0002:3 is not the format line"
+  git -C "$r" show design:docs/dev-skills/index.md | grep -q '0002' && bad "$case: docs/dev-skills/index.md already lists ADR 0002 (the text Finding needs it missing)"
   # the scoring files stay out of the repo
   [ -z "$(find "$r" -name 'EXPECTED*' -o -name 'DESIGN-FINDINGS*')" ] || bad "$case: a scoring file is inside the repo"
   grep -q '^Expected:' "$d/PROMPT.md" 2>/dev/null || bad "$case: PROMPT.md has no Expected line"

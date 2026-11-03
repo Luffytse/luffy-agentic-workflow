@@ -10,8 +10,8 @@ Draft the **project instructions**: the short text a project's coordinator reads
 Facts are your job. Gather:
 
 - The existing project instructions. If your context does not show them, ask the user (or the coordinator) for the current text; a re-run starts from it and proposes the full new text with a diff.
-- Each repo's `CLAUDE.md` / `AGENTS.md` and `docs/index.md`.
-- Which tracker the project uses (`docs/agents/issue-tracker.md` names it; if absent, ask the user where it is). Do not gather the map, open specs or tickets: they are state, and the coordinator looks them up.
+- Each repo's `CLAUDE.md` / `AGENTS.md` and `docs/dev-skills/index.md`.
+- Which tracker the project uses (`docs/dev-skills/issue-tracker.md` names it; if absent, ask the user where it is). Do not gather the map, open specs or tickets: they are state, and the coordinator looks them up.
 - Whether the project is inside a Milestone. Load `milestone` by name and apply its **No Milestone** test: read the Boundary record for its label form and look up only the open Milestone agreement, not its work list. With no Boundary record, no label form or no open Milestone agreement, keep the full draft below.
 
 Record "none yet" for anything that does not exist, and carry on with the links you have. Done when each of the above is a link, a text, or "none yet".
@@ -36,8 +36,8 @@ Done when every item has an answer or a recorded "not needed".
 
 Write the full instructions as pointer-style text:
 
-- Link `docs/index.md` (Build threads start there; if it is "none yet", say the index is still to be created), and leave its contents in that page.
-- Tell the coordinator to find open specs, plannings and tickets on the tracker when it needs them: name the tracker (and the repo, if the project has several) and say `docs/agents/issue-tracker.md` is where it is documented, so the coordinator is not sent to a file that may be absent or unreadable. Link no map, spec or ticket as state.
+- Link `docs/dev-skills/index.md` (Build threads start there; if it is "none yet", say the index is still to be created), and leave its contents in that page.
+- Tell the coordinator to find open specs, plannings and tickets on the tracker when it needs them: name the tracker (and the repo, if the project has several) and say `docs/dev-skills/issue-tracker.md` is where it is documented, so the coordinator is not sent to a file that may be absent or unreadable. Link no map, spec or ticket as state.
 - Keep it short enough to read in one minute, and cut what the skills already do by default.
 
 Inside a Milestone, tell the coordinator to run `milestone` for the Milestone and `team-lead` for its delivery, and point to the Boundary record. Keep only the project-specific choices settled in step 2, including a tier-to-model map only where the user overrides the default. Leave the coordinator loop, the invoked skills' rules and the Boundary record's values in their owners rather than restating them.

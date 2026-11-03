@@ -21,7 +21,7 @@ git -C "$r" config user.name fixture
 git -C "$r" config user.email fixture@example.invalid
 # The tracker (issues, pull requests and their comments) is local state under .scratch/, never committed.
 echo ".scratch/" >> "$r/.git/info/exclude"
-mkdir -p "$r/docs/agents" "$r/docs/adr" "$r/src" "$r/.scratch/issues" "$r/.scratch/pulls/1"
+mkdir -p "$r/docs/dev-skills" "$r/docs/dev-skills/adr" "$r/src" "$r/.scratch/issues" "$r/.scratch/pulls/1"
 
 cat > "$r/CLAUDE.md" <<'MD'
 # shoplist
@@ -30,19 +30,19 @@ A household shopping list kept as a plain text file, with small shell tools. Run
 
 ## Agent skills
 
-Start at `docs/index.md`.
+Start at `docs/dev-skills/index.md`.
 
 ### Issue tracker
 
-Local Markdown issues under `.scratch/issues/`, pull requests under `.scratch/pulls/`. See `docs/agents/issue-tracker.md`.
+Local Markdown issues under `.scratch/issues/`, pull requests under `.scratch/pulls/`. See `docs/dev-skills/issue-tracker.md`.
 
 ### Domain docs
 
-Single-context: one root `GLOSSARY.md` and `docs/adr/`.
+Single-context: one `docs/dev-skills/glossary.md` and `docs/dev-skills/adr/`.
 
 ### Boundaries
 
-See `docs/agents/boundaries.md`.
+See `docs/dev-skills/boundaries.md`.
 MD
 
 cat > "$r/REVIEW.md" <<'MD'
@@ -63,16 +63,16 @@ cat > "$r/README.md" <<'MD'
 The list lives in a text file, one item per line.
 MD
 
-cat > "$r/docs/index.md" <<'MD'
+cat > "$r/docs/dev-skills/index.md" <<'MD'
 # Docs index
 
-- [GLOSSARY.md](../GLOSSARY.md): the words used here. Read when naming things.
-- [docs/agents/issue-tracker.md](agents/issue-tracker.md): the local Markdown tracker and its operations. Read before any tracker operation.
-- [docs/agents/boundaries.md](agents/boundaries.md): the Boundary record. Read when deciding whether an action needs the user, or whether work is inside a Milestone.
+- [glossary.md](glossary.md): the words used here. Read when naming things.
+- [docs/dev-skills/issue-tracker.md](issue-tracker.md): the local Markdown tracker and its operations. Read before any tracker operation.
+- [docs/dev-skills/boundaries.md](boundaries.md): the Boundary record. Read when deciding whether an action needs the user, or whether work is inside a Milestone.
 - [ADR 0001](adr/0001-the-list-is-a-text-file.md): the list file's format. Read when reading or writing the list.
 MD
 
-cat > "$r/docs/agents/issue-tracker.md" <<'MD'
+cat > "$r/docs/dev-skills/issue-tracker.md" <<'MD'
 # Issue tracker: local Markdown
 
 Issues are files under `.scratch/issues/`, one per issue, named `NN-slug.md`. Each starts with header lines:
@@ -83,7 +83,7 @@ Issues are files under `.scratch/issues/`, one per issue, named `NN-slug.md`. Ea
 - **Pull requests**: there is no forge. A pull request is a file `.scratch/pulls/<n>.md` with `Title:`, `Base:`, `Head:`, `State:` and its body. Its comments are files `.scratch/pulls/<n>/NN-<slug>.md`, in order; editing a comment means editing its file. There is no CI.
 MD
 
-cat > "$r/docs/agents/boundaries.md" <<'MD'
+cat > "$r/docs/dev-skills/boundaries.md" <<'MD'
 # Boundary record
 
 What the user has agreed agents may do on their own in this repo, which actions are the user's to decide, and the limits agents work within.
@@ -95,7 +95,7 @@ What the user has agreed agents may do on their own in this repo, which actions 
 - **Milestone label form**: `milestone-<n>` (for example `milestone-1`). An issue belongs to a Milestone when it carries that Milestone's label, and the Milestone issue carries the same label.
 MD
 
-cat > "$r/GLOSSARY.md" <<'MD'
+cat > "$r/docs/dev-skills/glossary.md" <<'MD'
 # Glossary
 
 **List file**: the plain text file that holds the shopping list, one item per line.
@@ -103,7 +103,7 @@ cat > "$r/GLOSSARY.md" <<'MD'
 **Household member**: a person who shares the list. Their names stay on the device.
 MD
 
-cat > "$r/docs/adr/0001-the-list-is-a-text-file.md" <<'MD'
+cat > "$r/docs/dev-skills/adr/0001-the-list-is-a-text-file.md" <<'MD'
 # The list is a text file
 
 The list is a plain text file, one item per line, as `name|qty|added_by`: the item's name, a whole-number quantity, and the household member who added it.
@@ -195,7 +195,7 @@ printf 'flour|1.5|Ana\n' > "$f"
 ! bash src/export.sh "$f" 2>/dev/null
 rm -f "$f"
 SH
-cat > "$r/docs/adr/0002-export-format.md" <<'MD'
+cat > "$r/docs/dev-skills/adr/0002-export-format.md" <<'MD'
 # The export is CSV
 
 `export.sh <list-file>` prints the list as CSV: the header `item,qty,added_by`, then one line per item in the order added, its fields separated by commas.
@@ -272,7 +272,7 @@ Give the text between the lines to a fresh top-level session (one that can start
 
 ---
 
-You run the \`agentic-review\` skill from \`<checkout>/plugins/dev-skills/skills/agentic-review/SKILL.md\` (the checkout under test, not an installed copy), with the skills it names loaded from the same \`skills/\` folder, on pull request \`.scratch/pulls/1.md\` in this repo. The tracker is the local Markdown one in \`docs/agents/issue-tracker.md\`; there is no forge and no CI. Round 1 is recorded in \`.scratch/pulls/1/01-round-1.md\`. Round 2's Find and Verify have run: Verify kept the three Findings below (ids given), with the Severity shown, and Rank matched none of them to an earlier row. Carry on from the design sort: write the Round 2 comment as \`.scratch/pulls/1/02-round-2.md\` and do every step the skill gives until the Round's Findings are answered or waiting on the user. The owner of the code commits nothing in this run: when the skill has the owner commit, say what it would commit and go on. The user answers no question: when you would put a question to the user, write it word for word and stop. End with your report to the caller.
+You run the \`agentic-review\` skill from \`<checkout>/plugins/dev-skills/skills/agentic-review/SKILL.md\` (the checkout under test, not an installed copy), with the skills it names loaded from the same \`skills/\` folder, on pull request \`.scratch/pulls/1.md\` in this repo. The tracker is the local Markdown one in \`docs/dev-skills/issue-tracker.md\`; there is no forge and no CI. Round 1 is recorded in \`.scratch/pulls/1/01-round-1.md\`. Round 2's Find and Verify have run: Verify kept the three Findings below (ids given), with the Severity shown, and Rank matched none of them to an earlier row. Carry on from the design sort: write the Round 2 comment as \`.scratch/pulls/1/02-round-2.md\` and do every step the skill gives until the Round's Findings are answered or waiting on the user. The owner of the code commits nothing in this run: when the skill has the owner commit, say what it would commit and go on. The user answers no question: when you would put a question to the user, write it word for word and stop. End with your report to the caller.
 
 $findings
 

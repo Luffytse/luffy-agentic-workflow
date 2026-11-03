@@ -20,7 +20,7 @@ This file describes triage as it runs with the user. Inside a Milestone (the agr
 ## Reference docs
 
 - [AGENT-BRIEF.md](AGENT-BRIEF.md): how to write durable agent briefs
-- [OUT-OF-SCOPE.md](OUT-OF-SCOPE.md): how the `.out-of-scope/` knowledge base works
+- [OUT-OF-SCOPE.md](OUT-OF-SCOPE.md): how the `docs/dev-skills/out-of-scope/` knowledge base works
 
 ## Roles
 
@@ -72,22 +72,22 @@ Show counts and a one-line summary per item. Let the maintainer pick.
 
 ## Triage a specific issue or PR
 
-1. **Gather context.** If the issue is labelled `retro`, stop: it is a Retro issue, planned in batches, so skip it. Otherwise read the full issue or PR (body, comments, labels, author, dates; for a PR, the diff too). Parse any prior triage notes so you don't re-ask resolved questions. Explore the codebase: start at `docs/index.md` (with no index, fall back to `GLOSSARY.md` or `GLOSSARY-MAP.md`, and `docs/adr/`), open only the docs that fit, and respect ADRs in the area. Run two checks against the codebase: (a) **redundancy**: search for an existing implementation of the requested behavior by domain concept (not just the request's wording), and report where you looked. If found, it's an already-implemented `wontfix` (step 5). (b) **prior rejection**: read `.out-of-scope/*.md` and surface any that resembles this request.
+1. **Gather context.** If the issue is labelled `retro`, stop: it is a Retro issue, planned in batches, so skip it. Otherwise read the full issue or PR (body, comments, labels, author, dates; for a PR, the diff too). Parse any prior triage notes so you don't re-ask resolved questions. Explore the codebase: start at `docs/dev-skills/index.md` (with no index, fall back to `docs/dev-skills/glossary.md` and `docs/dev-skills/adr/`), open only the docs that fit, and respect ADRs in the area. Run two checks against the codebase: (a) **redundancy**: search for an existing implementation of the requested behavior by domain concept (not just the request's wording), and report where you looked. If found, it's an already-implemented `wontfix` (step 5). (b) **prior rejection**: read `docs/dev-skills/out-of-scope/*.md` and surface any that resembles this request.
 
 2. **Recommend.** Tell the maintainer your category and state recommendation with reasoning, plus a brief codebase summary relevant to the request (including whether it's already implemented). Wait for direction.
 
 3. **Verify the claim.** Before any grilling, check that the claim holds up. For a bug, reproduce it from the reporter's steps. For a PR, confirm the diff does what it claims: check it out, run the relevant tests or commands. Report what happened: confirmed (with code path), failed, or insufficient detail (a strong `needs-info` signal). A confirmed verification makes a much stronger agent brief.
 
-4. **Grill (if needed).** If the request needs fleshing out, call the Skill tool twice, for "grilling" and "domain-modeling", and grill it into shape a round of questions at a time, sharpening domain terms and updating the glossary (`GLOSSARY.md`, or the Area page `GLOSSARY-MAP.md` points to) and ADRs inline as decisions land. When writing any doc here, including `.out-of-scope/` files, load `docs-index` and apply its contract.
+4. **Grill (if needed).** If the request needs fleshing out, call the Skill tool twice, for "grilling" and "domain-modeling", and grill it into shape a round of questions at a time, sharpening domain terms and updating the glossary (`docs/dev-skills/glossary.md`, or the Area page it points to once split) and ADRs inline as decisions land. When writing any doc here, including `docs/dev-skills/out-of-scope/` files, load `docs-index` and apply its contract.
 
 5. **Apply the outcome:**
    - `ready-for-agent`: post an agent brief comment ([AGENT-BRIEF.md](AGENT-BRIEF.md)).
    - `ready-for-human`: same structure as an agent brief, but note why it can't be delegated (judgment calls, external access, design decisions, manual testing).
    - `needs-info`: post triage notes (template below).
    - For `wontfix`, close the issue, with the comment depending on *why*:
-     - **Already implemented**: the change already exists in the codebase. Point to where it lives; do **not** write to `.out-of-scope/` (that KB is for *rejected* requests, not built ones).
+     - **Already implemented**: the change already exists in the codebase. Point to where it lives; do **not** write to `docs/dev-skills/out-of-scope/` (that KB is for *rejected* requests, not built ones).
      - **Rejected (bug)**: give a polite explanation, then close.
-     - **Rejected (enhancement)**: write to `.out-of-scope/`, link to it from a comment, then close ([OUT-OF-SCOPE.md](OUT-OF-SCOPE.md)).
+     - **Rejected (enhancement)**: write to `docs/dev-skills/out-of-scope/`, link to it from a comment, then close ([OUT-OF-SCOPE.md](OUT-OF-SCOPE.md)).
    - `needs-triage`: apply the role. Optional comment if there's partial progress.
 
 ## Quick state override
@@ -118,7 +118,7 @@ If prior triage notes exist on the issue or PR, read them, check whether the rep
 
 ## Inside a Milestone
 
-Triage runs **inside a Milestone** when both hold: the Boundary record (the one the repo's `CLAUDE.md` or `AGENTS.md` points to, usually `docs/agents/boundaries.md`) names a Milestone label form, and an open Milestone issue exists (the issue carrying a label in that form that holds the Milestone's goal; for a batch, the one the release issue links or names). With no such agreement, triage runs as above, unchanged, and everything below is skipped. Inside a Milestone a run is one of two kinds: the **batch**, which the caller runs at the end of a Release, naming the Release or its release issue, and **handled at once** (see "Handled at once").
+Triage runs **inside a Milestone** when both hold: the Boundary record (`docs/dev-skills/boundaries.md`) names a Milestone label form, and an open Milestone issue exists (the issue carrying a label in that form that holds the Milestone's goal; for a batch, the one the release issue links or names). With no such agreement, triage runs as above, unchanged, and everything below is skipped. Inside a Milestone a run is one of two kinds: the **batch**, which the caller runs at the end of a Release, naming the Release or its release issue, and **handled at once** (see "Handled at once").
 
 Inside a Milestone agents decide: the user is asked nothing per issue, except as "Goes to the user" says. Read the Milestone issue (goal, features, acceptance criteria, exclusions, its own boundaries) and the Boundary record before the first issue. Every comment or issue triage posts here starts with the disclaimer above, and every tracker operation is the tracker doc's, cited by its name.
 
@@ -153,6 +153,6 @@ At the end, post one comment on the release issue, in the tracker doc's **Commen
 
 ### Dry run
 
-When the caller asks for a dry run (proposals only), run the batch's steps 1 to 3 and the "Goes to the user" test, and write nothing to the tracker: no comment, label, close, brief, `.out-of-scope/` file or summary, and ask the user nothing. Return the rows the summary would hold, plus for each the outcome step 5 would apply, in your reply.
+When the caller asks for a dry run (proposals only), run the batch's steps 1 to 3 and the "Goes to the user" test, and write nothing to the tracker: no comment, label, close, brief, `docs/dev-skills/out-of-scope/` file or summary, and ask the user nothing. Return the rows the summary would hold, plus for each the outcome step 5 would apply, in your reply.
 
 Any merge-time step the repo's own docs give is not part of the batch; it stays at or after the merge it belongs to.

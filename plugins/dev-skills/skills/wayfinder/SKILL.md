@@ -7,7 +7,7 @@ A loose idea has arrived, too big for one agent session, and wrapped in fog: the
 
 The destination varies per effort, and naming it is the first act of charting: it shapes every ticket. It might be a spec to hand off and iterate on, a decision to lock before planning starts, or a change made in place like a data-structure migration. The map is domain-agnostic: engineering work, course content, whatever fits the shape.
 
-When you explore the repo, start at `docs/index.md` and open only the docs that fit (with no index, fall back to `GLOSSARY.md` or `GLOSSARY-MAP.md`, and `docs/adr/`).
+When you explore the repo, start at `docs/dev-skills/index.md` and open only the docs that fit (with no index, fall back to `docs/dev-skills/glossary.md` and `docs/dev-skills/adr/`).
 
 ## Plan, don't do
 

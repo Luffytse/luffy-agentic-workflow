@@ -53,7 +53,7 @@ One small, end-to-end slice of work, built and reviewed on its own. Either part 
 _Avoid_: task, story
 
 **Agent label**:
-The label of the optional agent-only triage role: it marks an issue for one coding agent only, and a repo maps the role to one label per agent in its `docs/agents/triage-labels.md` (this repo: `claude-only` and `codex-only`). It is neither a category nor a state role. An agent that sees another agent's label does not work the issue; an issue with none can be taken by any agent. `triage` may apply it, and `to-tickets` copies a Spec's onto each of its Tickets.
+The label of the optional agent-only triage role: it marks an issue for one coding agent only, and a repo maps the role to one label per agent in its `docs/dev-skills/triage-labels.md` (this repo: `claude-only` and `codex-only`). It is neither a category nor a state role. An agent that sees another agent's label does not work the issue; an issue with none can be taken by any agent. `triage` may apply it, and `to-tickets` copies a Spec's onto each of its Tickets.
 _Avoid_: assignee, owner
 
 **Milestone**:
@@ -127,8 +127,12 @@ One Review at Quick depth over a Spec's Ticket before it joins the Spec branch. 
 
 ## Docs
 
+**Skill docs folder**:
+The one folder in a repo that only the skills use, `docs/dev-skills/`, holding every file they require at a fixed path: the Docs index, the setup files (the tracker, triage label, domain and release docs and the Boundary record), the glossary and its Area pages, ADRs and out-of-scope notes. Files that coding agents, other tools or people expect elsewhere stay outside it: `CLAUDE.md` and `AGENTS.md`, `REVIEW.md` at the root, the changelog at the path the release doc records, and `CONTRIBUTING.md` wherever the repo keeps it (ADR 0011).
+_Avoid_: skills folder (the plugin's own `skills/`), agents folder
+
 **Docs index**:
-The page `docs/index.md` that lists every doc the skills keep in a repo (not `CLAUDE.md`, `SKILL.md` files or GitHub issues), grouped by Area, each with one line saying when to read it. Agents read it first and open only what their work needs.
+The page `docs/dev-skills/index.md`, in the Skill docs folder, that lists every doc the skills keep in a repo and the repo's own docs an agent may need, inside the folder and outside it (not `CLAUDE.md`, `SKILL.md` files or GitHub issues), grouped by Area, each with one line saying when to read it. Agents read it first and open only what their work needs.
 _Avoid_: README, table of contents
 
 **Area**:
@@ -200,7 +204,7 @@ How hard a change is to walk back. A **one-way door** is a change that reverting
 _Avoid_: risk level
 
 **Boundary record**:
-A repo's agent doc, `docs/agents/boundaries.md`, written with the user by `setup-dev-skills`: which irreversible actions agents may take, which actions need the user's approval (the list may be empty), the resource budget, the check-in interval (default one hour) and the form of a Milestone's membership label (for example `milestone-<n>`). Inside a Milestone, the build skills read it instead of a fixed list to decide whether a pull request crosses a boundary and so goes to the user; outside one, the build skills' outside-a-Milestone merge list governs (ADR 0004). A Milestone issue may add allowed or forbidden actions for its own issues and wins over the record for them.
+A repo's agent doc, `docs/dev-skills/boundaries.md`, written with the user by `setup-dev-skills`: which irreversible actions agents may take, which actions need the user's approval (the list may be empty), the resource budget, the check-in interval (default one hour) and the form of a Milestone's membership label (for example `milestone-<n>`). Inside a Milestone, the build skills read it instead of a fixed list to decide whether a pull request crosses a boundary and so goes to the user; outside one, the build skills' outside-a-Milestone merge list governs (ADR 0004). A Milestone issue may add allowed or forbidden actions for its own issues and wins over the record for them.
 _Avoid_: permissions file, policy
 
 **Bug class**:

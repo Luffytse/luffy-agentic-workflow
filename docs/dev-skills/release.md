@@ -1,6 +1,6 @@
 # Releases
 
-How this repo versions `dev-skills` and cuts a Release with the `release` skill: where the version lives, how a pull request bumps it, where the changelog goes, how Releases and their labels are named, and the whole-Release check (see [ADR 0008](../adr/0008-each-skill-change-bumps-the-plugin-version.md)).
+How this repo versions `dev-skills` and cuts a Release with the `release` skill: where the version lives, how a pull request bumps it, where the changelog goes, how Releases and their labels are named, and the whole-Release check (see [ADR 0008](adr/0008-each-skill-change-bumps-the-plugin-version.md)).
 
 - **Bump mode**: pull requests bump. Every pull request that changes a file under `plugins/dev-skills/skills/` bumps the version as its last commit, with the number the coordinator hands out just before merge (see "Version hand-out" and "The bump commit" below; `CLAUDE.md` "Merge-time steps" states the rules). A Release opens no bump pull request: the `release` skill writes the changelog entry in a changelog pull request, runs the whole-Release check and closes the release issue with its notes.
 - **Version file**: `plugins/dev-skills/.claude-plugin/plugin.json`, the `"version"` field. This is the canonical source for reading the current version, and for locating Releases up to 0.25.0 in git history.
