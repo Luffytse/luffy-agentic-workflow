@@ -18,6 +18,32 @@ Pass: yes | no. Lessons: <what to change in the skill, if anything>
 
 ## Runs
 
+
+### 2026-11-03 07:37–07:42:48 UTC, base f14e51f, dev-skills 0.48.0: Codex desktop subagents, check run (Case 1)
+
+Skill text: desktop rework recorded in this commit on `codex/worker-control-528-desktop`, based on `f14e51f`; version unchanged. Runner: the desktop coordinator `/root` took the lifecycle and scheduling actions; Implementer `/root/implement_528_desktop` wrote this record from the parent's live results. The earlier failed Codex run below remains valid for its different runtime.
+
+## Worker control check
+
+Harness: Codex desktop subagents (`codex-subagents.md`) · Role: coordinator (explicit `/root`) · Runner: `/root` · Run: 2026-11-03 07:37–07:42:48 UTC
+
+Runtime: explicit root task path `/root`; probe A reported its descendant path and the same six collaboration tools. Desktop identity: `CODEX_INTERNAL_ORIGINATOR_OVERRIDE=Codex Desktop`, version `0.166.0-alpha.5.1`, sandbox `seatbelt`; runtime permission profile workspace-write with automatic escalation review. The tool inventory exposes `mcp__codex_app__automation_update`; its discovered schema and description supplied exact fields and the instruction to inspect `$CODEX_HOME/automations/*/automation.toml`. These are observed runtime contracts, not public stable API promises. Phone pairing was not inspected.
+
+Docs used: [subagents](https://learn.chatgpt.com/docs/agent-configuration/subagents), [app-server](https://learn.chatgpt.com/docs/app-server), [automations](https://learn.chatgpt.com/docs/automations), [remote connections](https://learn.chatgpt.com/docs/remote-connections), fetched by the coordinator for this rework. They support the capabilities; exact tool names, task paths, fields and statuses below come from the live runtime.
+
+| Capability | Essential | Method and source | Result | Evidence | Limits |
+|---|---|---|---|---|---|
+| Start a worker | yes | `collaboration.spawn_agent`; subagents page above | pass | A `/root/wc_probe_desktop`, token `wc-start-528-8b4d7e20`, spawned by 07:38:17; parent read running | Runtime-reported path and tools |
+| Worker state | yes | `collaboration.list_agents`; subagents and app-server pages above | pass | Parent read A running after start and at 07:39:32; scratch file `/tmp/wc-desktop-528-8b4d7e20/heartbeat.txt` corroborated activity | File is corroboration, not worker state |
+| Pause and resume | yes | `send_message`, `followup_task`; subagents page above | pass | Pause sent about 07:38:31 and acknowledged; file reads 07:38:38 and 07:39:05 unchanged. Resume sent 07:39:05, acknowledged and appended 07:39:10. After interruption, follow-up Resume about 07:39:42 retained token/path and appended 07:39:45 | Cooperative pause, no native global pause |
+| Confirmed stop | yes | `interrupt_agent`, independent `list_agents`; subagents and app-server pages above | pass | Interrupt after running read 07:39:32 returned previous_status running; independent list about 07:39:38 read interrupted for A | That run stopped; follow-up restarted it. No independent background processes |
+| End or failure notice | yes | Automatic final-result notification and `list_agents`; subagents and app-server pages above | pass | A final `done wc-start-528-8b4d7e20 retained context` received; B `/root/wc_end_desktop` spawned about 07:39:59, automatic final `done wc-end-528-927c618f` received by 07:40:02. Parent list about 07:40:45 read both completed with their exact final strings | Failure not provoked |
+| Scheduled check-in | yes | Desktop heartbeat; automations page above and discovered runtime schema | pass | At 07:37:35 create without destination rejected: `targetThreadId: Missing targetThreadId or destination=thread.` Retry `kind: "heartbeat"`, `mode: "create"`, `destination: "thread"`, `rrule: "FREQ=MINUTELY;INTERVAL=1"`, `status: "ACTIVE"` accepted; ID `wc-checkin-528-d7a290e4`, persisted creation 07:37:52.907 UTC. Persisted target_thread_id equals coordinator CODEX_THREAD_ID `01a1a055-44bd-7751-82be-51322411b1f5`. Scheduled heartbeat envelope with this automation ID arrived in the same chat at 07:42:09.383 UTC, retaining context; independent `mcp__codex_app__read_thread` returned that same thread ID and turn `01a1a05b-bdec-7b41-83c0-3891ad60074c` (startedAt `1793691729`) with the heartbeat ID/token and timestamp. Arrival was 4m16.476s after creation and before deadline 07:43:52.907. | No interval rejection; arrival observed after coordinator yielded idle about 07:41:14; no arrival observed while active, without establishing busy-turn semantics |
+
+Cleanup: update accepted with `mode: "update"`, the original ID, `kind: "heartbeat"`, original name/prompt/rrule, the same `targetThreadId`, `destination: "thread"` and `status: "PAUSED"`; persisted update 07:42:31.808 UTC. Independent `mode: "view"` rendered a card; matching automation file read at 07:42:39 confirmed `PAUSED` and unchanged target. Then `mode: "delete"` with that ID returned `deleteStatus: deleted`; independent file-existence read at 07:42:47.846 returned false. A subsequent view still rendered a card, so absence rests on the delete response and file read, not the card. Lifecycle probes read completed; no independent background processes remained.
+
+Verdict: **ready**. All six essential capabilities passed in this desktop runtime, including one scheduled same-chat arrival and termination read-back. Pass as an evidence eval: yes. Not exercised: failure notification or phone pairing/reachability. This result supplies the desktop scheduling proof missing from the earlier runtime; it does not change that earlier run's honest failure.
+
 ### 2026-11-03 07:24:24–07:26:12 UTC, base f5593f0, dev-skills 0.48.0: Codex subagents, check run (Case 1)
 
 Skill text: uncommitted #528 changes on `claude/project-thread-r67ntb`, based on `f5593f0db65ef5ee1e7c2973ee77d8fe01f64de9`; version unchanged on the user's instruction. Runner: the parent coordinator `/root` took every lifecycle action; its Implementer `/root/implement_528` wrote this record from the parent's live tool results. No tracker comment supplied a worker state.
