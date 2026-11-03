@@ -156,14 +156,14 @@ How much review a change gets, picked by Round 0: **None** (version fields, chan
 _Avoid_: depth, mode
 
 **Round**:
-One pass of Find, Verify and Rank over a pull request, its one comment, and the fix commits after it; a pull request gets at most 3. **Round 1** reviews the whole pull request; **Rounds 2 and 3** review only its new commits (for a merge from main, only its conflict resolutions), with one Finder and one Verifier at any level. A Round is **clean** when no Important is open after its Verify; a clean Round means ready to merge. After Round 3, what is still open is sorted (see **After-Round-3 sort**).
+One pass of Find, Verify and Rank over a pull request, its one comment, and the fix commits after it; a pull request gets at most 3. **Round 1** reviews the whole pull request; **Rounds 2 and 3** review only its new commits (for a merge from main, only its conflict resolutions), with one Finder and one Verifier at any level. Verify is skipped, with no Verifier started, when no Finder returned a candidate and no earlier Finding is open; the Round comment says no candidates went to a Verifier. Otherwise the Verifier is a separate agent each Round. A Round is **clean** when no Important is open after its Verify step; a clean Round means ready to merge. After Round 3, what is still open is sorted (see **After-Round-3 sort**).
 _Avoid_: pass, iteration
 
 **After-Round-3 sort**:
 What happens when Round 3 is not clean: a premium-tier agent turns each open Important into a bug Ticket, worked straight away as its own Ticket, or dismisses it with a reason; open Nits are dropped, and the pull request merges. A merge from main with conflicts after Round 3 gets at most one Quick check of only its resolutions, whose open Importants become bug Tickets the same way.
 
 **Dispute**:
-An owner's written case, with evidence (`file:line`, a command and its output), that a Finding is wrong, in place of a fix. The next Round's Verifier decides it; when nothing was committed, that Round is the Verifier alone, on the disputes.
+An owner's written case, with evidence (`file:line`, a command and its output), that a Finding is wrong, in place of a fix. The next Round's Verifier decides it; when nothing was committed, that Round is the Verifier alone, on the disputes (an open dispute is an open Finding, so that Verifier runs).
 _Avoid_: rebuttal (the earlier, removed rule)
 
 **Design Finding**:
@@ -184,7 +184,7 @@ A reviewer agent that looks for problems and reports candidate Findings. The **s
 _Avoid_: reviewer (too broad), scanner
 
 **Verifier**:
-The one agent per Round that checks each candidate Finding, and each open Finding with any dispute of it, against the code, keeps only what it confirmed and makes the final call on it. Premium tier at Deep, regular otherwise.
+The one agent per Round (none when the Round has no candidates and no open Finding) that checks each candidate Finding, and each open Finding with any dispute of it, against the code, keeps only what it confirmed and makes the final call on it. Premium tier at Deep, regular otherwise.
 _Avoid_: judge, triage agent
 
 **Finding**:

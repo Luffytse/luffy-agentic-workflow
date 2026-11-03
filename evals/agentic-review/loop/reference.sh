@@ -2,13 +2,37 @@
 # Writes a hand-made outcome into a built loop fixture, so test-fixture.sh can check that score.py passes a right one
 # and fails planted wrong ones. It stands in for a run; it is not one.
 # Usage: reference.sh merge <out-dir> <good|reports-main|misses-resolution|whole-pr|r1-open>
+#        reference.sh empty-round <out-dir> <good|verifier-ran|reports-main|whole-pr|none-with-rows>
 #        reference.sh after-round3 <out-dir> <good|nit-filed|no-labels|round-4|not-noted>
 set -eu
 case_="$1"; out="$2"; variant="$3"
 r="$out/repo"; p="$r/.scratch/pulls/1"
 g() { git -C "$r" "$@"; }
 
-if [ "$case_" = merge ]; then
+if [ "$case_" = empty-round ]; then
+  head="$(g rev-parse quota)"
+  r1="$(sed -n 's/^<!-- code-review kind=round round=1 .*head=\([0-9a-f]*\) .*/\1/p' "$p/01-round-1.md")"
+  reviewed="the new commits $r1..$head"; verifier="none (no candidates, no open Finding)"; rows=""
+  [ "$variant" = whole-pr ] && reviewed="the whole pull request"
+  [ "$variant" = verifier-ran ] && verifier="ran"
+  [ "$variant" = reports-main ] && rows="| R2-1 | Important | division by zero | app/report.py:6 | \`usage_percent\` divides by a zero limit | open | standards and spec Finder |"
+  [ "$variant" = none-with-rows ] && rows="| R2-1 | Nit (skip) | docstring wording | app/quota.py:5 | wording | open | standards and spec Finder |"
+  result="clean"; [ "$variant" = reports-main ] && result="not clean, 1 Important open"
+  cat >"$p/02-round-2.md" <<MD
+<!-- code-review kind=round round=2 level=Standard head=$head base=$r1 -->
+## Code review: Round 2 of at most 3 (Standard)
+
+Level: Standard (app/quota.py: changes what the quota functions return)
+Reviewed: $reviewed
+Result: $result
+Finders: standards and spec
+Verifier: $verifier
+
+| id | Severity | Bug class | Locations | Claim | Status | Note |
+|----|----------|-----------|-----------|-------|--------|------|
+$rows
+MD
+elif [ "$case_" = merge ]; then
   head="$(g rev-parse quota)"
   r1="$(sed -n 's/^<!-- code-review kind=round round=1 .*head=\([0-9a-f]*\) .*/\1/p' "$p/01-round-1.md")"
   bad="$(g show quota:app/quota.py | grep -n 'max(0, used - limit)' | cut -d: -f1)"

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Score a run of a loop fixture from what it left in the repo: the pull request's comments, the issues and the branch.
 
-Usage: score.py <merge|after-round3> <out-dir>   (the directory make-fixture.sh built, after the run)
+Usage: score.py <merge|after-round3|empty-round> <out-dir>   (the directory make-fixture.sh built, after the run)
 Prints one line per check and exits 1 if any fails. It reads files only; it judges outcomes, never wording.
 """
 import re
@@ -92,6 +92,26 @@ if case == "merge":
               not any("report.py" in r.get("Locations", "") or "usage_percent" in r.get("Claim", "") for r in rs))
         check("Result counts the open Important", re.search(r"^Result: not clean, [1-9]\d* Important open$", text, re.M)
               is not None)
+elif case == "empty-round":
+    head = git("rev-parse", "quota")
+    r1 = marker((pulls / "01-round-1.md").read_text(), "head")
+    found = comments(2)
+    check("exactly one Round 2 comment was posted", len(found) == 1)
+    check("no Round 3 comment was posted", not comments(3))
+    if len(found) == 1:
+        text = found[0].read_text()
+        check("Round 2's head is the merge at the branch head", marker(text, "head") == head)
+        check("Round 2 reviewed from Round 1's head", marker(text, "base") == r1)
+        reviewed = next((l for l in text.splitlines() if l.startswith("Reviewed:")), "")
+        check("Round 2 says it reviewed the new commits, not the whole pull request",
+              "new commits" in reviewed and "whole pull request" not in reviewed)
+        finders = next((l for l in text.splitlines() if l.startswith("Finders:")), "")
+        check("Round 2 ran one Finder, no adversarial one", finders != "" and "adversarial" not in finders
+              and "," not in finders)
+        verifier = next((l for l in text.splitlines() if l.startswith("Verifier:")), "")
+        check("the Round comment says no candidates went to a Verifier", re.match(r"Verifier: none\b", verifier) is not None)
+        check("the table has no rows", rows(text) == [])
+        check("Result is clean", re.search(r"^Result: clean$", text, re.M) is not None)
 elif case == "after-round3":
     head = git("rev-parse", "fix")
     c3 = (pulls / "03-round-3.md").read_text()
@@ -113,7 +133,7 @@ elif case == "after-round3":
     check("Round 3's Result says it was sorted",
           re.search(r"^Result: sorted after Round 3: 1 bug Tickets?, 0 dismissed$", c3, re.M) is not None)
 else:
-    raise SystemExit("usage: score.py <merge|after-round3> <out-dir>")
+    raise SystemExit("usage: score.py <merge|after-round3|empty-round> <out-dir>")
 
 print("PASS" if fails == 0 else f"{fails} check(s) failed")
 sys.exit(1 if fails else 0)

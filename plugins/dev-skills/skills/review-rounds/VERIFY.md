@@ -1,6 +1,6 @@
 # Verify
 
-The Verify step of [`review-rounds`](SKILL.md). One brand-new Verifier, on the regular tier (premium at Deep), checks every candidate of the Round.
+The Verify step of [`review-rounds`](SKILL.md). One brand-new Verifier, on the regular tier (premium at Deep), checks every candidate of the Round. When the Round has no candidate and no open Finding, `review-rounds` starts none.
 
 The Verifier gets: every candidate in the Finding format, tagged with its Finder; every open Finding from earlier Rounds and Ticket checks (id, claim, locations as recorded) and any dispute of it; the diff command and commit list; the spec and the design answers; the meaning of Important and the Skip list; and an Always check line only for a candidate raised from it. Paste in the brief and the copy rule from [FINDERS.md](FINDERS.md). On a Round that is the Verifier alone, give it only the disputed Findings and their disputes.
 

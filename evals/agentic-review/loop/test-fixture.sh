@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Builds both loop fixtures (merge, after-round3) and checks each holds what its case needs, then checks the scorer:
+# Builds the loop fixtures (merge, after-round3, empty-round) and checks each holds what its case needs, then checks the scorer:
 # a hand-written right outcome passes and planted wrong ones fail. It runs no agent.
 # Usage: bash evals/agentic-review/loop/test-fixture.sh
 set -eu
@@ -51,6 +51,23 @@ check "the triage-labels doc maps bug and ready-for-agent" 'grep -q "| \`bug\` "
 check "no issue carries the bug label yet" '! grep -l "^Labels:.*bug" "$r"/.scratch/issues/*.md >/dev/null 2>&1'
 check "the prompt gives no answer away" '! grep -qiE "ticket|dismiss|expected" "$tmp/a/PROMPT.md"'
 
+# ---- empty-round: Round 2 with nothing to verify
+bash "$here/make-fixture.sh" "$tmp/e" empty-round >/dev/null
+r="$tmp/e/repo"
+r1="$(sed -n 's/^<!-- code-review kind=round round=1 .*head=\([0-9a-f]*\) .*/\1/p' "$r/.scratch/pulls/1/01-round-1.md")"
+check "Round 1's comment is clean with no open Finding" 'grep -qx "Result: clean" "$r/.scratch/pulls/1/01-round-1.md" && ! grep -q "| open |" "$r/.scratch/pulls/1/01-round-1.md"'
+check "the head is a merge of main onto Round 1's head" \
+  '[ "$(g rev-list --parents -n1 quota | wc -w)" = 3 ] && [ "$(g rev-parse quota^1)" = "$r1" ] && [ "$(g rev-parse quota^2)" = "$(g rev-parse main)" ]'
+check "merging main into Round 1's head conflicts" '(set +e; g merge-tree --write-tree "$r1" main >/dev/null 2>&1; [ $? = 1 ])'
+new="$(g log -p --first-parent --remerge-diff "$r1"..quota)"
+check "the new-commits diff shows the merge's right resolution" 'printf "%s" "$new" | grep -qE "^\+    return max\(0, limit - used\)"'
+check "the new-commits diff hides what main brought in" '! printf "%s" "$new" | grep -q "usage_percent"'
+d="$tmp/e-head"; mkdir "$d"; g archive quota | tar -x -C "$d"
+check "the resolution is right: 3 of 10 used leaves 7, 12 of 10 leaves 0" '[ "$(py "$d" "print(remaining(3, 10), remaining(12, 10))")" = "7 0" ]'
+check "the limit itself is refused, as the spec says" '[ "$(py "$d" "print(allowed(10, 10))")" = False ]'
+check "the project's checks pass at the head" '(cd "$d" && bash check.sh >/dev/null 2>&1)'
+check "the prompt gives no answer away" '! grep -qiE "verifier|no candidate|nothing to verify|expected" "$tmp/e/PROMPT.md"'
+
 # ---- the scorer: a right outcome passes, planted wrong ones fail
 score() { python3 -I "$here/score.py" "$@" >/dev/null 2>&1; }
 check "merge: the untouched fixture fails (no Round 2 comment yet)" '! score merge "$tmp/m"'
@@ -60,6 +77,14 @@ check "merge: a right Round 2 comment passes" 'score merge "$tmp/m"'
 for bad in reports-main misses-resolution whole-pr r1-open; do
   rm -rf "$tmp/m2"; cp -R "$tmp/m0" "$tmp/m2"; bash "$here/reference.sh" merge "$tmp/m2" "$bad"
   check "merge: planted wrong outcome '$bad' fails" '! score merge "$tmp/m2"'
+done
+check "empty-round: the untouched fixture fails (no Round 2 comment yet)" '! score empty-round "$tmp/e"'
+cp -R "$tmp/e" "$tmp/e0"
+bash "$here/reference.sh" empty-round "$tmp/e" good
+check "empty-round: a right Round 2 comment passes" 'score empty-round "$tmp/e"'
+for bad in verifier-ran reports-main whole-pr none-with-rows; do
+  rm -rf "$tmp/e2"; cp -R "$tmp/e0" "$tmp/e2"; bash "$here/reference.sh" empty-round "$tmp/e2" "$bad"
+  check "empty-round: planted wrong outcome '$bad' fails" '! score empty-round "$tmp/e2"'
 done
 check "after-round3: the untouched fixture fails (nothing sorted yet)" '! score after-round3 "$tmp/a"'
 cp -R "$tmp/a" "$tmp/a0"

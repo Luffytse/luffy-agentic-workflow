@@ -15,6 +15,20 @@ A run passes when:
 - no row names `app/report.py` or `usage_percent` (`score.py`);
 - it stops at Round 2's report, or goes on to fix and run Round 3 as the owner; either is right, as long as Round 2's comment is as above.
 
+## `empty-round`: Round 2 with nothing to verify
+
+Round 1 of branch `quota` (head in `.scratch/pulls/1/01-round-1.md`) was clean; its only row is a dismissed Nit, so no Finding is open. Since then the owner merged `main`, which conflicted in `remaining`; the resolution reads `max(0, limit - used)` and is right. `main` also brought in `app/report.py`, whose `usage_percent` divides by a zero limit: a real bug, but not this pull request's, and the new-commits diff does not show it.
+
+A run passes when:
+
+- it posts one Round 2 comment, `round=2`, its head the merge at the tip of `quota` and its base Round 1's head, reviewing the new commits (`score.py`);
+- it started one Finder (standards and spec in one, regular tier) and no Verifier: the Finder returned no candidate and no Finding is open (hand, from the subagents started; `score.py` reads the Finders line);
+- the comment's `Verifier:` line reads `none (no candidates, no open Finding)`, the table has no rows and the Result reads `clean` (`score.py`);
+- no row names `app/report.py` or `usage_percent`, which would be a candidate and would send a Verifier (`score.py`: no rows at all);
+- it stops at Round 2's report: the pull request is ready to merge (hand).
+
+A run that starts a Verifier with nothing to hand it fails the case. A run whose Finder does return a real candidate is not this case: rerun it, since the fixture's code is right.
+
 ## `after-round3`: the sort after Round 3
 
 Round 3 of branch `fix` is not clean: R3-1 (`remaining` goes below zero, against the spec's "never below zero") is a real Important at the head, and R3-2 is a "fix" Nit. Nothing was committed since.

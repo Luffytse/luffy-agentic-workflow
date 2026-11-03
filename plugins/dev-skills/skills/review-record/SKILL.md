@@ -26,6 +26,7 @@ Level: Standard (changes what the export rule does)
 Reviewed: the whole pull request | the new commits <base>..<head>
 Result: clean | not clean, <n> Important open
 Finders: standards and spec
+Verifier: ran
 
 | id | Severity | Bug class | Locations | Claim | Status | Note |
 |----|----------|-----------|-----------|-------|--------|------|
@@ -41,6 +42,7 @@ Finders: standards and spec
 - **Level** is None, Quick, Standard or Deep, with Round 0's one-line reason. Older comments say `depth=` in the marker; read it as the level.
 - **Ids** are `R<round>-<n>`; a Ticket check uses `T<ticket number>.<check>-<n>`. A Finding keeps its first id in every later comment.
 - **Locations** are `file:line` or `file:start-end`, counted within the file at the comment's head.
+- **Verifier** is `ran`, or `none (no candidates, no open Finding)` when no Finder returned a candidate and no earlier Finding was open, so no candidates went to a Verifier; the table then has no rows. A Round comment without the line ran its Verifier.
 - **Rows:** every Finding this Round raised or dismissed, plus every earlier Finding whose status changed.
 - **Status** is `open`, `fixed` or `dismissed`. `fixed` names the fixing commit in the Note. A dismissal's Note says who and why: `Verifier: <reason>, rests on <file:line>`; `design kept: <link to the answer>`; or `dismissed after Round 3: <reason>`. An Important that became a bug Ticket after Round 3 stays `open` with `bug Ticket: <link>` in its Note.
 - **Note** starts with the Finder that raised the Finding, or with who closed it; keep it short.

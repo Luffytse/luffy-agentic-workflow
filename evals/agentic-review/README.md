@@ -6,6 +6,7 @@ Behaviour checks for the review: `agentic-review` (Round 0) and `review-rounds` 
 - **Verify-only check:** the Verifier alone, handed the two false alarms and two real controls, so its drop call is tested even when no Finder raises them. Rerun when `VERIFY.md` changes.
 - **Round 0:** does Round 0 pick None for a version-only diff, Quick for a typo and Standard for a skill-rule change, and load nothing more at None?
 - **Loop, `merge`:** does Round 2 after a merge of main review only the pull request's commits and the merge's conflict resolution, with one Finder and one Verifier?
+- **Loop, `empty-round`:** does a Round 2 in which the Finder returns no candidate and no Finding is open start no Verifier, go to Rank, and say in its comment that no candidates went to a Verifier?
 - **Loop, `after-round3`:** after a Round 3 that is not clean, does the open Important become a bug Ticket, the Nit get dropped, and the pull request become ready to merge, with no Round 4 and no question to the user?
 
 Every case's builder has a test that builds it and checks it holds what the case needs; run them after changing a builder or a skill file they read. None of them starts an agent:
@@ -26,6 +27,7 @@ bash evals/agentic-review/loop/test-fixture.sh
 | Verify-only check | decision-level in a subagent: one Verifier, given its brief, starts nothing |
 | Round 0 | full build-flow in a top-level session, as its steps say (the score reads whether a subagent was started); the level pick itself could be shown decision-level (guess, not yet tried) |
 | Loop, `merge` | full build-flow in a top-level session: Round 2 starts a Finder and a Verifier |
+| Loop, `empty-round` | full build-flow in a top-level session: Round 2 starts a Finder; the score reads the comment's `Verifier: none` line, and that no Verifier was started is checked by hand. A model run is owed (the builder, scorer and reference outcomes are tested; no agent has run it) |
 | Loop, `after-round3` | steps say a top-level session that can start subagents; the sort needs no Finder, so decision-level in a subagent may show it (guess, not yet tried) |
 | the builders' tests | no model session |
 
@@ -36,7 +38,7 @@ bash evals/agentic-review/loop/test-fixture.sh
 - `VERIFY-ONLY.md`: the candidates for the Verify-only check, in the Finding format, each tagged with its Finder.
 - `briefs.sh` and `brief-lib.sh`: build the Round 1 Finder and Verifier briefs for the planted fixture from the current `review-rounds` files, word for word, each Finder given only what `FINDERS.md` says it gets. `test-briefs.sh` checks them.
 - `round0/`: `make-fixture.sh`, `test-fixture.sh`, `EXPECTED.md`.
-- `loop/`: `make-fixture.sh` (cases `merge` and `after-round3`), `score.py` (scores a run from the files it left), `reference.sh` (hand-made right and wrong outcomes for the scorer's self-test), `test-fixture.sh`, `EXPECTED.md`.
+- `loop/`: `make-fixture.sh` (cases `merge`, `after-round3` and `empty-round`), `score.py` (scores a run from the files it left), `reference.sh` (hand-made right and wrong outcomes for the scorer's self-test), `test-fixture.sh`, `EXPECTED.md`.
 - `RESULTS.md`: one entry per run.
 
 Keep `EXPECTED.md`, `VERIFY-ONLY.md`, `score.py` and `RESULTS.md` away from the reviewing agents: they work in the scratch repo, not in this one.

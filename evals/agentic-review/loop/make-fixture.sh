@@ -1,19 +1,22 @@
 #!/usr/bin/env bash
 # Builds a loop fixture of the agentic-review eval: a small Python repo with a local Markdown tracker and pull request 1,
 # part way through its review.
-# Usage: make-fixture.sh <out-dir> <merge|after-round3>
+# Usage: make-fixture.sh <out-dir> <merge|after-round3|empty-round>
 # Makes <out-dir>/repo and <out-dir>/PROMPT.md.
 # `merge`: branch quota has had Round 1 (R1-1 open). Since then the owner fixed R1-1, and merged main, which had changed
 #   the same function, so the merge has a conflict resolution, and that resolution swaps two operands. main also added a
 #   file with a bug of its own, which is not part of the pull request. Round 2 is next.
 # `after-round3`: branch fix has had three Rounds; Round 3 is not clean, with one open Important (real at the head) and
 #   one open "fix" Nit, and nothing has been committed since.
+# `empty-round`: branch quota had a clean Round 1 (only a dismissed Nit). Since then the owner merged main, which had changed
+#   the same function; the merge conflicted and its resolution is right. Round 2 is next, and it has nothing to verify:
+#   a Finder has nothing to report and no earlier Finding is open. main also added a file with a bug of its own.
 # The scoring (EXPECTED.md, score.py) stays next to this script, never in the repo or the prompt.
 # See evals/agentic-review/README.md, "Loop cases".
 set -eu
-usage="usage: make-fixture.sh <out-dir> <merge|after-round3>"
+usage="usage: make-fixture.sh <out-dir> <merge|after-round3|empty-round>"
 out="${1:?$usage}"; case_="${2:?$usage}"
-case "$case_" in merge|after-round3) ;; *) echo "unknown case: $case_" >&2; exit 2 ;; esac
+case "$case_" in merge|after-round3|empty-round) ;; *) echo "unknown case: $case_" >&2; exit 2 ;; esac
 [ -e "$out" ] && { echo "$out exists" >&2; exit 2; }
 mkdir -p "$out"; out="$(cd "$out" && pwd -P)"
 r="$out/repo"
@@ -95,7 +98,7 @@ MD
 cat >"$r/check.sh" <<'SH'
 #!/usr/bin/env bash
 # The project's checks: the unit tests.
-set -eu
+set -euo pipefail
 cd "$(dirname "$0")"
 python3 -m unittest -q 2>&1 | tail -n 1
 SH
@@ -138,7 +141,8 @@ $8
 MD
 }
 
-if [ "$case_" = merge ]; then
+if [ "$case_" = merge ] || [ "$case_" = empty-round ]; then
+  empty=0; [ "$case_" = empty-round ] && empty=1
   cat >"$r/.scratch/issues/01-block-over-limit.md" <<'MD'
 Title: Block requests over the hour's limit
 Labels: enhancement, ready-for-agent
@@ -168,6 +172,7 @@ def allowed(used, limit):
     """Whether one more request fits in this hour."""
     return used <= limit
 PY
+  [ "$empty" = 1 ] && sed -i.bak 's/return used <= limit/return used < limit/' "$r/app/quota.py" && rm "$r/app/quota.py.bak"
   cat >>"$r/tests/test_quota.py" <<'PY'
 
 
@@ -177,20 +182,26 @@ class Allowed(unittest.TestCase):
         self.assertTrue(allowed(0, 10))
 PY
   r1="$(commit "Block requests over the hour's limit (#1)")"
-  line="$(grep -n 'return used <= limit' "$r/app/quota.py" | cut -d: -f1)"
-  round_comment 01-round-1.md 1 "$r1" "$(git -C "$r" rev-parse main)" "the whole pull request" "not clean, 1 Important open" \
-    "standards, spec, adversarial (bugs and edge cases)" \
-    "| R1-1 | Important | off-by-one at the limit | app/quota.py:$line | a request is allowed when \`used\` equals \`limit\`, so an account gets \`limit + 1\` requests | open | adversarial Finder |
+  if [ "$empty" = 1 ]; then
+    round_comment 01-round-1.md 1 "$r1" "$(git -C "$r" rev-parse main)" "the whole pull request" "clean" \
+      "standards, spec, adversarial (bugs and edge cases)" \
+      "| R1-1 | Nit (skip) | docstring wording | app/quota.py:5 | \"none once the limit is reached\" could say \"or passed\" | dismissed | Verifier: the code returns 0 past the limit too; wording only |"
+  else
+    line="$(grep -n 'return used <= limit' "$r/app/quota.py" | cut -d: -f1)"
+    round_comment 01-round-1.md 1 "$r1" "$(git -C "$r" rev-parse main)" "the whole pull request" "not clean, 1 Important open" \
+      "standards, spec, adversarial (bugs and edge cases)" \
+      "| R1-1 | Important | off-by-one at the limit | app/quota.py:$line | a request is allowed when \`used\` equals \`limit\`, so an account gets \`limit + 1\` requests | open | adversarial Finder |
 | R1-2 | Nit (skip) | docstring wording | app/quota.py:5 | \"none once the limit is reached\" could say \"or passed\" | dismissed | Verifier: the code returns 0 past the limit too; wording only |"
-  sed -i.bak 's/return used <= limit/return used < limit/' "$r/app/quota.py" && rm "$r/app/quota.py.bak"
-  cat >>"$r/tests/test_quota.py" <<'PY'
+    sed -i.bak 's/return used <= limit/return used < limit/' "$r/app/quota.py" && rm "$r/app/quota.py.bak"
+    cat >>"$r/tests/test_quota.py" <<'PY'
 
     def test_the_limit_itself_is_refused(self):
         from app.quota import allowed
         self.assertFalse(allowed(10, 10))
 PY
-  commit "fix: refuse the request that reaches the limit (R1-1)" >/dev/null
+    commit "fix: refuse the request that reaches the limit (R1-1)" >/dev/null
 
+  fi
   git -C "$r" switch -q main
   cat >"$r/app/quota.py" <<'PY'
 """Request quotas for one account."""
@@ -218,13 +229,15 @@ PY
 
 def remaining(used, limit):
     """How many requests are left this hour, never below zero."""
-    return max(0, used - limit)
+    return RESOLVED
 
 
 def allowed(used, limit):
     """Whether one more request fits in this hour."""
     return used < limit
 PY
+  if [ "$empty" = 1 ]; then sed -i.bak 's/RESOLVED/max(0, limit - used)/' "$r/app/quota.py"; else sed -i.bak 's/RESOLVED/max(0, used - limit)/' "$r/app/quota.py"; fi
+  rm "$r/app/quota.py.bak"
   git -C "$r" add -A
   git -C "$r" commit -q --no-edit
   git -C "$r" switch -q main
@@ -237,6 +250,7 @@ State: open
 Closes #1 (`.scratch/issues/01-block-over-limit.md`). Adds `allowed`, and `remaining` stops at zero.
 MD
   intro="Its Round 1 comment is posted. Since then the owner has committed a fix and merged \`main\` into the branch."
+  [ "$empty" = 1 ] && intro="Its Round 1 comment is posted. Since then the owner has merged \`main\` into the branch."
   task="run the pull request's next Round, as the skills say"
 else
   cat >"$r/.scratch/issues/01-burst-allowance.md" <<'MD'

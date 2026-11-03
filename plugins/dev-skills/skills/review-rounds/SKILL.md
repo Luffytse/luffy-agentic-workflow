@@ -1,10 +1,10 @@
 ---
 name: review-rounds
-description: "Run a review's Rounds once agentic-review's Round 0 has picked Quick, Standard or Deep: Finders, a Verifier, Rank and one comment per Round, at most 3 Rounds, then sort what is still open. Use when Round 0 hands over a Round or a Ticket check."
+description: "Run a review's Rounds once agentic-review's Round 0 has picked Quick, Standard or Deep: Finders, a Verifier (unless the Round has nothing to verify), Rank and one comment per Round, at most 3 Rounds, then sort what is still open. Use when Round 0 hands over a Round or a Ticket check."
 user-invocable: false
 ---
 
-A **Round** is one Review of a pull request (Find, Verify, Rank), its one comment, and the fix commits after it. A pull request gets at most **3 Rounds**. Load `review-record` by name for the comment shape and for reading earlier comments.
+A **Round** is one Review of a pull request (Find, Verify, Rank; Verify is skipped when there is nothing to verify), its one comment, and the fix commits after it. A pull request gets at most **3 Rounds**. Load `review-record` by name for the comment shape and for reading earlier comments.
 
 Run every Round in the **top-level session**, the one that can start subagents: a subagent cannot start its own, so never hand a Round to one. Every Finder and Verifier is a **brand-new subagent** each Round, given a brief, never this skill. If subagents cannot be started, stop and tell the user. Agents name a **model tier**; load `model-tiers` by name for the model each tier is in your coding agent (the project's own tier map wins). The issue tracker should have been provided to you; if not, tell the user to run `setup-dev-skills`.
 
@@ -16,6 +16,8 @@ Run every Round in the **top-level session**, the one that can start subagents: 
 | Round 1, Standard | standards, spec (regular); 1 adversarial on the best-fitting angle (cheap) | 1 (regular) |
 | Round 1, Deep | Standard's three, plus a security Finder (premium) | 1 (premium) |
 | Rounds 2 and 3, any level | 1 later-Round Finder: standards and spec in one (regular; premium at Deep) | 1 (regular; premium at Deep) |
+
+A Verifier column entry is the Verifier that runs when step 3 starts one; step 3 says when none runs.
 
 The briefs are in [FINDERS.md](FINDERS.md) and [VERIFY.md](VERIFY.md); read each when you brief that agent. At Deep, also read [DEEP.md](DEEP.md).
 
@@ -33,7 +35,7 @@ In Round 1, gather these and pass them on to Rounds 2 and 3; re-read only a sour
 
 1. **Pin.** Round 1 reviews the whole pull request, with Round 0's diff. Rounds 2 and 3 review only its new commits: `git log -p --first-parent --remerge-diff <last-head>..HEAD`, where `<last-head>` is the head in the last Round comment. This shows each commit of the pull request, and for a merge from main only its conflict resolutions. Record `git rev-parse HEAD` as the head.
 2. **Find.** Start the Finders for this Round in one parallel batch. Before Verify, count one report from each Finder, a "nothing found" included; ask again for a missing one, or start a new Finder on the same brief.
-3. **Verify.** Start the Verifier with every candidate, tagged with its Finder, and every open Finding from earlier Rounds and Ticket checks, with any dispute of it. Its calls are final. Wait for its report the same way.
+3. **Verify.** Start the Verifier with every candidate, tagged with its Finder, and every open Finding from earlier Rounds and Ticket checks, with any dispute of it. Its calls are final. Wait for its report the same way. When no Finder returned a candidate and no earlier Finding is open, start no Verifier: go to Rank, and the Round comment says no candidates went to a Verifier. Otherwise the Verifier is a separate agent each Round.
 4. **Rank** yourself. Two Findings match when they are in the same file and make the same claim. Merge matching Findings into one, keeping every location and Finder. A Finding matching an earlier open one keeps that id. Drop one matching an earlier dismissed Finding, unless the code at its locations changed since. Sort Important, then Nit, then Pre-existing; report at most 5 Nits, "fix" ones first.
 5. **Post** the Round comment and report to your caller under `## Important`, `## Nits` and `## Pre-existing`, each Finding with its id, Bug class, locations, claim and failure scenario.
 
@@ -50,7 +52,7 @@ A session that finds Round comments already posted continues from the latest one
 A Round is **clean** when no Important is open after its Verify.
 
 - **Clean:** the owner commits the "fix" Nits in one last commit that the project's checks pass, and the Round comment, posted after it, marks them fixed. The pull request is ready to merge.
-- **Not clean:** the owner of the code (in a build thread, its Implementer) fixes every open Important and "fix" Nit and leaves the "skip" Nits. An owner who thinks a Finding is wrong writes why, with evidence (`file:line`, a command and its output), in the commit message or a pull request comment, and the next Verifier decides. Each open Important is fixed or disputed before the next Round. When nothing was committed since the last head, the next Round is the Verifier alone, on the disputes.
+- **Not clean:** the owner of the code (in a build thread, its Implementer) fixes every open Important and "fix" Nit and leaves the "skip" Nits. An owner who thinks a Finding is wrong writes why, with evidence (`file:line`, a command and its output), in the commit message or a pull request comment, and the next Verifier decides. Each open Important is fixed or disputed before the next Round. When nothing was committed since the last head, the next Round is the Verifier alone, on the disputes (an open dispute is an open Finding, so that Verifier runs).
 - **The level only goes up.** When a new commit touches what Round 0 would call Deep, the next Round runs at Deep.
 - **After Round 1 or 2**, if not clean, the next Round follows. **After Round 3**, if not clean, sort what is open (below).
 
