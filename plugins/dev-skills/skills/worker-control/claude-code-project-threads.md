@@ -35,7 +35,7 @@ Source: [send work and read results](https://code.claude.com/docs/en/claude-proj
 
 ### Read a worker's state
 
-`list_threads`, reading **every page** until it returns no next cursor: a state filter applies page by page, so one page can miss a thread. For a finer reading, `get_session` on the thread's session gives its session status (running, idle, archived) and status bucket (runtime-reported; unproven from the coordinator until the check passes). Running and idle are not ended. Tracker comments and the thread's last message are never the state.
+`list_threads`, reading **every page** until it returns no next cursor: a state filter applies page by page, so one page can miss a thread. `list_threads` can lag about a minute behind a thread's end, so a thread that just ended may be missing from it: read `get_session` on its session, or wait and list again. `get_session` gives the session status (running, idle, archived) and status bucket (runtime-reported). A coordinator may not hold `get_session` (the check's coordinator did not): it then relies on `list_threads` and, for a finer or fresher reading, asks a thread to read `get_session` for it. A thread reads it. Running and idle are not ended. Tracker comments and the thread's last message are never the state.
 Source: [see what needs you](https://code.claude.com/docs/en/claude-projects#see-what-needs-you-in-overview), [work with sessions](https://code.claude.com/docs/en/claude-code-on-the-web#work-with-sessions)
 
 ### Notice a worker ended or failed

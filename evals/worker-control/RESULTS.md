@@ -18,7 +18,44 @@ Pass: yes | no. Lessons: <what to change in the skill, if anything>
 
 ## Runs
 
-### 2026-11-03, commit 583b965 (branch `t527-harness-team`; base 36a2530), dev-skills 0.48.0 (base): claude.ai project, detection by tool names and the check still owed
+### 2026-11-03 06:05-07:06 UTC, commit fd8b853 (branch `claude/project-thread-r67ntb`, PR #531), dev-skills 0.48.0 (base): claude.ai project, check run (Case 1), and unknown-harness case (Case 2)
+
+Source: the coordinator's recorded run, [#527 comment 6597596744](https://github.com/Luffytse/luffy-dev-skills/issues/527#issuecomment-6597596744), copied here. Supersedes the "check still owed" entries below for the check, except the second check-in arrival, which is still owed.
+
+#### Case 1: Claude Code project, check run
+
+Runner: a project thread (session `session_REMOVED`, parent `session_REMOVED` = the coordinator), not the coordinator: the coordinator reported it held no `get_session` in that turn and cannot create timers. Worker starts went through the coordinator, which started 3 cheap-tier threads (probe A, probe B, stop thread) from the runner's exact briefs. The coordinator read the check-in arrival itself.
+Runtime (probe 1): `get_session` on the runner's session: `environment_kind` `anthropic_cloud`, permission mode `auto`, `parent_session_id` = the coordinator. Tools: `message_coordinator` present, `start_thread` absent: thread/worker row 2 of the detection table, matches the reference. Shell: `CLAUDECODE=1`, `IS_SANDBOX=1` (sandbox on), `CLAUDE_CODE_CHILD_SESSION=1`. Held: `create_trigger`, `list_triggers`, `update_trigger`, `delete_trigger`, `send_later`, `archive_session` (via claude-code-remote), `get_session`, `list_events`.
+Docs used: the pages cited in `claude-code-project-threads.md` (projects, scheduled tasks, cloud sessions).
+
+```
+| Capability | Essential | Method | Result | Evidence | Limits |
+| Start a worker | yes | coordinator start_thread | pass | A: thread cmsg_...SN6n2t..., session cse_REMOVED; B: cmsg_...Va8iaw..., cse_REMOVED; both created 06:05:44-46 and readable by get_session at 06:05:57 | none |
+| Worker state | yes | get_session | pass | A at 06:05:57: RUNNING / bucket WORKING; after its turn IDLE / WORKING | read by a thread; the coordinator said it had no get_session that turn, so "get_session from the coordinator" is unproven |
+| Pause and resume | yes | message_thread "Pause/Resume <token>" | pass | pause sent 06:05:59, A stopped its loop (TaskStop 06:06:07, one line written 06:05:58) and replied "paused wc-start-41bdf5b7" 06:06:10; resume sent ~06:06:20, loop restarted 06:06:24, "resumed ..." reply 06:06:24 | scratch file is in A's container and could not be read; growth rests on A's own tool output and replies |
+| Confirmed stop | yes | stop thread (wc-stop-07d4a46a, session cse_REMOVED) | pass | stop thread: before IDLE/WORKING, archive_session, after ARCHIVED/COMPLETED (06:06:32-06:07:01); the runner then read A itself: session_status ARCHIVED, bucket COMPLETED | an archive can be undone with unarchive_session |
+| End or failure notice | yes | thread reply wakes coordinator | pass | B replied "done wc-end-21c72645" 06:05:57; the coordinator got it as a wake; get_session on B: IDLE, bucket COMPLETED (post_turn_summary completed) | list_threads did not show B for about a minute after it ended (coordinator's read at 06:06); only get_session showed it. Failure not provoked |
+| Scheduled check-in | yes | thread creates recurring task aimed at the coordinator | partial: arrived once, not twice | created trig_REMOVED 06:05:33 ("0 * * * *" stored as "5 * * * *", aimed at the coordinator via persistent_session_id). Arrived in the coordinator's own events 07:05:40.997Z, triggerFireReason scheduled, inbound_origin trigger_fire, its own turn, not a wake; last_run SUCCEEDED, session cse_REMOVED. Ended: delete_trigger, then list_triggers(enabled=true) empty | the second arrival (due 08:05) was skipped on the user's word: a 5-minute schedule was rejected ("minimum interval is 1 hour"), so the test cannot be made shorter. Arrival was about 35 s after the cron minute |
+```
+
+Also created and deleted: `trig_REMOVED` (a one-shot `send_later` reminder to the runner); `list_triggers` shows no scheduled task of this run left.
+Cleanup: probe A archived, probe B ended (COMPLETED), stop thread ended; no scheduled task left.
+Verdict: ready except one row: arrived once, second arrival skipped. Start, state, pause/resume, confirmed stop and end notice pass. The check-in method works (one scheduled arrival in the coordinator's own record, ended and read back), but "arrives at least twice" was not shown. **Whether one arrival is enough is the user's call**, not decided here; the skill keeps the two-arrival rule until the user decides.
+
+#### Case 2: unknown harness
+
+A fresh subagent was given only `SKILL.md` and `FACTS.md` (it found `DOCS.md` from the runtime help line). Against the README's pass list:
+- Step 1: no row matched; harness named Example Runner 3.2 from `EXAMPLE_RUNNER_VERSION`. Pass.
+- Step 3 from DOCS.md: start `spawn_worker`; state `worker_status`; `message_worker` NOT taken as stop or pause. Not available: stop, pause/resume, end/failure notification (polling only), scheduled check-in. Pass.
+- Nothing taken from a Claude Code reference. Pass.
+- One user line: "No reference for Example Runner; I read its methods from DOCS.md... Not available: stop, harness pause and resume, a worker-to-coordinator reply channel, end or failure notification, and scheduled check-in." Pass.
+- Planned Verdict: not ready: Pause and resume, Confirmed stop, End or failure notice, each with its meaning. Confirmed stop and End notice named, as required. Scheduled check-in was marked "not relied on" (allowed by Step 4 probe 7); the README lists it as a failure "where the work relies on them".
+- Minor: it added a "worker-to-coordinator reply channel" limit the docs do not state outright, and left the role "unknown". Neither changes the verdict.
+
+Not exercised: a provoked failure; the second check-in arrival; Remote Control threads.
+Pass: yes for Case 2; Case 1 ready except one row (above). Lessons: (1) `list_threads` can lag about a minute after an end and the coordinator may not hold `get_session`: the reference now names the read the coordinator can use and lets a thread read `get_session` for it. (2) The scheduler's minimum interval is one hour, so the check-in probe takes about 2.5 hours: recorded in probe 7; the pass rule is unchanged. (3) Probe workers run in separate containers, so "scratch file grows" is not available from outside; replies are the evidence for a project check: now stated in probes 3 and 4.
+
+### 2026-11-03, commit 583b965 (branch `t527-harness-team`; base 36a2530), dev-skills 0.48.0 (base): claude.ai project, detection by tool names and the check still owed (check superseded by the 06:05 UTC run above; second check-in arrival still owed)
 
 Runner: the #527 Implementer, a subagent of the Spec thread (session `session_REMOVED`), applying Step 1 of the renamed skill by hand at 04:02 UTC. It ran no probe.
 Detection, by the table's order:
