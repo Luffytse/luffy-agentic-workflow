@@ -123,6 +123,20 @@ class SkillLoadingPackaging(unittest.TestCase):
         self.plant("plugins/dev-skills/skills/model-tiers/SKILL.md")
         self.check(0)
 
+    def test_spaced_gpt_name_fails(self):
+        self.plant("plugins/dev-skills/skills/implement/SKILL.md", "Run it on GP" + "T 6.\n")
+        self.check(1)
+
+    def test_o_series_name_fails(self):
+        self.plant("plugins/dev-skills/skills/implement/SKILL.md", "Use o" + "4-mini for this.\n")
+        self.check(1)
+
+    def test_underscore_joined_and_digit_prefixed_o_series_digits_pass(self):
+        # Covers only underscore-joined (foo_o3_bar) and digit-prefixed (4o3) identifiers;
+        # hyphen- or dot-joined ones are flagged by design.
+        self.plant("plugins/dev-skills/skills/implement/SKILL.md", "Set foo_o" + "3_bar and version 4o3.\n")
+        self.check(0)
+
     def test_every_tier_naming_skill_points_at_the_map(self):
         skills = self.repo / "plugins/dev-skills/skills"
         for name in ["implement", "implement-spec", "review-rounds", "to-tickets",
