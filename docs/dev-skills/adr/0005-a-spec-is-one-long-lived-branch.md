@@ -6,6 +6,8 @@ A spec's ticket branches stay inside the build thread and are never pushed; only
 
 Amended 2026-11-03 (Spec #555): a section here described restarting a spec on a fresh spec branch when its review would not settle (2026-11-02, Spec #400). The review no longer has attempts or a restart ([ADR 0003](0003-code-review-runs-find-verify-rank-in-rounds.md)), so the section is removed.
 
+Amended 2026-11-03 (#513): a Ticket that carries another coding agent's agent-only label is built by that agent on the same spec branch, not by the spec thread and not through a pull request to main. The spec thread hands it off with a comment on the Ticket and keeps the spec pull request, its review and its merge; the other agent builds the Ticket off the pushed spec branch, runs its ticket check, squash-merges it into the spec branch and pushes, and the spec thread reads that check instead of repeating it. The spec pull request does not merge until that Ticket has landed or the user drops it. If the spec closed with such a Ticket still open, the spec is reopened and the remaining Tickets reach main through a continuation spec pull request on a spec branch of the same name, recreated from main.
+
 ## Why
 
 - A live test in a cloud thread (2026-10-29) showed two subagents can each work in their own worktree off a spec branch, commit, and be squash-merged back, in parallel.

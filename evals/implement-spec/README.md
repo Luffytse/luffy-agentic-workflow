@@ -13,3 +13,7 @@ Build each case with the `spec` flow: `bash evals/implement/merge-authority/make
 ## Evidence-owner check
 
 See [`implement`'s README](../implement/README.md#evidence-owner-check); the case applies to the Spec thread's steps 3 and 4. Model-run results: owed.
+
+## Mixed-agent check
+
+**Run level**: decision-level in a subagent. Case files in [`mixed-agent/`](mixed-agent/): `SPEC.md` (a Spec whose ticket 42 carries the other agent's label and blocks 43), `PROMPT.md` (the Spec thread writes what it does in five scenarios: mixed-agent siblings, a closed Spec with an open ticket, a same-agent Spec, re-entry after a foreign ticket landed, no authorized dispatch; then the other agent's worker side), `EXPECTED.md` (pass and fail per scenario; keep it away from the session under test) and `test.sh`, which checks the files exist and that `implement-spec`, `implement`, `team-lead` and ADR 0005 carry the continuation mechanism. Give the subagent `implement-spec`, `implement` and `team-lead` from the checkout, `SPEC.md` and `PROMPT.md`, and score its answer against `EXPECTED.md`. Model-run results: owed.

@@ -11,7 +11,7 @@ Read the configured project issue-tracker doc before tracker operations. If none
 
 Fetch the ticket from the issue tracker and state its title. If the reference is ambiguous, ask.
 
-- If it is a Spec, or a Ticket under one, stop and use `implement-spec` for the Spec instead.
+- If it is a Spec, or a Ticket under one, stop and use `implement-spec` instead, carrying the Spec, or the Ticket and any handoff it was given: its step 1 decides whether you own the Spec or build that one Ticket for its owner.
 - Use the tracker doc's **Count open blockers** operation and its completion rules. If any blocker remains uncleared, stop and tell the user (or the coordinator) which.
 - Read whether the ticket is parked with the tracker doc's **Park** operation. If it is, stop and tell the user (or the coordinator): it waits on the user, and the user lifts the park.
 

@@ -129,6 +129,9 @@ The branch one Ticket is built on. A Spec's Ticket branches start from the Spec 
 **Ticket check**:
 One Quick Round over a Spec's Ticket branch, against the Spec branch, before the Ticket joins it, recorded on the Spec pull request. Its open Findings carry into the Spec pull request's Round 1. Not one of the Spec pull request's Rounds.
 
+**Continuation**:
+The build of a Spec's Ticket that carries another agent's Agent label, by that agent, off the pushed Spec branch: the Spec thread hands it off and keeps the Spec pull request, and the other agent runs its Ticket check and squash-merges it in. Also the continuation Spec pull request that brings a closed Spec's remaining Tickets to main.
+
 ## Docs
 
 **Skill docs folder**:
