@@ -8,7 +8,7 @@
 - **Routing follows where the fix lands.** A problem with a skill or the workflow (skill text, review rules, how threads run) goes to the `dev-skills` repo, from any project. A problem only one project has (its CI, its docs, its `CLAUDE.md`) goes to that project's repo. No suggestion goes to both. A project that wants a skill of its own builds it in its own repo or `CLAUDE.md`; it may still suggest a `dev-skills` change, which `dev-skills`' Retro planning accepts or closes as won't do, with a reason.
 - `retro` finds the `dev-skills` repo from the `repository` field of the plugin's manifest (`plugins/dev-skills/.claude-plugin/plugin.json`), and the project's tracker from its `docs/dev-skills/issue-tracker.md`. When the thread cannot write to the `dev-skills` repo, `retro` puts the issue text in its report so the coordinator can file it.
 - **Votes.** When an open Retro issue already covers a suggestion, `retro` comments "seen again in <thread>" on it instead of opening a duplicate.
-- **Trigger.** After filing, `retro` counts the repo's open Retro issues and reads the newest closed Retro planning record. Its report says Retro planning is due when 10 or more are open, or when 2 weeks have passed since the last planning and at least 4 are open. The numbers live in one place in the skill. The person decides when to start; the coordinator offers a thread.
+- **No due notice.** `retro` does not count the backlog or say Retro planning is due (changed by #570): inside a Milestone the Release thread runs Retro planning at every Release end, and the user can start one by asking.
 - `implement` and `implement-spec` run `retro` on their own thread as their last step, once the pull request is merged and its issue is closed; a thread that handed its pull request to the person waits, and runs `retro` after the person merges it, or asks whether to run it if the person drops or closes the pull request unmerged, or the thread never opened one. Planning threads keep their project's rule instead.
 
 ## Retro planning (what `retro-planning` does)
@@ -23,9 +23,9 @@ It runs per repo and reads only that repo's Retro issues; the `dev-skills` repo 
 6. An issue with no new vote across 2 plannings is closed with "reopen if seen again", unless it was held back only by the cap or is spun off.
 7. **Spin-off.** A group the person wants to discuss further is not decided in this planning. It gets a separate planning thread (asked of the coordinator in a project, otherwise of the person), and each of its issues a comment naming that thread. A spun-off group does not count toward the cap, stays open and cannot expire. The owning thread ends by giving each issue a verdict: absorbed by a Ticket it files, or closed with a reason. It files no record of its own and leaves the spinning planning's record body alone; it comments each Ticket it files on that record, and later plannings read those comments with the record and recheck those fixes like any other. Until then, later plannings list those issues as "spun off, waiting" and skip them, as they skip issues waiting on an open Ticket.
 8. Recheck whether the problem behind an earlier fix has come back. If it has, the fix did not work, and that group goes first.
-9. The record lists the snapshot, the cap, every verdict and vote count, what was spun off and what arrived during the planning. The planning closes it at the end. A planning that pauses leaves it open and is resumed from it: the resumed run keeps the snapshot, first brings the record up to date with what was already done on the issues (closes, Tickets, spin-offs), redoes the grouping for the issues still without a verdict, and walks on from there. The next planning, and `retro`'s 2-week clock, read only closed records; the clock runs from the newest closed record's creation, which is now its planning's start.
+9. The record lists the snapshot, the cap, every verdict and vote count, what was spun off and what arrived during the planning. The planning closes it at the end. A planning that pauses leaves it open and is resumed from it: the resumed run keeps the snapshot, first brings the record up to date with what was already done on the issues (closes, Tickets, spin-offs), redoes the grouping for the issues still without a verdict, and walks on from there. The next planning reads only closed records.
 
-The thresholds (10, 2 weeks with 4, at most 3 groups, 2 plannings) are the user's choices, not taken from a source. Inside a Milestone (ADR 0004, ADR 0008) the 3-group cap and the walk with the person do not apply: agents decide every group at Release end (see `retro-planning`).
+The limits (at most 3 groups, 2 plannings) are the user's choices, not taken from a source. Inside a Milestone (ADR 0004, ADR 0008) the 3-group cap and the walk with the person do not apply: agents decide every group at Release end (see `retro-planning`).
 
 ## Considered options
 
@@ -37,7 +37,7 @@ The thresholds (10, 2 weeks with 4, at most 3 groups, 2 plannings) are the user'
 
 ## Consequences
 
-- `retro` gains filing, routing, votes and the trigger (Patches). `plugin.json` gains a `repository` field.
+- `retro` gains filing, routing, votes (Patches; its trigger was removed by #570). `plugin.json` gains a `repository` field.
 - A new skill of our own, `retro-planning`, lives under `plugins/dev-skills/skills/`, and `ask-matt` routes to it (a Patch).
 - `triage` must skip issues labelled `retro`, since they carry no `needs-triage` and would otherwise look untriaged (a Patch).
 - `implement` and `implement-spec` end with `retro` (Patches).

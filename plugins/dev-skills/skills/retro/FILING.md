@@ -16,17 +16,6 @@ Every candidate from step 4 that is not a repeated Bug class becomes a **Retro i
 
 If this thread cannot write to the target repo, do not file. Put the full issue text (title, labels, body) in the report so the coordinator can file it.
 
-## When Retro planning is due
-
-One retro can file into both repos. After filing, check each repo you filed or voted into on its own: count that repo's open `retro` issues. Planning is due for a repo when either holds:
-
-- 10 or more are open;
-- 2 weeks have passed since the clock started, and at least 4 are open.
-
-The clock starts at the creation of that repo's newest closed issue labelled `retro-planning`. With none, it starts at that repo's oldest open `retro` issue.
-
-The user decides when planning starts; do not start it. Say in the report which repo it is due for, so the coordinator can offer the user a `retro-planning` thread.
-
 ## Report
 
-List each suggestion with the issue it went to (filed or voted on, with the link), the full text of any issue you could not file, and a due notice naming each repo that is due.
+List each suggestion with the issue it went to (filed or voted on, with the link), and the full text of any issue you could not file.

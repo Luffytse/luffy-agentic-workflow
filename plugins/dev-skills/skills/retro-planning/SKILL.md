@@ -1,6 +1,6 @@
 ---
 name: retro-planning
-description: Work through this repo's Retro backlog: snapshot the open Retro issues, group them by root cause, walk the user through each group one at a time and act on each call at once (a Ticket, a close, or a spin-off to its own planning), keeping an open record that is closed at the end; inside a Milestone, agents decide every group at Release end. Use when Retro planning is due, or to resume one whose record is still open.
+description: Work through this repo's Retro backlog: snapshot the open Retro issues, group them by root cause, walk the user through each group one at a time and act on each call at once (a Ticket, a close, or a spin-off to its own planning), keeping an open record that is closed at the end; inside a Milestone, agents decide every group at Release end. Use when the user asks for Retro planning, when a Release ends inside a Milestone, or to resume one whose record is still open.
 ---
 
 A **Retro planning** works through one repo's **Retro backlog** (its open issues labelled `retro`): it merges duplicates, closes one-offs, and turns repeated problems into Tickets. Run this thread at the **premium** tier: the snapshot, verdict, cap, order, spin-off and expiry rules below interact, and each must be applied exactly. Load `model-tiers` by name for the model each tier is in your coding agent; the project's own tier map overrides it.
@@ -121,7 +121,7 @@ Done when the issue's state matches the call and the record shows it.
 
 ## 7. Close the record
 
-End every planning by closing the record, also when the user declined every verdict: once closed, it is the newest record, so `retro`'s clock runs from its creation (the snapshot time) and the expiry counts advance. Before closing, fill "Arrived during this planning" (each open `retro` issue filed, and each `Seen again` comment made, after the snapshot time), "Open issues: plannings without a new vote", and the waiting lists. Then close it, and give the user its link.
+End every planning by closing the record, also when the user declined every verdict: once closed, it is the newest record, so the expiry counts advance. Before closing, fill "Arrived during this planning" (each open `retro` issue filed, and each `Seen again` comment made, after the snapshot time), "Open issues: plannings without a new vote", and the waiting lists. Then close it, and give the user its link.
 
 A planning that pauses before the end leaves its record open; the next run of this skill resumes it at step 0.
 
