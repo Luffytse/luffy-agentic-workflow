@@ -73,6 +73,40 @@ class SkillLoadingPackaging(unittest.TestCase):
         self.plant("docs/dev-skills/glossary.md", "Ask Lu" + "fei.\n")
         self.check(1)
 
+    def test_skill_file_over_5000_words_fails_and_under_passes(self):
+        self.plant("plugins/dev-skills/skills/implement/SKILL.md", "word " * 5000)
+        self.check(1)
+        shutil.copy(pathlib.Path(__file__).resolve().parents[1] / "plugins/dev-skills/skills/implement/SKILL.md",
+                    self.repo / "plugins/dev-skills/skills/implement/SKILL.md")
+        self.plant("plugins/dev-skills/skills/implement/SKILL.md", "word " * 100)
+        self.check(0)
+
+    def test_new_reference_file_over_5000_words_fails(self):
+        (self.skill / "big.md").write_text("word " * 5001)
+        self.check(1)
+        (self.skill / "big.md").write_text("word " * 4999)
+        self.check(0)
+
+    def test_known_over_file_may_not_grow(self):
+        self.plant("plugins/dev-skills/skills/release/SKILL.md", "word " * 5)
+        self.check(1)
+
+    def test_known_over_file_under_the_limit_must_leave_the_list(self):
+        path = self.repo / "plugins/dev-skills/skills/release/SKILL.md"
+        path.write_text("word " * 4000)
+        self.check(1)
+
+    def test_known_over_file_that_is_gone_must_leave_the_list(self):
+        (self.repo / "plugins/dev-skills/skills/release/SKILL.md").rename(
+            self.repo / "plugins/dev-skills/skills/release/NOTES.md")
+        self.check(1)
+
+    def test_known_over_file_that_shrinks_passes(self):
+        path = self.repo / "plugins/dev-skills/skills/release/SKILL.md"
+        words = path.read_text().split(" ")
+        path.write_text(" ".join(words[:-20]))
+        self.check(0)
+
     def plant(self, rel, text="Run it on Son" + "net.\n"):
         with open(self.repo / rel, "a") as f:
             f.write("\n" + text)

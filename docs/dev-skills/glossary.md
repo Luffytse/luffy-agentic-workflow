@@ -200,7 +200,7 @@ How hard a change is to walk back. A **one-way door** is a change that reverting
 _Avoid_: risk level
 
 **Boundary record**:
-A repo's agent doc, `docs/dev-skills/boundaries.md`, written with the user by `setup-dev-skills`: which irreversible actions agents may take, which actions need the user's approval (the list may be empty), the resource budget, the check-in interval (default one hour) and the form of a Milestone's membership label (for example `milestone-<n>`). Inside a Milestone, the build skills read it instead of a fixed list to decide whether a pull request crosses a boundary and so goes to the user; outside one, the build skills' outside-a-Milestone merge list governs (ADR 0004). A Milestone issue may add allowed or forbidden actions for its own issues and wins over the record for them.
+A repo's agent doc, `docs/dev-skills/boundaries.md`, written with the user by `setup-dev-skills`: which irreversible actions agents may take, which actions need the user's approval (the list may be empty), the resource budget, the check-in interval (default one hour) and the form of a Milestone's membership label (for example `milestone-<n>`). Inside a Milestone, the build skills read it instead of a fixed list to decide whether a pull request crosses a boundary and so goes to the user; outside one, the build skills' outside-a-Milestone merge list governs (ADR 0004). A repo may add its own limits to its record; this repo's is the skill file size limit (5,000 words, a split-or-redesign decision for the user, enforced by the `skill-file-size` check). A Milestone issue may add allowed or forbidden actions for its own issues and wins over the record for them.
 _Avoid_: permissions file, policy
 
 **Bug class**:

@@ -29,6 +29,7 @@
 #   worker-reference-sources     each worker-control reference has methods, each method a Source: line with a doc link, each Detect and harness fact bullet a doc link
 #   team-lead-no-harness-detail  team-lead text names no harness tool (no mcp__ name, no `name` a worker-control reference puts in backticks); it calls worker-control
 #   milestone-no-delivery-detail the milestone skill plans and reports and hands delivery to team-lead: it names team-lead, and its text names no harness tool and no delivery record kind
+#   skill-file-size              no skill file (a SKILL.md or a reference .md under a skill) is over 5,000 words, except the known files, which may not grow
 #
 # `claude plugin validate .` is not run here: CI runs it as its own step; the README says to run it before pushing.
 #
@@ -354,6 +355,45 @@ sys.exit(1 if failed else 0)
 PYCODE
 then
   bad "milestone-no-delivery-detail failed (see above; requires python3): delivery is team-lead's, worker lifecycle is worker-control's"
+fi
+
+# skill-file-size: a skill file (every .md under skills/) over 5,000 words is a split-or-redesign question for the user
+# (Boundary record). Words are whitespace-separated tokens. A file over the limit when this check landed is listed in
+# known_over with its word count then: it may not grow, and it comes off the list once it is back to 5,000 or fewer.
+# Any other file over the limit fails.
+if [ -d "$skills" ] && ! python3 - "$skills" <<'PYCODE'
+import pathlib
+import sys
+
+LIMIT = 5000
+known_over = {  # path under skills/ -> words when this check landed
+    "release/SKILL.md": 6922,
+}
+skills = pathlib.Path(sys.argv[1])
+failed = False
+seen = set()
+for page in sorted(skills.rglob("*.md")):
+    rel = page.relative_to(skills).as_posix()
+    words = len(page.read_text().split())
+    seen.add(rel)
+    if rel in known_over:
+        if words > known_over[rel]:
+            print(f"FAIL: skill-file-size: {rel}: {words} words, grown past its recorded {known_over[rel]}; see writing-for-agents' \"When to split\"")
+            failed = True
+        elif words <= LIMIT:
+            print(f"FAIL: skill-file-size: {rel}: {words} words, under {LIMIT} now; remove it from known_over")
+            failed = True
+    elif words > LIMIT:
+        print(f"FAIL: skill-file-size: {rel}: {words} words, over {LIMIT}; see writing-for-agents' \"When to split\" and bring the user in to decide a split or a redesign")
+        failed = True
+for rel in known_over:
+    if rel not in seen:
+        print(f"FAIL: skill-file-size: {rel} no longer exists; remove it from known_over")
+        failed = True
+sys.exit(1 if failed else 0)
+PYCODE
+then
+  bad "skill-file-size failed (see above; requires python3)"
 fi
 
 [ "$fail" -eq 0 ] && echo "OK: dev-skills plugin checks passed"
