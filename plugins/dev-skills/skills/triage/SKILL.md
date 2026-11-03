@@ -155,4 +155,4 @@ At the end, post one comment on the release issue, in the tracker doc's **Commen
 
 When the caller asks for a dry run (proposals only), run the batch's steps 1 to 3 and the "Goes to the user" test, and write nothing to the tracker: no comment, label, close, brief, `.out-of-scope/` file or summary, and ask the user nothing. Return the rows the summary would hold, plus for each the outcome step 5 would apply, in your reply.
 
-The re-read of open Tickets after a skill change merges is not part of the batch; it stays right after each merge.
+Any merge-time step the repo's own docs give is not part of the batch; it stays at or after the merge it belongs to.

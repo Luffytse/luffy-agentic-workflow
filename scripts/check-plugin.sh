@@ -23,8 +23,12 @@
 #   vendor-model-names           no vendor model name in the repo's text (ADR 0002)
 #   no-person-names              no person's name in skill or doc text
 #   repo-free-skill-text         skill text names nothing that exists only in this repo
+#   no-repo-merge-rules          skill text does not state this repo's merge-time rules (the version hand-out, the Ticket re-read after a skill merge); a skill says to follow the repo's own docs
 #   no-agent-label-strings       the plugin names no repo's agent-only label strings (a repo maps the role in its triage-labels.md)
 #   tracker-operation-names      each operation cited as the tracker doc's **Name** or "Name" operation exists as a bold bullet in every issue-tracker seed
+#   worker-reference-sources     each worker-control reference has methods, each method a Source: line with a doc link, each Detect and harness fact bullet a doc link
+#   team-lead-no-harness-detail  team-lead text names no harness tool (no mcp__ name, no `name` a worker-control reference puts in backticks); it calls worker-control
+#   milestone-no-delivery-detail the milestone skill plans and reports and hands delivery to team-lead: it names team-lead, and its text names no harness tool and no delivery record kind
 #
 # `claude plugin validate .` is not run here: CI runs it as its own step; the README says to run it before pushing.
 #
@@ -211,6 +215,16 @@ if [ -n "$hits" ]; then
   bad "skill text names something only this repo has (an ADR number, \"Upstream\", a project, repo or person, or this repo's tooling)"
 fi
 
+# no-repo-merge-rules: the version hand-out (the coordinator gives each skill-changing pull request its number, one at a
+# time) and the Ticket re-read after a skill merge are this repo's own merge-time rules (CLAUDE.md, docs/agents/release.md).
+# Skill text only says to follow the merge-time steps the repo's own docs give, so it describes neither: no handing out
+# of version numbers, no "version hand-out", no "skill merge".
+hits="$(grep -rniE --include='*.md' --include='*.yaml' 'hand(s|ed|ing)? out (the |a |an |each |next |no |any |further |new )*(version )?numbers?|numbers? (is |are )?handed out|version hand-?out|skill merge|re-?read(s|ing)? (of )?(the )?open (issues|tickets)' "$skills")"
+if [ -n "$hits" ]; then
+  echo "$hits"
+  bad "skill text states a merge-time rule that only fits this repo (the version hand-out, the Ticket re-read after a skill merge); say to follow the merge-time steps the repo's own docs give"
+fi
+
 # no-agent-label-strings: the plugin speaks of the "agent-only" label role, never of one repo's label strings for it
 # (those name particular coding agents and live in each repo's docs/agents/triage-labels.md). Checks the whole plugin tree
 # except CHANGELOG.md, which records releases in this repo's words.
@@ -237,6 +251,110 @@ for seed in "$skills"/setup-dev-skills/issue-tracker-*.md; do
 $(grep -rnoE --include='*.md' "tracker doc's (\*\*[^*]+\*\*|\"[^\"]+\") operation" "$skills" | grep -v "/setup-dev-skills/issue-tracker-" | sed -E 's/^([^:]+:[0-9]+):/\1: /')
 EOF_HITS
 done
+
+# worker-reference-sources: a worker-control reference (any .md in skills/worker-control other than SKILL.md) is looked up,
+# never guessed, so its structure carries a doc page for every claim: at least one ### method under
+# "## Methods the coordinator adds", a "Source:" line with an https link in every ### section, and an https link in
+# every bullet under "## Detect" and "## What the harness does by itself". Structure only, never the wording.
+if [ -d "$skills/worker-control" ] && ! python3 - "$skills/worker-control" <<'PYCODE'
+import pathlib
+import sys
+
+failed = False
+
+
+def report(message):
+    global failed
+    print(f"FAIL: worker-reference-sources: {message}")
+    failed = True
+
+
+for ref in sorted(pathlib.Path(sys.argv[1]).glob("*.md")):
+    if ref.name == "SKILL.md":
+        continue
+    name = f"worker-control/{ref.name}"
+    section, method, sourced, methods = None, None, False, 0
+    for n, line in enumerate(ref.read_text().splitlines() + ["## end"], 1):
+        if line.startswith("## ") or line.startswith("### "):
+            if method is not None and not sourced:
+                report(f"{name}: method \"{method}\" has no Source: line with a doc link")
+            if line.startswith("## "):
+                section, method = line[3:].strip(), None
+            else:
+                method, sourced = line[4:].strip(), False
+                methods += section == "Methods the coordinator adds"
+        elif method is not None:
+            sourced = sourced or (line.startswith("Source:") and "(https://" in line)
+        elif section in ("Detect", "What the harness does by itself") and line.startswith("- ") and "(https://" not in line:
+            report(f"{name}:{n}: bullet has no doc link: {line[:80]}")
+    if methods == 0:
+        report(f"{name}: no ### method under \"## Methods the coordinator adds\"")
+sys.exit(1 if failed else 0)
+PYCODE
+then
+  bad "worker-reference-sources failed (see above; requires python3)"
+fi
+
+# team-lead-no-harness-detail: the team-lead skill manages work and takes every worker action through worker-control, so
+# its text (*.md under skills/team-lead) names no harness tool or state: no mcp__ name, and no backticked name that a
+# worker-control reference puts in backticks (its tool names, states and variables). Names only, never the wording.
+if [ -d "$skills/team-lead" ] && ! python3 - "$skills" <<'PYCODE'
+import pathlib
+import re
+import sys
+
+skills = pathlib.Path(sys.argv[1])
+names = set()
+for ref in (skills / "worker-control").glob("*.md"):
+    if ref.name != "SKILL.md":
+        names |= set(re.findall(r"`([^`\n]+)`", ref.read_text()))
+failed = False
+for page in sorted((skills / "team-lead").rglob("*.md")):
+    for n, line in enumerate(page.read_text().splitlines(), 1):
+        hits = sorted(set(re.findall(r"`([^`\n]+)`", line)) & names) + re.findall(r"mcp__\w+", line)
+        for hit in hits:
+            print(f"FAIL: team-lead-no-harness-detail: {page.relative_to(skills)}:{n}: names {hit}")
+            failed = True
+sys.exit(1 if failed else 0)
+PYCODE
+then
+  bad "team-lead-no-harness-detail failed (see above; requires python3): say it through worker-control"
+fi
+
+# milestone-no-delivery-detail: the milestone skill holds planning, adding a feature, Startup verification and the report;
+# delivery is the team-lead skill's and worker lifecycle is worker-control's. So milestone's SKILL.md names team-lead, and its
+# text (*.md under skills/milestone) names no harness tool (no mcp__ name, no backticked name a worker-control reference puts
+# in backticks) and no delivery record kind (a `<!-- milestone <kind> -->` or `<!-- team-lead <kind> -->` marker other than
+# the report's own). Names only, never the wording.
+if [ -d "$skills/milestone" ] && ! python3 - "$skills" <<'PYCODE'
+import pathlib
+import re
+import sys
+
+skills = pathlib.Path(sys.argv[1])
+names = set()
+for ref in (skills / "worker-control").glob("*.md"):
+    if ref.name != "SKILL.md":
+        names |= set(re.findall(r"`([^`\n]+)`", ref.read_text()))
+failed = False
+if (skills / "worker-control").is_dir() and not names:
+    print("FAIL: milestone-no-delivery-detail: worker-control references yield no backticked names")
+    failed = True
+if "team-lead" not in (skills / "milestone" / "SKILL.md").read_text():
+    print("FAIL: milestone-no-delivery-detail: milestone/SKILL.md does not name team-lead")
+    failed = True
+for page in sorted((skills / "milestone").rglob("*.md")):
+    for n, line in enumerate(page.read_text().splitlines(), 1):
+        hits = sorted(set(re.findall(r"`([^`\n]+)`", line)) & names) + re.findall(r"mcp__\w+", line)
+        hits += [m for m in re.findall(r"<!-- (?:milestone|team-lead) [a-z -]+ -->", line) if m != "<!-- milestone report -->"]
+        for hit in hits:
+            print(f"FAIL: milestone-no-delivery-detail: {page.relative_to(skills)}:{n}: names {hit}")
+            failed = True
+sys.exit(1 if failed else 0)
+PYCODE
+then
+  bad "milestone-no-delivery-detail failed (see above; requires python3): delivery is team-lead's, worker lifecycle is worker-control's"
+fi
 
 [ "$fail" -eq 0 ] && echo "OK: dev-skills plugin checks passed"
 exit "$fail"

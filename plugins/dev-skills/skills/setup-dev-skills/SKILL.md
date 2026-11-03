@@ -70,7 +70,7 @@ On **yes**, ask the user for the rules' text, then record them in the repo's `CL
 
 On **yes**, fill the release doc's values, leading with what exploration found: the version file and the field or line that holds the version, the changelog path (an existing `CHANGELOG.md`, else one beside the version file), and the label prefix (default `release-`). Then ask three more things, which `release` reads:
 
-- the **bump mode** (recommended: **Releases bump**): either a Release's bump pull request changes the version and ordinary pull requests leave it alone, or **pull requests bump**, where each pull request that changes the files the repo names bumps the version as its last commit at merge, with a number handed out then. On pull requests bump, ask which files make a pull request bump;
+- the **bump mode** (recommended: **Releases bump**): either a Release's bump pull request changes the version and ordinary pull requests leave it alone, or **pull requests bump**, where each pull request that changes the files the repo names bumps the version as its last commit at merge. On pull requests bump, ask which files make a pull request bump and how the number is given (the repo decides; the seed leaves it as a placeholder to fill in);
 - on pull requests bump only, the **Release name** form: the name, label and release issue title forms with `<...>` placeholders, such as the name `Phase <n>`, the label `release-p<n>` and the title `Release Phase <n>` (a Release is named, not numbered);
 - on pull requests bump only, the **whole-Release check**: the checks to run on the changelog pull request's branch (recommended: the repo's own checks), and any clean-up pass.
 

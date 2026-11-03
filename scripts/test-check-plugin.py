@@ -87,6 +87,19 @@ class SkillLoadingPackaging(unittest.TestCase):
                      "release", "retro-planning", "setup-project"]:
             self.assertIn("model-tiers", (skills / name / "SKILL.md").read_text(), name)
 
+    def test_repo_only_merge_rules_in_skill_text_fail(self):
+        for text in ("The coordinator hands out the next version number.\n",
+                     "Hand out version numbers one at a time.\n",
+                     "Re-read open Tickets after a skill merge.\n",
+                     "Re-read open issues after a merge.\n"):
+            self.plant("plugins/dev-skills/skills/implement/SKILL.md", text)
+            self.check(1)
+            shutil.copy(pathlib.Path(__file__).resolve().parents[1] / "plugins/dev-skills/skills/implement/SKILL.md",
+                        self.repo / "plugins/dev-skills/skills/implement/SKILL.md")
+
+    def test_no_shipped_skill_states_the_repo_only_merge_rules(self):
+        self.check(0)
+
     def cite(self, text):
         (self.skill / "SKILL.md").write_text(
             "---\nname: fixture-contract\ndescription: Use when a caller needs the fixture contract.\n"
@@ -113,6 +126,87 @@ class SkillLoadingPackaging(unittest.TestCase):
         self.assertIn("- **Park**", seed)
         for name in ["implement", "implement-spec"]:
             self.assertIn("tracker doc's **Park** operation", (skills / name / "SKILL.md").read_text(), name)
+
+    def worker_reference(self):
+        return self.repo / "plugins/dev-skills/skills/worker-control/claude-code-project-threads.md"
+
+    def run_checker(self):
+        return subprocess.run(["bash", str(self.repo / "scripts/check-plugin.sh")],
+                              cwd=self.repo, text=True, capture_output=True)
+
+    def test_worker_reference_method_without_source_fails(self):
+        self.plant("plugins/dev-skills/skills/worker-control/claude-code-project-threads.md",
+                   "### Wake a worker\n\nSend it a message; it wakes.\n")
+        result = self.run_checker()
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("Wake a worker", result.stdout)
+
+    def test_team_lead_naming_a_harness_tool_fails(self):
+        for text in ("Read the state with `list_threads`.\n", "Start it with mcp__hearthbot__start_thread.\n"):
+            self.plant("plugins/dev-skills/skills/team-lead/SKILL.md", text)
+            result = self.run_checker()
+            self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+            self.assertIn("team-lead-no-harness-detail", result.stdout)
+            shutil.copy(pathlib.Path(__file__).resolve().parents[1] / "plugins/dev-skills/skills/team-lead/SKILL.md",
+                        self.repo / "plugins/dev-skills/skills/team-lead/SKILL.md")
+
+    def test_shipped_team_lead_names_no_harness_detail(self):
+        self.check(0)
+
+    def test_milestone_naming_a_harness_tool_fails(self):
+        for text in ("Read the state with `list_threads`.\n", "Start it with mcp__hearthbot__start_thread.\n"):
+            self.plant("plugins/dev-skills/skills/milestone/SKILL.md", "team-lead\n" + text)
+            result = self.run_checker()
+            self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+            self.assertIn("milestone-no-delivery-detail", result.stdout)
+            self.assertNotIn("does not name team-lead", result.stdout)
+            self.assertRegex(result.stdout, r"milestone/SKILL\.md:\d+: names (list_threads|mcp__hearthbot)")
+            shutil.copy(pathlib.Path(__file__).resolve().parents[1] / "plugins/dev-skills/skills/milestone/SKILL.md",
+                        self.repo / "plugins/dev-skills/skills/milestone/SKILL.md")
+
+    def test_milestone_check_fails_when_worker_control_references_yield_no_names(self):
+        for ref in (self.repo / "plugins/dev-skills/skills/worker-control").glob("*.md"):
+            if ref.name != "SKILL.md":
+                ref.write_text(ref.read_text().replace("`", ""))
+        result = self.run_checker()
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("worker-control references yield no backticked names", result.stdout)
+
+    def test_milestone_holding_a_delivery_record_kind_fails(self):
+        self.plant("plugins/dev-skills/skills/milestone/reporting.md", "Post `<!-- milestone nudge -->` on the issue.\n")
+        result = self.run_checker()
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("milestone-no-delivery-detail", result.stdout)
+
+    def test_milestone_not_naming_team_lead_fails(self):
+        path = self.repo / "plugins/dev-skills/skills/milestone/SKILL.md"
+        path.write_text(path.read_text().replace("team-lead", "delivery"))
+        result = self.run_checker()
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("milestone-no-delivery-detail", result.stdout)
+
+    def test_shipped_milestone_holds_no_delivery_detail(self):
+        self.check(0)
+
+    def test_worker_reference_method_with_source_passes(self):
+        self.plant("plugins/dev-skills/skills/worker-control/claude-code-project-threads.md",
+                   "### Wake a worker\n\nSend it a message.\nSource: [page](https://example.com/docs/wake)\n")
+        self.check(0)
+
+    def test_worker_reference_fact_without_doc_link_fails(self):
+        path = self.worker_reference()
+        text = path.read_text().replace(
+            "## What the harness does by itself\n",
+            "## What the harness does by itself\n\n- **Guessed.** Threads never die.\n", 1)
+        path.write_text(text)
+        result = self.run_checker()
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("Guessed", result.stdout)
+
+    def test_worker_reference_reference_without_methods_fails(self):
+        (self.repo / "plugins/dev-skills/skills/worker-control/new-harness.md").write_text(
+            "# New harness\n\n## Detect\n\n- It says so. Source: [docs](https://example.com)\n")
+        self.check(1)
 
     def test_cited_tracker_operation_missing_from_tracker_doc_fails(self):
         for cite in ('the tracker doc\'s **Comment** operation', 'the tracker doc\'s "Comment" operation'):

@@ -20,12 +20,12 @@ Record "none yet" for anything that does not exist, and carry on with the links 
 
 Run `grilling` to settle how this project's threads work. On a re-run the existing text already answers what it covers: grill only the change the user wants and what depends on it. Keep its end gate: drafting starts once the user confirms you share an understanding.
 
-Inside a Milestone, settle only the project-specific choices: repos, thread limit and order, extra merge gates, any tier-to-model override and other additions not already held by `milestone`, the skills it invokes or the Boundary record. Read those owners to distinguish an addition from a shared default; leave their procedures with them.
+Inside a Milestone, settle only the project-specific choices: repos, thread limit and order, extra merge gates, any tier-to-model override and other additions not already held by `milestone`, `team-lead`, the skills it invokes or the Boundary record. Read those owners to distinguish an addition from a shared default; leave their procedures with them.
 
 Outside a Milestone, settle each of these, skipping what exploration already answered:
 
 - **Phases**: the coordinator's project threads, the Build threads (Spec threads run `implement-spec`, Ticket threads run `implement`), and planning threads if the project has them.
-- **Skill per thread kind**: which skill each runs (`wayfinder`, `to-spec`, `to-tickets`, `implement-spec`, `implement`).
+- **Skill per thread kind**: which skill each runs (`wayfinder`, `to-spec`, `to-tickets`, `implement-spec`, `implement`); the coordinator itself runs `team-lead` to deliver planned work (a Release, or a Milestone with `milestone`).
 - **Brief contents**: what every brief carries. Default: skill, Model tier, repo(s), Review depth, link to the ticket or spec.
 - **Tier-to-model map**: ask the user which model each Model tier (cheap, regular, premium) maps to in their harness. Vendor model names go only into the user's drafted instructions, never into skill text (the `model-tiers` skill holds the plugin default; the user's map overrides it). If the user has no map yet, record "not needed" and draft the rule without the map.
 - **Standing rules**: how many questions a thread asks the user at once, review Rounds, who merges, how many Build threads run at once, and any rule of the user's own.
@@ -40,7 +40,7 @@ Write the full instructions as pointer-style text:
 - Tell the coordinator to find open specs, plannings and tickets on the tracker when it needs them: name the tracker (and the repo, if the project has several) and say `docs/agents/issue-tracker.md` is where it is documented, so the coordinator is not sent to a file that may be absent or unreadable. Link no map, spec or ticket as state.
 - Keep it short enough to read in one minute, and cut what the skills already do by default.
 
-Inside a Milestone, tell the coordinator to run `milestone` and point to the Boundary record. Keep only the project-specific choices settled in step 2, including a tier-to-model map only where the user overrides the default. Leave the coordinator loop, the invoked skills' rules and the Boundary record's values in their owners rather than restating them.
+Inside a Milestone, tell the coordinator to run `milestone` for the Milestone and `team-lead` for its delivery, and point to the Boundary record. Keep only the project-specific choices settled in step 2, including a tier-to-model map only where the user overrides the default. Leave the coordinator loop, the invoked skills' rules and the Boundary record's values in their owners rather than restating them.
 
 Outside a Milestone, keep the full instructions settled in step 2. Name Model tiers (cheap, regular, premium), write the user's tier-to-model map, and add the rule: "start each thread on the model mapped to its brief's Model tier".
 
