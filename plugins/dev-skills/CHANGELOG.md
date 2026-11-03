@@ -2,6 +2,38 @@
 
 What each version of `dev-skills` brought, newest first. Each pull request that changes a skill bumps the version, and each Release adds one entry here covering everything since the last Release: its goal, the versions it delivered, the issues it shipped, and what a project using the plugin must do when something breaks. Entries up to 0.25.0 are one per version, when only a Release bumped it.
 
+## Milestone 1 · Release 5 (2026-11-03)
+
+Every file the skills require in a repo lives in one `docs/dev-skills/` folder, and one merge rule, read from the Boundary record, applies inside and outside a Milestone. The review itself was rebuilt along the way: a Round 0 sizes it, a `review-rounds` skill runs at most 3 Rounds, and `REVIEW.md` is down to 7 Always check lines.
+
+Versions: 0.50.0, 0.51.0, 0.52.0, 0.53.0. Commits: 1a17cd7..ddf9407.
+
+- Spec: keep the files the skills require in docs/dev-skills/ (#551)
+- Move every skill-required file to docs/dev-skills/ in one pull request (#552)
+- Same merge and approval rules inside and outside a Milestone (#533), built as Spec #572 with Tickets #573, #574 and #575
+- Doc fixes after the move: #332, #392, #427, #412, #413
+
+Also merged: Spec for a small, agentic review with Round 0 and at most 3 Rounds (#555, Tickets #556 and #557); flag any skill file over 5,000 words and record the limit as a boundary (#558); cut REVIEW.md to 7 rules with review levels (#559) and narrow its Quick levels (#568); remove the "Retro planning is due" rule from retro (#570).
+
+The planning approvals were split off to their own issue (#576) and are not in this Release.
+
+## Milestone 1 · Release 4 (2026-11-03)
+
+Milestone delivery moved out of the `milestone` skill into a `team-lead` skill and a `worker-control` skill with Claude Code and Codex references, the Milestone's project instructions were slimmed, and a set of review and Release safeguards were repaired.
+
+Versions: 0.43.0, 0.44.0, 0.45.0, 0.46.0, 0.47.0, 0.48.0, 0.49.0. Commits: 7cc9ca0..1a17cd7.
+
+- setup-project: draft only the project-specific parts once the milestone skill runs the coordinator (Milestone 1, piece C5) (#409)
+- Spec: split milestone into Milestone planning, a team-lead skill and harness references (Milestone 1, piece C6) (#523)
+- Move this repo's version hand-out and Ticket re-read out of the skills (#526)
+- Add the worker-control skill with the Claude Code references and its check (#527)
+- Add the Codex reference and check to worker-control (#528)
+- Move Milestone delivery into a new team-lead skill (#529)
+- Slim milestone to planning, add a feature and the report (#530)
+- Maintenance fixes: no-issue retro check membership (#476), logic-resolution depth in a merge-only Round (#479), review ranges with a bump or Nit commit (#480), agreed design changes after the last Round (#481), Park respected in Release scope (#487)
+
+Dropped: #491 and #501 (closed as not planned, replaced by Spec #523); the probes #534, #535 and #536 (answered, closed).
+
 ## Milestone 1 · Release 3 (2026-11-02)
 
 The `milestone` skill runs a Milestone end to end: it verifies its runtime at startup, plans and delivers the Milestone's Releases, checks in on and safely takes over silent threads, and writes the Milestone report, so the project's instructions keep only what is specific to the project.
