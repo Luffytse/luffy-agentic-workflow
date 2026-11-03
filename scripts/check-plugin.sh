@@ -26,6 +26,7 @@
 #   no-repo-merge-rules          skill text does not state this repo's merge-time rules (the version hand-out, the Ticket re-read after a skill merge); a skill says to follow the repo's own docs
 #   no-agent-label-strings       the plugin names no repo's agent-only label strings (a repo maps the role in its triage-labels.md)
 #   tracker-operation-names      each operation cited as the tracker doc's **Name** or "Name" operation exists as a bold bullet in every issue-tracker seed
+#   worker-reference-sources     each worker-control reference has methods, each method a Source: line with a doc link, each Detect and harness fact bullet a doc link
 #
 # `claude plugin validate .` is not run here: CI runs it as its own step; the README says to run it before pushing.
 #
@@ -248,6 +249,49 @@ for seed in "$skills"/setup-dev-skills/issue-tracker-*.md; do
 $(grep -rnoE --include='*.md' "tracker doc's (\*\*[^*]+\*\*|\"[^\"]+\") operation" "$skills" | grep -v "/setup-dev-skills/issue-tracker-" | sed -E 's/^([^:]+:[0-9]+):/\1: /')
 EOF_HITS
 done
+
+# worker-reference-sources: a worker-control reference (any .md in skills/worker-control other than SKILL.md) is looked up,
+# never guessed, so its structure carries a doc page for every claim: at least one ### method under
+# "## Methods the coordinator adds", a "Source:" line with an https link in every ### section, and an https link in
+# every bullet under "## Detect" and "## What the harness does by itself". Structure only, never the wording.
+if [ -d "$skills/worker-control" ] && ! python3 - "$skills/worker-control" <<'PYCODE'
+import pathlib
+import sys
+
+failed = False
+
+
+def report(message):
+    global failed
+    print(f"FAIL: worker-reference-sources: {message}")
+    failed = True
+
+
+for ref in sorted(pathlib.Path(sys.argv[1]).glob("*.md")):
+    if ref.name == "SKILL.md":
+        continue
+    name = f"worker-control/{ref.name}"
+    section, method, sourced, methods = None, None, False, 0
+    for n, line in enumerate(ref.read_text().splitlines() + ["## end"], 1):
+        if line.startswith("## ") or line.startswith("### "):
+            if method is not None and not sourced:
+                report(f"{name}: method \"{method}\" has no Source: line with a doc link")
+            if line.startswith("## "):
+                section, method = line[3:].strip(), None
+            else:
+                method, sourced = line[4:].strip(), False
+                methods += section == "Methods the coordinator adds"
+        elif method is not None:
+            sourced = sourced or (line.startswith("Source:") and "(https://" in line)
+        elif section in ("Detect", "What the harness does by itself") and line.startswith("- ") and "(https://" not in line:
+            report(f"{name}:{n}: bullet has no doc link: {line[:80]}")
+    if methods == 0:
+        report(f"{name}: no ### method under \"## Methods the coordinator adds\"")
+sys.exit(1 if failed else 0)
+PYCODE
+then
+  bad "worker-reference-sources failed (see above; requires python3)"
+fi
 
 [ "$fail" -eq 0 ] && echo "OK: dev-skills plugin checks passed"
 exit "$fail"

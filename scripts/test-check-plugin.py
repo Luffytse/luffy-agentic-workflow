@@ -127,6 +127,40 @@ class SkillLoadingPackaging(unittest.TestCase):
         for name in ["implement", "implement-spec"]:
             self.assertIn("tracker doc's **Park** operation", (skills / name / "SKILL.md").read_text(), name)
 
+    def worker_reference(self):
+        return self.repo / "plugins/dev-skills/skills/worker-control/claude-code-project-threads.md"
+
+    def run_checker(self):
+        return subprocess.run(["bash", str(self.repo / "scripts/check-plugin.sh")],
+                              cwd=self.repo, text=True, capture_output=True)
+
+    def test_worker_reference_method_without_source_fails(self):
+        self.plant("plugins/dev-skills/skills/worker-control/claude-code-project-threads.md",
+                   "### Wake a worker\n\nSend it a message; it wakes.\n")
+        result = self.run_checker()
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("Wake a worker", result.stdout)
+
+    def test_worker_reference_method_with_source_passes(self):
+        self.plant("plugins/dev-skills/skills/worker-control/claude-code-project-threads.md",
+                   "### Wake a worker\n\nSend it a message.\nSource: [page](https://example.com/docs/wake)\n")
+        self.check(0)
+
+    def test_worker_reference_fact_without_doc_link_fails(self):
+        path = self.worker_reference()
+        text = path.read_text().replace(
+            "## What the harness does by itself\n",
+            "## What the harness does by itself\n\n- **Guessed.** Threads never die.\n", 1)
+        path.write_text(text)
+        result = self.run_checker()
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("Guessed", result.stdout)
+
+    def test_worker_reference_reference_without_methods_fails(self):
+        (self.repo / "plugins/dev-skills/skills/worker-control/new-harness.md").write_text(
+            "# New harness\n\n## Detect\n\n- It says so. Source: [docs](https://example.com)\n")
+        self.check(1)
+
     def test_cited_tracker_operation_missing_from_tracker_doc_fails(self):
         for cite in ('the tracker doc\'s **Comment** operation', 'the tracker doc\'s "Comment" operation'):
             result = self.cite("Intro line.\n" + cite)
