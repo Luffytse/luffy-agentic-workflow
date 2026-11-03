@@ -33,6 +33,7 @@ Start **one Implementer** subagent on the ticket's tier. Load `model-tiers` by n
 - build test-first with the `tdd` skill, at seams agreed before the first test;
 - before reporting, read the repo's review rules file, if any, and check your diff against each Always-check line as the reviewer will;
 - when the change adds a rule that runs over a sequence of Rounds or steps, before Round 1 list the sequences (each ordering of the events the rule touches, including "it happens again") and write what the text tells the reader to do for each;
+- when an acceptance criterion names a run that needs tools you do not hold (scheduling a check-in, stopping a worker, a recorded run only the top-level session can make), the Ticket thread produces that evidence, not you: build everything else, draft the criterion's eval or record entry with a `PENDING: <the run>` marker in place of each runtime fact you cannot read (for example where skills load from), report the criterion as owed, and never claim it or leave a marker in an entry you call done;
 - before each push, check that `git status -sb` shows the Ticket branch (never a detached HEAD), and after it, report that `git rev-parse origin/<branch>` equals `HEAD`, as evidence the push landed;
 - leave the version as it is on main until the merge step: the merge step adds any bump the release doc calls for, with the number the repo's own docs say how to get;
 - report its evidence: the tests that fail before and pass after, the typecheck or the repo's checks, screenshots for anything visual (or "not visual"), and its one-way-door call (would reverting its commits undo everything the change did, including anything outside git?).
@@ -45,7 +46,7 @@ Keep this same Implementer, in the same worktree, for every later fix and merge 
 
 ## 4. Check the evidence
 
-Read the Implementer's report against the ticket's acceptance criteria and rerun the checks in the Implementer's worktree (a cheap subagent can, running no git command that moves the checkout). Check that it reports `origin/<branch>` equal to `HEAD` for every push. Anything missing or failing goes back to the Implementer. Done when every acceptance criterion has evidence and the checks pass on the branch's head, or, when the repo has no checks, the evidence says what was checked instead.
+Read the Implementer's report against the ticket's acceptance criteria and rerun the checks in the Implementer's worktree (a cheap subagent can, running no git command that moves the checkout). Check that it reports `origin/<branch>` equal to `HEAD` for every push. Anything missing or failing goes back to the Implementer. For each criterion the Implementer reported as owed, make the run yourself with your own tools (it is evidence, not code), then message the Implementer the output as observed; it replaces that entry's pending markers with it and pushes. A run that fails, or whose result contradicts the entry, goes back as a fix; after any fix that could change what the run showed, make the run again. If you cannot make the run either, ask the user for it and wait. Done when every acceptance criterion has evidence, no added line holds a `PENDING:` marker (grep the diff against main), and the checks pass on the branch's head, or, when the repo has no checks, the evidence says what was checked instead.
 
 ## 5. Open the pull request
 
@@ -57,7 +58,7 @@ Run `agentic-review` on the pull request in this thread: its Round 0 picks the l
 
 Before each Round, fetch main. If it moved, have the same Implementer merge main into the Ticket branch (a merge, never a rebase), resolve any conflicts and push; the next Round reviews the resolutions.
 
-Route each Round's open Importants and "fix" Nits to the same Implementer by message. It fixes, commits and pushes, or disputes a Finding with its evidence, as `review-rounds` says. Continue the review to its end, its after-Round-3 sort, design answers and Pre-existing filing included. Review policy belongs to `review-rounds`; the merge decision below remains yours.
+Route each Round's open Importants and "fix" Nits to the same Implementer by message. It fixes, commits and pushes, or disputes a Finding with its evidence, as `review-rounds` says. For a criterion the Implementer reported as owed, after a fix that could change what an owed run showed, return to step 4 and make the run again before the next Round or the merge. Continue the review to its end, its after-Round-3 sort, design answers and Pre-existing filing included. Review policy belongs to `review-rounds`; the merge decision below remains yours.
 
 The review ends **ready to merge**, or **waiting on a boundary** when a fix, a design answer, a bug Ticket or the merge would cross the Boundary record: then the merge waits, and you bring the pull request to the user as step 7 says, naming the Finding and the boundary. Each bug Ticket the after-Round-3 sort creates is built straight after this pull request merges, as a lone Ticket of its own, with this skill from step 1.
 

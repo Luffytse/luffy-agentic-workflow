@@ -53,3 +53,11 @@ Give only DECISION.md and the fixture to a fresh regular-tier decision agent, wi
 | `unrelated-no-issue` | no, no Retro origin despite an incidental labelled-issue reference | the same | the same |
 
 These are bounded decisions, not full lifecycle execution: record the actual answers, source revision and limits in RESULTS.md. Review agents, actual comments, commits, merges and coordinator callbacks are not exercised by this prompt.
+
+## Evidence-owner check
+
+Does the Ticket thread, for a criterion that needs a run the Implementer cannot make, tell the Implementer it produces that evidence, get a draft entry with pending markers, make the run itself, hand the output back, repeat it after a fix, and refuse to finish with a marker left? Does `to-tickets` mark such a criterion?
+
+Files in [`evidence-owner/`](evidence-owner/): `TICKET.md` (the Ticket, its second criterion needing a scheduled check-in), `PROMPT.md` (the decision prompt) and `EXPECTED.md` (keep it away from the session under test); `test.sh` checks the files exist and the three skills carry the mechanism. Run level: decision-level in a subagent is enough (the prompt asks what the thread would write and do); a full build-flow in a top-level session would also show the real run and the grep. `implement-spec` carries the same rule in its steps 3 and 4. Model-run results: owed, no entry in [RESULTS.md](RESULTS.md) yet.
+
+Run it: `bash evals/implement/evidence-owner/test.sh`.

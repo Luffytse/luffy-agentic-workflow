@@ -40,6 +40,8 @@ Break the work into **tracer bullet** tickets.
 
 **Scope edges.** When a drafted ticket names a part it does not change ("step 5 is not changed here"), check that exclusion against every one of its acceptance criteria and against any step, template or shared piece that reuses the excluded part. Where a criterion needs the excluded part, the ticket says the smallest edit it may make there, in a "Scope edges" paragraph (for example "step 5 only for the Release's name and label"), so its Implementer edits no more and a reviewer does not flag that edit as scope creep. This check applies to every split, in or outside a Milestone.
 
+**Runs the Implementer cannot make.** When a criterion needs a run that takes tools an Implementer subagent does not hold (scheduling a check-in, stopping a worker, a recorded run only the top-level session can make), end that criterion with `(evidence from the build thread)` and say in the ticket what the run shows, so the build thread produces it and the Implementer drafts the entry with pending markers.
+
 Give each ticket its **blocking edges**: the other tickets that must complete before it can start. A ticket with no blockers can start immediately.
 
 Give each ticket a **model tier**, the tier its Implementer runs on: **regular** by default, **premium** for heavy or tricky work (a subtle design call, wide-reaching changes, concurrency, security or money logic). Name the tier, never a vendor's model. Load `model-tiers` by name for the model each tier is in your coding agent; the project's own tier map overrides it.
