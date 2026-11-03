@@ -2,6 +2,21 @@
 
 What each version of `dev-skills` brought, newest first. Each pull request that changes a skill bumps the version, and each Release adds one entry here covering everything since the last Release: its goal, the versions it delivered, the issues it shipped, and what a project using the plugin must do when something breaks. Entries up to 0.25.0 are one per version, when only a Release bumped it.
 
+## Milestone 1 · Release 6 (2026-11-03)
+
+The review and release text now says what threads actually need: gaps Release 5's Retro planning (#581) found in delivered pieces were repaired, and small review and checker defects left from earlier Releases were fixed.
+
+Versions: 0.54.0, 0.55.0, 0.56.0, 0.57.0. Commits: ddf9407..eea5f8b.
+
+- Re-read a status before stating it, in grilling and retro-planning drafts (#350, absorbs #264 and #228)
+- `release` shipped test ignores negated closing keywords (#419)
+- The vendor-name check catches spaced GPT and o-series names (#435)
+- Stale size fact in ADR 0006 (#361)
+- The Implementer checks its diff against the review rules and walks a new rule's sequences (#586, absorbs #477 and #482)
+- Maintenance fixes from Retro planning #581: the asking thread writes the version hand-out record when the coordinator cannot (#582, absorbs #554); a review Round with nothing to verify skips Verify (#583, absorbs #247); each eval README names the run level its cases need (#584, absorbs #428)
+
+The Release 6 Triage batch and Retro planning (#598) filed no Ticket beyond one repo-docs bug, #590 (the hand-out scan reads issues only), which joins Release 7 as a maintenance fix.
+
 ## Milestone 1 · Release 5 (2026-11-03)
 
 Every file the skills require in a repo lives in one `docs/dev-skills/` folder, and one merge rule, read from the Boundary record, applies inside and outside a Milestone. The review itself was rebuilt along the way: a Round 0 sizes it, a `review-rounds` skill runs at most 3 Rounds, and `REVIEW.md` is down to 7 Always check lines.
