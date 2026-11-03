@@ -1,6 +1,10 @@
 # Results
 
-One entry per run of the `milestone` skill's dry run (the planning cases and the delivery cases: `deliver`, `deliver-stall`, `deliver-checkin-failed`, `deliver-pause`, `deliver-lift`, `deliver-thread-end`, and the report cases), newest first ([README](README.md) says how to build, run and score it). Record the commit and the plugin version from `plugins/dev-skills/.claude-plugin/plugin.json`; an entry written inside an open pull request names the commit and version it ran on as its base. Each planning run also applies the shape to one real Milestone issue (`score.py --shape`) and names the migration it needs, if any; each `deliver` run also applies the loop, read-only, to one real Milestone and names the thread it would start next and the next Release it would plan.
+One entry per run of the `milestone` skill's dry run (the planning cases and the report cases; the delivery entries below are history, see the first entry), newest first ([README](README.md) says how to build, run and score it). Record the commit and the plugin version from `plugins/dev-skills/.claude-plugin/plugin.json`; an entry written inside an open pull request names the commit and version it ran on as its base. Each planning run also applies the shape to one real Milestone issue (`score.py --shape`) and names the migration it needs, if any; each `deliver` run also applies the loop, read-only, to one real Milestone and names the thread it would start next and the next Release it would plan.
+
+## 2026-11-03 — Ticket #529: delivery moves to the team-lead skill
+
+The delivery loop left `milestone` for the `team-lead` skill (ADR 0010). The cases `deliver`, `deliver-stall`, `deliver-pause` and `deliver-lift` were rebuilt on harness events in [`../team-lead/`](../team-lead/README.md), whose [RESULTS.md](../team-lead/RESULTS.md) records their runs from now on; `deliver-checkin-failed` and `deliver-thread-end` were cut with the records they tested, and their fixture code left `make-fixture.sh` and `score.py`. The delivery entries below, and their `evidence/`, stay as history of the earlier loop. The planning and report cases were not rerun: their fixtures and scorers are unchanged apart from dropping the delivery-only parts of the shared fixture.
 
 ## 2026-11-03 — Ticket #526: version hand-out and Ticket re-read leave the skill
 

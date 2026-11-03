@@ -62,7 +62,7 @@ For a repo that cuts versioned Releases, its release doc (`docs/agents/release.m
 
 ## Milestones
 
-When you want agents to deliver a whole product goal unattended, across several Releases, start a **Milestone** with **`/milestone`**. It writes the Milestone issue with you (goal, features in order with their acceptance criteria, exclusions, budget, boundaries); you plan each feature through the main flow as usual, and agents may propose a feature but never add one. It then runs Startup verification, which proves the environment can run delivery unattended, before any delivery starts, and then delivery itself: the coordinator groups the features into Releases, starts the build threads in order, follows the merge-time steps the repo's own docs give and starts each Release thread. With no Milestone, every other skill works as described here.
+When you want agents to deliver a whole product goal unattended, across several Releases, start a **Milestone** with **`/milestone`**. It writes the Milestone issue with you (goal, features in order with their acceptance criteria, exclusions, budget, boundaries); you plan each feature through the main flow as usual, and agents may propose a feature but never add one. It then runs Startup verification, which proves the environment can run delivery unattended, before any delivery starts, and then delivery itself, which the coordinator runs with **`/team-lead`**: it starts the Release threads and the build threads in order, reacts to what they report, checks in on a silent one and replaces it, and follows the merge-time steps the repo's own docs give; `/milestone` writes the report for your Milestone review at the end. With no Milestone, every other skill works as described here.
 
 ## Vocabulary underneath
 

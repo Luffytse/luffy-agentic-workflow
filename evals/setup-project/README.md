@@ -6,7 +6,7 @@ Run each prompt in a fresh agent with the selected source's `setup-project` skil
 
 For `milestone-rerun.txt`, pass only when the full draft:
 
-- Names the `milestone` skill as the coordinator workflow, points to the repo/docs/tracker, and retains the two-thread limit and backend-before-dashboard order.
+- Names the `milestone` skill as the coordinator workflow and `team-lead` for its delivery, points to the repo/docs/tracker, and retains the two-thread limit and backend-before-dashboard order.
 - Retains the project's schema-migration merge gate, explicit completion callback, archive rule, and pull-main/reload-changed-skills rule after every merge. Any version hand-out or post-merge Ticket re-read the project wants is its own rule, kept in its instructions or release doc; no skill states one.
 - Leaves out the shared thread-kind/brief/model-start rules, Release grouping, nudge/stop/takeover procedure and retro procedure. These are reached through their owning skills.
 - Points to the Boundary record rather than copying its check-in interval, budget or deploy approval rule.

@@ -141,6 +141,18 @@ class SkillLoadingPackaging(unittest.TestCase):
         self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
         self.assertIn("Wake a worker", result.stdout)
 
+    def test_team_lead_naming_a_harness_tool_fails(self):
+        for text in ("Read the state with `list_threads`.\n", "Start it with mcp__hearthbot__start_thread.\n"):
+            self.plant("plugins/dev-skills/skills/team-lead/SKILL.md", text)
+            result = self.run_checker()
+            self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+            self.assertIn("team-lead-no-harness-detail", result.stdout)
+            shutil.copy(pathlib.Path(__file__).resolve().parents[1] / "plugins/dev-skills/skills/team-lead/SKILL.md",
+                        self.repo / "plugins/dev-skills/skills/team-lead/SKILL.md")
+
+    def test_shipped_team_lead_names_no_harness_detail(self):
+        self.check(0)
+
     def test_worker_reference_method_with_source_passes(self):
         self.plant("plugins/dev-skills/skills/worker-control/claude-code-project-threads.md",
                    "### Wake a worker\n\nSend it a message.\nSource: [page](https://example.com/docs/wake)\n")

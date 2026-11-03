@@ -38,7 +38,7 @@ While the plugin is below 1.0.0, a breaking change bumps the minor part instead,
 - **The Release thread** (premium tier) runs once every labelled issue is closed. It writes the `CHANGELOG.md` entry for everything since the last Release, listing the versions delivered, and runs a whole-Release check, including a clean-up pass. Inside a Milestone it first runs the Triage batch and the Release-end Retro planning, then plans the next Release.
 - **Whether a Release also bumps is set per project**, in its release doc. In this repo skill-changing pull requests bump, so a Release opens no bump pull request. In a typical product the Release bumps.
 - **No urgent patch Release here.** A fix ships in its own pull request with its own patch bump, so the urgent patch Release (clarified 2026-10-31, #327) is no longer needed in this repo.
-- The general Release flow lives in the `release` skill; the Milestone loop lives in the `milestone` skill (#385 item 1, implemented by #406). Each repo's specifics (where its version lives, its changelog path, its label form, whether Releases bump) live in a repo doc that `setup-dev-skills` writes, so the skill names no project.
+- The general Release flow lives in the `release` skill; Milestone planning and its report live in the `milestone` skill (#385 item 1, implemented by #406), and delivery in the `team-lead` skill (ADR 0010). Each repo's specifics (where its version lives, its changelog path, its label form, whether Releases bump) live in a repo doc that `setup-dev-skills` writes, so the skill names no project.
 
 ## Considered options
 

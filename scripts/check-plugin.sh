@@ -27,6 +27,7 @@
 #   no-agent-label-strings       the plugin names no repo's agent-only label strings (a repo maps the role in its triage-labels.md)
 #   tracker-operation-names      each operation cited as the tracker doc's **Name** or "Name" operation exists as a bold bullet in every issue-tracker seed
 #   worker-reference-sources     each worker-control reference has methods, each method a Source: line with a doc link, each Detect and harness fact bullet a doc link
+#   team-lead-no-harness-detail  team-lead text names no harness tool (no mcp__ name, no `name` a worker-control reference puts in backticks); it calls worker-control
 #
 # `claude plugin validate .` is not run here: CI runs it as its own step; the README says to run it before pushing.
 #
@@ -291,6 +292,32 @@ sys.exit(1 if failed else 0)
 PYCODE
 then
   bad "worker-reference-sources failed (see above; requires python3)"
+fi
+
+# team-lead-no-harness-detail: the team-lead skill manages work and takes every worker action through worker-control, so
+# its text (*.md under skills/team-lead) names no harness tool or state: no mcp__ name, and no backticked name that a
+# worker-control reference puts in backticks (its tool names, states and variables). Names only, never the wording.
+if [ -d "$skills/team-lead" ] && ! python3 - "$skills" <<'PYCODE'
+import pathlib
+import re
+import sys
+
+skills = pathlib.Path(sys.argv[1])
+names = set()
+for ref in (skills / "worker-control").glob("*.md"):
+    if ref.name != "SKILL.md":
+        names |= set(re.findall(r"`([^`\n]+)`", ref.read_text()))
+failed = False
+for page in sorted((skills / "team-lead").rglob("*.md")):
+    for n, line in enumerate(page.read_text().splitlines(), 1):
+        hits = sorted(set(re.findall(r"`([^`\n]+)`", line)) & names) + re.findall(r"mcp__\w+", line)
+        for hit in hits:
+            print(f"FAIL: team-lead-no-harness-detail: {page.relative_to(skills)}:{n}: names {hit}")
+            failed = True
+sys.exit(1 if failed else 0)
+PYCODE
+then
+  bad "team-lead-no-harness-detail failed (see above; requires python3): say it through worker-control"
 fi
 
 [ "$fail" -eq 0 ] && echo "OK: dev-skills plugin checks passed"
