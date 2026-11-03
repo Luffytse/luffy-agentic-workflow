@@ -2,6 +2,22 @@
 
 What each version of `dev-skills` brought, newest first. Each pull request that changes a skill bumps the version, and each Release adds one entry here covering everything since the last Release: its goal, the versions it delivered, the issues it shipped, and what a project using the plugin must do when something breaks. Entries up to 0.25.0 are one per version, when only a Release bumped it.
 
+## Milestone 1 · Release 7 (2026-11-03)
+
+A Spec whose Tickets belong to different agents (Claude and Codex) can now be planned, built and finished without improvising, and the Implementer evidence gap is closed.
+
+Versions: 0.58.0, 0.59.0, 0.60.0. Commits: eea5f8b..f9e3464.
+
+- `to-tickets` labels a Ticket that needs one agent's native runtime for that agent (#512, absorbs #468)
+- `implement-spec` builds mixed-agent Spec Tickets through continuations on the one Spec branch, with an ADR 0005 amendment (#513, absorbs #492)
+- ADR and skill now agree on when the Spec pull request is marked ready (#324)
+- `implement-spec` says who produces evidence an Implementer cannot (#587, absorbs #470)
+- Maintenance fix from the Release 6 Triage batch: the version hand-out scan reads records on pull requests too (#590)
+
+Also merged: `REVIEW.md` says what a review rerun does with an earlier record (#610).
+
+The Release 7 Triage batch and Retro planning are recorded on its release issue (#588).
+
 ## Milestone 1 · Release 6 (2026-11-03)
 
 The review and release text now says what threads actually need: gaps Release 5's Retro planning (#581) found in delivered pieces were repaired, and small review and checker defects left from earlier Releases were fixed.
