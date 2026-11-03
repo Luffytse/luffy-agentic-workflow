@@ -25,7 +25,7 @@ Inside a Milestone, settle only the project-specific choices: repos, thread limi
 Outside a Milestone, settle each of these, skipping what exploration already answered:
 
 - **Phases**: the coordinator's project threads, the Build threads (Spec threads run `implement-spec`, Ticket threads run `implement`), and planning threads if the project has them.
-- **Skill per thread kind**: which skill each runs (`wayfinder`, `to-spec`, `to-tickets`, `implement-spec`, `implement`).
+- **Skill per thread kind**: which skill each runs (`wayfinder`, `to-spec`, `to-tickets`, `implement-spec`, `implement`); the coordinator itself runs `team-lead` to deliver planned work (a Release, or a Milestone with `milestone`).
 - **Brief contents**: what every brief carries. Default: skill, Model tier, repo(s), Review depth, link to the ticket or spec.
 - **Tier-to-model map**: ask the user which model each Model tier (cheap, regular, premium) maps to in their harness. Vendor model names go only into the user's drafted instructions, never into skill text (the `model-tiers` skill holds the plugin default; the user's map overrides it). If the user has no map yet, record "not needed" and draft the rule without the map.
 - **Standing rules**: how many questions a thread asks the user at once, review Rounds, who merges, how many Build threads run at once, and any rule of the user's own.

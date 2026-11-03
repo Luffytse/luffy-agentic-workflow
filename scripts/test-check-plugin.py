@@ -153,6 +153,41 @@ class SkillLoadingPackaging(unittest.TestCase):
     def test_shipped_team_lead_names_no_harness_detail(self):
         self.check(0)
 
+    def test_milestone_naming_a_harness_tool_fails(self):
+        for text in ("Read the state with `list_threads`.\n", "Start it with mcp__hearthbot__start_thread.\n"):
+            self.plant("plugins/dev-skills/skills/milestone/SKILL.md", "team-lead\n" + text)
+            result = self.run_checker()
+            self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+            self.assertIn("milestone-no-delivery-detail", result.stdout)
+            self.assertNotIn("does not name team-lead", result.stdout)
+            self.assertRegex(result.stdout, r"milestone/SKILL\.md:\d+: names (list_threads|mcp__hearthbot)")
+            shutil.copy(pathlib.Path(__file__).resolve().parents[1] / "plugins/dev-skills/skills/milestone/SKILL.md",
+                        self.repo / "plugins/dev-skills/skills/milestone/SKILL.md")
+
+    def test_milestone_check_fails_when_worker_control_references_yield_no_names(self):
+        for ref in (self.repo / "plugins/dev-skills/skills/worker-control").glob("*.md"):
+            if ref.name != "SKILL.md":
+                ref.write_text(ref.read_text().replace("`", ""))
+        result = self.run_checker()
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("worker-control references yield no backticked names", result.stdout)
+
+    def test_milestone_holding_a_delivery_record_kind_fails(self):
+        self.plant("plugins/dev-skills/skills/milestone/reporting.md", "Post `<!-- milestone nudge -->` on the issue.\n")
+        result = self.run_checker()
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("milestone-no-delivery-detail", result.stdout)
+
+    def test_milestone_not_naming_team_lead_fails(self):
+        path = self.repo / "plugins/dev-skills/skills/milestone/SKILL.md"
+        path.write_text(path.read_text().replace("team-lead", "delivery"))
+        result = self.run_checker()
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("milestone-no-delivery-detail", result.stdout)
+
+    def test_shipped_milestone_holds_no_delivery_detail(self):
+        self.check(0)
+
     def test_worker_reference_method_with_source_passes(self):
         self.plant("plugins/dev-skills/skills/worker-control/claude-code-project-threads.md",
                    "### Wake a worker\n\nSend it a message.\nSource: [page](https://example.com/docs/wake)\n")

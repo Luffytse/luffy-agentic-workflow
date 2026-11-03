@@ -28,6 +28,7 @@
 #   tracker-operation-names      each operation cited as the tracker doc's **Name** or "Name" operation exists as a bold bullet in every issue-tracker seed
 #   worker-reference-sources     each worker-control reference has methods, each method a Source: line with a doc link, each Detect and harness fact bullet a doc link
 #   team-lead-no-harness-detail  team-lead text names no harness tool (no mcp__ name, no `name` a worker-control reference puts in backticks); it calls worker-control
+#   milestone-no-delivery-detail the milestone skill plans and reports and hands delivery to team-lead: it names team-lead, and its text names no harness tool and no delivery record kind
 #
 # `claude plugin validate .` is not run here: CI runs it as its own step; the README says to run it before pushing.
 #
@@ -318,6 +319,41 @@ sys.exit(1 if failed else 0)
 PYCODE
 then
   bad "team-lead-no-harness-detail failed (see above; requires python3): say it through worker-control"
+fi
+
+# milestone-no-delivery-detail: the milestone skill holds planning, adding a feature, Startup verification and the report;
+# delivery is the team-lead skill's and worker lifecycle is worker-control's. So milestone's SKILL.md names team-lead, and its
+# text (*.md under skills/milestone) names no harness tool (no mcp__ name, no backticked name a worker-control reference puts
+# in backticks) and no delivery record kind (a `<!-- milestone <kind> -->` or `<!-- team-lead <kind> -->` marker other than
+# the report's own). Names only, never the wording.
+if [ -d "$skills/milestone" ] && ! python3 - "$skills" <<'PYCODE'
+import pathlib
+import re
+import sys
+
+skills = pathlib.Path(sys.argv[1])
+names = set()
+for ref in (skills / "worker-control").glob("*.md"):
+    if ref.name != "SKILL.md":
+        names |= set(re.findall(r"`([^`\n]+)`", ref.read_text()))
+failed = False
+if (skills / "worker-control").is_dir() and not names:
+    print("FAIL: milestone-no-delivery-detail: worker-control references yield no backticked names")
+    failed = True
+if "team-lead" not in (skills / "milestone" / "SKILL.md").read_text():
+    print("FAIL: milestone-no-delivery-detail: milestone/SKILL.md does not name team-lead")
+    failed = True
+for page in sorted((skills / "milestone").rglob("*.md")):
+    for n, line in enumerate(page.read_text().splitlines(), 1):
+        hits = sorted(set(re.findall(r"`([^`\n]+)`", line)) & names) + re.findall(r"mcp__\w+", line)
+        hits += [m for m in re.findall(r"<!-- (?:milestone|team-lead) [a-z -]+ -->", line) if m != "<!-- milestone report -->"]
+        for hit in hits:
+            print(f"FAIL: milestone-no-delivery-detail: {page.relative_to(skills)}:{n}: names {hit}")
+            failed = True
+sys.exit(1 if failed else 0)
+PYCODE
+then
+  bad "milestone-no-delivery-detail failed (see above; requires python3): delivery is team-lead's, worker lifecycle is worker-control's"
 fi
 
 [ "$fail" -eq 0 ] && echo "OK: dev-skills plugin checks passed"

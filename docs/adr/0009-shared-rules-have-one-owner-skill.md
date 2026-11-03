@@ -37,7 +37,7 @@ This narrows ADR 0006's rejected separate index skill: the trigger stays with ea
 | `issue-absorption` | `to-tickets` before source-based drafting/publication; `retro-planning` before lifecycle classification and absorption; `pr` when selecting closing lines; builders when maintaining lines or completing absorbed sources | #368 |
 | `to-tickets` complete workflow | `retro-planning` after problem approval, including publication repair on resume; planning retains budget, order and record ownership | #369 |
 | `agentic-review` complete workflow | `implement` and `implement-spec` at review with worktree, branch, base, prior-check context and a corrective check's explicit Retro origin input; builders retain fixes, integration and independent merge policies | #366 |
-| `worker-control` | `milestone` Startup verification in a Claude Code harness, running its check in place of the check-in, worker-state and stop probes; `team-lead` for every worker start, state check, end, stop, pause, resume and check-in | #527, #529 |
+| `worker-control` | `milestone` Startup verification, running its check as the first part of the result (the loaded skill version is `milestone`'s own probe); `team-lead` for every worker start, state check, end, stop, pause, resume and check-in | #527, #529, #530 |
 | Project tracker and triage docs | Builders read blocker/closure operations; `to-spec` and `to-tickets` read publication operations and role mappings | #366 |
 
 ## Remaining references and consistency

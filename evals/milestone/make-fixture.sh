@@ -258,13 +258,17 @@ ${2:-}
 <!-- startup-verification result -->
 ## Startup verification
 
-Runner: thread verify-1 · Run: 2026-11-02 09:00–09:20 UTC
+Harness: claude.ai project, workers are threads (claude-code-project-threads) · Role: coordinator · Runner: coordinator and thread verify-1 · Run: 2026-11-02 09:00–09:20 UTC
+Runtime: cloud container; permission mode: acceptEdits; sandbox: unknown; tools held: coordinator starts and reads threads, threads hold scheduling and stop
 
-| Capability | Essential | How probed | Result | Evidence | Limits |
+| Capability | Essential | Method and source | Result | Evidence | Limits |
 |---|---|---|---|---|---|
-| Scheduled check-in | yes | the verification thread's one-shot scheduled task bound to the coordinator's session (the coordinator holds no scheduler; threads do) | pass | token arrived in the coordinator at 09:07 | the coordinator cannot schedule; a thread arranges its check-ins |
-| Real worker state | yes | cheap-tier thread; marker token | pass | marker comment read back | none |
-| Confirmed stop | yes | cheap-tier thread, archived by a thread | pass | idle before, archived after | an archive can be undone |
+| Start a worker | yes | start a thread; project doc | pass | id listed by the Harness | none |
+| Worker state | yes | read the thread's state | pass | running read under that id | none |
+| Pause and resume | not relied on | not probed | not probed | none | the Harness's own pause is the user's |
+| Confirmed stop | yes | a thread stops it; state read back by the coordinator | pass | running before, stopped after | an archive can be undone |
+| End or failure notice | yes | a thread replies and ends | pass | wake and ended state read | failure not provoked |
+| Scheduled check-in | yes | a thread arranges it into the coordinator | pass | two arrivals in the coordinator's record; ended | none |
 | Loaded skill version | yes | the verification thread | pass | versions equal | none |
 
 Verdict: ready
