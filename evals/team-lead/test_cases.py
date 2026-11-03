@@ -9,7 +9,6 @@ planted wrong run (a quiet check-in that writes, a takeover before the stop read
 fail. It is not a model run: see evals/team-lead/README.md and RESULTS.md for what that leaves owed.
 """
 import pathlib
-import re
 import subprocess
 import tempfile
 import unittest
