@@ -18,6 +18,32 @@ Pass: yes | no. Lessons: <what to change in the skill, if anything>
 
 ## Runs
 
+### 2026-11-03 07:24:24–07:26:12 UTC, base f5593f0, dev-skills 0.48.0: Codex subagents, check run (Case 1)
+
+Skill text: uncommitted #528 changes on `claude/project-thread-r67ntb`, based on `f5593f0db65ef5ee1e7c2973ee77d8fe01f64de9`; version unchanged on the user's instruction. Runner: the parent coordinator `/root` took every lifecycle action; its Implementer `/root/implement_528` wrote this record from the parent's live tool results. No tracker comment supplied a worker state.
+
+Docs used (fetched 2026-11-03): [subagents](https://learn.chatgpt.com/docs/agent-configuration/subagents), [app-server](https://learn.chatgpt.com/docs/app-server), [scheduled tasks](https://learn.chatgpt.com/docs/automations), [remote connections](https://learn.chatgpt.com/docs/remote-connections). The pages document the capabilities; exact collaboration tool names, task paths and statuses below are runtime-reported, not a public stable API.
+
+## Worker control check
+
+Harness: Codex subagents (`codex-subagents.md`) · Role: coordinator (runtime's explicit `/root`; Implementer is descendant `/root/implement_528`) · Runner: `/root` · Run: approximately 2026-11-03 07:24:24–07:26:12 UTC
+Runtime: local macOS shell, desktop surface unknown; permission mode: workspace-write with auto_review (runtime instructions); sandbox: on (`CODEX_SANDBOX=seatbelt`); `CODEX_VERSION=0.166.0`, `CODEX_INTERNAL_ORIGINATOR_OVERRIDE` unset. Coordinator and Implementer hold `collaboration.spawn_agent`, `list_agents`, `send_message`, `followup_task`, `interrupt_agent`, `wait_agent`; repeated runtime tool inventory exposes no `mcp__codex_app__*` tools or callable scheduler. Network enabled per runtime instructions. Phone pairing not inspected.
+
+| Capability | Essential | Method and source | Result | Evidence | Limits |
+|---|---|---|---|---|---|
+| Start a worker | yes | `collaboration.spawn_agent`; [subagents](https://learn.chatgpt.com/docs/agent-configuration/subagents) | pass | Cheap probe A returned `/root/wc_probe_a`, token `wc-start-c82f04a9`; `list_agents` at 07:24:33 read that path running | Start time approximately 07:24:24; exact names runtime-reported |
+| Worker state | yes | `collaboration.list_agents`; [manage subagents](https://learn.chatgpt.com/docs/agent-configuration/subagents#managing-subagents) | pass | Probe A running at 07:24:33 and 07:25:42; scratch `/tmp/wc-probe-c82f04a9/heartbeat.txt` grew at 07:24:37 and 07:24:41 | State comes from tool read, file only corroborates |
+| Pause and resume | yes | `collaboration.send_message`, `followup_task`; [steering](https://learn.chatgpt.com/docs/agent-configuration/subagents#managing-subagents) | pass | Pause sent about 07:24:42; parent received `paused wc-start-c82f04a9` by 07:24:49. File reads 07:24:49 and 07:25:23 unchanged since 07:24:41. Cooperative resume sent 07:25:24; acknowledgement by 07:25:40, file grew 07:25:37. After interruption, `followup_task` about 07:25:51 resumed retained context; acknowledgement and file append at 07:25:55 | Cooperative pause, no native global pause. Initial loop used shorter intervals than the shared 30-second brief; halted over a full 30-second interval |
+| Confirmed stop | yes | Coordinator `collaboration.interrupt_agent`, independent `list_agents` read-back; [stop subagents](https://learn.chatgpt.com/docs/agent-configuration/subagents#managing-subagents), [turn interruption](https://learn.chatgpt.com/docs/app-server) | pass | Before: running at 07:25:42. Interrupt about 07:25:45 returned previous_status running; next independent `list_agents` read interrupted under `/root/wc_probe_a` | Stops that run; follow-up restarted it in the same context. No independent background process was left |
+| End or failure notice | yes | Parent final-result notification and `list_agents`; [orchestration](https://learn.chatgpt.com/docs/agent-configuration/subagents#orchestration-and-thread-controls) | pass | Probe A final `done wc-start-c82f04a9 retained context`, completed about 07:26:02. Cheap probe B `/root/wc_probe_b`, token `wc-end-5e16bd70`, spawned about 07:26:00 with reply-and-end brief; parent received `done wc-end-5e16bd70`; state completed with exact final at 07:26:12 | Failure not provoked; no failure behavior proved |
+| Scheduled check-in | yes | Discover in-chat scheduler; [in-chat scheduled tasks](https://learn.chatgpt.com/docs/automations#schedule-a-task-inside-a-chat) | fail | Repeated tool inventory exposed no scheduling tool. Computer Use `getApp` for `com.openai.codex` refused access “for safety reasons” | No 1–2 minute request could be issued, no rejection of an interval, no longer fallback, no scheduled arrival, no termination/read-back proof; not a scheduler pass |
+
+Verdict: **not ready: Scheduled check-in**. The coordinator cannot prove it can wake itself on a schedule, so a silent worker may go unnoticed between user messages. Subagent detection and the other five capabilities passed; this run does not establish the target desktop session's identity or phone access.
+
+Cleanup: both probe workers read completed; no background processes remained. No scheduled task was created in this run. Scheduler listing and cleanup read-back were unavailable, so this run cannot certify the absence of tasks left by earlier runs. Not exercised: scheduled arrival and termination, failure notice, desktop/phone reachability. The requested shortest schedule remains untried because scheduling access is absent.
+
+Pass as an evidence eval: yes (including the failed essential capability and its consequence). Readiness: no. The #528 scheduling proof remains open; the Claude Code two-arrival policy is unchanged.
+
 ### 2026-11-03 06:05-07:06 UTC, commit fd8b853 (branch `claude/project-thread-r67ntb`, PR #531), dev-skills 0.48.0 (base): claude.ai project, check run (Case 1), and unknown-harness case (Case 2)
 
 Source: the coordinator's recorded run, [#527 comment 6597596744](https://github.com/Luffytse/luffy-dev-skills/issues/527#issuecomment-6597596744), copied here. Supersedes the "check still owed" entries below for the check, except the second check-in arrival, which is still owed.

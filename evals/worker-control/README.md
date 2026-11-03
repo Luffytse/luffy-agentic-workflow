@@ -10,7 +10,9 @@ In a claude.ai project the run must include the two probes nothing has shown yet
 
 Pass as an eval: every row's result rests on the evidence it cites, and every failed essential capability is named in the Verdict with its meaning.
 
-## Case 2: an unknown harness
+In Codex, also record the explicit runtime task path and the selected `codex-subagents.md` reference. Test cooperative pause, follow-up resume, and interruption with state read-back through the runtime collaboration tools. For scheduling, request 1 minute first (2 minutes when that is the shortest offered); try longer only after explicit rejection. One scheduled arrival in the coordinator chat plus task termination and read-back passes the Codex row. An absent scheduler fails that row when delivery relies on it; it does not turn Codex into an unknown Harness. A manual run or another chat cannot pass. Record host identity and phone pairing separately from subagent detection. Keep exact tool names marked runtime-reported rather than public stable API.
+
+## Case 2: an unknown Harness
 
 The fixture is [unknown-harness/FACTS.md](unknown-harness/FACTS.md), what a fictional harness's runtime reports, and [unknown-harness/DOCS.md](unknown-harness/DOCS.md), the docs page its help names. Give the agent under test the skill text and FACTS.md only; it must find DOCS.md from the facts. Its tools are not real, so the case runs Steps 1 to 3 and the check's plan, not the probes.
 
