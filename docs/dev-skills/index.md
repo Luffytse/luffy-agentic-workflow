@@ -51,6 +51,8 @@ Read this first, then open only the docs whose line fits your work. Specs and ti
 - [Skill loading eval README](../../evals/skill-loading/README.md): the fresh installed-runtime workflow/reference dependency gate, isolated fixtures and cross-folder reference check. Read when verifying dependency loading before consumer migration.
 - [Skill loading eval RESULTS.md](../../evals/skill-loading/RESULTS.md): source provenance, actual turns, rule application and separate visibility limits. Read when checking what #360 proved and what the final Spec eval must rerun.
 
+- [to-tickets agent-label eval](../../evals/to-tickets-agent-label/README.md): the bounded publication check for a runtime-derived agent-only label (`evals/to-tickets-agent-label/README.md`): a local-files fixture builder, a readback scorer and its self-test over six cases (unrestricted source, inherited restriction, conflicting restriction, no configured mapping, inside a Milestone, a resumed publication). Its README records six passing subagent runs. Read when changing the agent-only label rule in `to-tickets`.
+
 - [Caller cleanup eval](../../evals/caller-cleanup/README.md): bounded build-review handoffs, fix coordination and configured tracker/label operations. Read when changing build callers or publication role mapping; [results](../../evals/caller-cleanup/RESULTS.md) retain observed behavior and limits.
 
 ## Code review

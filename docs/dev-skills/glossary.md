@@ -53,7 +53,7 @@ One small, end-to-end slice of work, built and reviewed on its own. Either part 
 _Avoid_: task, story
 
 **Agent label**:
-The label of the optional agent-only triage role: it marks an issue for one coding agent only, and a repo maps the role to one label per agent in its `docs/dev-skills/triage-labels.md` (this repo: `claude-only` and `codex-only`). It is neither a category nor a state role. An agent that sees another agent's label does not work the issue; an issue with none can be taken by any agent. `triage` may apply it, and `to-tickets` copies a Spec's onto each of its Tickets.
+The label of the optional agent-only triage role: it marks an issue for one coding agent only, and a repo maps the role to one label per agent in its `docs/dev-skills/triage-labels.md` (this repo: `claude-only` and `codex-only`). It is neither a category nor a state role. An agent that sees another agent's label does not work the issue; an issue with none can be taken by any agent. `triage` may apply it, and `to-tickets` copies a Spec's onto each of its Tickets; it also gives a Ticket whose acceptance criteria demonstrably require one agent's native runtime that agent's label when the Spec carries none (never one the repo's label doc does not map; a Spec's label for another agent is surfaced, not changed).
 _Avoid_: assignee, owner
 
 **Milestone**:
