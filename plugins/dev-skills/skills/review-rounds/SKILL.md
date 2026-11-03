@@ -42,8 +42,8 @@ In Round 1, gather these and pass them on to Rounds 2 and 3; re-read only a sour
 A session that finds Round comments already posted continues from the latest one:
 
 - **Its Result reads `waiting on a boundary: …`:** the user's answer clears it. Look for that answer on the pull request after the comment; with none, ask the user and wait. Then continue the step that was waiting, as the answer says, and record a spoken answer as a pull request comment.
-- **Round 1 or 2:** not clean, run the next Round; clean, the review is over (ready to merge).
-- **Round 3:** there is no next Round. If its Result does not yet read `sorted after Round 3`, do the sort below; if it does, the review is over: ready to merge, with any bug Tickets as the remaining work.
+- **Round 1 or 2:** not clean, run the next Round; clean, the review is over (ready to merge), unless a merge with conflicts since then needs its Round (see Merges from main).
+- **Round 3:** there is no next Round. If it is not clean and its Result does not yet read `sorted after Round 3`, do the sort below; otherwise the review is over: ready to merge, with any bug Tickets as the remaining work.
 
 ## The loop
 
