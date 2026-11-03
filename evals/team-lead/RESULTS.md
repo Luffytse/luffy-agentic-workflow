@@ -4,9 +4,12 @@ One entry per run of the `team-lead` eval, newest first ([README](README.md) say
 
 ## Template
 
+Every new entry records its run level (see [Run level](README.md#run-level)); earlier entries have no such line and are not rewritten.
+
 ```
 ### <date>, commit <sha>, dev-skills <version>: <case or check>
 
+Run level: decision-level in a subagent | full build-flow in a top-level session | no model session (unit tests)
 Runner: <a fresh premium-tier session, or by hand; the coding agent>
 Ran: <what was run, and its output in short>
 Pass: yes | no. Not exercised: <what this run did not reach>. Lessons: <what to change>

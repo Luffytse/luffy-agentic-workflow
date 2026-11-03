@@ -2,6 +2,15 @@
 
 Checks of the `worker-control` skill (`plugins/dev-skills/skills/worker-control/`). Its working name was `harness-team`; entries before the rename say so. [RESULTS.md](RESULTS.md) records each run, newest first, in the shape of `evals/startup-verification/RESULTS.md`.
 
+## Run level
+
+**Run level** means what the runner can show from where it runs. *Decision-level in a subagent*: a fresh subagent (which cannot start subagents of its own) is given the skill and the fixture and says what it would do; steps that start or watch real workers are listed as not exercised. *Full build-flow in a top-level session*: a session that can start subagents, schedule a check-in and archive a worker runs the skill end to end.
+
+| Case | Run level |
+| --- | --- |
+| Case 1, the check per harness | full build-flow in a top-level session only: the coordinator starts the probe threads, arranges and ends a check-in, and stops a worker and reads the stop back. A subagent cannot take those probes; its run is recorded with each such probe failed with its limit |
+| Case 2, an unknown Harness | decision-level in a subagent is enough: it runs Steps 1 to 3 and the plan from FACTS.md and DOCS.md, with no real tool |
+
 ## Case 1: the check, per harness
 
 Run the skill's Steps 1 to 5 in one harness, by the agent that will coordinate there (or split as "Who acts" says), and record each probe's evidence from the harness's own record. One recorded run per harness the skill has a reference for. A probe the runner cannot take is recorded failed with its limit, never skipped. Record the commit the skill text ran on (inside an open pull request: that branch, with its base) and the plugin version, and which doc pages the run relied on.

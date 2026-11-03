@@ -4,6 +4,17 @@ Checks of the `milestone` skill's **planning phase**: does the coordinator write
 
 Delivery is the `team-lead` skill's now (ADR 0010): its cases (`deliver`, `deliver-stall`, `deliver-pause`, `deliver-lift`), rebuilt on Harness events, with the new `deliver-earlier` (an earlier loop's records read under the new skill), are in [`../team-lead/`](../team-lead/README.md). The cases for the earlier loop's records (`deliver-checkin-failed`, the thread-end identity regression `deliver-thread-end`) were cut with those records; their recorded runs stay in RESULTS.md and `evidence/` as history.
 
+## Run level
+
+**Run level** means what the runner can show from where it runs. *Decision-level in a subagent*: a fresh subagent (which cannot start subagents of its own) is given the skill and the fixture and says what it would do; steps that start or watch real workers are listed as not exercised. *Full build-flow in a top-level session*: a session that can start subagents, schedule a check-in and archive a worker runs the skill end to end.
+
+| Case | Run level |
+| --- | --- |
+| `plan`, `add-feature` | decision-level in a subagent: every write, thread start and message is a block in `.scratch/proposed-actions.md`, so no real worker starts |
+| report cases (`ready`, `incomplete`, `final-cut`, `reentry`) | decision-level in a subagent: the coordinator reads supplied records and writes `actions.json`; no real scheduler or tracker |
+
+(Judged from the fixtures, which record starts as blocks; no case here needs a top-level session. The loaded-skill-version probe and the Harness check are real-environment checks: see `../startup-verification/RESULTS.md` and `../worker-control/README.md`.)
+
 ## Fixture
 
 [`make-fixture.sh`](make-fixture.sh) builds one scratch repo per case, outside this repo: `bash evals/milestone/make-fixture.sh <out-dir> <plan|add-feature>`. It makes `<out-dir>/repo` (a git repo, one commit on `main`) and `<out-dir>/PROMPT.md` (the scripted prompt, with the user's answers).

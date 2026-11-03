@@ -2,6 +2,15 @@
 
 Checks of the `team-lead` skill (`plugins/dev-skills/skills/team-lead/`): its snapshot command, and its delivery as dry runs built on harness events. Each run gets an entry in [RESULTS.md](RESULTS.md).
 
+## Run level
+
+**Run level** means what the runner can show from where it runs. *Decision-level in a subagent*: a fresh subagent (which cannot start subagents of its own) is given the skill and the fixture and says what it would do; steps that start or watch real workers are listed as not exercised. *Full build-flow in a top-level session*: a session that can start subagents, schedule a check-in and archive a worker runs the skill end to end.
+
+| Check | Run level |
+| --- | --- |
+| `test_snapshot.py`, `test_cases.py` | no model session: ordinary commands |
+| the five dry runs (`deliver`, `deliver-stall`, `deliver-pause`, `deliver-lift`, `deliver-earlier`) | decision-level in a subagent: every start, stop, message and check-in is a block in `.scratch/` and every event is scripted, so nothing real is started. A subagent run is not a check that the real Harness starts workers, delivers a check-in or stops one; that is `worker-control`'s check, which needs a top-level session. (Judged from the fixture's prompt; a full build-flow run of these cases has not been tried.) |
+
 ## Snapshot command: unit tests
 
 `python3 evals/team-lead/test_snapshot.py` runs ordinary unit tests of `snapshot.py` as a command, on disposable git repos with dated commits and fixture tracker data: a local Markdown tracker (issue and pull request files), and GitHub through a stub `gh` on `PATH` that answers the REST routes the command calls. They cover each verdict (active; silent since a time, counted from the last commit, comment or start; nudged and waiting; still silent after its nudge; pull request ready or merged but not reported, and the same reported), a pull request found by the worker's branch when no report named it (a lost report, on both trackers), a ready pull request acted on and then tested for silence through `reported`, a resume restarting the silence clock and voiding an earlier nudge (`resumed`), earlier `<!-- milestone ... -->` records (a nudge counts, none is activity), a `###` heading inside a comment body, a nudge recorded minutes after its check-in still counting a whole interval at the next one, a replacement not flagged for its predecessor's merged pull request, the team lead's own records not counting as activity, the harness state printed as given, one row per worker, and the hand-read fallback: an issue the tracker does not have, an unreachable API, no `gh`, a tracker doc the command cannot read and no tracker doc, each exiting 3 with `read by hand` in the tracker cells while git is still read. Run them after changing `snapshot.py`.
@@ -29,7 +38,7 @@ Cut with the records they tested: the earlier loop's `deliver-checkin-failed` (a
 1. Build it into a scratch directory outside this repo.
 2. Start a **fresh** session at the **premium** tier (load `model-tiers` for the model), working directory `<out-dir>/repo`, and give it only the text between the `---` lines of `<out-dir>/PROMPT.md`, with `<checkout>` replaced by the checkout under test. Keep this README, `score.py` and `test_cases.py` away from it.
 3. Score it: `python3 evals/team-lead/score.py <out-dir> <case>`. It splits the actions at their `## Event <k>` lines and prints one line per check; it exits 1 when any fails. A quiet check-in is scored as an event with no block at all.
-4. Record the run in [RESULTS.md](RESULTS.md) with the commit and plugin version under test.
+4. Record the run in [RESULTS.md](RESULTS.md) with the commit, plugin version and run level under test.
 
 ### Self-test of the cases
 

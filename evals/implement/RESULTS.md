@@ -4,9 +4,12 @@ One entry per build-flow check of `implement`, newest first. Rerun when `impleme
 
 ## Template
 
+Every new entry records its run level (see [Run level](README.md#run-level)); earlier entries have no such line and are not rewritten.
+
 ```
 ### <date>, commit <sha>, dev-skills <version>
 
+Run level: decision-level in a subagent | full build-flow in a top-level session
 Setup: <repo, origin, tracker, ticket>
 Steps: <what each step of SKILL.md did, step by step>
 Not exercised: <paths of the skill this run did not reach>

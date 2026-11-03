@@ -16,6 +16,19 @@ bash evals/agentic-review/round0/test-fixture.sh
 bash evals/agentic-review/loop/test-fixture.sh
 ```
 
+## Run level
+
+**Run level** means what the runner can show from where it runs. *Decision-level in a subagent*: a fresh subagent (which cannot start subagents of its own) is given the skill and the fixture and says what it would do; steps that start or watch real workers are listed as not exercised. *Full build-flow in a top-level session*: a session that can start subagents, schedule a check-in and archive a worker runs the skill end to end.
+
+| Case | Run level |
+| --- | --- |
+| Planted fixture, step 3 (Finders and Verifier started by hand or by the coordinator) and the whole-review run | full build-flow in a top-level session: Finders and the Verifier are subagents, which a subagent cannot start |
+| Verify-only check | decision-level in a subagent: one Verifier, given its brief, starts nothing |
+| Round 0 | full build-flow in a top-level session, as its steps say (the score reads whether a subagent was started); the level pick itself could be shown decision-level (guess, not yet tried) |
+| Loop, `merge` | full build-flow in a top-level session: Round 2 starts a Finder and a Verifier |
+| Loop, `after-round3` | steps say a top-level session that can start subagents; the sort needs no Finder, so decision-level in a subagent may show it (guess, not yet tried) |
+| the builders' tests | no model session |
+
 ## Files
 
 - `base/`, `after/`, `SPEC.md`, `setup.sh`: the planted fixture. `base/` is the repo before the change (a tiny Python cost splitter with its own `docs/dev-skills/index.md` and a `REVIEW.md` with two Always check lines, one for `splitter/*.py`, which the change breaks once, and one for shell scripts, which the change does not touch); `after/` holds the files the change adds or edits; `setup.sh` builds it as a scratch repo (branch `main` holds `base/`, branch `planted` adds one commit with the change, and the spec sits untracked at `.scratch/SPEC.md`). The fixture's files are test data.

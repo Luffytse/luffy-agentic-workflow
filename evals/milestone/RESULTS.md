@@ -161,9 +161,12 @@ rule by hand, not a fresh Claude Code or Codex coordinator's adherence to it.
 
 ## Template
 
+Every new entry records its run level (see [Run level](README.md#run-level)); earlier entries have no such line and are not rewritten.
+
 ```
 ### <date>, commit <sha>, dev-skills <version>: <case>
 
+Run level: decision-level in a subagent | full build-flow in a top-level session
 Driven by: <a fresh session at the premium tier | by hand, reading the skill's text>; skill text from <path, branch>
 Proposed actions: <the numbered blocks, in short; the Milestone issue body when one was written>
 Score: <n>/<m> (`score.py <out-dir> <case>`); questions not covered by the script: <none | list>

@@ -23,8 +23,12 @@ Limits: these were decisions over supplied scenarios and passages, not live merg
 
 ## Template
 
+Every new entry records its run level (see [Run level](README.md#run-level)); earlier entries have no such line and are not rewritten.
+
 ```
 ### <date>, dev-skills <version>, <level>
+
+Run level: decision-level in a subagent | full build-flow in a top-level session
 
 | id | Reported? | Severity given | All locations? | Notes |
 |----|-----------|----------------|----------------|-------|

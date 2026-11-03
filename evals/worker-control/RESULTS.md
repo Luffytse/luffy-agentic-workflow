@@ -4,9 +4,12 @@ One entry per run of the `worker-control` skill's check or its unknown-harness c
 
 ## Template
 
+Every new entry records its run level (see [Run level](README.md#run-level)); earlier entries have no such line and are not rewritten.
+
 ```
 ### <date>, commit <sha>, dev-skills <version>: <harness>, <check run | unknown-harness case>
 
+Run level: decision-level in a subagent | full build-flow in a top-level session
 Runner: <who took each action, and why that agent>
 Runtime: <environment kind; permission mode; sandbox; tools held; how each was read>
 Docs used: <the reference's pages this run relied on>
