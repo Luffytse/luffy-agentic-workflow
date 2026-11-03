@@ -9,8 +9,10 @@ The coordinator runs this skill whenever it delivers planned work: a whole Miles
 
 ## The work it delivers
 
-- **Inside a Milestone** (an open Milestone issue, as `milestone`'s **No Milestone** test reads it): its features in build order, its order rule (one at a time, or up to some number at once) and its boundaries, from the Milestone issue. Delivery starts only once `milestone`'s planning has settled and the latest Startup verification result on the Milestone issue reads `Verdict: ready`, or, after a failed one, the user's word to go on is recorded there, naming each failed capability. If that result's Runtime line plainly names another environment than this one, tell the user.
+- **Inside a Milestone** (an open Milestone issue, as `milestone`'s **No Milestone** test reads it): its features in build order, its order rule (one at a time, or up to some number at once) and its own boundaries, from the Milestone issue. Delivery starts only once `milestone`'s planning has settled and the latest Startup verification result on the Milestone issue reads `Verdict: ready`, or, after a failed one, the user's word to go on is recorded there, naming each failed capability. If that result's Runtime line plainly names another environment than this one, tell the user.
 - **No Milestone:** the user's word and the current release issue: its labelled issues, in the order it gives. Before relying on a check-in or a stop, run `worker-control`'s check here unless a result for this Harness exists, and name each failed capability to the user, who says how to go on.
+
+**Boundaries are the same in both modes:** the Boundary record, and for an issue that belongs to a Milestone, that Milestone issue's own boundaries, which win for it. A worker's pull request that crosses one goes to the user, and a question about one is the user's to answer.
 
 The project's own instructions add their thread limit, tier map and what else a brief carries. Do every tracker read and write with the tracker doc's operations (`docs/dev-skills/issue-tracker.md`), cited by name below.
 
@@ -43,7 +45,7 @@ Start nothing while a pause is in effect or a merge-time step holds further star
 
 ## 3. React
 
-- **A worker reports or asks.** Read its issue, branch and pull request, then act on what they show: a merge-time request (step 4), a finished build (its slot frees), a question within the boundaries (answer it; a boundary crossing goes to the user).
+- **A worker reports or asks.** Read its issue, branch and pull request, then act on what they show: a merge-time request (step 4), a finished build (its slot frees), a question within the boundaries (answer it; a boundary crossing goes to the user, as above).
 - **A worker ended without its result,** as `worker-control` reads an end: no stop is needed. Start a fresh worker from its pushed branch and the tracker as "Replace a stalled worker" steps 3 and 4 say; it counts as a stall, so a replacement that ended parks the issue.
 - **A pull request is ready or merged** with no report: act as if the worker had reported, and tell it what you decided.
 
