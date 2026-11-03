@@ -15,6 +15,18 @@ Pass: yes | no. Lessons: <what to change in implement, if anything>
 
 ## Runs
 
+### 2026-11-03, base d4e71bb (the Spec branch, claude/project-thread-0vecgo), dev-skills 0.52.0 (no bump): #573 one merge rule, model runs owed
+
+Changed cases (fixture builder `make-fixture.sh`, `ticket` flow): `no-milestone` (now an agent merge with the `Agent-merged rules:` line), `inside-deep-adr` (new line name), `outside-boundary`, `no-record-twoway` and `no-record-oneway` (new), and the corrective-check cases `retro-inside`, `retro-outside` and `unrelated-no-issue` (all three now merge by the one rule; the Retro origin issue's labels decide only whether a Milestone issue applies). `inside-boundary` is unchanged.
+
+Checked: `bash evals/implement/merge-authority/test-fixture.sh` failed before the skill and builder edits (new cases unknown, old `Milestone review:` line and hand-over Expected for `no-milestone`) and passes after, for both flows. Desk check, by the #573 Implementer, who wrote the step 7 text: each case's fixture read against the new step 7 gives the Expected line (empty record when `boundaries.md` is absent; Milestone issue read only when the ticket carries `milestone-1`; Deep and the ADR change never stop a merge; one-way Door with the deletion unallowed by the record, or by an empty one, goes to the user).
+
+Owed: one fresh regular-tier model run of each changed case. It could not happen here: the session has no subagent tool, and starting a separate `claude -p` session to act as the thread was refused by the environment's permission classifier. Run each case per the README (decision-level is enough) and record it above this entry. The Spec pull request merges with these runs still owed, so they are a follow-up after the merge.
+
+Not exercised: everything a model run covers; steps 1 to 6 and the real bump commit and merge in any case.
+
+Pass: n/a (a desk check; model runs owed). Lessons: none yet. The `implement-spec` flow of the same fixture still expects the old skill text until #574 changes `implement-spec`, so its merge-authority runs are not valid until then. [Note: #574 has since landed on the Spec branch, so the spec flow is valid.]
+
 ### 2026-11-02, base 1756497f83c5c897abef05db6e192d2cb51d8382, dev-skills 0.43.0: #476 corrective-check membership, red/green decisions
 
 Setup: extended shared merge-authority fixture, `ticket` flow, no forge or CI. The coordinator ran one fresh regular-tier decision subagent against unchanged main skills for the inside case, then a different fresh regular-tier decision subagent against the candidate skills committed with this entry for all three green cases. Thus green has two fresh agents across both build flows, each seeing its own three cases; cases within a flow are not isolated from each other. Prompts came from DECISION.md; agents read the real skills and tracker fixtures, without this README's scoring table. No full Review was delegated.
