@@ -39,6 +39,8 @@ Run at most **3 Implementers at once**, counting every Implementer that is worki
    - start at `docs/dev-skills/index.md`, plus the exploration notes if any;
    - the worktree is a fresh checkout and may need its dependencies installed again;
    - build test-first with the `tdd` skill, at seams agreed before the first test;
+   - before reporting, read the repo's review rules file, if any, and check your diff against each Always-check line as the reviewer will;
+   - when the change adds a rule that runs over a sequence of Rounds or steps, before Round 1 list the sequences (each ordering of the events the rule touches, including "it happens again") and write what the text tells the reader to do for each;
    - it never pushes, but before each commit `git status -sb` must show its Ticket branch (never a detached HEAD), so no commit lands off the branch;
    - leave the version as it is on main until the merge step: a Ticket never bumps, and the merge step adds any bump the release doc calls for to the Spec pull request, with the number the repo's own docs say how to get;
    - before reporting, merge the Spec branch tip into its Ticket branch (a merge, never a rebase) and rerun the tests;

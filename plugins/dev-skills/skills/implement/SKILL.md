@@ -31,6 +31,8 @@ Start **one Implementer** subagent on the ticket's tier. Load `model-tiers` by n
 - the worktree is a fresh checkout and may need its dependencies installed again;
 - start at `docs/dev-skills/index.md`;
 - build test-first with the `tdd` skill, at seams agreed before the first test;
+- before reporting, read the repo's review rules file, if any, and check your diff against each Always-check line as the reviewer will;
+- when the change adds a rule that runs over a sequence of Rounds or steps, before Round 1 list the sequences (each ordering of the events the rule touches, including "it happens again") and write what the text tells the reader to do for each;
 - before each push, check that `git status -sb` shows the Ticket branch (never a detached HEAD), and after it, report that `git rev-parse origin/<branch>` equals `HEAD`, as evidence the push landed;
 - leave the version as it is on main until the merge step: the merge step adds any bump the release doc calls for, with the number the repo's own docs say how to get;
 - report its evidence: the tests that fail before and pass after, the typecheck or the repo's checks, screenshots for anything visual (or "not visual"), and its one-way-door call (would reverting its commits undo everything the change did, including anything outside git?).

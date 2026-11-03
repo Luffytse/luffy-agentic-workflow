@@ -116,7 +116,7 @@ A project thread that builds one Spec with `implement-spec`.
 A project thread that builds one lone Ticket with `implement`.
 
 **Implementer**:
-A subagent that builds a Ticket test-first and fixes its Findings. Build threads coordinate; Implementers write the code.
+A subagent that builds a Ticket test-first and fixes its Findings. Build threads coordinate; Implementers write the code. Before reporting, an Implementer checks its diff against the repo's review rules file's Always-check lines and, for a new rule that runs over a sequence of Rounds or steps, walks the sequences before Round 1.
 _Avoid_: coder, worker
 
 **Spec branch**:
