@@ -6,7 +6,7 @@ Checks of the `worker-control` skill (`plugins/dev-skills/skills/worker-control/
 
 Run the skill's Steps 1 to 5 in one harness, by the agent that will coordinate there (or split as "Who acts" says), and record each probe's evidence from the harness's own record. One recorded run per harness the skill has a reference for. A probe the runner cannot take is recorded failed with its limit, never skipped. Record the commit the skill text ran on (inside an open pull request: that branch, with its base) and the plugin version, and which doc pages the run relied on.
 
-In a claude.ai project the run must include the two probes nothing has shown yet: a recurring check-in arranged by a thread the coordinator starts, arriving in the coordinator's own record at least twice and then ended, and a stop worker stopping a probe thread and reading the stop back. The runner is the coordinator, with the threads it starts; a worker never runs it as the coordinator.
+In a claude.ai project the run must include the two probes nothing has shown yet: a recurring check-in arranged by a thread the coordinator starts, arriving in the coordinator's own record at least once and then ended, and a stop worker stopping a probe thread and reading the stop back. The runner is the coordinator, with the threads it starts; a worker never runs it as the coordinator.
 
 Pass as an eval: every row's result rests on the evidence it cites, and every failed essential capability is named in the Verdict with its meaning.
 
