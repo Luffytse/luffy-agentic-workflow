@@ -23,6 +23,7 @@
 #   vendor-model-names           no vendor model name in the repo's text (ADR 0002)
 #   no-person-names              no person's name in skill or doc text
 #   repo-free-skill-text         skill text names nothing that exists only in this repo
+#   no-repo-merge-rules          skill text does not state this repo's merge-time rules (the version hand-out, the Ticket re-read after a skill merge); a skill says to follow the repo's own docs
 #   no-agent-label-strings       the plugin names no repo's agent-only label strings (a repo maps the role in its triage-labels.md)
 #   tracker-operation-names      each operation cited as the tracker doc's **Name** or "Name" operation exists as a bold bullet in every issue-tracker seed
 #
@@ -209,6 +210,16 @@ hits="$(printf '%s\n' "$hits" | grep .)"
 if [ -n "$hits" ]; then
   echo "$hits"
   bad "skill text names something only this repo has (an ADR number, \"Upstream\", a project, repo or person, or this repo's tooling)"
+fi
+
+# no-repo-merge-rules: the version hand-out (the coordinator gives each skill-changing pull request its number, one at a
+# time) and the Ticket re-read after a skill merge are this repo's own merge-time rules (CLAUDE.md, docs/agents/release.md).
+# Skill text only says to follow the merge-time steps the repo's own docs give, so it describes neither: no handing out
+# of version numbers, no "version hand-out", no "skill merge".
+hits="$(grep -rniE --include='*.md' --include='*.yaml' 'hand(s|ed|ing)? out (the |a |an |each |next |no |any |further |new )*(version )?numbers?|numbers? (is |are )?handed out|version hand-?out|skill merge|re-?read(s|ing)? (of )?(the )?open (issues|tickets)' "$skills")"
+if [ -n "$hits" ]; then
+  echo "$hits"
+  bad "skill text states a merge-time rule that only fits this repo (the version hand-out, the Ticket re-read after a skill merge); say to follow the merge-time steps the repo's own docs give"
 fi
 
 # no-agent-label-strings: the plugin speaks of the "agent-only" label role, never of one repo's label strings for it

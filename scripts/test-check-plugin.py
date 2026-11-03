@@ -87,6 +87,19 @@ class SkillLoadingPackaging(unittest.TestCase):
                      "release", "retro-planning", "setup-project"]:
             self.assertIn("model-tiers", (skills / name / "SKILL.md").read_text(), name)
 
+    def test_repo_only_merge_rules_in_skill_text_fail(self):
+        for text in ("The coordinator hands out the next version number.\n",
+                     "Hand out version numbers one at a time.\n",
+                     "Re-read open Tickets after a skill merge.\n",
+                     "Re-read open issues after a merge.\n"):
+            self.plant("plugins/dev-skills/skills/implement/SKILL.md", text)
+            self.check(1)
+            shutil.copy(pathlib.Path(__file__).resolve().parents[1] / "plugins/dev-skills/skills/implement/SKILL.md",
+                        self.repo / "plugins/dev-skills/skills/implement/SKILL.md")
+
+    def test_no_shipped_skill_states_the_repo_only_merge_rules(self):
+        self.check(0)
+
     def cite(self, text):
         (self.skill / "SKILL.md").write_text(
             "---\nname: fixture-contract\ndescription: Use when a caller needs the fixture contract.\n"

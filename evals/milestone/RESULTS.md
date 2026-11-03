@@ -2,6 +2,10 @@
 
 One entry per run of the `milestone` skill's dry run (the planning cases and the delivery cases: `deliver`, `deliver-stall`, `deliver-checkin-failed`, `deliver-pause`, `deliver-lift`, `deliver-thread-end`, and the report cases), newest first ([README](README.md) says how to build, run and score it). Record the commit and the plugin version from `plugins/dev-skills/.claude-plugin/plugin.json`; an entry written inside an open pull request names the commit and version it ran on as its base. Each planning run also applies the shape to one real Milestone issue (`score.py --shape`) and names the migration it needs, if any; each `deliver` run also applies the loop, read-only, to one real Milestone and names the thread it would start next and the next Release it would plan.
 
+## 2026-11-03 — Ticket #526: version hand-out and Ticket re-read leave the skill
+
+The `deliver` fixtures now carry both rules in the fixture repo's `CLAUDE.md`; the skill says only to follow the repo's merge-time steps. No case was rerun in this entry: the scorer's hand-out and re-read checks are unchanged, and the entries below were recorded on the earlier skill text.
+
 ## 2026-11-02 — Ticket #408: report and stop for review
 
 Base: main `d0c387e`, plugin **0.41.0** in both manifests throughout these runs.

@@ -43,6 +43,26 @@ See `docs/agents/boundaries.md`.
 The version lives in `VERSION`. See `docs/agents/release.md` for who bumps it.
 MD
 
+if [ "$kind" = deliver ]; then
+  # The fixture repo plays this repo: the skill states no version hand-out and no Ticket re-read, only "follow the
+  # merge-time steps the repo's own docs give", so the repo's CLAUDE.md carries them (as this repo's CLAUDE.md does).
+  cat >> "$r/CLAUDE.md" <<'MD'
+
+## Merge-time steps
+
+The coordinator follows these two. `docs/agents/release.md` has the bump rules.
+
+**Version hand-out.** A thread about to merge a pull request that changes a file under `skills/` asks the coordinator for its version number just before merging; a pull request that changes no such file gets none and merges with no bump.
+- The coordinator gives main's `VERSION` raised minor for a new or changed skill rule and patch for a fix to one. It records the number first, in a comment on the issue the pull request builds (a Spec pull request: the Spec; one that builds no issue: the pull request itself) whose first line is `<!-- version hand-out -->` and whose second is `Version <number> for <pull request>: merge it next, with the bump as its last commit, as the release doc says.` Then it tells the thread.
+- Skill-changing pull requests merge one at a time. A number is out while main's `VERSION` has not reached it, its pull request is open and the thread it was given to is running; a closed-unmerged or parked pull request's number, or one whose thread ended, is void. While one is out, give none: record the request on the same issue, first line `<!-- version hand-out -->`, second `Waiting: <pull request> asked while <number> was out.`, and tell the thread to wait. At the first wake with no number out, give numbers to the waiting requests in the order they asked.
+- A thread that asks again because main moved under it gets a new number, recorded the same way; its earlier record is void.
+- While the user's pause is in effect, give no number: record the request as waiting and tell the thread to wait; a number already out stays out and its merge may finish. Waiting requests are served at any wake, a check-in included, not only on a merge report, since a number can go void with no report.
+- After the merge, read `VERSION` on main. If it is not the number given, give no further number and tell the merging thread to put main right first.
+
+**Ticket re-read after a skill merge.** Right after a pull request that changed a file under `skills/` merges, before any further thread starts, re-read the open issues of the Milestone that no running thread is building and whose body names the changed skill or a changed file, against main's new text of the skill: update an issue the change makes wrong or incomplete (the whole body written back with only that change and a one-line note naming the merge; a change to the Milestone's agreement goes to the user instead); close one it makes obsolete, with a note naming the merge; otherwise comment that it was re-read and still fits. Then read the blockers again and take the next start from what they say.
+MD
+fi
+
 cat > "$r/docs/index.md" <<'MD'
 # Docs index
 
@@ -133,7 +153,7 @@ if [ "$kind" = deliver ]; then
   cat > "$r/docs/agents/release.md" <<'MD'
 # Releases
 
-- **Bump mode**: pull requests bump. Every pull request that changes a file under `skills/` bumps `VERSION` as its last commit, with the number the coordinator hands out just before merge: minor for a new or changed skill rule, patch for a fix to one. Any other pull request leaves `VERSION` as it is. A Release opens no bump pull request; it writes the changelog entry for everything since the last Release.
+- **Bump mode**: pull requests bump. Every pull request that changes a file under `skills/` bumps `VERSION` as its last commit, with the number the coordinator gives just before merge (`CLAUDE.md`, "Merge-time steps"): minor for a new or changed skill rule, patch for a fix to one. Any other pull request leaves `VERSION` as it is. A Release opens no bump pull request; it writes the changelog entry for everything since the last Release.
 - **Version file**: `VERSION`, its only line.
 - **Changelog**: `CHANGELOG.md`, newest entry first.
 - **Label prefix**: `release-`.
@@ -141,7 +161,7 @@ if [ "$kind" = deliver ]; then
 
 ## The bump commit
 
-The merging thread changes `VERSION` to the number handed out, as the pull request's last commit.
+The merging thread changes `VERSION` to the number given, as the pull request's last commit.
 MD
 else
   cat > "$r/docs/agents/release.md" <<'MD'
