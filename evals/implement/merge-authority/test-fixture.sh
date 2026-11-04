@@ -77,5 +77,9 @@ for s in implement implement-spec; do
   grep -qiE 'Milestone review:|(inside|outside) a Milestone\*{0,2}, bring' "$skills/$s/SKILL.md" && bad "$s: SKILL.md keeps the old line name or an inside/outside merge list"
   grep -qiE "Milestone issue's own boundaries|Milestone-issue test" "$skills/$s/SKILL.md" && bad "$s: SKILL.md still reads a Milestone issue's own boundaries at merge"
 done
+# The merge rule lives in the merging Base skill (Spec #641): implement loads it and keeps no copy of the rule and no merge command.
+[ -f "$skills/merging/SKILL.md" ] || bad "merging: no SKILL.md"
+grep -q '`merging`' "$skills/implement/SKILL.md" || bad "implement: SKILL.md does not load merging"
+grep -qE 'Read the Boundary record|gh (pr|api)[^`]*merge|Bump the version' "$skills/implement/SKILL.md" && bad "implement: SKILL.md keeps its own Boundary reading, bump step or merge command"
 rm -rf "$out"
 [ "$fail" = 0 ] && echo "OK: merge-authority fixtures" || exit 1

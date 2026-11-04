@@ -1,6 +1,6 @@
 # implement eval
 
-Build-flow checks of `implement`. Each run gets an entry in [RESULTS.md](RESULTS.md). The merge-authority check below is the one to rerun when step 7's merge rule, the listing line or the bump step change; `implement-spec` reuses its fixture ([its README](../implement-spec/README.md)).
+Build-flow checks of `implement`. Each run gets an entry in [RESULTS.md](RESULTS.md). The merge-authority check below is the one to rerun when the merge rule, the listing line or the bump step change: step 7 loads the `merging` Base skill, which holds the rule, and the bump step is the release doc's (the `merging` cases are in [their own eval](../merging/README.md)); `implement-spec` reuses this fixture ([its README](../implement-spec/README.md)).
 
 ## Merge-authority check
 

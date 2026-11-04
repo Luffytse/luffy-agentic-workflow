@@ -21,9 +21,17 @@ _(Keep this section only when the policy is pull requests bump; otherwise delete
 - **Version file**: `<path to the file that holds the version>`, the `<field or line that holds it>`. A bump changes only this value in it.
 - **Extra cut step**: the changelog entry carries the line `Versions: <the versions delivered, oldest first, each once, or "none, the version stays X.Y.Z">. Commits: <start>..<end>.` under the goal. The versions delivered are each value the version file reached since the last Release's end commit.
 
-### The bump commit
+### The bump at merge
 
-The merging thread adds it as the pull request's last commit, just before merge:
+A merge-time step: the merging thread takes it just before the merge of each pull request that changes `<the files that bump the version>`, the user's merge too. A pull request that changes none of them gets no number and no bump.
+
+1. Get the next version number just before the merge, as this doc says it is given (from the user when it says nothing), and wait for it.
+2. Have the committer the merge names add the bump as the pull request's last commit, with the bump commit's steps below, and push.
+3. If main moves before the merge and the merge-time steps run again: while main's version is unchanged, keep the bump commit and its number (get no new number, add no second bump commit). When main's version changed, get a new number; the committer merges main in, resolves the version file by taking main's, and redoes the bump as a new commit after that merge, superseding the old bump.
+
+"Last commit" means the last of the pull request's own work, so a merge of main after the bump is fine.
+
+### The bump commit
 
 - Change the version in the version file, and nothing else in it.
 - Anything else the bump commit must change or run, such as a second file that repeats the version or a check to run before pushing. None.
