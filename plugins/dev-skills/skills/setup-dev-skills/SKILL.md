@@ -8,10 +8,10 @@ description: "Configure a GitHub repo for the dev-skills plugin: write its issue
 Derived from Matt Pocock's setup skill; the seed files in this folder are mostly his text (MIT, see `LICENSE-mattpocock-skills` in the plugin folder). Scaffold the per-repo configuration the other skills read. Every file it writes lives in `docs/dev-skills/`, the one folder only the skills use, so it never mixes with the repo's own docs; only `REVIEW.md` and the `## Agent skills` block in `CLAUDE.md` or `AGENTS.md` go at the repo root, where reviewers and coding agents expect them:
 
 - **Issue tracker**: GitHub Issues, in `docs/dev-skills/issue-tracker.md`.
-- **Labels**: the 5 state roles and 2 category roles that `triage` uses, the optional agent-only role (one label per coding agent) when the user wants it, the `wayfinder:*` labels and the `parked` label (the tracker doc's **Park** operation uses it), in `docs/dev-skills/triage-labels.md` and on the repo.
+- **Labels**: the 5 state roles and 2 category roles that `triage` uses, the `next-release` role, the optional agent-only role (one label per coding agent) when the user wants it, the `wayfinder:*` labels and the `parked` label (the tracker doc's **Park** operation uses it), in `docs/dev-skills/triage-labels.md` and on the repo.
 - **Domain docs**: where the glossary (`docs/dev-skills/glossary.md`) and ADRs (`docs/dev-skills/adr/`) live and how skills read them, in `docs/dev-skills/domain.md`, plus the `docs/dev-skills/index.md` that lists the docs.
 - **Review rules**: a starter `REVIEW.md` at the repo root, where the repo's own review rules go.
-- **Releases**: where the version lives, who bumps it (the bump mode), the changelog path, the release label prefix, and for pull-requests-bump repos the Release name form and the whole-Release check, that `release` reads, in `docs/dev-skills/release.md`, for a repo that cuts versioned Releases.
+- **Releases**: the versioning policy (none, pull requests bump or Releases bump, with that policy's text), the Release name form, the Release size, the changelog path, the release label prefix, the cut steps and the whole-Release check, that `release` reads, in `docs/dev-skills/release.md`, for a repo that cuts Releases, versioned or not.
 - **Boundaries**: which irreversible actions agents may take, which need the user's approval, the resource budget, the check-in interval and the Milestone label form, in the Boundary record, `docs/dev-skills/boundaries.md`.
 - **GitHub settings**: checked and reported, never changed.
 
@@ -48,7 +48,7 @@ Summarise what is present and what is missing. Take the sections in order, one a
 
 > Do you want to keep the default labels? (recommended: **yes**)
 
-The defaults are the 5 state roles, `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`, and the 2 category roles, `bug` and `enhancement`, each label string equal to its role name. On **yes**, write them as they are. Only if the user says no, usually because the repo already uses other names (for example `bug:triage` for `needs-triage`), collect the overrides so `triage` applies the existing labels instead of creating duplicates.
+The defaults are the 5 state roles, `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`, and the 2 category roles, `bug` and `enhancement`, plus the `next-release` role, each label string equal to its role name. On **yes**, write them as they are. Only if the user says no, usually because the repo already uses other names (for example `bug:triage` for `needs-triage`), collect the overrides so `triage` applies the existing labels instead of creating duplicates.
 
 Then ask one more question:
 
@@ -66,15 +66,20 @@ On **yes**, ask the user for the rules' text, then record them in the repo's `CL
 
 **Section E: Releases.** Ask one question:
 
-> Does this repo cut versioned Releases with the `release` skill? (recommended: **yes** when exploration found a version file, otherwise **no**)
+> Does this repo cut Releases with the `release` skill, with or without a version? (recommended: **yes**)
 
-On **yes**, fill the release doc's values, leading with what exploration found: the version file and the field or line that holds the version, the changelog path (an existing `CHANGELOG.md`, else one beside the version file), and the label prefix (default `release-`). Then ask three more things, which `release` reads:
+On **no**, write no release doc. On **yes**, ask these in order, one answer each, leading with the recommended answer and with what exploration found:
 
-- the **bump mode** (recommended: **Releases bump**): either a Release's bump pull request changes the version and ordinary pull requests leave it alone, or **pull requests bump**, where each pull request that changes the files the repo names bumps the version as its last commit at merge. On pull requests bump, ask which files make a pull request bump and how the number is given (the repo decides; the seed leaves it as a placeholder to fill in);
-- on pull requests bump only, the **Release name** form: the name, label and release issue title forms with `<...>` placeholders, such as the name `Phase <n>`, the label `release-p<n>` and the title `Release Phase <n>` (a Release is named, not numbered);
-- on pull requests bump only, the **whole-Release check**: the checks to run on the changelog pull request's branch (recommended: the repo's own checks), and any clean-up pass.
+- the **versioning policy** (recommended: **pull requests bump** when exploration found a version file and the repo's pull requests already change it, **Releases bump** for any other repo with a version file, **none** for a repo with no version): **none**, where the repo keeps no version; **pull requests bump**, where each pull request that changes the files the repo names bumps the version as its last commit at merge; or **Releases bump**, where a Release's bump pull request changes the version and ordinary pull requests leave it alone. On pull requests bump or Releases bump, fill the version file and the field or line that holds the version from what exploration found; on pull requests bump, also ask which files make a pull request bump and how the number is given (the repo decides; the seed leaves it as a placeholder to fill in);
+- the **Release name** form: the name, label and release issue title forms with `<...>` placeholders (recommended: the name `Release <n>`, the label `release-<n>` and the title `Release <n>`);
+- the **Release size**, the most items one Release takes, counted of any kind (recommended: **5**);
+- the **changelog path** (an existing `CHANGELOG.md`, else one at the repo root) and the **label prefix** (default `release-`);
+- the **cut steps**: anything else the cut must change or run, after the changelog entry is written (recommended: **none**); on Releases bump, ask whether the bump pull request must change or run anything else, such as a second file that repeats the version, and on pull requests bump, whether the bump commit must (recommended: **nothing**);
+- the **whole-Release check**: the checks to run on the changelog pull request's branch, and any clean-up pass (recommended: the repo's own checks).
 
-Then ask whether the bump pull request (Releases bump) or the bump commit (pull requests bump) must change or run anything else, such as a second file that repeats the version (recommended: **nothing**). On **no**, write no release doc.
+Write the seed's matching "Policy:" section and delete the other two. A repo with no version still gets a release doc, with policy none and no version fields. The Releases bump section carries the semver sizes and the bump pull request's steps, so write them from the seed.
+
+On a re-run over a release doc that has a "Bump mode" line and no versioning policy, take that mode as the policy (and its Version file, Release name and whole-Release check as the answers), and ask for every field the doc lacks: usually the Release size and the cut steps, and the Release name form too when the doc has none.
 
 **Section F: Boundaries.** Ask the user for the Boundary record's values, one question each, leading with the recommended answer:
 
@@ -90,7 +95,7 @@ An empty answer to the second question is valid. The build skills read this reco
 
 > What should a Milestone's membership label look like? (recommended: **`milestone-<n>`**, for example `milestone-1`)
 
-Never guess a value. Say that a Milestone issue may add allowed or forbidden actions for its own issues and wins over the record for them; the seed already says so.
+Never guess a value. Say that this record is the only one: a Milestone issue holds no boundaries of its own, so an action to allow or reserve for a Milestone goes here; the seed already says so.
 
 On a re-run, fill the fresh draft of the record from the existing record's values before diffing it, so a value filled in earlier is never shown as a revert to the seed's placeholder; ask again only for a value the existing record lacks, or that the user wants to change.
 
@@ -107,7 +112,7 @@ Build every file from the seeds in this folder:
 - the `## Agent skills` block (step 4)
 - `docs/dev-skills/index.md`, new or updated, listing every `docs/dev-skills/` file, `REVIEW.md` (with a "read when reviewing a change or adding an Always check line" line) and every other doc found while exploring, by loading `docs-index` and applying its contract
 
-On a re-run, diff each draft against the file in the repo. Keep the values the earlier run filled in (the repo link, the label strings, the PR flag, the release doc's values, including its bump mode, Release name form and whole-Release check, and the Boundary record's values) and change only what drifted from the seeds. Show the user the diff, or "no change" per file. The rules the user gave in Section D are drafted into the diff of the file they go in (`CLAUDE.md` or `AGENTS.md`, or `REVIEW.md`) and shown before writing; adding a line to an existing `REVIEW.md` is an addition, not a rewrite. Let the user edit before anything is written.
+On a re-run, diff each draft against the file in the repo. Keep the values the earlier run filled in (the repo link, the label strings, the PR flag, the release doc's values, including its versioning policy, Release name form, Release size, cut steps and whole-Release check, and the Boundary record's values) and change only what drifted from the seeds. Show the user the diff, or "no change" per file. The rules the user gave in Section D are drafted into the diff of the file they go in (`CLAUDE.md` or `AGENTS.md`, or `REVIEW.md`) and shown before writing; adding a line to an existing `REVIEW.md` is an addition, not a rewrite. Let the user edit before anything is written.
 
 Done when the user has approved the drafts, or approved "no change".
 
@@ -128,7 +133,7 @@ Start at `docs/dev-skills/index.md`; it says which doc to read for what.
 
 ### Triage labels
 
-[one-line summary of the label vocabulary, for example "5 state roles + 2 category roles: ...", plus the agent-only labels when the repo has them]. See `docs/dev-skills/triage-labels.md`.
+[one-line summary of the label vocabulary, for example "5 state roles + 2 category roles: ...", plus the `next-release` role and the agent-only labels when the repo has them]. See `docs/dev-skills/triage-labels.md`.
 
 ### Domain docs
 
@@ -136,7 +141,7 @@ Start at `docs/dev-skills/index.md`; it says which doc to read for what.
 
 ### Releases
 
-[one-line summary: the version file, the bump mode (Releases bump or pull requests bump) and the release label prefix]. See `docs/dev-skills/release.md`.
+[one-line summary: the versioning policy (none, pull requests bump or Releases bump), the Release size and the release label prefix]. See `docs/dev-skills/release.md`.
 ```
 
 Leave out the `### Releases` part when the repo has no release doc.
@@ -151,7 +156,7 @@ Add a `### Boundaries` part to the block, after `### Domain docs` and before `##
 
 Then write the approved files, and `docs/dev-skills/index.md` last.
 
-**Create the labels.** Create every label the skills use that the repo lacks, whether or not `triage` is installed: the label string of each of the 5 state roles, `bug` and `enhancement`, each agent-only label from the table (only when Section B was **yes**), and `wayfinder:map`, `wayfinder:research`, `wayfinder:prototype`, `wayfinder:grilling`, `wayfinder:task` and `parked`. Use `gh api --method POST repos/<owner>/<repo>/labels -f name=<label>` (or the session's GitHub tools); `gh label create` needs GraphQL. Leave `retro`, `retro-planning` and the release labels alone: `retro`, `retro-planning` and `release` create them when first needed.
+**Create the labels.** Create every label the skills use that the repo lacks, whether or not `triage` is installed: the label string of each of the 5 state roles, `bug` and `enhancement`, `next-release`, each agent-only label from the table (only when Section B was **yes**), and `wayfinder:map`, `wayfinder:research`, `wayfinder:prototype`, `wayfinder:grilling`, `wayfinder:task` and `parked`. Use `gh api --method POST repos/<owner>/<repo>/labels -f name=<label>` (or the session's GitHub tools); `gh label create` needs GraphQL. Leave `retro`, `retro-planning` and the release labels alone: `retro`, `retro-planning` and `release` create them when first needed.
 
 ### 5. Check GitHub settings and report
 

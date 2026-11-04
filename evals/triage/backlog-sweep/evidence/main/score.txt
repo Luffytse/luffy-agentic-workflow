@@ -1,0 +1,17 @@
+FAIL duplicate #31 closed as a duplicate or not planned: not closed
+FAIL duplicate #31's close links the kept issue #30
+FAIL obsolete #32 closed
+FAIL obsolete #32's close gives the reason
+FAIL #33, left out of 3 Releases in a row, closed as not planned: not closed
+FAIL #33's close says reopen to bring it back
+PASS no other issue closed (left out twice, not in a row, planned feature, enhancements, marked)
+FAIL next-release set on exactly the severe issue and the feature-blocker: saw [], want [40, 41]
+PASS #41 triaged to ready-for-agent
+FAIL each agent-found enhancement sent to ready-for-human: saw []
+FAIL no agent-found enhancement put at ready-for-agent: added to: [50]
+FAIL ready-for-agent removed from the agent-found enhancement that had it: removed from: []
+PASS no release label applied or created (Release planning owns them)
+PASS one ## Triage batch summary on release issue #4
+FAIL the summary lists every issue the batch decided: missing: [31, 32, 33, 51]
+PASS every comment starts with the triage disclaimer
+5/16 checks passed

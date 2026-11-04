@@ -8,7 +8,7 @@
 - **Routing follows where the fix lands.** A problem with a skill or the workflow (skill text, review rules, how threads run) goes to the `dev-skills` repo, from any project. A problem only one project has (its CI, its docs, its `CLAUDE.md`) goes to that project's repo. No suggestion goes to both. A project that wants a skill of its own builds it in its own repo or `CLAUDE.md`; it may still suggest a `dev-skills` change, which `dev-skills`' Retro planning accepts or closes as won't do, with a reason.
 - `retro` finds the `dev-skills` repo from the `repository` field of the plugin's manifest (`plugins/dev-skills/.claude-plugin/plugin.json`), and the project's tracker from its `docs/dev-skills/issue-tracker.md`. When the thread cannot write to the `dev-skills` repo, `retro` puts the issue text in its report so the coordinator can file it.
 - **Votes.** When an open Retro issue already covers a suggestion, `retro` comments "seen again in <thread>" on it instead of opening a duplicate.
-- **No due notice.** `retro` does not count the backlog or say Retro planning is due (changed by #570): inside a Milestone the Release thread runs Retro planning at every Release end, and the user can start one by asking.
+- **No due notice.** `retro` does not count the backlog or say Retro planning is due (changed by #570): the Release thread runs Retro planning at every Release end, and the user can start one by asking.
 - `implement` and `implement-spec` run `retro` on their own thread as their last step, once the pull request is merged and its issue is closed; a thread that handed its pull request to the person waits, and runs `retro` after the person merges it, or asks whether to run it if the person drops or closes the pull request unmerged, or the thread never opened one. Planning threads keep their project's rule instead.
 
 ## Retro planning (what `retro-planning` does)
@@ -25,7 +25,7 @@ It runs per repo and reads only that repo's Retro issues; the `dev-skills` repo 
 8. Recheck whether the problem behind an earlier fix has come back. If it has, the fix did not work, and that group goes first.
 9. The record lists the snapshot, the cap, every verdict and vote count, what was spun off and what arrived during the planning. The planning closes it at the end. A planning that pauses leaves it open and is resumed from it: the resumed run keeps the snapshot, first brings the record up to date with what was already done on the issues (closes, Tickets, spin-offs), redoes the grouping for the issues still without a verdict, and walks on from there. The next planning reads only closed records.
 
-The limits (at most 3 groups, 2 plannings) are the user's choices, not taken from a source. Inside a Milestone (ADR 0004, ADR 0008) the 3-group cap and the walk with the person do not apply: agents decide every group at Release end (see `retro-planning`).
+The limits (at most 3 groups, 2 plannings) are the user's choices, not taken from a source. At a Release end (ADR 0004, ADR 0008) the 3-group cap and the walk with the person do not apply: agents decide every group at Release end (see `retro-planning`).
 
 ## Considered options
 

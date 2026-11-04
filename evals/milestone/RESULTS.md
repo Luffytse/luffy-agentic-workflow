@@ -2,6 +2,41 @@
 
 One entry per run of the `milestone` skill's dry run (the planning cases and the report cases; the delivery entries below are history, see the first entry), newest first ([README](README.md) says how to build, run and score it). Record the commit and the plugin version from `plugins/dev-skills/.claude-plugin/plugin.json`; an entry written inside an open pull request names the commit and version it ran on as its base. Each planning run also applies the shape to one real Milestone issue (`score.py --shape`) and names the migration it needs, if any; each `deliver` run also applies the loop, read-only, to one real Milestone and names the thread it would start next and the next Release it would plan.
 
+## 2026-11-04 — Ticket #638: model runs at `aeb9b39`, branch and main
+
+Runner: the coordinator. Each case got a fresh premium-tier subagent with only the text of its `PROMPT.md`, and `<checkout>` was set to a `git archive` copy (with `evals/` removed) of the branch (`aeb9b39`, plugin 0.61.0, unbumped) or of main (`c29d3b1`, 0.61.0). The add cases were rebuilt with `aeb9b39`'s `make-fixture.sh`. The plan cases are the runs from the entry below; their fixtures did not change in `aeb9b39`. All were scored with `aeb9b39`'s `score.py`. Run level: decision-level in a subagent. Evidence: [`evidence/638/`](evidence/638/), one folder per `<branch|main>-<case>` holding the prompt, `proposed-actions.md`, `questions.md`, `report.md` and `score.txt`. `main-plan-small` wrote no actions file.
+
+| Case | Branch | Main | Main's failures |
+| --- | --- | --- | --- |
+| `plan` | 22/22 | 0/2 | wrote no actions |
+| `plan-small` | 17/17 | 0/3 | wrote no actions: it asked for the acceptance, the exclusions, a budget and boundaries beyond the Boundary record, then stopped with them unanswered |
+| `add-feature` | 24/24 | 19/20 | touched Ticket 12 (usage line) updated once: 0 edits |
+| `add-feature-excluded` | 25/25 | 20/21 | the same |
+
+Pass: yes on the branch, for all four cases. Main fails the new behaviour: it has no Ticket-update step, and on the plan cases it wrote no Milestone issue. Not exercised: a real tracker; the read-back of each write (reads are not recorded); planning a feature with `grill-with-docs` or `to-spec` inside the run, because the plan was scripted.
+
+## 2026-11-04 — Ticket #638: first model runs judged, scorer and fixture fixed (not yet passes)
+
+The coordinator ran the four planning cases with fresh premium-tier subagents on `git archive` copies of `c3edc53` (branch) and `c29d3b1` (main), with `evals/` removed. Run dirs: the coordinator's scratchpad `evals638/run-<branch|main>-<case>/`. Scores: `plan` branch 22/22, main 0/2 (no actions); `plan-small` branch 16/17, main 0/3; `add-feature` branch 19/20, main 19/20; `add-feature-excluded` branch 19/21, main 19/21. The three branch failures, judged:
+
+- `plan-small`, "no question on what a one-Release Milestone defaults": **scorer bug**. The one flagged question was the step 6 draft approval, which lists the defaults. The check now skips a question that names the draft. The branch run then scores 17/17.
+- Both add cases, "touched Ticket 12 updated once" (main fails it too): **the fixture was wrong, and the skill was vague**. The plan only added `--no-color` to the usage line. Ticket 12 ("names `bye`") stays true once colour lands, so the agent was right to leave it as it was. The fixture's Ticket 12 now has acceptance criteria naming the exact usage line, and the plan changes that line, so 12's own test would check the old line. The skill's touch rule now says a Ticket is touched when its text would be wrong once both land, that it is updated to the end state, and that a Ticket the feature only builds on is not touched.
+- `add-feature-excluded`, "Excluded drops colour and keeps translations": **scorer bug**. The section included the agent's note under the list ("colour output … taken out of Excluded"). The check now reads only the list items. The branch run passes it.
+
+`test_score.py` passes 12/12, with new reference runs for the draft approval and the Excluded note, and a planted run that keeps colour in Excluded. These were not passes: the reruns are in the entry above.
+
+## 2026-11-04 — Ticket #638: every plan is a Milestone; features added mid-Milestone join it
+
+Base: Spec branch `claude/project-thread-28offd` at `006570d`, plugin **0.61.0** in both manifests. `milestone` now plans a one-Release Milestone with defaults (one at a time, Acceptance's first line, Excluded `None`), writes no Boundaries section or Budget line (the Boundary record holds them), and, when the user plans a feature while a Milestone is open, joins it to that Milestone without asking which, lists it, labels it and updates each open Ticket it touches; a change to the goal, acceptance or exclusions is one question.
+
+Cases changed: `plan` no longer scripts a budget or a boundary, and its shape check now requires no Boundaries section; `add-feature` no longer pre-answers an agreement question and its plan touches Ticket 12 (the usage line lists `--no-color`); new `plan-small` and `add-feature-excluded`. The prompt now has the runner list every question in `questions.md`, so the question checks are scored.
+
+Offline, run here: `test_score.py` passes 11/11 (a hand-written reference run of `plan-small`, `add-feature` and `add-feature-excluded` passes; a Boundaries section, a budget question, Ticket 12 left as it was, labelling before listing, an agreement question in `add-feature`, and none in `add-feature-excluded` each fail the check they plant). By reading main's text (`c29d3b1`) against the cases: its step 5 asks for the budget and boundaries and its shape holds `## Boundaries`, so `plan-small` fails the question and shape checks; its "Adding a feature" has no Ticket update, so both add cases fail "touched Ticket 12 updated once". That is a reading, not a run.
+
+Real Milestone issue: Milestone 1 (#396, body as of 2026-11-04), `score.py --shape`: 4 of 6 pass. Migration: its `## Boundaries` section (no approvals, budget none, a note that is history) is now history and may be dropped, since it matches the Boundary record; its table still needs the `Feature` and `Accepted when` columns the 2026-11-02 entry names. The issue was not edited.
+
+Model runs (owed when this entry was written): made by the coordinator on the branch and on main. They are recorded in the entry "Ticket #638: model runs at `aeb9b39`, branch and main" above, after the fixture and scorer fixes in the entry "first model runs judged".
+
 ## 2026-11-03 — Ticket #530: `milestone` slimmed to planning, add a feature, Startup verification and the report
 
 `milestone` lost its remaining delivery text: Startup verification's four tracker-marker probes became a pointer to `worker-control`'s check plus the one loaded-skill-version probe, and the Delivery and Milestone review sections point at `team-lead`. The report is unchanged but for its thread inventory (no "check-in and stop threads"). Fixtures changed: the `add-feature` case's Startup verification result and the report fixture's probe names now use the check's rows; the cases' expectations and both scorers are unchanged.

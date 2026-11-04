@@ -1,0 +1,3 @@
+- How should colour output (issue 30) work, how will you accept it, and is it a Spec or one lone Ticket?
+- Milestone 1's Excluded section lists colour output (`30-colour.md`); adding it as a feature takes it out of Excluded. Do you agree to that change?
+- Where does colour output go in Milestone 1's build order (it is last, third, unless you name a place)?

@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# Builds one fixture for the milestone skill's dry run of its planning phase (plan, add-feature). The delivery cases
-# moved to evals/team-lead/ with the team-lead skill.
-# Usage: make-fixture.sh <out-dir> <plan|add-feature>
+# Builds one fixture for the milestone skill's dry run of its planning phase (plan, plan-small, add-feature,
+# add-feature-excluded). The delivery cases moved to evals/team-lead/ with the team-lead skill.
+# Usage: make-fixture.sh <out-dir> <plan|plan-small|add-feature|add-feature-excluded>
 # Makes <out-dir>/repo (a git repo, one commit on main, with a dry-run local tracker) and <out-dir>/PROMPT.md
 # (the scripted prompt for a fresh coordinator session). See evals/milestone/README.md.
 set -eu
 out="$1"; case_="$2"
-case "$case_" in plan|add-feature) ;; *) echo "unknown case: $case_" >&2; exit 2 ;; esac
+case "$case_" in plan|plan-small|add-feature|add-feature-excluded) ;; *) echo "unknown case: $case_" >&2; exit 2 ;; esac
 [ -e "$out" ] && { echo "$out exists" >&2; exit 2; }
 mkdir -p "$out"
 out="$(cd "$out" && pwd)"
@@ -108,10 +108,6 @@ What the user has agreed agents may do on their own in this repo, which actions 
 - **Budget**: none.
 - **Check-in interval**: 1 hour.
 - **Milestone label form**: `milestone-<n>` (for example `milestone-1`). An issue belongs to a Milestone when it carries that Milestone's label, and the Milestone issue carries the same label.
-
-## Milestone issues
-
-A Milestone issue may name extra allowed or forbidden actions for its own issues. For an issue that belongs to the Milestone, the Milestone issue wins over this record; for every other issue, this record applies as written.
 MD
 
 cat > "$r/docs/dev-skills/release.md" <<'MD'
@@ -183,6 +179,11 @@ Parent: .scratch/issues/10-farewell.md
 Blocked by: .scratch/issues/11-bye-code.md
 
 The usage line names `bye`. Model tier: cheap.
+
+## Acceptance criteria
+
+- [ ] `greet.sh` with no command prints exactly `usage: greet.sh hello|bye <name>` to standard error and exits 2.
+- [ ] `bash test.sh` checks that exact line.
 MD
 cat > "$r/.scratch/issues/20-quiet.md" <<'MD'
 Title: Add a --quiet flag
@@ -214,8 +215,11 @@ Someone asked for coloured greetings. Not looked at yet.
 MD
 printf 'enhancement\nneeds-triage\nbug\n' > "$r/.scratch/labels.md"
 
-# The open Milestone 1 (add-feature), with its Startup verification passed. $1 is the order rule;
-# $2, if given, is one more feature row.
+# The open Milestone 1 (add-feature cases), with its Startup verification passed. $1 is the order rule;
+# $2, if given, is one more feature row. $excluded is the Excluded list.
+excluded='- Translations.'
+[ "$case_" = add-feature-excluded ] && excluded='- Colour output (`30-colour.md`).
+- Translations.'
 write_milestone() {
   cat > "$r/.scratch/issues/00-milestone.md" <<MD
 Title: Milestone 1: goodbye and quiet
@@ -246,12 +250,7 @@ ${2:-}
 
 ## Excluded
 
-- Translations.
-
-## Boundaries
-
-- **Budget:** none.
-- Also needs the user's approval: publishing a release to the package registry.
+$excluded
 
 ## Comments
 
@@ -275,7 +274,7 @@ Verdict: ready
 MD
 }
 
-if [ "$case_" = add-feature ]; then
+if [ "$case_" = add-feature ] || [ "$case_" = add-feature-excluded ]; then
   printf 'milestone-1\nrelease-0.4.0\n' >> "$r/.scratch/labels.md"
   for f in 10-farewell 11-bye-code 12-bye-usage 20-quiet; do
     sed -i.bak 's/^Labels: enhancement$/Labels: enhancement, milestone-1, release-0.4.0/' "$r/.scratch/issues/$f.md"
@@ -317,9 +316,9 @@ skill it names from the same checkout's `plugins/dev-skills/skills/`.
 
 This is a dry run. The tracker doc, `docs/dev-skills/issue-tracker.md`, says how every write is recorded in
 `.scratch/proposed-actions.md` instead of being made: follow it for every tracker write and every thread you would
-start. Change no other file. The user is scripted: when the skill has you ask the user something, take the answer
-from "The user's answers" below; when a question is not covered there, append it to `.scratch/questions.md`, treat it
-as unanswered, and do not guess an answer. Today is 2026-11-02.
+start. Change no other file. The user is scripted: append every question you ask the user to `.scratch/questions.md`,
+one `- ` line each, then take the answer from "The user's answers" below; when a question is not covered there, add
+` (unanswered)` to its line, treat it as unanswered, and do not guess an answer. Today is 2026-11-02.
 
 When you stop, write `.scratch/report.md`: the last message you would send the user, and what the skill says comes
 next and what it waits for.
@@ -337,24 +336,42 @@ The user's answers:
 - Order: "Farewell first, then quiet. Two at once is fine."
 - Milestone acceptance: "Both merged and closed, and at the review I run `greet.sh --quiet bye Ada` and see nothing."
 - Excluded: "Colour output (issue 30) and translations."
-- Budget: "None."
-- Boundaries beyond the Boundary record: "Publishing a release to the package registry needs my approval."
 - The draft Milestone issue: "Yes, that's it. Write it."
 - Startup verification: "It has not run in this environment yet."
 
 Stop when the skill would hand over to its next phase.
 TXT
-  elif [ "$case_" = add-feature ]; then
+  elif [ "$case_" = plan-small ]; then
     cat <<'TXT'
 
-The user's message: "Add colour output (issue 30) to Milestone 1, after the quiet flag."
+The user's message: "Let's plan a small Release: just the quiet flag (issue 20). I planned it already; its acceptance
+criteria are in the issue."
 
 The user's answers:
-- When asked to plan issue 30 first: "Yes. Colour the name green only when standard output is a terminal;
-  `--no-color` turns it off. Accepted when a test covers the terminal case and `--no-color`. It is one lone Ticket."
+- Goal: "Scripts can run the greeter silently."
+- Any feature an agent proposes: "No."
+- The draft Milestone issue: "Yes, that's it. Write it."
+- Startup verification: "It has not run in this environment yet."
+
+Stop when the skill would hand over to its next phase.
+TXT
+  else
+    cat <<'TXT'
+
+The user's message, in a planning thread: "I want colour output (issue 30). Let's plan it."
+
+The user's answers:
+- When asked to plan issue 30: "Colour the name in `hello` green only when standard output is a terminal;
+  `--no-color` turns it off, and the usage line becomes exactly `usage: greet.sh [--no-color] hello|bye <name>`.
+  Accepted when a test covers
+  the terminal case and `--no-color`. It is one lone Ticket."
 - Its place in the order: "Third, after the quiet flag."
 - Whether it joins the open Release 0.4.0: "Leave that to the rules."
-- Any change to the goal, acceptance, exclusions or boundaries: "No."
+TXT
+    [ "$case_" = add-feature-excluded ] && cat <<'TXT'
+- Whether colour output can come out of Milestone 1's exclusions: "Yes, take it out of Excluded."
+TXT
+    cat <<'TXT'
 
 Stop when the feature is added, or when the skill says it must wait.
 TXT

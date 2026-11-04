@@ -1,6 +1,6 @@
 # Triage Labels
 
-The skills speak in terms of 5 state roles + 2 category roles, plus one optional agent-only role. This file maps those roles to the actual label strings used in this repo's issue tracker.
+The skills speak in terms of 5 state roles + 2 category roles, plus the `next-release` role and one optional agent-only role. This file maps those roles to the actual label strings used in this repo's issue tracker.
 
 | Role in `dev-skills` | Label in our tracker | Meaning                                  |
 | -------------------- | -------------------- | ---------------------------------------- |
@@ -11,6 +11,12 @@ The skills speak in terms of 5 state roles + 2 category roles, plus one optional
 | `wontfix`            | `wontfix`            | Will not be actioned                     |
 | `bug`                | `bug`                | Something is broken                      |
 | `enhancement`        | `enhancement`        | New feature or improvement               |
+
+The `next-release` role is neither a state nor a category role. It marks an issue that must join the next Release. `triage` sets it on a severe issue or one that blocks a planned feature, and `retro-planning` on the Ticket of a group that joins; `release` takes marked issues into the next Release and removes the mark once they carry the release label.
+
+| Role in `dev-skills` | Label in our tracker | Meaning                                       |
+| -------------------- | -------------------- | --------------------------------------------- |
+| `next-release`       | `next-release`       | Must join the next Release                    |
 
 The agent-only role is optional and is neither a state nor a category role. It marks an issue for one coding agent only, and a repo that uses it has one label per agent. Fill the table with this repo's agents and their label strings, or delete this section and the role when the repo does not use it:
 

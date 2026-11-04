@@ -1,0 +1,3 @@
+Retro planning (resumed record issues/20.md, cap 3 default; no Boundary record, so not inside a Milestone and the user decides per group).
+Group 1 of 1: Empty input crashes summary (#12), root cause: summary() divides by len(values) with no empty guard. Seen in 2 distinct threads (fixture-A, fixture-B). Verdict: Act (Ticket), 1 of 3 cap slots. Note #33 is blocked by #12.
+Should we address this problem with a Ticket (to-tickets would propose a mechanical check/test, preserving nonempty average, rather than a prose reminder), spin it off, close it, or keep it open?

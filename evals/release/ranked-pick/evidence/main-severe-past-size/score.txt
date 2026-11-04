@@ -1,0 +1,11 @@
+PASS one release issue opened, titled Release 3
+FAIL Order lists the expected ranked pick, in order: saw [], want [36, 31, 37]
+FAIL every Order entry has a line of reason: thin: []
+FAIL release-3 applied to exactly the taken issues: saw [10, 11, 12, 20], want [31, 36, 37]
+PASS release-3 created
+FAIL Left out names every ranked candidate not taken: saw [31, 35, 36, 37]
+PASS nothing taken is listed as left out
+PASS next-release removed from exactly the taken marked issues
+FAIL Size line gives the size and the items used: no **Size:** line
+FAIL Size line counts the severe issues past the size
+4/10 checks passed

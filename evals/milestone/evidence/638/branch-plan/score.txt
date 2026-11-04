@@ -1,0 +1,23 @@
+PASS proposed-actions.md holds actions
+PASS one Milestone issue created, titled 'Milestone 1: ...', labelled milestone-1
+PASS shape: headings present
+PASS shape: headings in order
+PASS shape: order rule stated before the table
+PASS shape: feature table columns start # | Feature | Kind | Accepted when
+PASS shape: at least one feature row
+PASS shape: every feature row has its acceptance criteria
+PASS shape: no Boundaries section and no Budget line (the Boundary record holds them)
+PASS features listed farewell then quiet
+PASS order rule says up to 2 at once
+PASS Excluded names colour and translations
+PASS Acceptance has the user's review check
+PASS label created before the Milestone issue
+PASS 10-farewell labelled milestone-1 after the Milestone issue is created
+PASS 11-bye-code labelled milestone-1 after the Milestone issue is created
+PASS 12-bye-usage labelled milestone-1 after the Milestone issue is created
+PASS 20-quiet labelled milestone-1 after the Milestone issue is created
+PASS 30-colour never labelled
+PASS 10 and 20 linked as sub-issues
+PASS Tickets 11 and 12 keep their Spec parent
+PASS no thread started and no release label (delivery has not started)
+22/22 checks pass

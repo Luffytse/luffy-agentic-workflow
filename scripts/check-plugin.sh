@@ -366,8 +366,7 @@ import pathlib
 import sys
 
 LIMIT = 5000
-known_over = {  # path under skills/ -> words when this check landed
-    "release/SKILL.md": 6922,
+known_over = {  # path under skills/ -> words when this check landed; empty since release/SKILL.md came back under
 }
 skills = pathlib.Path(sys.argv[1])
 failed = False

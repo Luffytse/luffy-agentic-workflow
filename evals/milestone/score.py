@@ -4,7 +4,8 @@
 The delivery cases moved to evals/team-lead/score.py with the team-lead skill.
 
 Usage:
-  score.py <out-dir> <plan|add-feature>   score <out-dir>/repo/.scratch/proposed-actions.md for that case
+  score.py <out-dir> <case>               score <out-dir>/repo/.scratch/proposed-actions.md (and questions.md) for
+                                          that case: plan, plan-small, add-feature or add-feature-excluded
   score.py --shape <body-file>            check a Milestone issue body (for example a real one) against the shape
 
 Prints one line per check (PASS or FAIL with what it saw) and exits 1 when any check fails.
@@ -14,7 +15,13 @@ import re
 import sys
 
 LABEL = "milestone-1"
-HEADINGS = ["## Goal", "## Features, in build order", "## Acceptance", "## Excluded", "## Boundaries"]
+HEADINGS = ["## Goal", "## Features, in build order", "## Acceptance", "## Excluded"]
+CASES = ("plan", "plan-small", "add-feature", "add-feature-excluded")
+# A question about the Milestone's agreement: its goal, its own acceptance or its exclusions (not a feature's criteria).
+AGREEMENT = re.compile(r"\bgoal\b|exclu|Milestone(?:'s| 1's)? acceptance|acceptance of the Milestone|## Acceptance", re.I)
+# A question about what a Milestone issue no longer holds, or what a one-Release Milestone takes as a default.
+DEFAULTED = re.compile(r"budget|boundar|approval|at once|one at a time|order|exclu|left out|review|accept the Milestone"
+                       r"|Milestone(?:'s)? acceptance", re.I)
 COLUMNS = ["#", "Feature", "Kind", "Accepted when"]
 
 results = []
@@ -89,10 +96,8 @@ def shape(body, prefix=""):
     if header[:4] == COLUMNS:
         empty = [r[0] for r in data if len(r) < 4 or not r[3]]
         check(prefix + "every feature row has its acceptance criteria", not empty, "empty in rows " + ", ".join(empty))
-    check(prefix + "Boundaries has a Budget line",
-          bool(re.search(r"^- \*\*Budget:?\*\*", section(body, "## Boundaries"), re.M)))
-    check(prefix + "Boundaries has a line beyond Budget",
-          len([l for l in section(body, "## Boundaries").splitlines() if l.startswith("- ")]) >= 2)
+    check(prefix + "no Boundaries section and no Budget line (the Boundary record holds them)",
+          "## Boundaries" not in body and not re.search(r"^- \*\*Budget", body, re.M))
     return data
 
 
@@ -118,7 +123,6 @@ def score_plan(blocks):
     check("Excluded names colour and translations",
           bool(re.search(r"colou?r", section(m["body"], "## Excluded"), re.I))
           and "ranslation" in section(m["body"], "## Excluded"))
-    check("Boundaries names the registry approval", "registry" in section(m["body"], "## Boundaries"))
     check("Acceptance has the user's review check", "--quiet bye Ada" in section(m["body"], "## Acceptance"))
     made = [b for b in blocks if b["op"] == "Create a label" and b["f"].get("Label") == LABEL]
     check("label created before the Milestone issue", bool(made) and made[0]["n"] < m["n"])
@@ -138,27 +142,81 @@ def score_plan(blocks):
           f"{len(started)} threads, {len(released)} release-label actions")
 
 
-def score_add(blocks, original):
+def questions(out):
+    try:
+        text = open(f"{out}/repo/.scratch/questions.md").read()
+    except FileNotFoundError:
+        return []
+    return [l[2:].strip() for l in text.splitlines() if l.startswith("- ")]
+
+
+def score_plan_small(blocks, qs):
+    creates = [b for b in blocks if b["op"] == "Create an issue" and LABEL in b["f"].get("Labels", "")
+               and b["f"].get("Title", "").startswith("Milestone 1:")]
+    check("one Milestone issue created, titled 'Milestone 1: ...', labelled " + LABEL, len(creates) == 1,
+          f"{len(creates)} found")
+    # The draft approval (step 6) shows the defaults and is no question on them.
+    asked = [q for q in qs if DEFAULTED.search(q) and not re.search(r"\bdraft\b", q, re.I)]
+    check("no question on what a one-Release Milestone defaults or the Boundary record holds", not asked,
+          " | ".join(asked))
+    if not creates:
+        return
+    m = creates[0]
+    rows = shape(m["body"], "shape: ")
+    names = [r[1] if len(r) > 1 else "" for r in rows]
+    check("one feature: quiet", len(rows) == 1 and "20" in names[0], " / ".join(names))
+    check("order rule defaults to one at a time",
+          bool(re.search(r"one at a time", section(m["body"], "## Features, in build order"), re.I)))
+    check("Acceptance holds the default line",
+          bool(re.search(r"merged and its issue closed", section(m["body"], "## Acceptance"), re.I)))
+    check("Excluded holds a default (none)", bool(re.search(r"\bnone\b|nothing", section(m["body"], "## Excluded"), re.I)),
+          section(m["body"], "## Excluded").strip()[:80])
+    hit = labels_added(blocks, "20-quiet")
+    check("20-quiet labelled after the Milestone issue is created", bool(hit) and hit[0]["n"] > m["n"])
+    others = [p for p in ["10-farewell", "11-bye-code", "12-bye-usage", "30-colour"] if labels_added(blocks, p)]
+    check("nothing else labelled", not others, ", ".join(others))
+    started = [b for b in blocks if b["op"] == "Start a thread"]
+    check("no thread started (delivery has not started)", not started, f"{len(started)} threads")
+
+
+def score_add(blocks, original, qs, case):
     edits = [b for b in blocks if b["op"] == "Edit an issue body" and "00-milestone" in b["issue"]]
-    check("Milestone issue body edited once", len(edits) == 1, f"{len(edits)} found")
+    check("Milestone issue body edited", bool(edits), "none found")
     if not edits:
         return
-    e = edits[0]
+    listed = [b for b in edits if len(feature_rows(b["body"])) >= 4]
+    e = listed[0] if listed else edits[0]  # the edit that lists the new feature
+    last = edits[-1]
+    agreement = [q for q in qs if AGREEMENT.search(q)]
+    if case == "add-feature":
+        check("no question on the Milestone's goal, acceptance or exclusions", not agreement, " | ".join(agreement))
+    else:
+        check("exactly one question on the Milestone's agreement, naming the exclusion",
+              len(agreement) == 1 and re.search(r"exclu", agreement[0], re.I) is not None, " | ".join(agreement))
+    asked_milestone = [q for q in qs if re.search(r"which Milestone|this Milestone or|next Milestone", q, re.I)]
+    check("does not ask which Milestone (it joins the open one by default)", not asked_milestone,
+          " | ".join(asked_milestone))
     plan30 = [b for b in blocks if b["n"] < e["n"] and (
         ("30-colour" in b["issue"] and b["op"] in ("Edit an issue body", "Apply / remove labels")
          and "milestone" not in b["f"].get("Add", ""))
         or (b["op"] == "Create an issue" and re.search(r"colou?r", b["f"].get("Title", ""), re.I)))]
     check("issue 30 planned (its Ticket written) before the Milestone issue changes", bool(plan30))
-    rows = shape(e["body"], "shape: ")
+    rows = shape(last["body"], "shape: ")
     names = [r[1] if len(r) > 1 else "" for r in rows]
     check("rows: farewell, quiet, then colour",
           len(rows) == 3 and "10" in names[0] and "20" in names[1] and ("30" in names[2] or "olo" in names[2]),
           " / ".join(names))
     check("added row marked 'added <date> by the user'",
           len(rows) == 3 and re.search(r"added 2026-11-02 by the user", " ".join(rows[2]), re.I) is not None)
-    changed = [h for h in ["## Goal", "## Acceptance", "## Excluded", "## Boundaries"]
-               if section(original, h).strip() != section(e["body"], h).strip()]
-    check("goal, acceptance, exclusions and boundaries unchanged", not changed, "changed " + ", ".join(changed))
+    kept = ["## Goal", "## Acceptance"] + (["## Excluded"] if case == "add-feature" else [])
+    changed = [h for h in kept if section(original, h).strip() != section(last["body"], h).strip()]
+    check("unchanged: " + ", ".join(h[3:] for h in kept), not changed, "changed " + ", ".join(changed))
+    if case == "add-feature-excluded":
+        # Only the list items: a note under the list may name colour as taken out.
+        exc = "\n".join(l for l in section(last["body"], "## Excluded").splitlines() if l.startswith("- "))
+        check("Excluded drops colour and keeps translations", not re.search(r"colou?r", exc, re.I) and "ranslation" in exc,
+              exc.strip()[:80])
+
     target = [b for b in blocks if b["op"] == "Apply / remove labels" and LABEL in b["f"].get("Add", "")
               and "colo" in b["issue"]]
     check("the colour feature labelled after the Milestone issue lists it", bool(target) and target[0]["n"] > e["n"])
@@ -167,6 +225,22 @@ def score_add(blocks, original):
           ", ".join(str(b["n"]) for b in early))
     rel = [b for b in blocks if "release-0.4.0" in b["f"].get("Add", "")]
     check("not added to the open Release 0.4.0", not rel)
+    # The touched Ticket: 12's acceptance names the exact usage line, which the feature changes, so left as it is
+    # its own test would contradict the feature once both land.
+    feature_ids = ["30-colour"] + [re.search(r"\((\d\d-[^)]+\.md)\)", b["issue"]).group(1) for b in blocks
+                                  if b["op"] == "Create an issue" and re.search(r"\(\d\d-[^)]*colo[^)]*\)", b["issue"])]
+    t12 = [b for b in blocks if b["op"] == "Edit an issue body" and "12-bye-usage" in b["issue"]]
+    check("touched Ticket 12 (usage line) updated once", len(t12) == 1, f"{len(t12)} edits")
+    if t12:
+        body = t12[-1]["body"]
+        check("Ticket 12 written whole: its old text kept", "The usage line names `bye`" in body)
+        check("Ticket 12's usage line now has --no-color", "[--no-color] hello|bye" in body)
+        check("Ticket 12 carries a note naming the feature", any(f in body for f in feature_ids),
+              "none of " + ", ".join(feature_ids))
+        check("Ticket 12 updated after the feature is listed", t12[-1]["n"] > e["n"])
+    untouched = [p for p in ["10-farewell", "11-bye-code", "20-quiet"]
+                 if any(b["op"] == "Edit an issue body" and p in b["issue"] for b in blocks)]
+    check("untouched features and Tickets left as they are", not untouched, ", ".join(untouched))
 
 
 def starts(blocks, skill=None):
@@ -185,7 +259,7 @@ def starts(blocks, skill=None):
 def main():
     if len(sys.argv) == 3 and sys.argv[1] == "--shape":
         shape(open(sys.argv[2]).read())
-    elif len(sys.argv) == 3 and sys.argv[2] in ("plan", "add-feature"):
+    elif len(sys.argv) == 3 and sys.argv[2] in CASES:
         out, case = sys.argv[1], sys.argv[2]
         try:
             text = open(f"{out}/repo/.scratch/proposed-actions.md").read()
@@ -193,11 +267,14 @@ def main():
             text = ""
         blocks = parse_actions(text)
         check("proposed-actions.md holds actions", bool(blocks))
+        qs = questions(out)
         if case == "plan":
             score_plan(blocks)
+        elif case == "plan-small":
+            score_plan_small(blocks, qs)
         else:
             original = open(f"{out}/repo/.scratch/issues/00-milestone.md").read()
-            score_add(blocks, original)
+            score_add(blocks, original, qs, case)
     else:
         print(__doc__)
         sys.exit(2)

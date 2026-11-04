@@ -1,0 +1,3 @@
+- How do you want issue 30 (colour output) planned: what should it do, when is it accepted, and is it a Spec with Tickets or one lone Ticket?
+- Where does the colour feature go in the Milestone's build order?
+- Should the colour feature join the open Release 0.4.0?

@@ -1,186 +1,159 @@
 ---
 name: release
-description: "Cut a Release and plan the next one: check every issue with the release label is closed, then either pick the patch, minor or major bump from what shipped and open the bump pull request with its changelog entry for the user to merge, or, where pull requests bump the version, write the changelog entry for everything since the last Release; then run the Release planning: propose the next Release's goal and scope for the user to decide, or, inside a Milestone, plan it without asking the user. Use when the user wants to cut a release, plan the next release, or ship an urgent fix as its own patch Release."
+description: "Cut a Release and plan the next one: check its issues shipped, write the changelog entry, run the release doc's cut steps and whole-Release check, close it, run triage and retro-planning, then rank every candidate and pick the next Release up to the Release size. Use when the user wants to cut a release or plan the next one, or every issue of the current Release has closed."
 ---
 
 # Release
 
-A **Release** is one named step of the project and the few features it ships. A **feature** is one piece of work the user would name as one thing: a Spec with all its Tickets, a lone Ticket with the issues it absorbs, or a few related issues the user agrees to treat as one. Each issue in a feature carries the Release's **release label**. One **release issue**, titled `Release <name>`, holds the Release's goal in one sentence, its label, its cap on features, its scope list and, once it is cut, its notes. The release issue itself carries no release label, so it is never counted among the issues the Release ships. Run this thread at the **premium** tier: the bump size (when Releases bump) and the next scope are judgement calls the user confirms (inside a Milestone the next scope is yours to decide, as step 5's "Inside a Milestone" says). Load `model-tiers` by name for the model each tier is in your coding agent; the project's own tier map overrides it.
+A **Release** is one named step of a Milestone and the items it ships. An **item** is one piece of work: a Spec with its Tickets, a lone Ticket, or a bug, each counted as 1. Every issue in a Release carries its **release label**. One **release issue** holds its goal, its label, its Milestone, the size used, its ranked order, what was left out and, once it is cut, its notes; the release issue carries no release label itself. Run this thread at the **premium** tier: the ranking and the reruns are judgement calls. Load `model-tiers` by name for the model each tier is in your coding agent; the project's own tier map overrides it.
 
-The release doc's **bump mode** says who changes the version:
-
-- **Releases bump** (also when the release doc names no bump mode): ordinary pull requests merge to main with no version change; only the Release's **bump pull request** changes the version, and the user merges it. A Release's name is its version: its label is the release doc's label prefix plus the version (for example `release-1.4.0`) and its release issue is titled `Release X.Y.Z`. Its **title pattern** is `Release ` followed by a version (step 1 writes it out), and its **label pattern** is the prefix followed by a version.
-- **Pull requests bump**: each pull request bumps the version itself, as the repo's rules say, so a Release picks no bump size and opens no bump pull request. It writes one changelog entry for everything merged since the last Release, recording its start and end commits and the versions it delivered, in a **changelog pull request** that changes no version. Its name, label and release issue title follow the forms on the release doc's Release name line (for example the name `Phase <n>`, the label `release-p<n>`, the title `Release Phase <n>`), never a version. A form's pattern is the form with regex special characters escaped and each `<...>` placeholder replaced by `.+`, anchored with `^` and `$` (inside a jq string each escaping backslash is written twice, as in step 1's `\\.`): the title form gives the **title pattern**, the label form the **label pattern**.
-
-Parts marked "Releases bump" or "When pull requests bump" apply in that mode only; the rest applies in both.
-
-The **heading test**: the changelog has an entry headed with a name (a version when Releases bump) when it has a heading line `## <name>` followed by a space or the end of the line, so `## 0.23.1 (2026-10-31)` counts for `0.23.1` and `## 0.23.10 (2026-11-02)` does not.
+The user plans the Milestone and its features with `milestone`; everything in this skill runs without waiting for a reply, except where a step says to stop. A feature to plan is proposed to the user, and nothing waits on the answer. A fix that cannot wait for the next Release is built and merged like any issue; the next changelog entry lists it.
 
 ## Before you start
 
-Read the repo's **release doc**, `docs/dev-skills/release.md`: its version file, changelog path, label prefix, extra steps for the bump pull request and bump mode, and, when pull requests bump, its Release name line (the name, label and release issue title forms) and the whole-Release check it names. If the repo has no release doc, tell the user to run `setup-dev-skills`, which writes one, and stop. When pull requests bump and the release doc gives no name, label and title forms, tell the user the release doc must name them, and stop. Do every issue, label and pull request operation with the commands in the tracker doc, `docs/dev-skills/issue-tracker.md` (with none, use the GitHub repo of the checkout's `origin` remote and the `gh api repos/<owner>/<repo>/...` REST routes).
+Read the repo's **release doc**, `docs/dev-skills/release.md`: its Release name (the name, label and release issue title forms), Release size, changelog path, **cut steps** (with what its versioning policy section adds to them) and whole-Release check. With no release doc, or one missing the name forms or the Release size, tell the user to run `setup-dev-skills`, which writes them, and stop. Read the Boundary record (`docs/dev-skills/boundaries.md`) for who merges, the triage label doc for the label of each role (`ready-for-agent`, `bug`, `enhancement`, `next-release`), and the tracker doc (`docs/dev-skills/issue-tracker.md`) for its traps and its named operations. Work the tracker and pull requests with the tools you already use.
 
-Pick the path:
+The **Milestone** is the one the last release issue's `**Milestone:**` line names, or else the open Milestone issue (the issue `milestone` wrote, carrying a label in the Boundary record's Milestone label form).
 
-- When pull requests bump, there is no urgent Release: a fix that cannot wait ships in its own pull request, which bumps the version as it merges, and the next Release's changelog entry lists it (under its release label if it carries one, else under "Also merged"). If the user asks for an urgent fix, tell them so, open no release issue, and point them to building the fix like any other issue. If an open release issue has the `**Urgent fix:**` line (left from when Releases bumped), tell the user and ask whether to close it; never cut it. Then skip the two urgent bullets below.
-- Releases bump: an open release issue has the `**Urgent fix:**` line (step 1's command lists it with `urgent` true), and the user's request is for that fix or names none (a rerun of an urgent request lands here, so no second urgent release issue is opened while the first is open; if several are open and the request does not say which, ask): read the `#<n>` after `**Urgent fix:** ships` in its body (`gh api repos/<owner>/<repo>/issues/<release issue> --jq .body`), then that issue (`gh api repos/<owner>/<repo>/issues/<n> --jq '{state, state_reason}'`). Before testing its state or taking any exit below, complete item 1's labelling for that fix issue, using this existing urgent release issue and its version rather than opening another. Closed as `completed` and shipped (the shipped test in step 1): first fetch main and see whether its bump pull request has merged: the version file on main equals that release issue's version, or the changelog on main already has an entry headed with that version (the heading test; a later Release may have been cut on top). If so, go to step 4; otherwise go to item 2 of "Urgent fix" for that Release. Closed any other way (`not_planned`, `duplicate`): the fix shipped nothing, so tell the user and ask whether to drop the urgent Release by closing its release issue, instead of cutting it. Still open, or closed as `completed` but not shipped: the fix is not on main yet, so if the user asked for the urgent fix, tell them its release issue is already open and stop (never open a second), unless the user confirms the fix is on main (then it counts as shipped, as in step 1); otherwise read on (step 1 treats it as open).
-- Releases bump: the user has a fix that cannot wait for the current Release, and no open urgent release issue names it: go to "Urgent fix".
-- No release label exists yet (`gh api repos/<owner>/<repo>/labels --paginate --jq '.[].name'`, keeping the names that start with the prefix when Releases bump, or that match the label pattern when pull requests bump): this is the repo's first Release (when pull requests bump, its first named one), so go straight to step 5.
-- Otherwise: steps 1 to 5 in order.
+The **heading test**: the changelog has an entry for a Release when it has a line `## <name>` followed by a space or the end of the line, so `## Release 1 (2026-11-01)` counts for `Release 1` and `## Release 10` does not.
 
-Versions are compared part by part as numbers, never as text (`1.4.10` is above `1.4.9`); every comparison of versions below ("highest", "above", "below", "reached", "passed", "at or below") follows this.
+### Find where you are
+
+Every run, first or rerun, starts here, from freshly fetched main and the tracker; take the first case that fits:
+
+1. An open release issue whose Order lists nothing, or lists an issue that does not carry its label or still carries `next-release` (or a Spec with an open Ticket without the label), is a planning that stopped part way: go to step 5, whose "Rerun first" finishes it. A release issue written before the Order list (a `## Scope` list and no `## Order`) whose label an issue carries is not one: it is the current Release of case 2, and the issues carrying its label are its scope.
+2. An open release issue whose label its issues carry is the **current Release**. If the changelog on main has its entry (the heading test), its changelog pull request merged: go to step 3. Otherwise go to step 1. If several are open, take the oldest and say so in your report.
+3. No open release issue, but open issues carry a release label that no release issue names: a planning stopped before its release issue was opened: go to step 5.
+4. Otherwise, the last release issue is the closed one cut most recently. Go to step 4 unless it holds both end-of-Release records, and then to step 5. With no release issue at all, this is the repo's first Release: go to step 5.
 
 ## 1. Check the current Release is done
 
-Find the open issue whose title matches the title pattern (`gh api "repos/<owner>/<repo>/issues?state=open" --paginate --jq '.[] | select(.pull_request == null and (.title | test("<title pattern>"))) | {number, title, urgent: ((.body // "") | contains("**Urgent fix:**"))}'`; when Releases bump, the pattern is `^Release [0-9]+\\.[0-9]+\\.[0-9]+$`): its body holds the goal, and the **current release label** is, when Releases bump, the release doc's prefix plus its `X.Y.Z`, and when pull requests bump, the label its `**Label:**` line names (it matches the label pattern; if it has none, ask the user). Fetch main. Releases bump: read the version from the field the release doc names for the version file on main and compare it whole (exact equality) with the release issue's version: if they are equal, or the changelog on main has an entry headed with that version (the heading test), its bump pull request has merged, so keep this release issue's number and version and go straight to step 4. When pull requests bump: if the changelog on main has an entry headed with this Release's name (the heading test), its changelog pull request has merged, so keep this release issue and go straight to step 4. An urgent fix's release issue (one with `urgent` true, whose body has the `**Urgent fix:**` line that "Urgent fix" writes) is never the current Release here: it is cut only through "Urgent fix". If more than one without that line is open, list them and ask the user which to cut. When no release issue is open, or only urgent fixes', take a release label that an open issue carries: when Releases bump, the one of the highest version, leaving out every urgent fix's label; when pull requests bump, the one matching the label pattern, asking the user which when several do (list the release labels as in "Pick the path", and for each, `gh api "repos/<owner>/<repo>/issues?labels=<label>&state=open" --paginate --jq '.[] | select(.pull_request == null) | .number'`, any line meaning an open issue; the endpoint also returns pull requests, which are not counted), tell the user the Release has no release issue. Outside a Milestone, ask them for its goal in one sentence (step 3 needs it; when pull requests bump, its name and title fill the forms with the values the label holds in place of the label form's placeholders), then open the release issue for it with the template in step 5 (scope: the labelled issues), so steps 3 and 4 have one to name, comment on and close. Inside a Milestone, ask nobody and open none here: the Release is planned or partly planned with its release issue missing, so cut nothing and go to step 5, whose "Rerun first" completes the plan; the open-issue rule of the list below then stops the cut. If no open issue carries such a label either, there is no current Release to cut: tell the user so and go to step 5.
+List every issue carrying the current release label, open and closed (where the tracker lists pull requests with issues, leave them out).
 
-Releases bump: the **open Releases' versions** are every version that the title of an open `Release X.Y.Z` issue names (the command above lists them, urgent or not) plus every version that a release label carried by an open issue names (listed as above). Count both: a Release whose labelled issues have all closed but whose bump pull request is not merged yet is still open, and only its release issue's title shows it. Steps 2 and 5 take a new version above all of these (step 2 leaves out the current Release's own version), and "Urgent fix" takes the next free patch on main's version, so no two open Releases ever share a version, title or label.
+- An issue closed as completed **shipped** when a merged pull request into the default branch closes it with a closing keyword in its body (`Closes #<n>`, `Fixes #<n>`, `Resolves #<n>` and their other tenses). A Ticket merged into a Spec branch shipped when the Spec's pull request, merged into the default branch, closes the Ticket that way. A commit or pull request that only mentions the issue, a negated keyword ("does not close #<n>"), or a close by hand does not count.
+- An issue closed any other way (not planned, duplicate) shipped nothing: list it as **dropped**.
+- An open issue, or one closed as completed that fails the shipped test, **blocks the cut**. Stop and report each one to the user, who waits (rerun once they close) or carries some over. A carried-over issue loses the release label, and the release issue gains a line naming it; a closed issue that failed the shipped test is carried over only after the user reopens it, or counts as shipped once the user confirms the fix is on main. Carried-over issues are candidates in step 5.
 
-List every issue with the current release label, open and closed (`gh api "repos/<owner>/<repo>/issues?labels=<label>&state=all" --paginate --jq '.[] | select(.pull_request == null) | {number, title, state, state_reason}'`).
+Done when every issue with the current release label is shipped or dropped, and every carried-over issue has lost the label.
 
-- An issue closed as `completed` shipped only if a pull request that closes it is merged into the default branch (the **shipped test**: list merged pull requests whose body closes it, `gh api --paginate repos/<owner>/<repo>/issues/<n>/timeline --jq '.[] | select(.event == "cross-referenced" and .source.issue.pull_request.merged_at != null and ((.source.issue.body // "") | gsub("((^|[^A-Za-z])(not|never|without)|n[^A-Za-z ]t)\\s+((yet|really|fully|also|quite)\\s+)?(close[sd]?|fix(e[sd])?|resolve[sd]?):?\\s+#<n>\\b"; " "; "i") | test("(^|[^A-Za-z])(close[sd]?|fix(e[sd])?|resolve[sd]?):? +#<n>\\b"; "i"))) | .source.issue.number'`, and for each, `gh api repos/<owner>/<repo>/pulls/<p> --jq '{merged, base: .base.ref}'` must read `merged` true and the default branch as `base`. A Ticket merged into a Spec branch has no pull request of its own; the Spec's is found when its body closes the Ticket with a keyword directly before its number). A commit that only mentions the issue, or a negated keyword ("does not close #<n>"), does not count. An issue closed as `completed` that fails the shipped test, such as one closed by hand, is not shipped: treat it as open and tell the user, who confirms the fix is on main (then it counts as shipped) or carries it over (after reopening it, see below).
-- An issue closed any other way (`not_planned`, `duplicate`) shipped nothing: list it as dropped.
-- An open issue, or one closed as `completed` that fails the shipped test, blocks the cut. List every open one to the user, who waits (stop and say so; rerun once they close) or carries some over to the next Release: remove the label from each carried-over issue and add a line naming them to the release issue. A closed issue that fails the shipped test is carried over only after the user reopens it, so every carried-over issue is open; until then it keeps blocking the cut. They become candidates in step 5.
+## 2. Write the changelog entry and run the cut steps
 
-Done when every issue with the current release label is closed and marked shipped or dropped, and any carried-over issue has lost the label.
+What ships is everything merged to main since the last Release, not only the labelled issues. Find the commit where the last Release ended: the end commit of the top changelog entry's `Commits: <start>..<end>` line; for a top entry with no such line, the commit that added its heading line; with no entry, everything on main ships. The **start commit** is that commit and the **end commit** is main's tip. Read every commit in between, with the pull request and issue each came from. The last Release's own changelog merge rides along unlisted.
 
-## 2. Read what ships and pick the bump size
-
-What ships is everything merged to main since the last Release, not only the labelled issues. Fetch main and find the commit where the last Release ended:
-
-- Releases bump: the commit that set the current version (`git log -1 --format=%H -S '<current version>' origin/main -- <version file>`).
-- When pull requests bump: the end commit recorded by the top entry of the changelog on main (the second commit of its `Commits:` line, `<start>..<end>`). A top entry with no `Commits:` line was cut by a bump pull request, so it ends at the commit that added its heading line (`git log -1 --format=%H -S '<that heading line>' origin/main -- <changelog>`). With no entry at all, everything on main ships. The version file's history marks no Release in this mode, since every pull request moves it.
-
-Read every commit after it (`git log --format='%h %s' <that commit>..origin/main`), with the merged pull request and issue each one came from.
-
-When pull requests bump, pick no size and rename nothing: the pull requests already bumped. The commit that merged the last Release's own changelog pull request rides along and is not listed. Record instead, for step 3: the **start commit** (the commit above, `git rev-parse --short <it>`), the **end commit** (`git rev-parse --short origin/main`), and the **versions delivered**, each version the version file reached in the range, oldest first, each once: for each commit in the range that touched the file (`git log --reverse --format=%h <start>..<end> -- <version file>`), read that field in `git show <sha>:<version file>`, and keep it only when it differs from the version kept before it (the first compared with the start's own version, from `git show <start>:<version file>`), so a commit that touched the file without changing the version adds nothing; with none kept, the version stayed at the start's. A change that is breaking by the major rule below still gets its "What to do" lines in the entry. The rest of this step is for Releases bump.
-
-Give each change one size, by what a project using this one must do:
-
-- **patch**: a fix. Something now does what it already promised; no project has to change anything.
-- **minor**: something new that breaks nothing, such as a new command, skill, step or option.
-- **major**: a breaking change: a project using this one must do something, because a name it calls was renamed or removed, the format of a file it keeps changed, or a label or setting it needs changed.
-- **rides along**: typos, decision records and repo-only changes (docs, tests, evals and tooling that do not ship) never decide the size.
-
-The bump is the biggest size among the changes. While the version is below 1.0.0, a breaking change bumps the minor part instead, and the changelog entry gets a "What to do" list. 1.0.0 is cut only when the user declares the project stable; never propose it on your own. The new version is the highest of the current version and the open Releases' versions (step 1) other than the current Release's own, with that part raised and every part after it set to 0.
-
-If the new version is not the one the current release label names, tell the user. Once they confirm the size (in step 3), rename the label with `gh api --method PATCH repos/<owner>/<repo>/labels/<old label> -f new_name=<new label>` (the issues keep it under its new name; if a label with the new name already exists, left from a dropped Release, list the issues carrying it as step 5 does, tell the user that deleting the label removes it from all of them, and ask whether to delete it; on yes delete the label itself with `gh api --method DELETE repos/<owner>/<repo>/labels/<new label>` before the rename; on no, stop and tell the user, leaving the label, the release issue's title and its Label line unchanged) and retitle the release issue and fix its Label line, so all three name the version that ships.
-
-Done when every commit since the last Release has a size or rides along, the bump is the biggest of them, and each change above patch has one line on why; when pull requests bump, when every commit since the last Release is read and the start commit, end commit and versions delivered are recorded.
-
-## 3. Open the bump or changelog pull request
-
-First do the open-bump check below. Then make a branch from the fetched main, and in one commit:
-
-- Releases bump: change the version in the version file to the new version, and nothing else in that file. When pull requests bump, leave the version file as it is: this is the changelog pull request.
-- Add an entry at the top of the changelog (create the file with a `# Changelog` heading if it does not exist):
-
-  ```md
-  ## X.Y.Z (<yyyy-mm-dd>)
-
-  <the Release's goal, one sentence, from the release issue>
-
-  - <title of each shipped issue> (#<n>)
-
-  Also merged: <one line per change since the last Release that no shipped issue covers, each with its #<n> (the issue's, or the pull request's only when no issue covers it); leave this line out when there is none>.
-
-  ### What to do
-
-  <only for a breaking change: each thing a project using this one must do>
-  ```
-
-  When pull requests bump, head the entry `## <name> (<yyyy-mm-dd>)` with the Release's name, and put this line under the goal: `Versions: <the versions delivered (step 2), oldest first, each once, or "none, the version stays X.Y.Z">. Commits: <start>..<end>.` (the start and end commits from step 2). The next Release finds where this one ended from that line.
-
-  A change is listed once, in the first entry that ships it: leave out of the list and of "Also merged" every change whose `#<n>` (the issue's, else the pull request's) a list line or "Also merged" line of an earlier entry already names, an entry being earlier when it is lower in the changelog on main (never this Release's own entry, which the open-bump check holds on its branch; a number only mentioned in prose does not count), though step 1 still counts those issues as shipped.
-
-- Releases bump: carry out every extra step the release doc lists.
-
-The open-bump check: a bump pull request's title has the word "release" followed by the version as a whole number (`chore(release): <version>`, so a rerun can find it), and a changelog pull request's title the word "release" followed by the Release's name (`docs(release): <name>`; in the pattern below, put the name with regex special characters escaped in place of `v?<version>`), so look for one already open for this release issue (`gh api "repos/<owner>/<repo>/pulls?state=open" --paginate --jq '.[] | select(.title | test("release\\S*\\s+v?<version>($|[^0-9])"; "i")) | {number, title, body}'`, for this version (write its dots as `\\.` in the pattern) and for the version the label named before a size change). A title match counts only if its body contains `#<issue number>` of this release issue as a whole number; one whose body does not is no match. When nothing matches (a repo whose own title rule leaves out the word "release" is not found by title), list the open pull requests whose body names it (`gh api "repos/<owner>/<repo>/pulls?state=open" --paginate --jq '.[] | select((.body // "") | test("#<issue number>($|[^0-9])")) | {number, title}'`); if you cannot tell which is the bump pull request, ask the user. If one is open, do not open a second: tell the user, and update that one (its branch, entry and, after a size change, its title) instead, using its `number` in step 4.
-
-When pull requests bump, run the whole-Release check the release doc names on the branch (with none named, the checks the repo's rules name before a push). A failure blocks the cut: tell the user, have each fix built as its own pull request (it bumps the version as usual), and rerun this skill once they merge. Then push and open the pull request with `pr`, titled `docs(release): <name>` (or by the repo's own title convention, keeping the name in it). Its body names the release issue, gives the start and end commits and the versions delivered, lists the dropped issues and the check's result. Its Door is two-way: it changes no version. Merge it yourself once its checks pass, as the repo's rules merge a pull request that changes only docs (when those rules say the user merges it, ask the user instead). Just before merging, fetch main: if main has moved past the end commit, update the branch onto it, redo the end commit, the versions delivered and the entry, and rerun the check, so no merge falls between two Releases.
-
-Releases bump: run the checks the repo's rules name before a push, push, and open the pull request with `pr`, titled by the same rule, `chore(release): <version>` (where the repo's own rules set another title convention, use that, keeping the version in it). Its body names the release issue, gives the bump size with the line on why for each change above patch, lists the dropped issues, and asks the user to confirm the size. Its Door is one-way: a cut version reaches every project that installs it. The user merges it; never merge it yourself. If the user picks another size, change the version, the entry's heading, the label, the release issue's title and its Label line (step 2) and this pull request's title, and push again.
-
-Done when the bump pull request is open, its checks pass, and the user has been asked to confirm the size and merge; when pull requests bump, when the whole-Release check passes and the changelog pull request is merged.
-
-## 4. Close the Release
-
-Keep the release issue selected by the path that brought you here: the current Release from step 1, or the urgent release issue from the urgent path. When step 3 ran and Releases bump, wait for the user to merge that issue's bump pull request; it is merged when `gh api repos/<owner>/<repo>/pulls/<n> --jq .merged` prints `true`. If the thread has to stop first, tell the user to bring it back here once they merge. When pull requests bump, step 3 merged the changelog pull request. When you arrive by a shortcut that skips step 3, the bump or changelog pull request already merged, so there is no pull request to poll.
-
-Fetch main and re-read the selected release issue's title for its name (its version when Releases bump). From the changelog on main, take the entry headed with that exact name (the heading test), through the line before the next entry's heading (the next line starting `## `) or the end of the file. If it is missing, stop and tell the user; never substitute another entry. Post that entry as a comment on that same release issue, as its notes (when pull requests bump, its `Versions:` and `Commits:` line records the versions delivered and the start and end commits), and close it. This applies on every path, even when a later Release is now the top entry and the version file names that later version.
-
-Done when the bump or changelog pull request is merged and the release issue is closed with its notes.
-
-## 5. Release planning
-
-Propose the next Release; the user decides it. Inside a Milestone (see "Inside a Milestone" at the end of this step) you plan it yourself and the user decides nothing, except as that section says; where this step says the user approves, confirms or decides the scope, that section replaces it.
-
-The candidates are every open issue labelled `ready-for-agent` (the label the triage label doc gives that role) that carries no release label (`gh api "repos/<owner>/<repo>/issues?labels=<ready-for-agent label>&state=open" --paginate --jq '.[] | select(.pull_request == null) | {number, title, labels: [.labels[].name]}'`, dropping every issue with a label that starts with the prefix), and every issue carried over in step 1 (all open, as step 1 requires). A Spec and its Tickets are one feature; so is a lone Ticket with the issues it absorbs. Issues in any other triage state belong to `triage`, not here.
-
-Put to the user:
-
-- a **goal** in one sentence, the thing this Release makes true;
-- a **scope** of at most 5 features (fewer is fine), each naming the feature, the issues in it and one line on why it fits the goal, chosen so the Release takes days, not weeks. Group related candidates into one feature only when the user would name them as one thing, and say so in the line;
-- the candidates left out, grouped, with one line each on why;
-- the **next version**: the highest of the version in the version file on main (the one just cut; on a repo's first Release nothing was cut, so it is the version the project already has) and the open Releases' versions (step 1), with its patch part raised if the scope is fixes only, its minor part raised if anything in it is new or (below 1.0.0) breaking, or its major part raised if anything in it is breaking at 1.0.0 or later. Its label is the release doc's prefix plus that version; step 2 of that Release renames it if what ships turns out bigger or smaller. When pull requests bump, propose the next **name** instead of a version: the release doc's name form filled with the last Release's values, its last placeholder raised by one, unless the user says another value changes (with no named Release yet, ask the user for the values). Its label and release issue title fill the label and title forms with the same values.
-
-The cap is 5 features unless the user raises it, and then only for this Release; the release issue records the cap and the user's reason, and the next Release goes back to 5. Iterate until the user approves a scope (inside a Milestone nothing iterates: you decide it).
-
-Then create the label if the repo lacks it. If it already exists (a dropped Release leaves its label on closed issues), list every issue carrying it (`gh api "repos/<owner>/<repo>/issues?labels=<label>&state=all" --paginate --jq '.[] | select(.pull_request == null) | {number, title, state}'`): when any is not one approved for this Release (by the user, or chosen by you inside a Milestone), never reuse it silently, because step 1 would count those issues as members. Ask the user, who either lets you clear the label from them (`gh api --method DELETE repos/<owner>/<repo>/issues/<n>/labels/<label>`) or picks another version (another name when pull requests bump). Inside a Milestone this paragraph does not apply: you ask nobody and clear nothing, only open issues carrying the label count, and they are the scope so far (see "Rerun first" below). Then apply it to each approved issue and to every open Ticket of an approved Spec (list the Spec's Tickets with the tracker doc's way of checking a sub-issue link: its sub-issues, `gh api --paginate repos/<owner>/<repo>/issues/<spec>/sub_issues --jq '.[] | {number, state}'`, plus any issue whose body has a `Part of #<spec>` line; keep only the open ones), and open the release issue, with no release label of its own:
+An open pull request whose body names this release issue is this Release's changelog pull request from an earlier run: update it, and open no second one. Otherwise make a branch from the fetched main and add an entry at the top of the changelog (create the file with a `# Changelog` heading if it does not exist):
 
 ```md
-Title: Release <name, X.Y.Z when Releases bump>
+## <name> (<yyyy-mm-dd>)
+
+<the Release's goal, one sentence, from the release issue>
+
+Commits: <start>..<end>.
+
+- <title of each shipped issue> (#<n>)
+
+Also merged: <one item per change since the last Release that no shipped issue covers, each with its #<n> (the issue's, or the pull request's when no issue covers it); leave this line out when there is none>.
+
+### What to do
+
+<only for a change that makes a project using this one do something: each thing it must do; leave the section out otherwise>
+```
+
+List a change once, in the first entry that ships it: leave out every `#<n>` that a list line or "Also merged" line of an earlier entry already names (step 1 still counts those issues as shipped).
+
+Then carry out the release doc's **cut steps**, in order, on this branch: they may add to the entry (a line naming versions, for example), change other files, or say how the pull request is titled and who merges it. Where a cut step says something different from this step, the cut step wins. Run the release doc's whole-Release check on the branch (with none named, the checks the repo's rules name before a push). A failure blocks the cut: report it, have each fix built as its own pull request, and rerun this skill once they merge.
+
+Open the pull request with `pr`, titled `docs(release): <name>` unless a cut step or the repo's own title rule says otherwise, keeping the name in the title. Its body names the release issue, gives the start and end commits, lists the dropped issues and gives the check's result; its Door is two-way unless a cut step says otherwise. Merge it once its checks pass, as the Boundary record and the repo's rules let an agent merge a pull request of that kind; where they, or a cut step, say a person merges it, ask the user and stop until it merges (the rerun finds its entry on main and goes to step 3). Just before merging, fetch main: if main moved past the end commit, update the branch onto it, redo the end commit, the entry and the cut steps, and rerun the check, so no merge falls between two Releases.
+
+Done when the changelog pull request, with its entry, its cut steps and a passing whole-Release check, is merged.
+
+## 3. Close the Release
+
+Fetch main. From the changelog on main take the entry headed with this Release's name (the heading test), through the line before the next `## ` heading or the end of the file; if it is missing, stop and tell the user, and never substitute another entry. Post it as a comment on the release issue, as its notes, and close the issue.
+
+Done when the release issue is closed with its notes.
+
+## 4. Run the end-of-Release pass
+
+Load `triage` by name and run its Triage batch for the Release just closed, naming its release issue; then load `retro-planning` by name and run its Release-end Retro planning for the same Release. Both run before the planning, so it sees what they closed and marked `next-release`.
+
+After each one, comment on the closed release issue, first line `<!-- release end-of-Release pass -->`, second line `triage ran for this Release.` (or `retro-planning ran ...`). If one cannot run (it fails, or the thread cannot start it), write `<skill> could not run: <why>.` instead and go on: the planning ranks what the tracker shows, and your report names the pass that did not run. A rerun skips each skill that already has its record.
+
+Done when the closed release issue holds a record for `triage` and one for `retro-planning`.
+
+## 5. Plan the next Release
+
+With no open Milestone, plan nothing: tell the user the next Release needs a Milestone, planned with `milestone` (a small Release is a Milestone with one Release), list any severe or `next-release` issues waiting, and stop. Otherwise read the Milestone issue: its goal, features in order, acceptance criteria and exclusions.
+
+**Rerun first.** If "Find where you are" found an open release issue whose planning stopped part way: when its Order lists issues, that order stands; rank nothing again and finish only what is missing (see "Write it down"). When its Order lists nothing, plan it as below and write the result into that issue instead of opening another. If open issues carry a release label that no release issue names, those issues are the scope so far: keep each, count it toward the size, rank the rest around them, and open the release issue for the whole set. On every rerun path, an issue in the scope that now reads parked (the tracker doc's **Park** operation) stays in it and is reported as parked and skipped for building; remove no release label.
+
+### The candidates
+
+Every open issue that carries no release label and does not read parked, of these kinds:
+
+- a **severe** issue (a security hole, lost data, or delivery stopped: nothing can merge or ship), at `ready-for-agent` or marked `next-release`;
+- an issue marked `next-release`;
+- a **planned feature**: one the Milestone issue lists (including any added since the last Release), together with its open blockers (the tracker doc's **Count open blockers** operation); a Ticket of a listed Spec belongs to its Spec;
+- a `ready-for-agent` bug;
+- every issue carried over in step 1.
+
+A parked issue is left out, waiting on the user to lift its park. An **unplanned feature** (an enhancement, or any other feature-sized issue, that the Milestone issue does not list) is never ranked, whatever its label or whoever suggested it: propose each one to the user in one line, saying the Milestone issue does not list it; the user plans it with `milestone` or not. Any other issue, such as one at `needs-triage`, `needs-info`, `ready-for-human` or `wontfix`, is not a candidate.
+
+### The ranked list
+
+Sort every candidate into one list, in descending priority:
+
+1. **Group 1**: severe issues, then issues marked `next-release`; within each, oldest first.
+2. **Group 2**: the planned features, in the order you set this planning (below), each preceded by its open blockers in the order they must land. A blocker already placed higher stays where it is. A feature with a blocker an agent cannot take (parked, not at `ready-for-agent`, or closed as not planned, duplicate or `wontfix`, which never clears) is left out, naming that blocker.
+3. **Group 3**: `ready-for-agent` bugs, oldest first.
+
+An issue that meets several conditions goes in its highest group, and first within it: a severe issue also marked `next-release` comes before the other severe issues; a bug that blocks a planned feature goes before that feature in group 2, not in group 3. Each issue appears once. A Spec is one entry, standing for its Tickets.
+
+**Re-order the planned features** at every planning, starting from the Milestone issue's order: a feature that others depend on comes first; then the one that moves the Milestone's goal furthest; the Milestone issue's order breaks ties. Write one line of reason for each feature's place, and for every other entry one line on why it is in its group (the harm, the mark's reason, the feature it unblocks, the bug's age).
+
+### Pick from the top
+
+Take entries from the top, one item at a time, until the items taken reach the release doc's **Release size**. Once the size is full, every severe issue still in the list joins anyway, past the size; nothing else does. Every ranked candidate not taken is **left out**, with why: the size was reached, a blocker an agent cannot take, or parked.
+
+### Name it
+
+Fill the release doc's name, label and title forms for the next Release: the last Release's values with the last placeholder raised by one, unless the release doc gives another rule (such as a new Milestone starting again at 1). If a closed issue already carries that label, a dropped Release used the name: take the next value instead. Write the goal in one sentence: what this Release makes true, toward the Milestone's goal.
+
+### Write it down
+
+Open the release issue, with no release label of its own:
+
+```md
+Title: <the title form, filled>
 
 **Goal:** <one sentence>
 
 **Label:** `<label>`. Every issue in this Release carries it.
 
-**Milestone:** #<n> <Inside a Milestone only: the Milestone issue; leave this line out otherwise.>
+**Milestone:** #<n>
 
-**Cap:** <5 features, or the raised cap and the user's reason>. Used: <n>. <Inside a Milestone, add: Maintenance fixes: <m>, outside the cap.>
+**Size:** <the release doc's size>. Used: <items taken within the size>.<, plus <k> severe past the size>
 
-## Scope
+## Order
 
-- **<feature>**: <one line on why it fits the goal>
-  - #<n> <title>
+1. #<n> <title>: <one line of reason>
 
-<Inside a Milestone, after the features, a "Maintenance fixes" list: each issue and the reason the Triage batch or Release-end Retro planning gave.>
+## Left out
+
+- #<n> <title>: <why>
+
+## Proposed to the user
+
+- #<n> <title>: <an unplanned feature; the Milestone issue does not list it>
 
 ## Notes
 
-Posted as a comment when the Release is cut. Until then, issues filed during this Release wait for the next Release planning, except Tickets split from a Spec in it.
+Posted as a comment when the Release is cut. Issues filed from now on wait for the next planning, apart from Tickets split from a Spec in this Release.
 ```
 
-Label nothing the user did not approve (inside a Milestone, nothing outside the scope you chose).
+Write `None.` under a heading with nothing in it. Then create the label if the repo lacks it, and apply it to each issue in the Order and to every open Ticket of a Spec in it (its sub-issues, by the tracker doc's way of checking a sub-issue link, and any issue whose body has a `Part of #<spec>` line). Remove `next-release` from each taken issue that carries it, once it carries the release label; an issue left out keeps its mark. Label nothing outside the Order.
 
-Tell the user that issues filed from now on wait for the next Release planning, apart from Tickets split from a Spec in this Release, which `to-tickets` gives the label.
+Report to the user the Order with its reasons, the size used, what was left out and why, and the features proposed; nothing waits on a reply.
 
-Done when every approved issue (inside a Milestone, every chosen one) carries the label, no other issue does, and the release issue is open.
+When the caller asks for a dry run, run this step read-only: write nothing to the tracker and return the Release it would plan.
 
-### Inside a Milestone
-
-Release planning runs **inside a Milestone** when both hold: the Boundary record (`docs/dev-skills/boundaries.md`) names a Milestone label form, and an open Milestone issue exists (the issue carrying a label in that form that holds the Milestone's goal; the one named by the `**Milestone:**` line of the release issue just cut, and, if that issue has none, the open issue carrying the label form that holds the Milestone's goal: member issues carry the label too, so take the one whose body is the Milestone, not a feature). With no such agreement, step 5 runs as written above and everything here is skipped.
-
-Inside a Milestone agents plan each Release like a sprint: you decide the scope, label it and open the release issue without waiting for the user. The Release thread, which calls this skill, runs `triage` as the Triage batch and `retro-planning` as the Release-end Retro planning for the Release just cut (both name the release issue) before this planning, so it sees their result. If one cannot run (it fails, or the thread cannot start it), do not plan on a guess: say which is missing, plan the feature scope only, leave out maintenance fixes, and tell the user in your report which source was not read and which Release's maintenance fixes may be missing; the next planning will not look again. Read the Milestone issue (goal, features in order, acceptance criteria, exclusions, its own boundaries) and the Boundary record first. Steps above apply with these changes:
-
-- **Rerun first**: before choosing, look for the next Release's release issue: an open issue whose title matches the title pattern and whose body has no `**Urgent fix:**` line (no version is recomputed to find it). If one exists, this planning already ran: its label is the one its `**Label:**` line names, which is the label form filled with the same values as its title, never the bare pattern. The scope already chosen is the issues carrying that label. Count its features toward the cap, read the maintenance fixes from its list, and finish only what is missing (a label on a chosen issue, the release issue's lines); never choose again. If none exists but open issues carry a release label (leaving out an urgent fix's label; a Release planned or partly planned whose release issue is missing, reached from step 1 or from an interrupted run of this step), those issues are the scope so far: their features count toward the cap and maintenance fixes do not, their label is the Release's, and its name fills the title form with the same values. Add the planned features that still qualify, in the Milestone's order, up to the cap, labelling each, and open the release issue from the whole set. On either rerun path, re-read whether chosen issues are parked with the tracker doc's **Park** operation; keep parked members in the established scope and cap, report them as parked and skipped for building, and leave their park in place. Remove no label anywhere. Step 1's open-issue rule then stops any cut, since nothing is built yet.
-- **Scope, features**: the Milestone issue's **planned features** are the ones it lists, in its order. Take those that are still open, carry no release label, do not read parked with the tracker doc's **Park** operation and are **unblocked**. A feature is unblocked when the tracker doc's **Count open blockers** operation, with its completion rules, finds each issue blocking it cleared (a blocker closed `not_planned` or `duplicate`, or labelled `wontfix`, is not cleared) or finds the blocker to be a feature taken earlier in this same scope. Take them in the Milestone issue's order, at most 5, never passing over a qualifying feature to take a later one. For each, write one line on why it is in: its place in the order and what it moves the Milestone toward. A planned feature that does not fit the cap waits for the next Release; a blocked one is listed as left out, with its blocker, and a parked one as left out, waiting on the user to lift its park.
-- **Scope, maintenance fixes**: the issues marked `joins the next Release` join the scope as a separate "Maintenance fixes" list, each with the reason given. Read the marks in the rows of the `## Triage batch` comments on the release issue just cut (`gh api --paginate repos/<owner>/<repo>/issues/<n>/comments --jq '.[] | select(.body | contains("## Triage batch")) | .body'`): a row's issue joins when its disposition is `joins the next Release`; a row marked `handled at once` joins when the decision it links, recorded on that issue, says it joins. No such comment means the Triage batch has not run: use the "cannot run" path above. Read the other source, in the "Verdicts" table of this Release's Retro planning record: the closed `retro-planning` issue whose creation time is later than the creation time of the release issue just cut, so a record of an earlier Release never counts. If no such record is closed (it is still open, or none ran), Retro planning has not run: use the "cannot run" path above. A row counts when its Verdict is `joins the next Release`; what joins is the Ticket or Tickets named in its "Reason or Ticket" column, never the group's Retro issues, and if that Ticket is a Spec, its open Tickets join as a feature would. They do not count toward the cap, and the release issue says so.
-- **No unlisted feature**: label no feature that the Milestone issue does not list, whoever suggested it. A candidate that is not a planned feature and not a maintenance fix the Triage batch or Release-end Retro planning chose is left out, and one that looks worth planning is proposed to the user, one question each, saying the Milestone issue does not list it; the user plans it or not. Nothing is labelled for it.
-- **The cap**: 5 features. Only the user raises it, and then only for one Release; never raise it yourself.
-- **The rest of the step**: the goal, the left-out candidates and the next name or version are written as above (the goal from the Milestone's goal and the scope). Create or check the label (an existing one is handled by "Rerun first", never by asking the user), label each chosen issue and open the release issue with the template, no waiting; its notes may add one line: `Planned by the Release thread from the Milestone issue's order, without waiting for the user.` Tell the user in your report what was planned (the scope, the cap used, the maintenance fixes, the left-out candidates) and that issues filed from now on wait for the next Release planning, apart from Tickets split from a Spec in this Release; nothing waits on a reply.
-- **Goes to the user**: only a candidate to plan (above), a plan that would cross a boundary in the Boundary record or in the Milestone issue's own boundaries, or one that would change the Milestone's agreement (goal, acceptance criteria, exclusions). Propose it and label nothing for it; the rest of the plan goes ahead.
-
-Done when the release issue is open with its label on every chosen issue, each feature with its reason, the maintenance fixes listed apart from the cap, and no unlisted feature labelled.
-
-When the caller asks for a dry run (proposals only), run this section read-only: write nothing to the tracker, ask the user nothing, and return the Release it would plan.
-
-## Urgent fix
-
-Releases bump only (when pull requests bump, see "Pick the path"). A fix that cannot wait for the current Release ships as a patch Release of one issue:
-
-1. Once the user confirms it cannot wait, take the version: the version on main with its patch part raised by one, because an urgent Release is always a patch on what is on main. If an open Release already holds that exact version (the open Releases' versions, step 1), raise the patch part again until the version is free. Never move above a planned minor or major Release's version: with a planned `1.5.0` open and main at `1.4.0`, the fix is `1.4.1`, not `1.5.1` (a planned patch Release at `1.4.1` only makes the fix `1.4.2`). So the fix never shares a version, title or label with another open Release, and the planned Release keeps its own. Open its release issue (as in step 5, including the check of an existing label), `Release X.Y.Z` with that version, with a one-sentence goal, the one issue in scope, and this line under the goal: `**Urgent fix:** ships #<n> on its own, outside the planned Release.` Verify that the fix issue carries this urgent release label and no other release label: add the urgent label if missing and remove any other release label it carries, then read its labels back to confirm. Complete this labelling on a first run and on every rerun, whether the fix issue is open or closed, so it is not counted in the planned Release too. It is built like any other issue.
-2. Once the fix is on main (the shipped test), run steps 2 to 4 with this urgent release issue and its own label as the current Release, never the planned one, with these patch-only rules overriding step 2's size and version selection. Fetch main on every entry to this item, including after a wait. Step 2 reads everything merged since the last Release: if any change is bigger than a fix, tell the user and wait until the planned Release is cut, then rerun this item from freshly fetched main. Stop before steps 3 and 4 while waiting; an urgent Release never cuts at minor or major size. Other fixes already on main ship too (listed under "Also merged" here, and left out of the planned Release's own entry by step 3). Work from the version on main read at cut time, not the highest of the open Releases' versions. Keep the version this urgent release issue names only while it is above main's version; if main has reached it or passed it (a planned or sibling Release was cut first), take main's version with its patch part raised by one, and again until no open Release holds it, and rename the label and retitle as step 2 says. Re-read the open Releases' versions at this point, leaving out this urgent Release's own reservation (its release issue and its labelled fix issue), and apply item 1's collision rules against the other Releases. So the urgent Release never takes a planned Release's version or label, never sets the version file below main's, and never jumps above a planned Release.
-3. Skip step 5: the planned Release's plan stands. While the planned Release is still open, leave its label, its release issue's title and its Label line as they are, even if they now name a version at or below the one just cut; its own step 2 moves them above the cut version when it is cut. If its bump pull request is open, it now conflicts with the urgent one (both edit the version file and the changelog's top) and sets a version at or below the cut: tell the user not to resolve it by hand, and to bring the planned Release back here, whose step 2 takes a version above the cut and whose step 3 updates that open pull request (the open-bump check) with the version, the entry's heading, the label, the release issue's title and its Label line together.
-
-Done when the fix's bump pull request is merged, its release issue is closed, and the planned Release, if still open, keeps its label and title, and the user has been told to rerun it if its bump pull request is open.
+Done when the release issue is open with its Goal, Size, Order, Left out and Proposed sections, every issue in its Order (and every open Ticket of a Spec in it) carries the label, no other issue does, and no taken issue still carries `next-release`.

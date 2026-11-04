@@ -1,0 +1,29 @@
+PASS event 1: one Release worker with release, no build worker, and no check-in yet (a planning-only Release worker)
+PASS event 2: the check-in arranged every hour through the Harness, before the first build worker starts
+PASS event 2: the Spec worker on 10
+PASS event 3: 10 started 40 minutes ago: a quiet check-in writes nothing
+FAIL event 4: one nudge record on 10-
+PASS event 4: one nudge message to w-10-0920
+PASS event 4: no stop and no fresh worker yet
+PASS event 5: still silent after its nudge: w-10-0920 stopped through the harness
+PASS event 5: no fresh worker before the stop reads back, no second nudge
+PASS event 6: 10- parked with the Park operation (label and parked record)
+PASS event 6: the user told once
+PASS event 6: no fresh worker on 10-
+PASS event 6: the loop goes on: an implement worker on 20
+PASS event 7: one fresh implement worker on 20-
+PASS event 7: its brief names the pushed branch t20 and the tracker
+PASS event 7: its start record names the worker it takes over from (w-20-1205)
+PASS event 7: a failed worker needs no nudge or stop
+PASS event 8: the fresh worker active: a quiet check-in writes nothing
+FAIL event 9: one nudge record on 20-
+PASS event 9: one nudge message to w-20-1230
+PASS event 9: no stop and no fresh worker yet
+PASS event 10: still silent after its nudge: w-20-1230 stopped through the harness
+PASS event 10: no fresh worker before the stop reads back, no second nudge
+PASS event 11: 20- parked with the Park operation (label and parked record)
+PASS event 11: the user told once
+PASS event 11: no fresh worker on 20-
+PASS event 12: every feature parked or waiting: a quiet check-in writes nothing
+PASS events 7 to 12: nothing written for 10 and the user not told of it again
+26/28 checks passed

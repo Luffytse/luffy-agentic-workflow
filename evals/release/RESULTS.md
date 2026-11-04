@@ -1,6 +1,6 @@
 # Results
 
-One entry per dry run of `release`, newest first. A dry run follows `SKILL.md` step by step against a real repo but only proposes: it merges, labels, renames, opens and closes nothing. Rerun when `release` changes, and record the commit and the plugin version from `plugins/dev-skills/.claude-plugin/plugin.json`. An entry written inside an open pull request names the commit and plugin version it ran on as its base; anything that happens after the entry's last commit (later Rounds, merges, the merge itself) is recorded on the pull request, not in the file.
+One entry per dry run of `release`, newest first. A dry run follows `SKILL.md` step by step against a real repo or a fixture (the ranked-pick cases, [README](README.md)) but only proposes: it merges, labels, opens and closes nothing. Entries below dated before 2026-11-04 ran the earlier skill with bump modes and an "Inside a Milestone" section; they stay as history. Rerun when `release` changes, and record the commit and the plugin version from `plugins/dev-skills/.claude-plugin/plugin.json`. An entry written inside an open pull request names the commit and plugin version it ran on as its base; anything that happens after the entry's last commit (later Rounds, merges, the merge itself) is recorded on the pull request, not in the file.
 
 ## Template
 
@@ -14,6 +14,35 @@ Pass: yes | no. Lessons: <what to change in release, if anything>
 ```
 
 ## Runs
+
+### 2026-11-04, branch `review-fix` (Spec #633 Round 1 fixes, base 3e9653c), dev-skills 0.61.0 (base): `old-shape-cut`
+
+Setup: the new ranked-pick case `old-shape-cut` (R1-1 of PR #651's Round 1): `no-version`'s fixture with the open Release 2 (#2) written before the Order list (`**Cap:**` line, `## Scope` list, no `## Order`), its issues #10 and #20 labelled `release-2` and closed by merged pull requests.
+
+- **Self-test:** `python3 evals/release/ranked-pick/test_cases.py`: 8 tests OK (reference runs pass all nine cases, in one test; a planted run that plans `old-shape-cut` again with no cut fails).
+- **Spec head's skill, literal (red, as text):** "Find where you are" case 1 reads #2's empty Order as a planning that stopped part way, so step 5 plans into #2 and nothing is cut.
+- **Branch's skill, literal (green):** case 1 now says such an issue is the current Release of case 2; the changelog has no `## Release 2`, so steps 1 to 5 run as in `no-version`.
+- **Fresh runs (2026-11-04, made by the coordinator):** one fresh premium-tier subagent per text, given only the PROMPT.md text, with `<checkout>` set to a `git archive` copy (evals/ removed) of this branch at ac00325 or of the Spec head at 3e9653c, scored with `score.py` from ac00325. The outputs and scores are in `ranked-pick/evidence/branch-old-shape-cut/` and `ranked-pick/evidence/spec-head-old-shape-cut/`; the Implementer rescored both, with the same results.
+  - **Branch: 20/20.** It read #2 as the current Release by the new clause, cut it, then planned Release 3 with Order #21.
+  - **Spec head: also 20/20.** In its final message it said the literal text would have sent it to plan #2 again ("Read literally, the skill's first case … would have sent it to re-plan instead"), and it read the `## Scope` list as the Order anyway (its report: "I read its Scope as its Order").
+- **Verdict:** this case does not separate the two texts: a careful premium run works around the old wording. The fix makes explicit what the old text left to the agent's judgement; what fails a replan with no cut is the planted wrong run in `test_cases.py`, not a model run. Pass: yes for the branch; the red is literal only.
+
+### 2026-11-04, branch `ticket-635` (base 7d8ed12), dev-skills 0.61.0 (base): the one path, ranked-pick cases
+
+Setup: the eight ranked-pick cases (`evals/release/ranked-pick/`), written before the skill text. Run by the Implementer of #635. Run level: literal walkthroughs of each case against main's skill (c29d3b1, the pre-#635 `release`) and the branch's skill, plus `test_cases.py` (no model session). The Implementer could not make fresh-agent runs; the coordinator made them (below).
+
+- **Self-test:** `python3 evals/release/ranked-pick/test_cases.py`: 7 tests OK (reference runs pass all eight cases; the planted wrong runs fail).
+- **Main's skill, literal (red):** every case first misreads the release doc: it names no bump mode, so main's skill takes Releases bump, whose version file and `Release X.Y.Z` titles the repo lacks. Read past that, as if pull requests bumped, its step 5 "Inside a Milestone" picks: `severe-first`: fails: the unmarked security bug #31 joins only through a Triage batch row and #35's `next-release` mark means nothing to it, so the Order is [#10, #20] and the bugs are not candidates; `blocker-first`: fails: #20 is left out as blocked by #40, which is not a planned feature; `bugs-fill`: fails: ready bugs join only as maintenance fixes a batch chose; `unplanned-feature`: passes (#50 is proposed, never labelled), a control; `size-reached`: fails: the cap is 5 features, not the release doc's size 3; `severe-past-size`: fails: no severe rule and no size; `reorder`: fails: the Milestone issue's order is kept ([#24, #25, #26] with #24 and #25 blocked); `no-version`: fails at "Before you start": no bump mode means Releases bump, which needs a version file the repo lacks.
+- **Branch's skill, literal (green):** each case follows "Find where you are" (case 4, both end-of-Release records on #2, so step 5; `no-version` takes case 2, then steps 1 to 5) and gives the Expected column of the README; `no-version`'s entry carries `Commits: <Release 1's end>..<main>` and no `Versions:` line, since the release doc's policy is none and its cut steps add none.
+- **Fresh runs (2026-11-04, made by the coordinator):** each case ran twice in a fresh premium-tier subagent given only the PROMPT.md text, with `<checkout>` set to a `git archive` copy of this branch at 2bf55e8 or of main at c29d3b1, on a fixture from `make_fixture.py`, scored with `score.py`. The outputs and scores are in `ranked-pick/evidence/<branch|main>-<case>/`; the Implementer rescored every run directory, with the same results.
+  - **Branch: 8 of 8 pass, no FAIL:** severe-first 9/9, blocker-first 9/9, bugs-fill 10/10, unplanned-feature 11/11, size-reached 9/9, severe-past-size 10/10, reorder 9/9, no-version 20/20.
+  - **Main: 8 of 8 fail.** FAIL counts: severe-first 5, blocker-first 4, bugs-fill 6, unplanned-feature 5, size-reached 3, severe-past-size 6, reorder 4, no-version 4. No main run wrote an Order or Size line. Behaviour: on unplanned-feature it ranked #50 and #51; on severe-first it missed #30 and left `next-release` on #35; on severe-past-size it labelled #10, #11, #12 and #20 instead of #31, #36 and #37; on no-version it wrote no end-of-Release records.
+  - **Correction:** the literal walkthrough above predicted main would pass unplanned-feature. It does not.
+- **Owed:** the premium case check of Spec #626 for each new case, once #626 lands.
+
+Not exercised: a real tracker, a cut step that adds a `Versions:` line or a bump pull request (this repo's release doc and the "Releases bump" seed), a rerun of a stopped planning, a carried-over issue, a whole-Release check that fails, and a changelog pull request a person merges.
+
+Pass: yes. The branch is green on all eight cases and main is red on all eight. Lessons: the literal walkthrough of main missed that it ranks unplanned features.
 
 ### 2026-11-02, commit ac43b8c (base), dev-skills 0.32.0 (base): "pull requests bump", Milestone 1 · Release 3 planned inside a Milestone, and a without-Milestone check
 

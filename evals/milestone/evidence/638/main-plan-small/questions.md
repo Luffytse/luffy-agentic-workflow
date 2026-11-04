@@ -1,0 +1,5 @@
+- What outcome do you want by the end of this Milestone, in a sentence or a short paragraph in your own words?
+- How will you accept the Milestone at its review: beyond issue 20 being merged and closed, what will you check yourself? (unanswered)
+- What is excluded from this Milestone (for example the farewell command, issue 10, and coloured output, issue 30), and where should it go instead, if anywhere? (unanswered)
+- What budget applies: the Boundary record's (none), or a tighter one for this Milestone? (unanswered)
+- Are there any boundaries beyond the Boundary record for this Milestone: an action its issues may also take, or one that needs your approval? "None beyond the Boundary record" is a fine answer. (unanswered)
