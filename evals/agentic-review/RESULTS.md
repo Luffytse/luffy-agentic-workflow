@@ -4,6 +4,30 @@ One entry per run, newest first. Rerun when a pull request changes how `agentic-
 
 Entries before the review was rebuilt around Round 0 and `review-rounds` ran the earlier review (up to 5 Rounds, rebuttals, the convergence check, Milestone design answers, merge-only Rounds). They are kept as history: the checks they name for those rules were removed with the rules, and a `<depth>` there is the old Review depth.
 
+### 2026-11-04, Script briefs, third run, dev-skills 0.75.1
+
+Run level: decision-level in a subagent that can run shell commands (regular tier); it starts no agent. Two fresh regular-tier subagents in one parallel batch, each told to read the case's `PROMPT.md` and do exactly it. Rerun because the pull request for #675 (absorbing #674) changes how a Round is briefed: one Report format in `FINDERS.md`, each Finder brief naming its report file, `verify` reading `<out>/reports` by default.
+
+Case: `script-briefs/`, `make-case.sh` run on each `plugins/` copy. Branch run: the plugin copy of the branch at `36503008` (dev-skills 0.75.1). Baseline run: `plugins/` of main at `d66fb5b`, from `git archive`. Both scored with the branch's `score.py`.
+
+| check | main's skill | branch's skill |
+|-------|--------------|----------------|
+| F1 files | PASS | PASS |
+| B1 standards brief | FAIL (differs from the script's) | PASS |
+| B2 spec brief | FAIL (differs from the script's) | PASS |
+| B3 adversarial brief | FAIL (differs from the script's) | PASS |
+| B4 Verifier brief | FAIL (differs from the script's) | PASS |
+| L1 work tree | PASS | PASS |
+| H1 script run, not hand-written (by hand) | PASS | PASS |
+
+Score: main 2/6, branch 6/6.
+
+Branch's run (H1): the agent ran `round1`, copied the canned `messages/*-finder.txt` to `<finder>.md` in a work directory outside the repository and the briefs directory, ran `verify --reports <that directory>` (it found no files when it first pointed `--reports` at `messages/`, then fixed the names), and wrote `verifier.md` with the three Findings. Main's run (H1): the agent copied the messages to `reports/` and passed `--reports` explicitly. In both runs the agent ran the script; no brief was written by hand.
+
+Reading the baseline: the scorer compares against the branch's script output, so main's briefs fail B1-B4 by lacking the Report format and the report path. This shows main's briefs differ from the branch's, not a failure of main's own flow.
+
+Stated gap: no run had a real Finder write its report file. The case's `messages/` are final messages, not files, so the run agent copied them to files. The Finder-side file write (and a Finder that cannot write it) is covered only by the deterministic tests of what the briefs say and what `verify` accepts.
+
 ### 2026-11-04, dev-skills 0.71.0, Verify-only, Standard
 
 Run level: decision-level in a subagent, as the README says: one fresh regular-tier subagent per run, given its `verifier.md` and no other input. Branch run: `38bbea8` (the Verifier-alone brief carries the meaning of Important and the Skip list), plugin 0.71.0. Baseline run: main `7dc6244` (0.71.0, from a `git archive`). Both on the Standard fixture from `setup.sh`, brief from `briefs.sh --verify-only <fixture> standard`. Driven by the thread, which scored with `EXPECTED.md`.
