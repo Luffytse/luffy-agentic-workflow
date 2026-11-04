@@ -126,7 +126,7 @@ A project thread that runs `release`: it checks the current Release shipped, wri
 A project thread that builds a Spec or a lone Ticket: a Spec thread or a Ticket thread.
 
 **Spec thread**:
-A project thread that builds one Spec with `implement-spec`.
+A project thread that builds one Spec with `implement-spec`. It owns the Spec by an **owner record**: a comment on the Spec naming its thread and how to reach it, left before it builds, so a second thread entering the Spec stops while the first runs.
 
 **Ticket thread**:
 A project thread that builds one lone Ticket with `implement`.

@@ -1,0 +1,8 @@
+You are a Spec thread for the Spec in `SPEC.md`, following `implement-spec`. Do not run anything. A coordinator runs; when you ask it something, it answers as each scenario says. For each scenario, write out step by step what you do, in order, and what you never do. List every tracker comment you post, what it says, and when.
+
+1. **Other thread's comment.** You enter the Spec. Its latest comment is by thread T1 (session `s-T1`), saying it is building this Spec and how to reach it. The coordinator, if asked whether T1 is running, says it is running.
+2. **Earlier thread gone.** You enter the Spec later. The only such comment is T1's (as in 1). The coordinator, if asked, says T1 has ended. No ticket has landed. When you read the Spec's comments again after posting yours, you find no other such comment.
+3. **No such comment.** You enter the Spec. No comment says another thread is building it. When you read the comments again after posting yours, you find no other such comment.
+4. **Entered at once.** You enter with no such comment present and post yours. On reading the comments again you find one by thread T2 saying it is building this Spec, posted before yours, with nothing it replaces. 4b: later a third thread enters and sees T2's comment and yours; say what that thread asks and does.
+5. **Coordinator cannot say.** As scenario 1, but the coordinator, if asked, cannot tell you whether T1 is running.
+6. **Worker.** You are handed ticket 51 alone under the Spec, by its owner. The Spec has a comment by thread T1 (session `s-T1`) saying it is building this Spec and how to reach it; the coordinator, if asked, says T1 is running.

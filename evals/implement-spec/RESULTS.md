@@ -18,6 +18,17 @@ Pass: yes | no. Lessons: <what to change in implement-spec, if anything>
 
 ## Runs
 
+### 2026-11-04, commits b5b7c0a and ab4c7a4 (claude/project-thread-ypj9u9), dev-skills 0.66.0 (no bump): owner-claim case, branch's and main's skills
+
+Run level: decision-level in a subagent. Tier: regular (fresh subagents).
+Setup: `owner-claim/`, one run per skill version, six scenarios plus 4b each. Each subagent got the skill folder, `SPEC.md` and `PROMPT.md` only; `EXPECTED.md` was kept away. The branch's skill was the checkout at `b5b7c0a`; the baseline was a `git archive` of main at `9233e77` (dev-skills 0.66.0 on main; the branch leaves the version as it is).
+Case check: a premium-tier reviewer returned fix for scenarios 1 to 4, keep for 5 and drop for 6. All fixes were applied: neutral prompt wording, the second read's result stated, "before step 2", scenario 4b added, the old own-record scenario 6 replaced by a Worker scenario, and the skill gained the "record in force" wording to close a third-thread gap. The post-fix cases were not re-checked by a second premium pass.
+Branch run: scenarios 1 to 6 and 4b all pass `EXPECTED.md`. 1 asks the coordinator, stops and posts nothing. 2 posts a record naming T1's before the Spec branch, re-reads and builds. 3 posts before step 2. 4 stops and posts only its own earlier record. 4b asks about T2, not the stopped thread. 5 asks the user, waits and posts no record. 6 (Worker) posts no record.
+Main run: 2 fails (builds, posts no record, names none replaced). 3 fails (no record posted). 4b fails (asks which of T2 or the earlier thread is running, and "does not choose by comment order"). 1, 4, 5 and 6 pass by the run's own reasoning ("beyond the skill": it says main has no rule and acts on common sense); it reported that the cases measure nothing about main until the rule exists.
+Not exercised: a full build-flow (steps 3 to 9); a real tracker or coordinator.
+Rerun after Round 1: the Worker clause in `SKILL.md` step 1 and scenario 6 (T1's comment on the Spec, T1 running) were changed in `ab4c7a4`; the skill text between `b5b7c0a` and `ab4c7a4` differs only by the Worker clause. Scenario 6 got no run on main with the new prompt. The branch was rerun once at `ab4c7a4` (all six scenarios plus 4b, same method, regular tier, fresh subagent, dev-skills 0.66.0): all pass `EXPECTED.md`; scenario 6's Worker skipped the owner-record bullet, posted no record, did not ask whether T1 runs, and built 51 only.
+Pass: yes for the branch. Lessons: scenarios 1, 4, 5 and 6 do not separate main from the branch (a careful model stops by common sense); the discriminating scenarios are 2, 3 and 4b. A single run per version, no variance estimate.
+
 ### 2026-11-04, commit ad8ab26 (the Spec branch, claude/project-thread-vk76z1), dev-skills 0.62.0 (no bump yet): #643 closing case, branch's and main's skills
 
 Run level: decision-level in a session.
