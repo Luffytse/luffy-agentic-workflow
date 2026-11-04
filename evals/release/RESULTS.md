@@ -15,6 +15,15 @@ Pass: yes | no. Lessons: <what to change in release, if anything>
 
 ## Runs
 
+### 2026-11-04, branch `review-fix` (Spec #633 Round 1 fixes, base 3e9653c), dev-skills 0.61.0 (base): `old-shape-cut`
+
+Setup: the new ranked-pick case `old-shape-cut` (R1-1 of PR #651's Round 1): `no-version`'s fixture with the open Release 2 (#2) written before the Order list (`**Cap:**` line, `## Scope` list, no `## Order`), its issues #10 and #20 labelled `release-2` and closed by merged pull requests.
+
+- **Self-test:** `python3 evals/release/ranked-pick/test_cases.py`: 9 tests OK (reference runs pass all nine cases; a planted run that plans `old-shape-cut` again with no cut fails).
+- **Spec head's skill, literal (red):** "Find where you are" case 1 reads #2's empty Order as a planning that stopped part way, so step 5 plans into #2 and nothing is cut.
+- **Branch's skill, literal (green):** case 1 now says such an issue is the current Release of case 2; the changelog has no `## Release 2`, so steps 1 to 5 run as in `no-version`.
+- **Fresh runs:** PENDING: one fresh premium-tier run of `old-shape-cut` on this branch's skill and one on the Spec head's (3e9653c), scored with `score.py`.
+
 ### 2026-11-04, branch `ticket-635` (base 7d8ed12), dev-skills 0.61.0 (base): the one path, ranked-pick cases
 
 Setup: the eight ranked-pick cases (`evals/release/ranked-pick/`), written before the skill text. Run by the Implementer of #635. Run level: literal walkthroughs of each case against main's skill (c29d3b1, the pre-#635 `release`) and the branch's skill, plus `test_cases.py` (no model session). The Implementer could not make fresh-agent runs; the coordinator made them (below).

@@ -21,7 +21,7 @@ The **heading test**: the changelog has an entry for a Release when it has a lin
 
 Every run, first or rerun, starts here, from freshly fetched main and the tracker; take the first case that fits:
 
-1. An open release issue whose Order lists nothing, or lists an issue that does not carry its label or still carries `next-release` (or a Spec with an open Ticket without the label), is a planning that stopped part way: go to step 5, whose "Rerun first" finishes it.
+1. An open release issue whose Order lists nothing, or lists an issue that does not carry its label or still carries `next-release` (or a Spec with an open Ticket without the label), is a planning that stopped part way: go to step 5, whose "Rerun first" finishes it. A release issue written before the Order list (a `## Scope` list and no `## Order`) whose label an issue carries is not one: it is the current Release of case 2, and the issues carrying its label are its scope.
 2. An open release issue whose label its issues carry is the **current Release**. If the changelog on main has its entry (the heading test), its changelog pull request merged: go to step 3. Otherwise go to step 1. If several are open, take the oldest and say so in your report.
 3. No open release issue, but open issues carry a release label that no release issue names: a planning stopped before its release issue was opened: go to step 5.
 4. Otherwise, the last release issue is the closed one cut most recently. Go to step 4 unless it holds both end-of-Release records, and then to step 5. With no release issue at all, this is the repo's first Release: go to step 5.

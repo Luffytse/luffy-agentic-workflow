@@ -7,6 +7,7 @@ Issue numbers are the issue file prefixes (#10 is .scratch/issues/10-*.md). Ever
 the closed release issue of the last Release (#2, "Release 2", unless the case cuts it) and the fixture repo. The
 Milestone's goal is GOAL unless the case names its own.
 """
+import copy
 
 GOAL = "Round out the greeter's commands."
 
@@ -148,6 +149,9 @@ CASES = {
         ],
     ),
 }
+# A release issue written before the Order list (a `## Scope` list and a Cap line, no `## Order`) whose label its
+# issues carry is the current Release: it is cut as in no-version, never replanned.
+CASES["old-shape-cut"] = dict(copy.deepcopy(CASES["no-version"]), old_shape=True)
 
 EXPECT = {
     "severe-first": dict(order=[31, 35, 10, 20, 30], labelled={31, 35, 10, 11, 12, 20, 30}, left_out=set(),
@@ -167,3 +171,4 @@ EXPECT = {
     "no-version": dict(order=[21], labelled={21}, left_out=set(), not_ranked=set(), cleared=set(), used=1,
                        cut=dict(name="Release 2", shipped=[10, 20], also_merged=[9])),
 }
+EXPECT["old-shape-cut"] = EXPECT["no-version"]

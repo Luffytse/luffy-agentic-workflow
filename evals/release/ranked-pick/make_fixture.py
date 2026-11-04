@@ -203,6 +203,12 @@ def build(out, name):
                    body=f"**Goal:** Say goodbye and keep quiet.\n\n**Label:** `release-2`. Every issue in this Release carries it.\n\n"
                         f"**Milestone:** #1\n\n**Size:** {case['size']}. Used: {len(members)}.\n\n## Order\n\n{order}\n\n"
                         "## Left out\n\nNone.\n\n## Notes\n\nPosted as a comment when the Release is cut.\n")
+        if case.get("old_shape"):
+            title = lambda n: next(i["title"] for i in issues if i["n"] == n)  # noqa: E731
+            scope = "\n".join(f"- **{title(n)}**: next in the Milestone's order.\n  - #{n} {title(n)}" for n in members)
+            rel["body"] = ("**Goal:** Say goodbye and keep quiet.\n\n**Label:** `release-2`. Every issue in this Release carries it.\n\n"
+                           f"**Milestone:** #1\n\n**Cap:** 5 features. Used: {len(members)}. Maintenance fixes: 0, outside the cap.\n\n"
+                           f"## Scope\n\n{scope}\n\n## Notes\n\nPosted as a comment when the Release is cut.\n")
         shas = {}
         for k, p in enumerate(case["pulls"]):
             f = r / p["file"]

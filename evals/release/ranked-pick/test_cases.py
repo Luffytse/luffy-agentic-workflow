@@ -5,7 +5,8 @@ Run: python3 evals/release/ranked-pick/test_cases.py
 For each case it builds the fixture, writes a reference run by hand from the case's expected pick (the release issue,
 its label writes and, in the cut case, the cut's blocks), and scores it: the reference must pass, and planted wrong
 runs (two entries swapped, a non-severe issue taken past the size, an unplanned feature ranked, a Versions line in a
-repo with no version, the mark left on a taken issue, a severe issue left out) must fail. It is not a model run of the
+repo with no version, the mark left on a taken issue, a severe issue left out, an old-shape release issue planned
+again instead of cut) must fail. It is not a model run of the
 skill: see evals/release/README.md and RESULTS.md for the model runs.
 """
 import pathlib
@@ -24,13 +25,13 @@ def block(k, op, issue, fields):
     return f"### {k}. {op}\nIssue: {issue}\n{fields}\n"
 
 
-def reference(case, exp, repo, order=None, labelled=None, cleared=None, left=None, versions=False, used=None):
+def reference(case, exp, repo, order=None, labelled=None, cleared=None, left=None, versions=False, used=None, cut=True):
     order = order if order is not None else exp["order"]
     labelled = labelled if labelled is not None else exp["labelled"]
     cleared = cleared if cleared is not None else exp["cleared"]
     left = left if left is not None else exp["left_out"]
     out, k = [], 1
-    if "cut" in exp:
+    if "cut" in exp and cut:
         git = lambda *a: subprocess.run(["git", "-C", str(repo), *a], capture_output=True, text=True).stdout.strip()  # noqa: E731
         start = git("log", "-1", "--format=%h", "--abbrev=7", "--grep", "(#5)", "--fixed-strings")
         end = git("rev-parse", "--short=7", "HEAD")
@@ -103,6 +104,9 @@ class Cases(unittest.TestCase):
 
     def test_mark_left_on_a_taken_issue_fails(self):
         self.assertEqual(self.run_case("severe-first", cleared=set()).returncode, 1)
+
+    def test_old_shape_release_replanned_not_cut_fails(self):
+        self.assertEqual(self.run_case("old-shape-cut", cut=False).returncode, 1)
 
     def test_severe_issue_left_out_fails(self):
         e = EXPECT["severe-first"]
