@@ -21,7 +21,9 @@ Any other tracker, or a read that fails, prints "read by hand" in that row's tra
 command exits 3: read those rows with the tracker doc's own operations. Git is read either way.
 
 Verdicts: "pull request ready but not reported" (ready or merged after the later of the worker's last report and
-its start, so a replacement is not flagged for its predecessor's pull request); "active" (activity within the
+its start, so a replacement is not flagged for its predecessor's pull request; a ready pull request still open
+counts only while the worker has made no comment or push (or been resumed) since marking it ready, because a Spec thread marks its pull request
+ready before its review and the review's comments and pushes are the worker at work); "active" (activity within the
 silent-after window); "nudged at <T>, waiting"; "still silent after its nudge at <T>" (a window, less a 10-minute grace
 for a nudge recorded minutes after its check-in, has passed since the nudge with no activity); "silent since <T>". Activity is a pushed commit, a comment
 on the issue or the pull request, a pull request change, the worker's start, its last report or its resume. Comments
@@ -264,7 +266,10 @@ def row_for(w, repo, tracker, now, window):
     last = max(activity) if activity else None
     nudge = max(nudges) if nudges else None
     seen = max([t for t in (w["reported"], w["started"]) if t], default=None)
-    if ready_at and (seen is None or seen < ready_at):
+    # An open pull request is finished only if the worker did nothing after marking it ready: a Spec thread marks its
+    # pull request ready before its review, and the review's comments and fixes are the worker at work.
+    working = ready_at and pr["state"] == "open" and any(t > ready_at for t in activity)
+    if ready_at and (seen is None or seen < ready_at) and not working:
         verdict = "pull request ready but not reported"
     elif last and now - last < window:
         verdict = "active"

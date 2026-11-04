@@ -46,7 +46,7 @@ Start nothing while a pause is in effect or a merge-time step holds further star
 
 - **A worker reports or asks.** Read its issue, branch and pull request, then act on what they show: a merge-time request (step 4), a finished build (its slot frees), a question within the boundaries (answer it; a boundary crossing goes to the user, as above), a request for another agent's worker on a Ticket (a continuation handoff: start that agent on it through `worker-control` where the Harness can, otherwise tell the user once which agent to run on which handoff; tell the asking worker which; when that worker finishes, tell the owning Spec worker, or restart it from its pushed branch if it ended).
 - **A worker ended without its result,** as `worker-control` reads an end: no stop is needed. Start a fresh worker from its pushed branch and the tracker as "Replace a stalled worker" steps 3 and 4 say; it counts as a stall, so a replacement that ended parks the issue.
-- **A pull request is ready or merged** with no report: act as if the worker had reported, and tell it what you decided.
+- **A pull request is merged, or is ready and it has had no comment or push since,** with no report: act as if the worker had reported, and tell it what you decided. A ready pull request whose worker still comments or pushes (a Spec thread reviewing it) is a working worker.
 
 ## 4. Merge-time steps
 
