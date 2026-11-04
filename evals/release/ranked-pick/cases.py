@@ -146,21 +146,31 @@ CASES = {
                 labels=["needs-triage", "bug"]),
         ],
     ),
-    # Release 2 (closed, cut in an earlier run) carried two issues over: the release issue's `## Carried over` section
-    # lists #31 (still open) and #34 (closed since), both also in its Order (Used 3); its Notes carry a line shaped like a
-    # carried-over line for #32 outside that section, which a rerun must not read as one.
-    # #31 carries no state label, so only the section makes it a candidate; #32 and #34 are not.
+    # Release 2 (closed, cut in an earlier run) carried four issues over: the release issue's `## Carried over` section
+    # lists #31, #33, #50 (still open) and #34 (closed since), all also in its Order (Used 5); its Notes carry a line
+    # shaped like a carried-over line for #32 outside that section, which a rerun must not read as one. Each open
+    # carried-over issue goes where its kind puts it: #33, a `ready-for-agent` bug, ranks in group 3 ahead of the older
+    # #30 (carried-over issues first in group 3); #31 carries only `bug` (no state label, its fix waits on a decision), so
+    # an agent cannot take it: it is left out with that reason and built by no one; #50, an enhancement the Milestone
+    # issue no longer lists, is an unplanned feature: proposed to the user, never ranked. #32 and #34 are not candidates.
     "carried-over": dict(
         size=5,
         milestone=[20],
         carried=[(31, "Empty name prints `Hello, !`", "the fix needed a decision on the empty name"),
+                 (33, "Unknown command exits 0 from a pipe", "not finished in time"),
+                 (50, "Colour output", "not started"),
                  (34, "Names with accents come out mangled", "the reproduction was missing")],
         notes_text="- #32 Trailing space after the greeting: not finished, carried to the next Release.",
-        issues=[QUIET,
-            bug(31, "empty-name", "Empty name prints `Hello, !`", "2026-09-15", "`greet.sh hello ''` prints `Hello, !`.",
+        issues=[QUIET, TYPO,
+            bug(31, "empty-name", "Empty name prints `Hello, !`", "2026-09-15",
+                "`greet.sh hello ''` prints `Hello, !`. The fix waits on a decision: greet `world`, or refuse an empty name?",
                 labels=["bug"]),
             bug(32, "trailing-space", "Trailing space after the greeting", "2026-10-10", "Every greeting ends in a space.",
                 labels=["bug"]),
+            bug(33, "exit-code", "Unknown command exits 0 from a pipe", "2026-10-01", "`greet.sh nope | cat` exits 0."),
+            dict(n=50, slug="colour", title="Colour output", type="ticket", labels=["ready-for-agent", "enhancement"],
+                 created="2026-09-10", body="Print the greeting in green when stdout is a terminal.",
+                 comments=[("2026-10-18T09:00:00Z", "The user removed this from Milestone 1's features.")]),
             dict(bug(34, "accents", "Names with accents come out mangled", "2026-08-01", "`greet.sh hello Zoë` prints `Zo?`.",
                      labels=["bug"]), status="closed"),
         ],
@@ -188,6 +198,62 @@ CASES = {
             dict(n=7, title="feat: farewell command", body="Closes #10", file="src/greet.sh", line="# bye\n"),
             dict(n=8, title="feat: quiet flag", body="Fixes #20", file="src/greet.sh", line="# quiet\n"),
         ],
+    ),
+    # A rerun after a partial carry-over, before the cut: Release 2 (#2) is open; #10 shipped (merged #7, `Closes #10`);
+    # #31 was carried over in an earlier run (its line under `## Carried over`, its `release-2` label removed). #31 is
+    # accounted for, so "Find where you are" takes case 2, not case 1: the Release is cut (step 1 is done) and #31 never
+    # gets `release-2` back; in the planning that follows it is a candidate again (a `ready-for-agent` bug, group 3).
+    "carry-partial-rerun": dict(
+        size=5,
+        milestone=[10, 21],
+        cut=True,
+        order2=[10, 31],
+        carried=[(31, "Empty name prints `Hello, !`", "the user chose to carry it over; its fix is not done")],
+        issues=[
+            dict(n=10, slug="farewell", title="Farewell command", type="ticket", labels=["ready-for-agent", "enhancement", "milestone-1", "release-2"],
+                 created="2026-10-02", status="closed", body="Add `greet.sh bye <name>`."),
+            bug(31, "empty-name", "Empty name prints `Hello, !`", "2026-09-15", "`greet.sh hello ''` prints `Hello, !`."),
+            dict(n=21, slug="shout", title="Shout flag", type="ticket", labels=["ready-for-agent", "enhancement", "milestone-1"],
+                 created="2026-10-04", body="`-s` prints the greeting in capitals."),
+        ],
+        pulls=[dict(n=7, title="feat: farewell command", body="Closes #10", file="src/greet.sh", line="# bye\n")],
+    ),
+    # A rerun after a full carry-over: Release 2 (#2) is open and both its issues, #10 and #31, were carried over (both
+    # under `## Carried over`, neither labelled). Nothing shipped; #9 merged with no issue. Case 2 fits (every Order
+    # issue is accounted for), so the Release is cut and closed with what merged since Release 1, and #10 and #31 are
+    # candidates for Release 3, next to the planned #21.
+    "carry-full-rerun": dict(
+        size=5,
+        milestone=[10, 21],
+        cut=True,
+        order2=[10, 31],
+        carried=[(10, "Farewell command", "not finished in time"),
+                 (31, "Empty name prints `Hello, !`", "the user chose to carry it over; its fix is not done")],
+        issues=[
+            dict(n=10, slug="farewell", title="Farewell command", type="ticket", labels=["ready-for-agent", "enhancement", "milestone-1"],
+                 created="2026-10-02", body="Add `greet.sh bye <name>`."),
+            bug(31, "empty-name", "Empty name prints `Hello, !`", "2026-09-15", "`greet.sh hello ''` prints `Hello, !`."),
+            dict(n=21, slug="shout", title="Shout flag", type="ticket", labels=["ready-for-agent", "enhancement", "milestone-1"],
+                 created="2026-10-04", body="`-s` prints the greeting in capitals."),
+        ],
+        pulls=[dict(n=9, title="docs: README usage", body="No issue.", file="README.md", line="Usage: greet.sh hello <name>\n")],
+    ),
+    # A planning that really stopped part way still takes case 1, with a carry-over beside it: Release 2 (#2) is open,
+    # its Order lists #20 (labelled), #21 (not labelled, not carried over: its label was removed by hand) and #31 (carried
+    # over, unlabelled). #21 makes case 1 fit; "Rerun first" labels #21 only, never the carried-over #31, and cuts nothing.
+    "partway-rerun": dict(
+        size=5,
+        milestone=[20, 21],
+        cut=True,
+        order2=[20, 21, 31],
+        carried=[(31, "Empty name prints `Hello, !`", "the user chose to carry it over; its fix is not done")],
+        issues=[
+            dict(QUIET, labels=QUIET["labels"] + ["release-2"]),
+            dict(n=21, slug="shout", title="Shout flag", type="ticket", labels=["ready-for-agent", "enhancement", "milestone-1"],
+                 created="2026-10-04", body="`-s` prints the greeting in capitals."),
+            bug(31, "empty-name", "Empty name prints `Hello, !`", "2026-09-15", "`greet.sh hello ''` prints `Hello, !`."),
+        ],
+        pulls=[],
     ),
     # A repo that keeps no version cuts a whole Release: shipped test, changelog entry with no Versions line and no
     # version file, the end-of-Release pass in order, then the plan.
@@ -230,10 +296,18 @@ EXPECT = {
                     cleared=set(), used=3, reasons=True),
     "empty": dict(order=[], labelled=set(), left_out={20}, not_ranked={34, 50}, proposed={50}, cleared=set(),
                   used=0, empty=True),
-    "carried-over": dict(order=[20, 31], unordered=True, labelled={20, 31}, left_out=set(), not_ranked={32, 34},
-                         cleared=set(), used=2),
+    "carried-over": dict(order=[20, 33, 30], labelled={20, 33, 30}, left_out={31}, left_reason={31: r"carried"},
+                         not_ranked={32, 34, 50}, proposed={50}, cleared=set(), used=3),
     "carry-over-cut": dict(order=[], labelled=set(), left_out=set(), not_ranked=set(), cleared=set(), used=0,
                            carry=dict(n=31, release=2)),
+    "carry-partial-rerun": dict(order=[21, 31], labelled={21, 31}, left_out=set(), not_ranked=set(), cleared=set(),
+                                used=2, never_relabel={31},
+                                cut=dict(name="Release 2", shipped=[10], also_merged=[], carried=[31])),
+    "carry-full-rerun": dict(order=[10, 21, 31], unordered=True, last=31, labelled={10, 21, 31}, left_out=set(),
+                             not_ranked=set(), cleared=set(), used=3, never_relabel={10, 31},
+                             cut=dict(name="Release 2", shipped=[], also_merged=[9], carried=[10, 31])),
+    "partway-rerun": dict(order=[], labelled=set(), left_out=set(), not_ranked=set(), cleared=set(), used=0,
+                          rerun=dict(release=2, labelled={21}, never={31})),
     "no-version": dict(order=[21], labelled={21}, left_out=set(), not_ranked=set(), cleared=set(), used=1,
                        cut=dict(name="Release 2", shipped=[10, 20], also_merged=[9])),
 }

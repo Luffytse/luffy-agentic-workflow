@@ -253,13 +253,15 @@ def build(out, name):
                           f"| --- | --- | --- | --- |\n{rows}\n\n## Excluded\n\n- Translations.\n")
     slug_of[1] = "milestone-1"
     if case.get("cut"):
-        members = [i["n"] for i in issues if "release-2" in i["labels"]]
+        # The Order Release 2 was planned with: the case's own (carried-over issues lost the label but stay listed), or
+        # else the issues carrying its label.
+        members = case.get("order2") or [i["n"] for i in issues if "release-2" in i["labels"]]
         order = "\n".join(f"{k}. #{n} {next(i['title'] for i in issues if i['n'] == n)}: next in the Milestone's order."
                           for k, n in enumerate(members, 1))
         rel = dict(n=2, slug="release-2", title="Release 2", type="release", labels=[], created="2026-10-16",
                    body=f"**Goal:** Say goodbye and keep quiet.\n\n**Label:** `release-2`. Every issue in this Release carries it.\n\n"
                         f"**Milestone:** #1\n\n**Size:** {case['size']}. Used: {len(members)}.\n\n## Order\n\n{order}\n\n"
-                        "## Left out\n\nNone.\n\n## Notes\n\nPosted as a comment when the Release is cut.\n")
+                        f"## Left out\n\nNone.\n\n{carried_section(case)}## Notes\n\nPosted as a comment when the Release is cut.\n")
         if case.get("old_shape"):
             title = lambda n: next(i["title"] for i in issues if i["n"] == n)  # noqa: E731
             scope = "\n".join(f"- **{title(n)}**: next in the Milestone's order.\n  - #{n} {title(n)}" for n in members)

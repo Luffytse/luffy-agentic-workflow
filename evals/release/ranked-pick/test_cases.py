@@ -6,7 +6,7 @@ For each case it builds the fixture, writes a reference run by hand from the cas
 its label writes and, in the cut case, the cut's blocks), and scores it: the reference must pass, and planted wrong
 runs (two entries swapped, a non-severe issue taken past the size, an unplanned feature ranked, a Versions line in a
 repo with no version, the mark left on a taken issue, a severe issue left out, an old-shape release issue planned
-again instead of cut) must fail. It is not a model run of the
+again instead of cut, a carried-over issue labelled again or ranked when no agent can take it) must fail. It is not a model run of the
 skill: see evals/release/README.md and RESULTS.md for the model runs.
 """
 import os
@@ -51,10 +51,23 @@ def carry_reference(variant=None):
     return edit + label
 
 
+def rerun_reference(variant=None):
+    """Reference run of partway-rerun; `variant` plants one wrong run: relabel (the carried-over #31 labelled too), cut."""
+    out = [block(1, "Apply / remove labels", "21-shout.md", "Add: release-2\nRemove: none")]
+    if variant == "relabel":
+        out.append(block(2, "Apply / remove labels", "31-empty-name.md", "Add: release-2\nRemove: none"))
+    if variant == "cut":
+        out.append(block(2, "Open a pull request", "new (PR 10)",
+                         "Branch: release-2\nTitle: docs(release): Release 2\nBody:\n~~~\nCuts #2.\n~~~\nFile: CHANGELOG.md\n~~~\nx\n~~~"))
+    return "\n".join(out)
+
+
 def reference(case, exp, repo, order=None, labelled=None, cleared=None, left=None, versions=False, used=None, cut=True,
-              empty_issue=False, variant=None):
+              empty_issue=False, variant=None, relabel=(), left_why=None, shipped=None):
     if exp.get("carry"):
         return carry_reference(variant)
+    if exp.get("rerun"):
+        return rerun_reference(variant)
     order = order if order is not None else exp["order"]
     labelled = labelled if labelled is not None else exp["labelled"]
     cleared = cleared if cleared is not None else exp["cleared"]
@@ -66,8 +79,13 @@ def reference(case, exp, repo, order=None, labelled=None, cleared=None, left=Non
         end = git("rev-parse", "--short=7", "HEAD")
         old = (repo / "CHANGELOG.md").read_text().split("\n", 2)[2]
         vline = "Versions: 0.1.0. " if versions else ""
+        titles = {i["n"]: i["title"] for i in CASES[case]["issues"]}
+        ship = exp["cut"]["shipped"] if shipped is None else shipped
+        listed = "".join(f"- {titles[n]} (#{n})\n" for n in ship) or "- Nothing shipped: every issue was carried over.\n"
+        pulls = {p["n"]: p["title"].split(": ", 1)[-1] for p in CASES[case]["pulls"]}
+        also = ", ".join(f"{pulls[n]} (#{n})" for n in exp["cut"]["also_merged"])
         entry = (f"## Release 2 (2026-11-04)\n\nSay goodbye and keep quiet.\n\n{vline}Commits: {start}..{end}.\n\n"
-                 "- Farewell command (#10)\n- Quiet flag (#20)\n\nAlso merged: README usage (#9).\n")
+                 f"{listed}" + (f"\nAlso merged: {also}.\n" if also else ""))
         out.append(block(k, "Open a pull request", "new (PR 10)",
                          f"Branch: release-2\nTitle: docs(release): Release 2\nBody:\n~~~\nCuts #2.\n~~~\n"
                          f"File: CHANGELOG.md\n~~~\n# Changelog\n\n{entry}\n{old}~~~")); k += 1
@@ -81,7 +99,9 @@ def reference(case, exp, repo, order=None, labelled=None, cleared=None, left=Non
                              f"Body:\n~~~\n<!-- release end-of-Release pass -->\n{s} ran for this Release.\n~~~")); k += 1
     titles = {i["n"]: i["title"] for i in CASES[case]["issues"]}
     lines = "\n".join(f"{j}. #{n} {titles.get(n, '')}: taken here for the reason its group and place give." for j, n in enumerate(order, 1))
-    lo = "\n".join(f"- #{n} {titles.get(n, '')}: size reached or blocked." for n in sorted(left)) or "None."
+    whys = {n: "carried over, an agent cannot take it: no state label" for n in exp.get("left_reason", {})}
+    whys.update(left_why or {})
+    lo = "\n".join(f"- #{n} {titles.get(n, '')}: {whys.get(n, 'size reached or blocked')}." for n in sorted(left)) or "None."
     prop = "\n".join(f"- #{n} {titles[n]}: not listed by the Milestone issue." for n in sorted(exp.get("proposed", set()))) or "None."
     past = f", plus {exp['past']} severe past the size" if exp.get("past") else ""
     size = CASES[case]["size"]
@@ -96,6 +116,8 @@ def reference(case, exp, repo, order=None, labelled=None, cleared=None, left=Non
     for n in sorted(labelled):
         rem = "next-release" if n in cleared else "none"
         out.append(block(k, "Apply / remove labels", f"{n:02d}-x.md", f"Add: release-3\nRemove: {rem}")); k += 1
+    for n in relabel:  # a planted wrong run: a carried-over issue given the old release label back
+        out.append(block(k, "Apply / remove labels", f"{n:02d}-x.md", "Add: release-2\nRemove: none")); k += 1
     return "\n".join(out)
 
 
@@ -250,14 +272,32 @@ class Cases(unittest.TestCase):
         r = self.run_case("empty", report="Done.\n")
         self.assertEqual(r.returncode, 1)
 
-    def test_carried_over_issue_left_out_fails(self):
-        r = self.run_case("carried-over", order=[20], labelled={20}, used=1)
+    def test_carried_over_ready_bug_left_out_fails(self):
+        r = self.run_case("carried-over", order=[20, 30], labelled={20, 30}, left={31, 33}, used=2)
+        self.assertEqual(r.returncode, 1)
+
+    def test_carried_over_ready_bug_after_older_bug_fails(self):
+        r = self.run_case("carried-over", order=[20, 30, 33])
+        self.assertEqual(r.returncode, 1)
+        self.assertIn("FAIL Order lists the expected ranked pick", r.stdout)
+
+    def test_carried_over_issue_no_agent_can_take_ranked_fails(self):
+        r = self.run_case("carried-over", order=[20, 33, 30, 31], labelled={20, 33, 30, 31}, left=set(), used=4)
+        self.assertEqual(r.returncode, 1)
+
+    def test_carried_over_issue_left_out_without_its_reason_fails(self):
+        r = self.run_case("carried-over", left_why={31: "size reached"})
+        self.assertEqual(r.returncode, 1)
+        self.assertIn("FAIL #31 left out with its named reason", r.stdout)
+
+    def test_carried_over_unplanned_feature_ranked_fails(self):
+        r = self.run_case("carried-over", order=[20, 33, 30, 50], labelled={20, 33, 30, 50}, used=4)
         self.assertEqual(r.returncode, 1)
 
     def test_prose_mention_or_closed_carried_issue_ranked_fails(self):
         for extra in (32, 34):
             with self.subTest(extra=extra):
-                r = self.run_case("carried-over", order=[20, 31, extra], labelled={20, 31, extra}, used=3)
+                r = self.run_case("carried-over", order=[20, 33, 30, extra], labelled={20, 33, 30, extra}, used=4)
                 self.assertEqual(r.returncode, 1)
 
     def test_carried_over_fixture_renders_the_section(self):
@@ -265,15 +305,23 @@ class Cases(unittest.TestCase):
             repo = make_fixture.build(pathlib.Path(t) / "out", "carried-over")
             body = _text(repo, ".scratch/issues/02-release-2.md")
             sec = re.search(r"^## Carried over\n(.*?)(?=^## )", body, re.S | re.M).group(1)
-            self.assertIn("#31", sec)
-            self.assertIn("#34", sec)
+            for n in ("#31", "#33", "#50", "#34"):
+                self.assertIn(n, sec)
             self.assertNotIn("#32", sec)
+            labels = lambda f: _text(repo, f".scratch/issues/{f}").splitlines()[2]  # noqa: E731
+            self.assertEqual(labels("31-empty-name.md"), "Labels: bug")  # no state label: an agent cannot take it
+            self.assertIn("ready-for-agent, bug", labels("33-exit-code.md"))
+            self.assertIn("enhancement", labels("50-colour.md"))
+            milestone = _text(repo, ".scratch/issues/01-milestone-1.md")
+            self.assertNotIn("#50", milestone)  # unplanned: the Milestone issue does not list it
+            self.assertLess(CASES["carried-over"]["issues"][1]["created"], "2026-10-01")  # #30 older than #33
+            self.assertIn("decision", _text(repo, ".scratch/issues/31-empty-name.md"))
             self.assertIn("#32", body)  # in Notes, shaped like a carried-over line
             self.assertIn("carried to the next Release", body)
             order = re.search(r"^## Order\n(.*?)(?=^## )", body, re.S | re.M).group(1)
-            self.assertIn("#31", order)
-            self.assertIn("#34", order)
-            self.assertIn("Used: 3", body)
+            for n in ("#31", "#33", "#50", "#34"):
+                self.assertIn(n, order)
+            self.assertIn("Used: 5", body)
 
     def test_carry_over_cut_reference_passes(self):
         r = self.run_case("carry-over-cut")
@@ -299,6 +347,78 @@ class Cases(unittest.TestCase):
             self.assertIn("Status: open", _text(repo, ".scratch/issues/02-release-2.md"))
             self.assertNotIn("Carried over", _text(repo, ".scratch/issues/02-release-2.md"))
             self.assertIn("carry #31 over", (repo.parent / "PROMPT.md").read_text())
+
+    def _carry_rerun_fixture(self, case):
+        t = tempfile.mkdtemp()
+        self.addCleanup(lambda: subprocess.run(["rm", "-rf", t]))
+        repo = make_fixture.build(pathlib.Path(t) / "out", case)
+        body = _text(repo, ".scratch/issues/02-release-2.md")
+        sec = lambda h: re.search(rf"^## {h}\n(.*?)(?=^## )", body, re.S | re.M).group(1)  # noqa: E731
+        head = lambda f: dict(ln.split(": ", 1) for ln in _text(repo, f".scratch/issues/{f}").split("\n\n", 1)[0].splitlines())  # noqa: E731
+        return repo, body, sec, head
+
+    def test_carry_reruns_render_their_state(self):
+        """Rendered input: #2 open, its Order and `## Carried over` lists, each issue's label and status."""
+        want = {  # case: (Order, carried over, labelled release-2, closed)
+            "carry-partial-rerun": ([10, 31], [31], {"10-farewell.md"}, {"10-farewell.md"}),
+            "carry-full-rerun": ([10, 31], [10, 31], set(), set()),
+            "partway-rerun": ([20, 21, 31], [31], {"20-quiet.md"}, set()),
+        }
+        for case, (order, carried, labelled, closed) in want.items():
+            with self.subTest(case=case):
+                repo, body, sec, head = self._carry_rerun_fixture(case)
+                self.assertEqual(head("02-release-2.md")["Status"], "open")
+                self.assertEqual([int(n) for n in re.findall(r"^\d+\. #(\d+)", sec("Order"), re.M)], order)
+                self.assertEqual([int(n) for n in re.findall(r"^- #(\d+) \S.*: \S", sec("Carried over"), re.M)], carried)
+                files = [f.name for f in (repo / ".scratch/issues").iterdir()]
+                for f in files:
+                    h = head(f)
+                    self.assertEqual("release-2" in h["Labels"], f in labelled, f"{case}: {f} {h['Labels']}")
+                    if f in closed:
+                        self.assertEqual(h["Status"], "closed")
+                cl = _text(repo, "CHANGELOG.md")
+                self.assertIn("## Release 1", cl)
+                self.assertNotIn("## Release 2", cl)
+                self.assertNotIn("carr", (repo.parent / "PROMPT.md").read_text().split("---")[1].lower())
+
+    def test_carry_partial_rerun_ships_ten_by_its_pull_request(self):
+        repo, *_ = self._carry_rerun_fixture("carry-partial-rerun")
+        self.assertIn("Closes #10", _text(repo, ".scratch/pulls/7.md"))
+        self.assertIn("ready-for-agent, bug", _text(repo, ".scratch/issues/31-empty-name.md").splitlines()[2])
+
+    def test_carry_full_rerun_has_only_an_issueless_merge(self):
+        repo, *_ = self._carry_rerun_fixture("carry-full-rerun")
+        self.assertEqual(sorted(f.name for f in (repo / ".scratch/pulls").iterdir()), ["5.md", "9.md"])
+        self.assertIn("No issue.", _text(repo, ".scratch/pulls/9.md"))
+
+    def test_carry_rerun_relabel_fails(self):
+        for case in ("carry-partial-rerun", "carry-full-rerun"):
+            with self.subTest(case=case):
+                r = self.run_case(case, relabel=(31,))
+                self.assertEqual(r.returncode, 1)
+                self.assertIn("FAIL carried-over #31 never gets release-2 back", r.stdout)
+
+    def test_carry_rerun_replanned_not_cut_fails(self):
+        for case in ("carry-partial-rerun", "carry-full-rerun"):
+            with self.subTest(case=case):
+                self.assertEqual(self.run_case(case, cut=False).returncode, 1)
+
+    def test_carried_issue_listed_as_shipped_fails(self):
+        r = self.run_case("carry-full-rerun", shipped=[10])
+        self.assertEqual(r.returncode, 1)
+        self.assertIn("FAIL carried-over #10 not listed as shipped", r.stdout)
+
+    def test_carry_full_rerun_carried_bug_not_last_fails(self):
+        r = self.run_case("carry-full-rerun", order=[10, 31, 21])
+        self.assertEqual(r.returncode, 1)
+
+    def test_partway_rerun_wrong_runs_fail(self):
+        for variant, failing in (("relabel", "carried-over #31 not labelled"),
+                                 ("cut", "no changelog pull request opened or merged (no cut)")):
+            with self.subTest(variant=variant):
+                r = self.run_case("partway-rerun", variant=variant)
+                self.assertEqual(r.returncode, 1, r.stdout)
+                self.assertIn("FAIL " + failing, r.stdout)
 
     def test_severe_issue_left_out_fails(self):
         e = EXPECT["severe-first"]

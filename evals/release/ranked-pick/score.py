@@ -4,9 +4,10 @@
 Usage: score.py <out-dir> <case>
 Prints one line per check (PASS or FAIL with what it saw) and exits 1 when any check fails. See
 evals/release/README.md. The checks read the release issue the run opens for "Release 3" (its Order, Left out,
-Proposed to the user and Size), the label writes, and, in the cut case, the changelog pull request and the order of
+Proposed to the user and Size), the label writes, and, in the cut cases, the changelog pull request and the order of
 the cut, close and end-of-Release blocks; in carry-over-cut, the `## Carried over` edit of the release issue
-and its order against the label removal.
+and its order against the label removal; in the carry-over reruns, that no carried-over issue gets `release-2` back;
+in partway-rerun, that "Rerun first" labels only the issue that lost its label and cuts nothing.
 """
 import pathlib
 import re
@@ -74,6 +75,8 @@ def main(out, case):
         return empty_checks(blocks, report, exp)
     if exp.get("carry"):
         return carry_checks(blocks, exp["carry"])
+    if exp.get("rerun"):
+        return rerun_checks(blocks, exp["rerun"])
 
     created = [b for b in blocks if b["op"].startswith("create an issue") and b["title"].strip() == NEXT]
     check("one release issue opened, titled Release 3", len(created) == 1, f"{len(created)} found")
@@ -84,6 +87,8 @@ def main(out, case):
         check("Order lists exactly the expected issues", sorted(got_order) == sorted(exp["order"]), f"saw {got_order}, want {exp['order']}")
     else:
         check("Order lists the expected ranked pick, in order", got_order == exp["order"], f"saw {got_order}, want {exp['order']}")
+    if exp.get("last") is not None:
+        check(f"#{exp['last']} comes last in the Order", got_order[-1:] == [exp["last"]], f"saw {got_order}")
     if exp.get("reasons", True):
         thin = [n for n, line in order if len(re.sub(r"^.*?#\d+", "", line).split()) < 4]
         check("every Order entry has a line of reason", order and not thin, f"thin: {thin}")
@@ -94,8 +99,12 @@ def main(out, case):
     label_made = any(b["op"].startswith("create a label") and b["label"].strip("` ") == NEXT_LABEL for b in blocks)
     check(f"{NEXT_LABEL} created", label_made)
 
-    left = {n for n, _ in refs(section(body, "Left out"), numbered=False)}
+    left_lines = refs(section(body, "Left out"), numbered=False)
+    left = {n for n, _ in left_lines}
     check("Left out names every ranked candidate not taken", exp["left_out"] <= left, f"saw {sorted(left)}")
+    for n, pat in exp.get("left_reason", {}).items():
+        why = [line for m, line in left_lines if m == n]
+        check(f"#{n} left out with its named reason ({pat})", any(re.search(pat, w, re.I) for w in why), f"saw {why}")
     check("nothing taken is listed as left out", not (left & added), f"both: {sorted(left & added)}")
     if exp["not_ranked"]:
         hit = exp["not_ranked"] & (set(got_order) | left | added)
@@ -115,6 +124,9 @@ def main(out, case):
         past = re.search(r"(\d+)\s+severe", size.group(3)) if size else None
         check("Size line counts the severe issues past the size", past and int(past.group(1)) == exp["past"],
               size.group(0) if size else "")
+    for n in sorted(exp.get("never_relabel", set())):
+        back = [b["k"] for b in blocks if b["op"].startswith("apply") and b["n"] == n and "release-2" in labels_split(b["add"])]
+        check(f"carried-over #{n} never gets release-2 back", not back, f"blocks {back}")
     if "cut" in exp:
         cut_checks(repo, blocks, exp["cut"], created)
     print(f"{sum(results)}/{len(results)} checks passed")
@@ -165,6 +177,29 @@ def carry_checks(blocks, carry):
     return 0 if all(results) else 1
 
 
+def rerun_checks(blocks, rerun):
+    """A planning that stopped part way: "Rerun first" labels the Order issues that lack the label, never a carried-over
+    one, and cuts, closes and opens nothing."""
+    label = f"release-{rerun['release']}"
+    added = {b["n"] for b in blocks if b["op"].startswith("apply") and label in labels_split(b["add"])}
+    check(f"{label} applied to exactly the Order issue that lost it", added == rerun["labelled"],
+          f"saw {sorted(added)}, want {sorted(rerun['labelled'])}")
+    for n in sorted(rerun["never"]):
+        check(f"carried-over #{n} not labelled", n not in added)
+    prs = [b for b in blocks if b["op"].startswith(("open a pull request", "merge a pull request"))]
+    check("no changelog pull request opened or merged (no cut)", not prs, f"{[b['op'] for b in prs]}")
+    closed = [b for b in blocks if b["op"].startswith("close") and b["n"] == rerun["release"]]
+    check(f"release issue #{rerun['release']} not closed", not closed)
+    opened = [b for b in blocks if b["op"].startswith("create an issue")]
+    check("no other release issue opened", not opened, f"{[b['title'] for b in opened]}")
+    edits = [b for b in blocks if b["op"].startswith("edit") and b["n"] == rerun["release"]]
+    kept = all(any(re.match(rf"^- #{n}\b", ln) for ln in section(b["body"], "Carried over").splitlines())
+               for b in edits for n in rerun["never"])
+    check("an edit of the release issue keeps its `## Carried over` lines", kept)
+    print(f"{sum(results)}/{len(results)} checks passed")
+    return 0 if all(results) else 1
+
+
 def cut_checks(repo, blocks, cut, created):
     git = lambda *a: subprocess.run(["git", "-C", str(repo), *a], capture_output=True, text=True).stdout.strip()  # noqa: E731
     start = git("log", "-1", "--format=%h", "--abbrev=7", "--grep", r"(#5)", "--fixed-strings")
@@ -182,6 +217,8 @@ def cut_checks(repo, blocks, cut, created):
     check("no Versions line (the repo keeps no version)", not re.search(r"^\s*Versions:", entry, re.M))
     for n in cut["shipped"]:
         check(f"#{n} listed as shipped", re.search(rf"^- .*#{n}\b", entry, re.M))
+    for n in cut.get("carried", []):
+        check(f"carried-over #{n} not listed as shipped", not re.search(rf"^- .*#{n}\b", entry, re.M))
     for n in cut["also_merged"]:
         check(f"#{n} under Also merged", re.search(rf"Also merged.*#{n}\b", entry, re.S))
     check("old entry kept below", "## Release 1" in log)
