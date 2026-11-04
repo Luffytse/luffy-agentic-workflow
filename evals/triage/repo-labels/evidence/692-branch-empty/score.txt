@@ -1,0 +1,9 @@
+PASS the run wrote tracker blocks at all
+PASS #10: no repo label applied or removed (the table is empty)
+PASS #11: no repo label applied or removed (the table is empty)
+PASS #12: no repo label applied or removed (the table is empty)
+PASS #13: no repo label applied or removed (the table is empty)
+PASS #14: no repo label applied or removed (the table is empty)
+PASS no label outside the roles is applied
+PASS every comment starts with the triage disclaimer
+8/8 checks passed

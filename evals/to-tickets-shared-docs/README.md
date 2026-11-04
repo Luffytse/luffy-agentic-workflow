@@ -45,3 +45,14 @@ Five more fresh regular-tier `claude -p` runs (file tools only, same method and 
 - Main: `hidden` PASS twice, with the same edges.
 
 `hidden` was written to make main find a pair it did not expect (01 and 03 share a glossary entry but no code, while 01 and 02 are tied in code), and main still got it right in both runs. So no case here separates the pull request's skill from main's: all four cases are a regression guard for the rule and a check against over-blocking, not a demonstrated gain. The rule is the only text that names doc lines, but a regular-tier model reading main's step 3 already orders items that rewrite one entry. `separate` was run on the branch only, and not on main.
+
+### Run for #692 (repo-label rule added to `to-tickets` step 3)
+
+Four fresh regular-tier subagents (Agent tool, file tools only), one per case (`shared`, `separate`, `hidden`, `resume`), each given the `to-tickets` and `triage` skills from the branch (head b2b7cbf, plugin 0.79.0) and the fixture's `PROMPT.md`, scored with `score.py`. Subagent runs, not a top-level session.
+
+- `shared`: PASS (02 blocked by 01).
+- `separate`: PASS (no edges).
+- `resume`: PASS (02 filed blocked by 01, no other new ticket).
+- `hidden`: the scorer reported "no Ticket carries work item 01/02/03", because the subagent wrote the acceptance criteria in its own words and no checkbox line carried the key names (`format_greeting`, `record_shout`, `record_greeting`). Read by hand, the set is correct: three tickets, 02 (log shouted greetings) blocked by 01 and 03 (record in history) blocked by 01. Recorded as a scorer key-wording miss, not a skill result; the scorer was left unchanged in this change.
+
+The change does not touch the shared-doc-lines rule, so these are regression guards.

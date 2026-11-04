@@ -1,22 +1,24 @@
 #!/usr/bin/env bash
 # Builds a loop fixture of the agentic-review eval: a small Python repo with a local Markdown tracker and pull request 1,
 # part way through its review.
-# Usage: make-fixture.sh <out-dir> <merge|after-round3|empty-round>
+# Usage: make-fixture.sh <out-dir> <merge|after-round3|after-round3-labels|empty-round>
 # Makes <out-dir>/repo and <out-dir>/PROMPT.md.
 # `merge`: branch quota has had Round 1 (R1-1 open). Since then the owner fixed R1-1, and merged main, which had changed
 #   the same function, so the merge has a conflict resolution, and that resolution swaps two operands. main also added a
 #   file with a bug of its own, which is not part of the pull request. Round 2 is next.
 # `after-round3`: branch fix has had three Rounds; Round 3 is not clean, with one open Important (real at the head) and
 #   one open "fix" Nit, and nothing has been committed since.
+# `after-round3-labels`: `after-round3`, with a Repo labels table (`backend` for the server code under app/, `frontend` for the
+#   UI under ui/) in the triage-labels doc: the bug Ticket the sort files must carry `backend` and not `frontend`.
 # `empty-round`: branch quota had a clean Round 1 (only a dismissed Nit). Since then the owner merged main, which had changed
 #   the same function; the merge conflicted and its resolution is right. Round 2 is next, and it has nothing to verify:
 #   a Finder has nothing to report and no earlier Finding is open. main also added a file with a bug of its own.
 # The scoring (EXPECTED.md, score.py) stays next to this script, never in the repo or the prompt.
 # See evals/agentic-review/README.md, "Loop cases".
 set -eu
-usage="usage: make-fixture.sh <out-dir> <merge|after-round3|empty-round>"
+usage="usage: make-fixture.sh <out-dir> <merge|after-round3|after-round3-labels|empty-round>"
 out="${1:?$usage}"; case_="${2:?$usage}"
-case "$case_" in merge|after-round3|empty-round) ;; *) echo "unknown case: $case_" >&2; exit 2 ;; esac
+case "$case_" in merge|after-round3|after-round3-labels|empty-round) ;; *) echo "unknown case: $case_" >&2; exit 2 ;; esac
 [ -e "$out" ] && { echo "$out exists" >&2; exit 2; }
 mkdir -p "$out"; out="$(cd "$out" && pwd -P)"
 r="$out/repo"
@@ -85,6 +87,20 @@ cat >"$r/docs/dev-skills/triage-labels.md" <<'MD'
 | `bug` | `bug` |
 | `enhancement` | `enhancement` |
 MD
+
+if [ "$case_" = after-round3-labels ]; then
+  cat >>"$r/docs/dev-skills/triage-labels.md" <<'MD'
+
+## Repo labels
+
+Labels this repo records for its own kinds of work, each with one line saying when it applies. They are not triage roles. An empty table means the repo has none.
+
+| Label in our tracker | When it applies |
+| -------------------- | --------------- |
+| `backend` | Work on the server code under `app/`: quota rules, limits, what the functions return. |
+| `frontend` | Work on the web UI under `ui/`: layout, styling, what the page shows. |
+MD
+fi
 
 cat >"$r/docs/dev-skills/boundaries.md" <<'MD'
 # Boundary record
@@ -338,7 +354,8 @@ with <checkout> replaced by the path of a copy of this checkout's plugins/ folde
 ---
 You are the build thread of pull request 1 in this repo (\`.scratch/pulls/1.md\`). $intro
 
-Load the agentic-review skill from <checkout>/dev-skills/skills/agentic-review/SKILL.md and $task. Start subagents where
+Load the agentic-review skill from <checkout>/dev-skills/skills/agentic-review/SKILL.md, any skill it names from
+<checkout>/dev-skills/skills/<name>/SKILL.md, and $task. Start subagents where
 the skills say to. Every tracker and pull request operation goes through \`docs/dev-skills/issue-tracker.md\`. Do not
 merge the pull request; you are its owner, so make any fix or commit yourself on its branch.
 

@@ -8,6 +8,8 @@ Checks of the `triage` skill (`plugins/dev-skills/skills/triage/`). Each run get
 | --- | --- |
 | `backlog-sweep/test_cases.py` | no model session: builds the case and scores a reference run and planted wrong runs |
 | the backlog-sweep case | decision-level in a fresh session: every tracker write is a block in `.scratch/proposed-actions.md`, so nothing real is labelled, commented on or closed |
+| `repo-labels/test_cases.py` | no model session: builds both cases, checks the rendered files, and scores a reference run and planted wrong runs |
+| the repo-labels cases (`table`, `empty`) | decision-level in a fresh regular-tier session, as the backlog-sweep case (dry-run tracker, `.scratch/proposed-actions.md`) |
 
 ## Backlog-sweep case
 
@@ -38,3 +40,36 @@ No other issue gains `next-release`, no release label is applied, every comment 
 ### Self-test of the case
 
 `python3 evals/triage/backlog-sweep/test_cases.py` builds the case and scores a reference run written from the expected outcome; the reference must pass, and planted wrong runs (a duplicate closed with no link, an obsolete issue closed with no reason or as not planned, the issue left out twice expired, an expiry without "reopen to bring it back", an agent-found enhancement expired, put at or left at `ready-for-agent`, the planned feature expired, the severe issue or the feature-blocker unmarked, an extra mark, a release label applied, no summary, a comment without the disclaimer) must fail. It proves the builder and scorer agree; it is not a model run of the skill.
+
+## Repo-labels cases
+
+Gap: the `to-spec` whole-Spec rule (a label must fit the whole Spec) has no eval case, because `to-spec` is a conversation-driven synthesis skill with no seam these fixtures can score; it is covered by review of the pointer text only, and the PR's `**Eval:**` line names it.
+
+Checks of the repo labels rule `triage` holds (Roles, **Repo labels**; Spec #690, Ticket #692). [`repo-labels/make_fixture.py`](repo-labels/make_fixture.py) builds a case outside this repo: `python3 evals/triage/repo-labels/make_fixture.py <out-dir> <table|empty>` makes `<out-dir>/repo` and `<out-dir>/PROMPT.md`. The repo is a small orders app (`ui/`, `api/`) on the backlog-sweep case's dry-run local tracker, with Milestone 1 (#1), the closed Release 1 (#2) and five open `needs-triage` issues. The run is part 1 of the Triage batch for Release 1 (the sweep and the summary are skipped). The data and expected outcome are in [`repo-labels/label_case.py`](repo-labels/label_case.py). The tracker's label list also holds `performance`, `security` and `docs`, which the table does not list.
+
+Case `table`: the triage-labels doc has a Repo labels table with `frontend` (work under `ui/`) and `backend` (work under `api/`).
+
+| Issue | Fixture | Expected |
+| --- | --- | --- |
+| #10 | UI bug: the Pay button text is cut off (`ui/cart.html`) | ends with `frontend`, not `backend` |
+| #11 | CONTRIBUTING.md names a test command that does not exist | neither label |
+| #12 | the orders list is slow, one query per order (`api/orders.py`) | ends with `backend`, not `frontend`, and none of `performance`, `security`, `docs` |
+| #13 | already carries `frontend`; the work is all in `api/export.py` | `frontend` removed, `backend` added, and a comment on #13 that names `frontend` |
+| #14 | UI bug (`ui/footer.html`) carrying `backend`; the prompt says the user asked that #14 keep it (the issue also holds the owner's comment as colour) | `backend` still on it (removing it fails) |
+
+No label outside the roles and the table is applied or created, and every comment starts with the triage disclaimer.
+
+Case `empty`: the same backlog and the same labels on the issues, with the Repo labels table empty. No issue gains or loses `frontend` or `backend`, and no label outside the roles is applied (a repo with no Repo labels rows sees no change).
+
+Which cases discriminate: in the first runs neither case separated the branch from main (main's agent applied the table's labels itself), so both are regression guards for the rule, and `empty` guards "no rows, no change". Scorers read outcomes only: each issue's labels after the run's Apply / remove labels blocks, the comments on it and any label created, never how a comment is phrased.
+
+### Running the cases
+
+1. Build each case into its own scratch directory outside this repo.
+2. Start a **fresh** session at the **regular** tier (load `model-tiers` for the model), working directory `<out-dir>/repo`, and give it only the text between the `---` lines of `<out-dir>/PROMPT.md`, with `<checkout>` replaced by the checkout under test. Keep this README, `label_case.py`, `score.py` and `test_cases.py` away from it.
+3. Score it: `python3 evals/triage/repo-labels/score.py <out-dir> <table|empty>`. It prints one line per check and exits 1 when any fails.
+4. Run it on the branch's skill and on main's (`git archive <main sha> plugins | tar -x -C <dir>`, so the session reads the skills but not `evals/`), and record both in [RESULTS.md](RESULTS.md); keep each run's `.scratch/proposed-actions.md` and score in `repo-labels/evidence/<ticket>-<branch|main>-<case>/`.
+
+### Self-test of the cases
+
+`python3 evals/triage/repo-labels/test_cases.py` builds both cases, checks what a session would read (the Repo labels rows are in the doc for `table` and absent for `empty`; #13 carries `frontend` and names only an API file; #14 carries `backend`, names only a UI file and holds the owner's comment; no issue body names a label, and the prompt names only `backend`, in the line where the user asks that #14 keep it; the tracker lists the unlisted labels), then scores a reference run written from the expected outcome. The reference must pass, and planted wrong runs (a UI bug given both labels or none, an unmatched issue given a label, an unlisted label applied or created, the stale label left on, or removed with no comment or one that does not name it, the user-named label removed, a comment without the disclaimer, and for `empty` a repo label applied or removed) must fail. It is not a model run of the skill.

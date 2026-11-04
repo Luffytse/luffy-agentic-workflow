@@ -8,6 +8,7 @@ Behaviour checks for the review: `agentic-review` (Round 0) and `review-rounds` 
 - **Loop, `merge`:** does Round 2 after a merge of main review only the pull request's commits and the merge's conflict resolution, with one Finder and one Verifier?
 - **Loop, `empty-round`:** does a Round 2 in which the Finder returns no candidate and no Finding is open start no Verifier, go to Rank, and say in its comment that no candidates went to a Verifier?
 - **Loop, `after-round3`:** after a Round 3 that is not clean, does the open Important become a bug Ticket, the Nit get dropped, and the pull request become ready to merge, with no Round 4 and no question to the user?
+- **Loop, `after-round3-labels`:** the same sort in a repo whose triage-labels doc has a Repo labels table (`backend` for the server code under `app/`, `frontend` for the UI under `ui/`): does the bug Ticket carry `backend` and not `frontend`? The plain `after-round3` case, which has no table, also checks that the bug Ticket carries no label beyond `bug` and `ready-for-agent`.
 - **Script briefs:** does a fresh top-level-style session, following `review-rounds`, write a Round's Finder and Verifier briefs by running the plugin's brief script, so the files are the script's own? Rerun when `review-rounds` or `review_briefs.py` changes how a Round is briefed.
 
 Every case's builder has a test that builds it and checks it holds what the case needs; run them after changing a builder or a skill file they read. None of them starts an agent:
@@ -32,6 +33,7 @@ bash evals/agentic-review/loop/test-fixture.sh
 | Loop, `merge` | full build-flow in a top-level session: Round 2 starts a Finder and a Verifier |
 | Loop, `empty-round` | full build-flow in a top-level session: Round 2 starts a Finder; the score reads the comment's `Verifier: none` line, and that no Verifier was started is checked by hand. No model run is recorded yet (the builder, scorer and reference outcomes are tested; no agent has run it) |
 | Loop, `after-round3` | steps say a top-level session that can start subagents; the sort needs no Finder, so decision-level in a subagent may show it (guess, not yet tried) |
+| Loop, `after-round3-labels` | as `after-round3`; no model run is recorded: the sort starts a premium-tier subagent, which a decision-level subagent cannot do, so the run needs a top-level session (the stated gap of Ticket #692). The builder, scorer and reference outcomes are tested; no agent has run it |
 | the builders' tests | no model session |
 
 ## Files
@@ -42,7 +44,7 @@ bash evals/agentic-review/loop/test-fixture.sh
 - `briefs.sh`: builds the Round 1 Finder briefs for the planted fixture by calling `plugins/dev-skills/skills/review-rounds/review_briefs.py` (`round1`), the one builder; with `--verify-only` it splits `VERIFY-ONLY.md` into one report per Finder and calls `review_briefs.py verify`. It holds no brief text. `test-briefs.sh` checks what it builds (the files, and that the fixture's spec and Always check line reach the right brief); what each brief holds from the skill files is tested in `evals/review-briefs/`.
 - `script-briefs/`: the Script briefs case: `make-case.sh`, `PROMPT.md`, `messages/` (the Finders' canned final messages), `score.py`, `test_score.py`.
 - `round0/`: `make-fixture.sh`, `test-fixture.sh`, `EXPECTED.md`.
-- `loop/`: `make-fixture.sh` (cases `merge`, `after-round3` and `empty-round`), `score.py` (scores a run from the files it left), `reference.sh` (hand-made right and wrong outcomes for the scorer's self-test), `test-fixture.sh`, `EXPECTED.md`.
+- `loop/`: `make-fixture.sh` (cases `merge`, `after-round3`, `after-round3-labels` and `empty-round`), `score.py` (scores a run from the files it left), `reference.sh` (hand-made right and wrong outcomes for the scorer's self-test), `test-fixture.sh`, `EXPECTED.md`.
 - `RESULTS.md`: one entry per run.
 
 Keep `EXPECTED.md`, `VERIFY-ONLY.md`, `score.py` and `RESULTS.md` away from the reviewing agents: they work in the scratch repo, not in this one.
@@ -88,8 +90,9 @@ A Round whose briefs come from the plugin's brief script. Scoring: [`script-brie
 
 - `merge`: Round 1 is posted (R1-1 open); since then a fix commit and a merge of `main` whose conflict resolution swaps two operands. `main` also brought in a bug of its own. Round 2 is next.
 - `after-round3`: three Rounds are posted; Round 3 is not clean, with one real open Important and one "fix" Nit.
+- `after-round3-labels`: `after-round3` in a repo whose triage-labels doc has a Repo labels table (`backend`, `frontend`).
 
-1. `bash evals/agentic-review/loop/make-fixture.sh <out-dir> <merge|after-round3>` makes `<out-dir>/repo` and `<out-dir>/PROMPT.md`.
+1. `bash evals/agentic-review/loop/make-fixture.sh <out-dir> <merge|after-round3|after-round3-labels|empty-round>` makes `<out-dir>/repo` and `<out-dir>/PROMPT.md`.
 2. Copy this checkout's `plugins/` folder to a directory of its own, as for Round 0.
 3. Give a fresh top-level session that can start subagents the text between the lines of `PROMPT.md`, its working directory `<out-dir>/repo`, `<checkout>` replaced by that copy's path. One run per case.
 4. Run `python3 evals/agentic-review/loop/score.py <case> <out-dir>`, score the hand-scored points in `loop/EXPECTED.md` from the session's report and tool calls, and record the run in `RESULTS.md`.

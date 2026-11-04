@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Score a run of a loop fixture from what it left in the repo: the pull request's comments, the issues and the branch.
 
-Usage: score.py <merge|after-round3|empty-round> <out-dir>   (the directory make-fixture.sh built, after the run)
+Usage: score.py <merge|after-round3|after-round3-labels|empty-round> <out-dir>   (the directory make-fixture.sh built, after the run)
 Prints one line per check and exits 1 if any fails. It reads files only; it judges outcomes, never wording.
 """
 import re
@@ -112,7 +112,7 @@ elif case == "empty-round":
         check("the Round comment says no candidates went to a Verifier", re.match(r"Verifier: none\b", verifier) is not None)
         check("the table has no rows", rows(text) == [])
         check("Result is clean", re.search(r"^Result: clean$", text, re.M) is not None)
-elif case == "after-round3":
+elif case in ("after-round3", "after-round3-labels"):
     head = git("rev-parse", "fix")
     c3 = (pulls / "03-round-3.md").read_text()
     check("Round 3's head is still the branch head (nothing new committed or reviewed)", marker(c3, "head") == head)
@@ -124,6 +124,11 @@ elif case == "after-round3":
         body = new[0].read_text()
         labels = next((l for l in body.splitlines() if l.startswith("Labels:")), "")
         check("the issue carries the bug and ready-for-agent labels", "bug" in labels and "ready-for-agent" in labels)
+        have = {x.strip() for x in labels.partition(":")[2].split(",") if x.strip()}
+        # With a Repo labels table the bug is server code, so it carries backend and not frontend; with no table, no repo label.
+        want = {"bug", "ready-for-agent", "backend"} if case == "after-round3-labels" else {"bug", "ready-for-agent"}
+        check("the issue carries the repo labels that fit and no other label" if case == "after-round3-labels"
+              else "the issue carries no label beyond bug and ready-for-agent (no Repo labels table)", have == want)
         check("the issue names R3-1's location", re.search(rf"app/quota\.py:{bad}\b", body) is not None)
         check("the issue links the pull request", ".scratch/pulls/1" in body or "pull request 1" in body.lower())
         check("the issue is not about the Nit", "mysterious name" not in body and "`n`" not in body)
@@ -133,7 +138,7 @@ elif case == "after-round3":
     check("Round 3's Result says it was sorted",
           re.search(r"^Result: sorted after Round 3: 1 bug Tickets?, 0 dismissed$", c3, re.M) is not None)
 else:
-    raise SystemExit("usage: score.py <merge|after-round3|empty-round> <out-dir>")
+    raise SystemExit("usage: score.py <merge|after-round3|after-round3-labels|empty-round> <out-dir>")
 
 print("PASS" if fails == 0 else f"{fails} check(s) failed")
 sys.exit(1 if fails else 0)

@@ -171,7 +171,7 @@ Pass: yes | no. <one line on what to change in agentic-review, if anything>
 For the loop cases (scored by `loop/score.py` and `loop/EXPECTED.md`):
 
 ```
-### <date>, dev-skills <version>, Loop: <merge | after-round3>
+### <date>, dev-skills <version>, Loop: <merge | after-round3 | after-round3-labels | empty-round>
 
 score.py: <its output, PASS or the failed checks>
 Hand-scored: <the diff command used; the subagents started, with their tiers; the report to the caller; any question to the user>
@@ -179,6 +179,15 @@ Pass: yes | no. <one line on what to change in review-rounds, if anything>
 ```
 
 ## Runs
+
+### 2026-11-04, branch `ticket-692` (Ticket #692, Spec #690), dev-skills 0.78.1 (base, main 56def67), Loop: `after-round3-labels`
+
+Setup: the `after-round3-labels` case (`loop/make-fixture.sh <out-dir> after-round3-labels`), written before the skill text; `review-rounds` now has the bug Ticket take the repo labels that fit by `triage`'s rule. The plain `after-round3` case gains a check that its bug Ticket carries no label beyond `bug` and `ready-for-agent`.
+
+- **Self-test:** `bash evals/agentic-review/loop/test-fixture.sh`: all checks pass (a right sort with `bug`, `ready-for-agent`, `backend` passes `after-round3-labels`; no repo label, `frontend` instead, and `backend` plus `frontend` each fail; the plain case fails an extra `backend`).
+- **Main's skill, literal walkthrough (red):** main's `review-rounds` files the bug Ticket with the `bug` and `ready-for-agent` labels only, so `after-round3-labels` fails on the labels check; `after-round3` passes.
+- **Runs: not made (the one stated gap).** Both cases need a top-level session that can start the premium-tier sorter subagent after Round 3; a decision-level subagent cannot start one, and the Spec thread's runs were decision-level subagents. The run cannot be made from where the thread runs, so no branch or main run of `after-round3-labels` or `after-round3` is recorded. The case's reference run and self-test pass (`test-fixture.sh`, above), and the rule they exercise is `triage`'s, which the `triage` and `to-tickets` runs cover.
+- **Eval:** behaviour change, so the case runs on the branch's skill and on main's (ADR 0013).
 
 ### 2026-11-02, dev-skills 0.29.0, Spec #400 pull request #444, Deep
 

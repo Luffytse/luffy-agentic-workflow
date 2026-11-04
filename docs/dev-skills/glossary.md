@@ -57,7 +57,7 @@ The label of the optional agent-only triage role: it marks an issue for one codi
 _Avoid_: assignee, owner
 
 **Repo label**:
-A label the repo records in the **Repo labels** table of its `docs/dev-skills/triage-labels.md`, with a one-line "when it applies" (this repo's table is empty). It is not a triage role, not an Agent label and has no effect beyond sitting on the issue. `setup-dev-skills` records the table and creates new labels; dropping a row stops the repo recording the label and deletes nothing from the tracker. An empty table means the repo has none.
+A label the repo records in the **Repo labels** table of its `docs/dev-skills/triage-labels.md`, with a one-line "when it applies" (this repo's table is empty). It is not a triage role and not an Agent label. `triage` owns the rule that applies it: apply each label whose line fits the issue, by the agent's judgement, and any label the user named for the issue; never apply a label that is not in the table unless the user named it; remove one only when it no longer fits, with a one-line comment saying why, and never one the user named. `to-spec` applies the rule to the Spec as a whole, `to-tickets` to each Ticket on its own work (a label the user named for the Spec goes on every Ticket) and `review-rounds` to each bug Ticket it files, each pointing to `triage`; builders read none and a label routes no work. `setup-dev-skills` records the table and creates new labels; dropping a row stops the repo recording the label and deletes nothing from the tracker. An empty table means the repo has none.
 _Avoid_: custom role
 
 **Milestone**:
