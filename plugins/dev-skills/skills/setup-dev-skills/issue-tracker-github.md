@@ -36,6 +36,11 @@ When set to `yes`, PRs run through the same labels and states as issues, using t
 
 GitHub shares one number space across issues and PRs, so a bare `#42` may be either: resolve with `gh pr view 42` and fall back to `gh issue view 42`. REST: `gh api repos/<owner>/<repo>/issues/42` answers for both, and it is a PR when the response has a `pull_request` key.
 
+## Merging a pull request
+
+- **Merge a PR**: with the pull request's number, the method and the title the caller names. A squash takes the pull request's body as its commit message: save the body with `gh pr view <number> --json body --jq .body > <file>`, then `gh pr merge <number> --squash --subject '<title>' --body-file <file>`. A merge commit: `gh pr merge <number> --merge --subject '<title>'`. The single quotes and the file keep the shell from expanding backticks and `$(...)` in them; an apostrophe in the title is written as `'\''`. REST, where `gh pr` fails for lack of GraphQL: read the body with `gh api repos/<owner>/<repo>/pulls/<number> --jq '.body // ""' > <file>`, then `gh api --method PUT repos/<owner>/<repo>/pulls/<number>/merge -f merge_method=squash -f commit_title='<title>' -F commit_message=@<file>`, or `-f merge_method=merge -f commit_title='<title>'` for a merge commit.
+- **Read whether a PR merged**: `gh api repos/<owner>/<repo>/pulls/<number> --jq .merged` prints `true` only for a merged pull request. A failed read or any other output means not merged.
+
 ## When a skill says "publish to the issue tracker"
 
 Create a GitHub issue.

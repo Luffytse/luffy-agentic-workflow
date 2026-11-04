@@ -77,7 +77,7 @@ On **no**, write no release doc. On **yes**, ask these in order, one answer each
 - the **cut steps**: anything else the cut must change or run, after the changelog entry is written (recommended: **none**); on Releases bump, ask whether the bump pull request must change or run anything else, such as a second file that repeats the version, and on pull requests bump, whether the bump commit must (recommended: **nothing**);
 - the **whole-Release check**: the checks to run on the changelog pull request's branch, and any clean-up pass (recommended: the repo's own checks).
 
-Write the seed's matching "Policy:" section and delete the other two. A repo with no version still gets a release doc, with policy none and no version fields. The Releases bump section carries the semver sizes and the bump pull request's steps, so write them from the seed.
+Write the seed's matching "Policy:" section and delete the other two. A repo with no version still gets a release doc, with policy none and no version fields. The Releases bump section carries the semver sizes and the bump pull request's steps, and the pull requests bump section the bump each merge takes, so write them from the seed.
 
 On a re-run over a release doc that has a "Bump mode" line and no versioning policy, take that mode as the policy (and its Version file, Release name and whole-Release check as the answers), and ask for every field the doc lacks: usually the Release size and the cut steps, and the Release name form too when the doc has none.
 
@@ -87,7 +87,7 @@ On a re-run over a release doc that has a "Bump mode" line and no versioning pol
 
 > Which actions must come to you for approval, for example deleting production or customer data? (recommended: **none** for a repo with no data of value, else ask the user to name them)
 
-An empty answer to the second question is valid. The build skills read this record in place of a fixed list when they decide who merges, for every pull request, so never add actions the user did not name.
+An empty answer to the second question is valid. `merging` reads this record in place of a fixed list when it decides who merges, for every pull request, so never add actions the user did not name.
 
 > Is there a budget agents must stay within, such as a paid service, an API quota or a token limit? (recommended: **none**)
 

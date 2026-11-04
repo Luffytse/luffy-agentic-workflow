@@ -94,9 +94,17 @@ cat > "$r/docs/dev-skills/release.md" <<'MD'
 - **Version file**: `VERSION`, its only line. A bump changes only this value in it.
 - **Changelog**: `CHANGELOG.md`, newest entry first.
 
-## The bump commit
+## The bump at merge
 
-The merging thread adds it as the pull request's last commit, just before merge, with the number the coordinator gives then:
+A merge-time step: the merging thread takes it just before the merge of each pull request that changes a file under `src/`, the user's merge too. A pull request that changes none of them gets no number and no bump.
+
+1. Get the next version number just before the merge, from the coordinator, and wait for it.
+2. Have the committer the merge names add the bump as the pull request's last commit, with the bump commit's steps below, and push.
+3. If main moves before the merge and the merge-time steps run again: while main's version is unchanged, keep the bump commit and its number (get no new number, add no second bump commit). When main's version changed, get a new number; the committer merges main in, resolves the version file by taking main's, and redoes the bump as a new commit after that merge, superseding the old bump.
+
+"Last commit" means the last of the pull request's own work, so a merge of main after the bump is fine.
+
+## The bump commit
 
 - Change the version in the version file, and nothing else in it.
 - Commit as `chore(release): <version>`.

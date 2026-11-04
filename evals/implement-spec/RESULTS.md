@@ -18,6 +18,22 @@ Pass: yes | no. Lessons: <what to change in implement-spec, if anything>
 
 ## Runs
 
+### 2026-11-04, commit ad8ab26 (the Spec branch, claude/project-thread-vk76z1), dev-skills 0.62.0 (no bump yet): #643 closing case, branch's and main's skills
+
+Run level: decision-level in a session.
+Setup: the closing case ran twice, on fresh dry-run fixtures built by `closing/make_fixture.py` into a scratch runs directory (`c-branch`, `c-main`), each a fresh premium-tier subagent given only the prompt text. The branch's skills were a `git archive` of the `plugins/` folder at `ad8ab26`; main's were a `git archive` of `origin/main` at `9367726`.
+Score: `closing/score.py` on each run: 11 PASS, 0 FAIL, for both the branch's and main's.
+Not exercised: a full build-flow in a top-level session with real tracker writes; steps 1 to 7. Still owed: the merge-authority cases through step 8's new `merging` load, and the premium case check of Spec #626, once it lands.
+Pass: yes, decision-level. Lessons: none.
+
+### 2026-11-04, branch `ticket-643` off `fff4fb0` (the Spec branch, claude/project-thread-vk76z1), dev-skills 0.62.0 (no bump): #643 closing case, self-test, model runs recorded above
+
+Run level: no model session.
+Setup: `python3 evals/implement-spec/closing/test_cases.py`, which builds the fixture with `closing/make_fixture.py` and scores a reference run, ten planted wrong runs and a real-write run.
+Score: `OK: 1 case, 12 scored runs`: the reference run passes; every planted wrong run fails on the check it plants (`-v` lists them).
+Not exercised: everything a model run covers; the closing case's model runs are recorded in the entry above. Still owed: the premium case check of Spec #626, once it lands, and the merge-authority cases through step 8's new `merging` load.
+Pass: n/a (self-test only). Lessons: none yet.
+
 ### 2026-11-04, commit `0027423` (`ticket-638`), dev-skills 0.61.0 (no bump): #638 merge-authority and corrective-check decisions, spec flow
 
 Run level: decision-level in a subagent

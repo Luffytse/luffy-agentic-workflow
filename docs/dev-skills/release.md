@@ -2,7 +2,7 @@
 
 How this repo versions `dev-skills` and cuts a Release with the `release` skill: where the version lives, how a pull request bumps it, where the changelog goes, how Releases and their labels are named, and the whole-Release check (see [ADR 0008](adr/0008-each-skill-change-bumps-the-plugin-version.md)).
 
-- **Bump mode**: pull requests bump. Every pull request that changes a file under `plugins/dev-skills/skills/` bumps the version as its last commit, with the number the coordinator hands out just before merge (see "Version hand-out" and "The bump commit" below; `CLAUDE.md` "Merge-time steps" states the rules). A Release opens no bump pull request: the `release` skill writes the changelog entry in a changelog pull request, runs the whole-Release check and closes the release issue with its notes.
+- **Bump mode**: pull requests bump. Every pull request that changes a file under `plugins/dev-skills/skills/` bumps the version as its last commit, with the number the coordinator hands out just before merge (see "The bump at merge", "The bump commit" and "Version hand-out" below; `CLAUDE.md` "Merge-time steps" states the rules). A Release opens no bump pull request: the `release` skill writes the changelog entry in a changelog pull request, runs the whole-Release check and closes the release issue with its notes.
 - **Version file**: `plugins/dev-skills/.claude-plugin/plugin.json`, the `"version"` field. This is the canonical source for reading the current version, and for locating Releases up to 0.25.0 in git history.
 - **Synchronized version copy**: `plugins/dev-skills/.codex-plugin/plugin.json`, the `"version"` field. A bump changes only the version field in both manifests, to the same version. Do not use this copy to locate Release history: its creation introduces the existing version without cutting a Release.
 - **Changelog**: `plugins/dev-skills/CHANGELOG.md`, newest entry first. One entry per Release, covering everything since the last Release, listing the versions it delivered and its start and end commits (its `Versions:` and `Commits:` line).
@@ -18,9 +18,19 @@ How this repo versions `dev-skills` and cuts a Release with the `release` skill:
 
 Releases here cover the `dev-skills` plugin only. `dai-portal-data` has no release doc of its own yet, so its version is left as it is.
 
+## The bump at merge
+
+A merge-time step, which the merging thread takes when the `merging` skill runs the repo's merge-time steps (`implement`, `implement-spec` and `release` load `merging` at their merge step): just before the merge of each pull request that changes a file under `plugins/dev-skills/skills/`, the user's merge too. A pull request that changes no such file gets no number and no bump.
+
+1. Get the next version number just before the merge, from the coordinator as "Version hand-out" below says, and wait for it.
+2. Have the committer the merge names (an Implementer of the merging thread) add the bump as the pull request's last commit, with "The bump commit" steps below, and push.
+3. If main moves before the merge and the merge-time steps run again: while main's version is unchanged, keep the bump commit and its number (ask for no new number, add no second bump commit). When main's version changed, ask again (see "A repeat" below); the committer merges main in, resolves the version files by taking main's, and redoes the bump as a new commit after that merge, superseding the old bump.
+
+"Last commit" means the last of the pull request's own work, so a merge of main after the bump is fine.
+
 ## The bump commit
 
-The merging thread adds it as the pull request's last commit, just before merge, with the number the coordinator handed out:
+The last commit of the pull request's own work, with the number the coordinator handed out:
 
 - Update both manifests to the same version; leave their other fields unchanged. The `codex-packaging` check rejects drift.
 - Before pushing, run `bash scripts/check-plugin.sh` and `claude plugin validate .`.

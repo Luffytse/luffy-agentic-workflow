@@ -77,7 +77,7 @@ A merge's conflict resolutions are new commits, and the next Round reviews them,
 
 ## When a person is needed
 
-Only when a fix, a design answer, a bug Ticket or the merge would cross something the project's Boundary record lists. Then set the Round comment's Result to `waiting on a boundary: <what would be crossed>`, and tell your caller which Finding and which boundary. The user's answer clears it (see Resuming). Nothing else stops the review for a person.
+Only when a fix, a design answer, a bug Ticket or the merge would cross a boundary, as the `merging` skill defines a crossing (load it by name and read only its "Who merges" part, not the merge flow). Then set the Round comment's Result to `waiting on a boundary: <what would be crossed>`, and tell your caller which Finding and which boundary. The user's answer clears it (see Resuming). Nothing else stops the review for a person.
 
 ## Pre-existing Findings
 

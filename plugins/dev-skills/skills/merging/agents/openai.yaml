@@ -1,0 +1,5 @@
+interface:
+  display_name: "Merging"
+  short_description: "Finish a ready pull request: who merges, merge-time steps, merge, close"
+policy:
+  allow_implicit_invocation: true
