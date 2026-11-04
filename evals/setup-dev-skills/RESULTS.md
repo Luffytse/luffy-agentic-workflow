@@ -16,6 +16,24 @@ Pass: yes | no. Lessons: <what to change, if anything>
 
 ## Runs
 
+### 2026-11-04, commit 7d7e8b8, base d66fb5b, dev-skills 0.75.1: case 3, Repo labels (Ticket #691)
+
+Setup (decision-level subagent runs, not a top-level session; reported by the coordinator): the fixtures of `make_repo_labels_fixture.py` (`fresh`, `rerun-drop`, `none`), scored with `score_repo_labels.py`. Fresh regular-tier subagents, one per case per skill version (this branch's `setup-dev-skills` and main's from a `git archive` of d66fb5b), each given the skill folder and the case's `PROMPT.md`, with a logging `gh` stub on PATH.
+Conversation: the scripted answers of `PROMPT.md`.
+File written: `docs/dev-skills/triage-labels.md` with the Repo labels table, as scored below.
+Not exercised: a real remote, the Section E and F paths beyond the scripted answers.
+Self-test: `python3 evals/setup-dev-skills/test_repo_labels.py` prints `ok`: the rendered prompts and repos say what each case means, a reference run per case passes, 22 planted wrong runs fail.
+Branch (7d7e8b8), regular tier:
+- `fresh`: PASS, every check.
+- `rerun-drop`: PASS, all 13 checks. It offered `docs-only` as a candidate, asked the question with recommended yes, dropped the `backend` row only, kept the tracker label and deleted nothing.
+- `none`: PASS, every check (empty table, question recommended no, no candidates).
+Main (d66fb5b), regular tier:
+- `fresh`: FAIL. No `## Repo labels` section, `security` not created and not in the tracker, no candidates offered, no labels-of-its-own question and so no recommended no.
+- `none`: FAIL only on "the doc has a `## Repo labels` section with a table": main ignores that seed section. Its agent asked the question itself from the prompt and recommended no.
+- `rerun-drop`: PASS, every check. The case does not tell main from the branch: main's agent kept the `frontend` row, dropped `backend` from the doc, deleted no label and asked a labels-of-its-own question recommended yes on its own, because the prompt names the drop.
+Note: the runs above used the skill text at 757cbcc/7d7e8b8; a later edit, in 012145c on the Spec branch, drops the phrase "its description" from the line-drafting step because List labels returns names only. The runs were not repeated: the fixtures do not depend on that source.
+Pass: yes. The branch passes 3 of 3; main fails `fresh` and `none`. `rerun-drop` is a regression guard for the never-delete rule, not a branch-versus-main discriminator. Lessons: a prompt that names the drop and the rows lets main reach the same outcome; a harder `rerun-drop` would not name the drop until the table is shown.
+
 ### 2026-11-04, commit (this Ticket's commit), base c29d3b1, dev-skills 0.61.0: Section E scorer and case 2 runs a to d
 
 Setup: `score_release_doc.py` on the old release doc seed (from main) and on the three fixture docs in `fixtures/`, filled from the new seed by a script, one per policy. Then the coordinator ran fresh regular-tier subagents of this branch's `setup-dev-skills` on scratch fixtures with the case 2 answers. A logging stub `gh` recorded every call, so the remote was never reached.
