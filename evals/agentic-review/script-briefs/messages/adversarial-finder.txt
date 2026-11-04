@@ -1,0 +1,7 @@
+### settle never pays the last creditor
+- Severity (proposed): Important
+- Bug class: off-by-one in a loop bound
+- Locations: splitter/split.py:27
+- Claim: The creditor loop runs over `range(len(creditors) - 1)`, so the last creditor in the sorted list is never paid. With one creditor the loop body never runs.
+- Failure scenario: Ana pays 3000 for a trip of Ana, Ben and Caro. `balances` gives `{"Ana": 2000, "Ben": -1000, "Caro": -1000}`; there is one creditor, `range(0)` is empty, and `settle` returns `[]`, so the page tells no one to pay anyone. With two creditors, the one owed less is never paid.
+- Evidence: `splitter/split.py:27` `for i in range(len(creditors) - 1):`. Spec: "`split.settle(balances)` returns transfers `(debtor, creditor, cents)` that bring every balance to zero, for any number of debtors and creditors."

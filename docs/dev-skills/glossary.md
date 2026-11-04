@@ -216,6 +216,10 @@ A short file at a repo's root telling reviewers what Important means there, what
 A reviewer agent that looks for problems and reports candidate Findings. The **standards Finder** and **spec Finder** come from Upstream; at Standard and Deep one **adversarial Finder** takes the angle that fits the change best ("what the change is missing" is one); at Deep a premium **security Finder** is added. Rounds 2 and 3 run one **later-Round Finder**, standards and spec in one.
 _Avoid_: reviewer (too broad), scanner
 
+**Brief script**:
+`review_briefs.py`, in the `review-rounds` folder: writes each Round's Finder and Verifier briefs, one complete Markdown file per agent, by cutting the text out of the skill's brief files and filling in the Round's values from git and the repo's files. The thread pastes each file whole into one fresh subagent, and builds the briefs by hand from the brief files when the script cannot run. The agentic-review eval builds its briefs with the same script.
+_Avoid_: brief builder (the eval's `briefs.sh` only calls it)
+
 **Verifier**:
 The one agent per Round (none when the Round has no candidates and no open Finding) that checks each candidate Finding, and each open Finding with any dispute of it, against the code, keeps only what it confirmed and makes the final call on it. Premium tier at Deep, regular otherwise.
 _Avoid_: judge, triage agent

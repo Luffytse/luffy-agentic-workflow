@@ -19,7 +19,15 @@ Run every Round in the **top-level session**, the one that can start subagents: 
 
 A Verifier column entry is the Verifier that runs when step 3 starts one; step 3 says when none runs.
 
-The briefs are in [FINDERS.md](FINDERS.md) and [VERIFY.md](VERIFY.md); read each when you brief that agent. At Deep, also read [DEEP.md](DEEP.md).
+The brief text is in [FINDERS.md](FINDERS.md), [VERIFY.md](VERIFY.md) and, at Deep, [DEEP.md](DEEP.md); they are its only source.
+
+## Briefing the agents
+
+Run `python3 <this skill's folder>/review_briefs.py <kind> ...` (Python 3 and git only; `--help` gives the options) to write one complete brief file per agent into a directory you name outside the work tree. Paste each file whole into one brand-new subagent, at the tier the script prints beside it. The kind is the Round: `round1` (Round 1), `later` (Round 2 or 3), `ticket` (a Ticket check), `fixed` (a diff since a fixed point), `verify` (the Verifier, after the Finders), `disputes` (the Verifier alone on disputes). You still decide what needs judgement and pass it in as files: the spec, the standards files, the adversarial angle, the earlier open Findings with their disputes, the design answers.
+
+Save each Finder's final message, unchanged, to `<finder>.md` in one directory (`standards`, `spec`, `adversarial`, `security`, or `later` for a later-Round Finder), then run `verify` over those files, with the same `--level` and `--spec` (and `--round`, `--for`) as the Round's briefs: it checks that each Finder reported (a Finding in the format, or a line saying nothing found), names any that did not (ask that Finder again, as step 2 says), and carries the reports into the Verifier's brief as written. It writes no brief when there is nothing to verify.
+
+If the script cannot run or stops on a section it cannot find, build each brief by hand from the brief files: each Finder gets only what its section lists, the Verifier what VERIFY.md lists.
 
 ## Sources, gathered once
 
