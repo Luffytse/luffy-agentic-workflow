@@ -2,6 +2,23 @@
 
 What each version of `dev-skills` brought, newest first. Each pull request that changes a skill bumps the version, and each Release adds one entry here covering everything since the last Release: its goal, the versions it delivered, the issues it shipped, and what a project using the plugin must do when something breaks. Entries up to 0.25.0 are one per version, when only a Release bumped it.
 
+## Milestone 1 · Release 10 (2026-11-04)
+
+The final Release of Milestone 1: build threads confirm their issue still holds on main, setup records repo labels that triage and planning apply, Finders share one report format with the Verifier, already-done issues close as completed, `release` handles carried-over issues, parallel Tickets never edit the same doc lines, and the evals docs and owed eval runs are cleaned up.
+
+Versions: 0.76.0, 0.77.0, 0.78.0, 0.78.1, 0.78.2, 0.79.0, 0.80.0. Commits: 0867a6b..3310320.
+
+- Finders follow one standard report format, shared with the Verifier, and write their own report file (#675, absorbs #674)
+- Done work is closed as completed, never as not planned, so its dependents unblock (#680)
+- `setup-dev-skills` records repo labels that `triage`, `to-spec`, `to-tickets` and `review-rounds` apply (#690: #691, #692)
+- Tickets that build in parallel never edit the same doc lines (#656)
+- `release` cuts a fully carried-over Release and gives every carried-over issue a place (#686, absorbs #685)
+- Build threads confirm their issue is still true on main before writing code (#671)
+- Evals docs: fixture issues carry a claim test, and a run returns its report when it cannot write the file (#681, absorbs #683)
+- The eval runs that merged pull requests left owed are run or closed out (#695)
+
+Also merged: the evals guide's regression-guard rule for a case main already passes, from Retro #702 (#705).
+
 ## Milestone 1 · Release 9 (2026-11-04)
 
 Release planning checks every open issue against main, `release` handles its empty and carried-over cases, and the team-lead eval, the Verifier-alone brief and `implement-spec`'s cleanup agree with their own rules.
