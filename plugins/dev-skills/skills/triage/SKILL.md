@@ -1,6 +1,6 @@
 ---
 name: triage
-description: "Move issues and external PRs through the triage roles (category and state), verify them, and write agent-ready briefs; at a Release end, run the Triage batch, which also sweeps the backlog. Use when the user says \"triage\" or asks to look at incoming issues or external PRs, or when a Release thread runs the Triage batch."
+description: "Move issues and external PRs through triage roles and write agent-ready briefs. Use when the user says \"triage\" or asks to look at incoming issues or external PRs, or when a Release thread runs the Triage batch."
 ---
 
 # Triage

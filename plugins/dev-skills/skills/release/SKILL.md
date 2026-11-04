@@ -1,6 +1,6 @@
 ---
 name: release
-description: "Cut a Release and plan the next one: check its issues shipped, write the changelog entry, run the release doc's cut steps and whole-Release check, close it, run triage and retro-planning, then rank every candidate and pick the next Release up to the Release size. Use when the user wants to cut a release or plan the next one, or every issue of the current Release has closed."
+description: "Cut a Release and plan the next: changelog, cut steps, close it, pick the next Release's issues. Use when the user wants to cut a release or plan the next one, or every issue of the current Release has closed."
 ---
 
 # Release

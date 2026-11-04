@@ -1,6 +1,6 @@
 ---
 name: agentic-review
-description: "Review a pull request, or the changes since a fixed point (commit, branch, tag, or merge-base). Round 0 sizes the review from the changed files: at level None the project's checks are the whole review; at Quick, Standard or Deep, review-rounds runs Finders, a Verifier (unless a Round has nothing to verify) and at most 3 Rounds. Use when the user wants to review a PR, a branch or work-in-progress changes, run a ticket check, or asks to \"review since X\"."
+description: "Review a pull request, or the changes since a fixed point (commit, branch, tag, merge-base); Round 0 sizes it, review-rounds runs it. Use to review a PR, branch or work-in-progress changes, run a ticket check, or when asked to \"review since X\"."
 ---
 
 **Round 0** sizes the review before any agent starts. You run it yourself, in the top-level session, with no subagent. It picks a **level** (None, Quick, Standard or Deep), records it, and hands over to `review-rounds` when a Round will run.

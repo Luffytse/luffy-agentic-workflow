@@ -1,6 +1,6 @@
 ---
 name: ask-matt
-description: "Route the user to the right skill or flow for their situation, from idea to ship. Use when the user asks which skill to use, where to start a new piece of work, or how the skills fit together."
+description: "Route the user to the right skill or flow, from idea to ship. Use when the user asks which skill to use, where to start new work, or how the skills fit together."
 ---
 
 # Ask Matt

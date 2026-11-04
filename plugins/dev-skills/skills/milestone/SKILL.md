@@ -1,6 +1,6 @@
 ---
 name: milestone
-description: "Plan a Milestone with the user (a small Release is a one-Release Milestone) and report at its end: write the Milestone issue (goal, features in order with acceptance criteria, exclusions, membership label; boundaries stay the Boundary record's), add a feature the user plans mid-Milestone and update the Tickets it touches, record Startup verification (the `worker-control` check plus the loaded skill version) before delivery starts, and, once every feature is merged or parked, write the Milestone report and stop for the user's Milestone review. Delivery itself is the `team-lead` skill's. Use when the user asks for a Milestone, wants new work planned as a small Release (cutting one, or planning an open Milestone's next one, is `release`'s), or to add a feature to one, when a feature the user planned is ready while a Milestone is open, when a Milestone is about to start, when its delivery reaches the Milestone review, or when the user asks whether this environment can run a Milestone unattended."
+description: "Plan a Milestone (a small Release is one), verify startup, report; delivery is team-lead's. Use when asked for a Milestone or small Release (cutting one, or planning an open Milestone's next one, is release's), to add a feature to one, or whether one can run unattended, or when a Milestone starts or reaches its review, or a feature is ready."
 ---
 
 # Milestone

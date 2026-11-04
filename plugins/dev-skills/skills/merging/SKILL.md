@@ -1,6 +1,6 @@
 ---
 name: merging
-description: Finish a pull request that is ready to merge: decide from the Boundary record whether you merge it or bring it to the user, write the `Agent-merged rules:` line, run the repo's merge-time steps, sync with main, merge with the caller's method, then confirm the merge and close its issues. Use when a build or release workflow reaches its merge step, or must decide whether an action crosses a boundary.
+description: "Finish a pull request that is ready to merge: decide from the Boundary record who merges, run merge-time steps, merge, close its issues. Use when a build or release workflow reaches its merge step, or must decide if an action crosses a boundary."
 user-invocable: false
 ---
 

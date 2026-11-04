@@ -1,6 +1,6 @@
 ---
 name: setup-dev-skills
-description: "Configure a GitHub repo for the dev-skills plugin: write its issue tracker, triage label, domain doc, release doc and Boundary record files, create the labels the skills use, and check the GitHub settings the build skills rely on. Use when the user sets up a repo for these skills, or the repo has no issue tracker or triage labels configured yet, or asks to update the repo's tracker, label, domain-doc, release-doc or Boundary-record files."
+description: "Configure a GitHub repo for the dev-skills plugin: tracker, label, domain, release and Boundary files, labels, settings. Use when the user sets up a repo for these skills, it has no tracker or triage labels configured, or those files need updating."
 ---
 
 # Set up dev-skills
