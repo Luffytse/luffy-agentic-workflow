@@ -1,0 +1,7 @@
+### Spare cents go to the last people, not the first
+- Severity (proposed): Important
+- Bug class: spare cents to the wrong people (spec mismatch)
+- Locations: splitter/split.py:11
+- Claim: `i >= len(people) - spare` gives the spare cents to the last people; the spec says the first.
+- Failure scenario: `split_evenly(1000, ["Ana", "Ben", "Caro"])` gives Caro 334 and Ana 333, where the spec gives Ana 334.
+- Evidence: `splitter/split.py:11` `if i >= len(people) - spare:`. Spec: "the spare cents go one each to the first people in the list".

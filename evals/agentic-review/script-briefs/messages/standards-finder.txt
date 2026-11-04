@@ -1,0 +1,7 @@
+### Public function without a docstring
+- Severity (proposed): Nit
+- Bug class: public function without a docstring
+- Locations: splitter/cli.py:7
+- Claim: `main` has a comment where its docstring should be, so it breaks the `REVIEW.md` Always check line that every public function in `splitter/` has a docstring.
+- Failure scenario: A reader of the module's help output finds no description of `main`, and the standing rule is broken once.
+- Evidence: `splitter/cli.py:7` `def main(argv):` followed by a `#` comment, not a docstring.

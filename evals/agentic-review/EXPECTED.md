@@ -71,3 +71,19 @@ The check passes when:
 - every Location the Verifier gives, in any answer, is `file:line` counted within that file (as `grep -n` on the `planted` tree gives it), never a line counted across the diff or a listing of several files (#98).
 
 On Deep, the one Verifier runs on the premium tier; score it the same way.
+
+## Script briefs
+
+What a Round briefed from the script leaves. The run is a fresh regular-tier subagent given `script-briefs/PROMPT.md` (Round 1 at Standard, then the Verifier's brief from three canned Finder messages in `script-briefs/messages/`); it starts no agent. `script-briefs/score.py` builds the briefs the plugin script gives for the same inputs and compares byte for byte with what the run left in `<out-dir>/repo.briefs/round/`.
+
+| id | Check | Pass when |
+|----|-------|-----------|
+| F1 | files | exactly `finder-standards.md`, `finder-spec.md`, `finder-adversarial.md` and `verifier.md` (the table of `review-rounds` at Standard names three Finders and one Verifier) |
+| B1-B3 | Finder briefs | each is identical to the script's file of that name |
+| B4 | Verifier brief | identical to the script's, so the three messages are carried over unchanged, each under its Finder, and only the Always check line the standards Finder's Bug class names is in it |
+| L1 | work tree | the repository has no new or changed file (the briefs were written outside it) |
+| H1 | by hand | the reply names the script command it ran for the Finders and for the Verifier |
+
+B1-B3 compare against the script run with exactly `--base main --head planted`, so a run that passes `--base <sha>` instead of `main` fails them too.
+
+Expected: on the branch's skill every check passes. On main's skill, which has no script, a hand-built set cannot be byte-identical, so B1-B4 fail while F1 and L1 may pass: that shows the change moved the briefs from hand-made to the script's. A run that passes B1-B4 on main's skill means the checks are too loose.
