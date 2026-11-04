@@ -112,6 +112,8 @@ Pass: yes for Case 2; Case 1 ready (above). Lessons: (1) `list_threads` can lag 
 
 ### 2026-11-03, commit 583b965 (branch `t527-harness-team`; base 36a2530), dev-skills 0.48.0 (base): claude.ai project, detection by tool names and the check still owed (check superseded by the 06:05 UTC run above)
 
+**Superseded 2026-11-04 (Ticket #695):** the coordinator's run of the check is the 06:05–07:06 UTC entry above (Case 1: ready, one scheduled arrival, accepted by the user on 2026-11-03), at the same dev-skills version 0.48.0; `worker-control` has not changed behaviour for Claude Code projects since, so no new run was made.
+
 Runner: the #527 Implementer, a subagent of the Spec thread (session `session_REMOVED`), applying Step 1 of the renamed skill by hand at 04:02 UTC. It ran no probe.
 Detection, by the table's order:
 - `mcp__hearthbot__start_thread`: absent from this agent's tools.
@@ -137,6 +139,8 @@ Not exercised: every probe. **Still owed:** the coordinator's run of the check w
 Pass: yes as a by-hand detection trace; no as the check.
 
 ### 2026-11-03, commit f410be8 (branch `t527-harness-team`; base 25708c4), dev-skills 0.48.0 (base): unknown harness, unknown-harness case
+
+**Superseded 2026-11-04 (Ticket #695):** the rerun by a fresh agent given only the skill text and `FACTS.md` is Case 2 of the 06:05–07:06 UTC entry above (a fresh subagent, passing against the README's list).
 
 Runner: the #527 Implementer, a subagent of the Spec thread, applying the skill text by hand to [unknown-harness/FACTS.md](unknown-harness/FACTS.md). Not an independent agent: this runner holds no Agent tool (see the run below), so no fresh agent could be started for it. A rerun by an agent given only the skill text and FACTS.md is still owed.
 Trace, by the skill's steps:
@@ -164,6 +168,8 @@ Not exercised: an independent agent under test; the probes themselves.
 Pass: yes, as a by-hand trace against README's case 2. Lessons: the Detect sections decide on `CLAUDECODE` first, so a non-Claude-Code harness can never half-match a Claude Code reference.
 
 ### 2026-11-03, commit f410be8 (branch `t527-harness-team`; base 25708c4), dev-skills 0.48.0 (base): Claude Code project, check run (partial, by a worker's subagent)
+
+**Superseded 2026-11-04 (Ticket #695):** the coordinator's run of the check is the 06:05–07:06 UTC entry above (Case 1: ready, one scheduled arrival, accepted by the user on 2026-11-03), at the same dev-skills version 0.48.0; `worker-control` has not changed behaviour for Claude Code projects since, so no new run was made.
 
 Runner: the #527 Implementer, a subagent of the Spec thread "Build the milestone skill redesign" (session `session_REMOVED`, `cse_REMOVED`), running Steps 1 to 5 by hand from the skill text. It is **not** the agent that will coordinate: the project coordinator is session `session_REMOVED`. So each probe whose tool this runner lacks is recorded failed with that limit, as the skill's "Who acts" says; this run proves detection only; its state reading of an existing thread corroborates the method without passing it. Run: 2026-11-03 00:35–00:44 UTC.
 Runtime: read at 00:35:49Z and again at 00:43Z.

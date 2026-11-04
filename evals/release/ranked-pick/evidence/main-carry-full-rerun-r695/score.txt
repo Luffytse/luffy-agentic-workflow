@@ -1,0 +1,24 @@
+PASS one release issue opened, titled Release 3
+PASS Order lists exactly the expected issues
+PASS #31 comes last in the Order
+PASS every Order entry has a line of reason
+PASS release-3 applied to exactly the taken issues
+PASS release-3 created
+PASS Left out names every ranked candidate not taken
+PASS nothing taken is listed as left out
+PASS next-release removed from exactly the taken marked issues
+PASS Size line gives the size and the items used
+PASS carried-over #10 never gets release-2 back
+PASS carried-over #31 never gets release-2 back
+PASS a changelog pull request writes CHANGELOG.md
+PASS the changelog pull request changes no other file (no version file)
+PASS entry headed ## Release 2
+PASS Commits line gives the start and end commits
+PASS no Versions line (the repo keeps no version)
+PASS carried-over #10 not listed as shipped
+PASS carried-over #31 not listed as shipped
+PASS #9 under Also merged
+PASS old entry kept below
+PASS an end-of-Release record for triage and one for retro-planning
+PASS cut order: pull request, merge, notes, close, triage, retro-planning, plan
+23/23 checks passed

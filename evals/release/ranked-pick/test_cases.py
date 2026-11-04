@@ -6,7 +6,7 @@ For each case it builds the fixture, writes a reference run by hand from the cas
 its label writes and, in the cut case, the cut's blocks), and scores it: the reference must pass, and planted wrong
 runs (two entries swapped, a non-severe issue taken past the size, an unplanned feature ranked, a Versions line in a
 repo with no version, the mark left on a taken issue, a severe issue left out, an old-shape release issue planned
-again instead of cut, a carried-over issue labelled again or ranked when no agent can take it) must fail. It is not a model run of the
+again instead of cut, a carried-over issue labelled again or ranked when no agent can take it, Order lines that hold only titles, size-reached issues left out for another reason) must fail. It is not a model run of the
 skill: see evals/release/README.md and RESULTS.md for the model runs.
 """
 import os
@@ -63,7 +63,7 @@ def rerun_reference(variant=None):
 
 
 def reference(case, exp, repo, order=None, labelled=None, cleared=None, left=None, versions=False, used=None, cut=True,
-              empty_issue=False, variant=None, relabel=(), left_why=None, shipped=None):
+              empty_issue=False, variant=None, relabel=(), left_why=None, shipped=None, bare=False, none_line=None):
     if exp.get("carry"):
         return carry_reference(variant)
     if exp.get("rerun"):
@@ -81,7 +81,7 @@ def reference(case, exp, repo, order=None, labelled=None, cleared=None, left=Non
         vline = "Versions: 0.1.0. " if versions else ""
         titles = {i["n"]: i["title"] for i in CASES[case]["issues"]}
         ship = exp["cut"]["shipped"] if shipped is None else shipped
-        listed = "".join(f"- {titles[n]} (#{n})\n" for n in ship) or "- Nothing shipped: every issue was carried over.\n"
+        listed = "".join(f"- {titles[n]} (#{n})\n" for n in ship) or (none_line or "- Nothing shipped: every issue was carried over.") + "\n"
         pulls = {p["n"]: p["title"].split(": ", 1)[-1] for p in CASES[case]["pulls"]}
         also = ", ".join(f"{pulls[n]} (#{n})" for n in exp["cut"]["also_merged"])
         entry = (f"## Release 2 (2026-11-04)\n\nSay goodbye and keep quiet.\n\n{vline}Commits: {start}..{end}.\n\n"
@@ -98,8 +98,9 @@ def reference(case, exp, repo, order=None, labelled=None, cleared=None, left=Non
             out.append(block(k, "Comment on an issue", "02-release-2.md",
                              f"Body:\n~~~\n<!-- release end-of-Release pass -->\n{s} ran for this Release.\n~~~")); k += 1
     titles = {i["n"]: i["title"] for i in CASES[case]["issues"]}
-    lines = "\n".join(f"{j}. #{n} {titles.get(n, '')}: taken here for the reason its group and place give." for j, n in enumerate(order, 1))
-    whys = {n: "carried over, an agent cannot take it: no state label" for n in exp.get("left_reason", {})}
+    why = "" if bare else ": taken here for the reason its group and place give."
+    lines = "\n".join(f"{j}. #{n} {titles.get(n, '')}{why}" for j, n in enumerate(order, 1))
+    whys = {n: "carried over, an agent cannot take it: no state label" for n in exp.get("left_reason", {}) if "carried" in case}
     whys.update(left_why or {})
     lo = "\n".join(f"- #{n} {titles.get(n, '')}: {whys.get(n, 'size reached or blocked')}." for n in sorted(left)) or "None."
     prop = "\n".join(f"- #{n} {titles[n]}: not listed by the Milestone issue." for n in sorted(exp.get("proposed", set()))) or "None."
@@ -139,7 +140,7 @@ CLAIMS = {
     "bye-usage": lambda r: "bye" not in _run(r).stderr,
     "quiet": lambda r: _run(r, "-q", "hello", "Ada").stdout != "Hello, Ada!",
     "shout": lambda r: "HELLO, ADA!" not in _run(r, "-s", "hello", "Ada").stdout,
-    "name-file": lambda r: _names_file_not_read(r),
+    "lower": lambda r: "hello, ada!" not in _run(r, "-l", "hello", "Ada").stdout,
     "count": lambda r: _run(r, "-n", "2", "hello", "Ada").stdout.count("Hello") != 2,
     "colour": lambda r: not re.search(r"\\033|\\e\[|tput|colou?r", _text(r, "src/greet.sh")),
     "json": lambda r: '"greeting"' not in _run(r, "--json", "hello", "Ada").stdout,
@@ -168,13 +169,6 @@ def _test_sh(repo, env=None):
     """test.sh as CI runs it, minus its 10 s sleep (slow-test checks that line on its own)."""
     return subprocess.run(["bash", "-c", "sed '/^sleep 10$/d' test.sh | bash"], cwd=repo, capture_output=True, text=True,
                           env=dict(os.environ, **(env or {})))
-
-
-def _names_file_not_read(repo):
-    with tempfile.TemporaryDirectory() as d:
-        f = pathlib.Path(d, "names")
-        f.write_text("Ada\nBob\n")
-        return "Hello, Bob" not in _run(repo, "-f", str(f), "hello").stdout
 
 
 def _profile_overwritten(repo):
@@ -289,6 +283,37 @@ class Cases(unittest.TestCase):
         r = self.run_case("carried-over", left_why={31: "size reached"})
         self.assertEqual(r.returncode, 1)
         self.assertIn("FAIL #31 left out with its named reason", r.stdout)
+
+    def test_rendered_tracker_doc_and_old_shape_issue(self):
+        with tempfile.TemporaryDirectory() as t:
+            for case in ("no-version", "old-shape-cut"):
+                repo = make_fixture.build(pathlib.Path(t) / case, case)
+                make_fixture.slug_of.clear()
+                doc = (repo / "docs/dev-skills/issue-tracker.md").read_text()
+                self.assertIn("Go on as if each write you record was made", doc)
+            two = (repo / ".scratch/issues/02-release-2.md").read_text()
+            self.assertIn("**Cap:**", two)
+            self.assertIn("## Scope", two)
+            self.assertNotIn("## Order", two)
+
+    def test_nothing_shipped_bullet_naming_carried_issues_passes(self):
+        r = self.run_case("carry-full-rerun", none_line="- Nothing shipped: every issue in this Release (#10, #31) was carried over.")
+        self.assertEqual(r.returncode, 0, r.stdout)
+
+    def test_shipped_bullet_naming_carried_issue_fails(self):
+        r = self.run_case("carry-full-rerun", none_line="- Repeat flag (#31), carried over from Release 1")
+        self.assertEqual(r.returncode, 1)
+        self.assertIn("FAIL carried-over #31 not listed as shipped", r.stdout)
+
+    def test_reorder_order_lines_with_only_titles_fail(self):
+        r = self.run_case("reorder", bare=True)
+        self.assertEqual(r.returncode, 1)
+        self.assertIn("FAIL every Order entry has a line of reason", r.stdout)
+
+    def test_size_reached_left_out_for_another_reason_fails(self):
+        r = self.run_case("size-reached", left_why={23: "blocked by #40", 30: "blocked by #40"})
+        self.assertEqual(r.returncode, 1)
+        self.assertIn("FAIL #23 left out with its named reason", r.stdout)
 
     def test_carried_over_unplanned_feature_ranked_fails(self):
         r = self.run_case("carried-over", order=[20, 33, 30, 50], labelled={20, 33, 30, 50}, used=4)

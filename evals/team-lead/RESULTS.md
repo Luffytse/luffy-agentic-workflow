@@ -17,6 +17,17 @@ Pass: yes | no. Not exercised: <what this run did not reach>. Lessons: <what to 
 
 ## Runs
 
+### 2026-11-04, main `9d1de32`, dev-skills 0.80.0 (no bump): #695 owed items of the Ticket #529 entries
+
+Run level: no model session (the snapshot against the real GitHub API); the model runs are superseded and the rest are gaps
+Runner: the #695 Ticket thread.
+Ran: `snapshot.py` on the checkout against this repo's real GitHub issues through `gh api` REST (the tracker doc's route, no stub): `python3 plugins/dev-skills/skills/team-lead/snapshot.py --repo . --worker 'id=probe;issue=695;branch=claude/project-thread-1j5xdh;started=2026-11-04T22:37:00Z' --now 2026-11-04T23:00:00Z`. It read issue 695's comments, the branch's last commit (found by the branch), and found no pull request for the branch; exit 0, one row: harness state "not given", last commit 2026-11-04T22:37:09Z, last comment 2026-11-04T22:38:13Z, no pull request, verdict **active**. The header read "tracker: GitHub (gh REST)". This is the real-API run the Ticket #529 entries listed as owed (they used only a stub `gh`).
+Superseded, not rerun: the owed model runs of the five delivery cases ran in the `0027423` entry (0.61.0) and, for `deliver-stall` and `deliver-lift`, the `578842d` entry (0.71.0), both newer than the 0.48.0 entries that listed them. `team-lead`'s other changes since (#671's `main-check-report` clause) have their own recorded runs, so the delivery cases were not run a third time on 0.80.0.
+**Stated gaps:**
+- *A run through a real Harness reference.* It cannot be made from where this thread runs: it needs a top-level session that can start, message, stop and schedule workers (the README's run-level table puts this in `worker-control`'s check), and a build thread's session cannot start the workers a delivery needs. Not made.
+- *A silent-Release-worker case.* No case exists: the Ticket #529 entry says a Release worker's silence is read by hand at a check-in and brought to the user once, and "no case covers that yet". Writing one is new eval work, not a run, so it is left as a gap for the Milestone report and a Ticket for planning; this pull request adds no case.
+Pass: yes, for what ran. Not exercised: the two gaps above. Lessons: none.
+
 ### 2026-11-04, branch `claude/project-thread-bryult` at `dde4766`, base main `91a35d3`, dev-skills 0.78.0 (no bump): `main-check-report` after Ticket #671
 
 Run level: decision-level in a subagent
@@ -68,12 +79,16 @@ Pass: no for `deliver-stall` and `deliver-lift` on the branch (one Pre-existing 
 
 ### 2026-11-04, branch `ticket-638` off `006570d`, dev-skills 0.61.0 (unbumped): Ticket #638, the lone-Release path removed
 
+**Superseded 2026-11-04 (Ticket #695):** the five delivery dry runs are in the `0027423` entry above.
+
 Run level: no model session (unit tests)
 Runner: the Implementer subagent of Ticket #638, by script.
 Ran: `test_snapshot.py` (31 tests) and `test_cases.py` (6 tests), both OK. The fixture's Milestone issue lost its `## Boundaries` section (a Milestone issue holds none now); no case or scorer check read it.
 Pass: yes, for what ran. The five delivery dry runs, owed when this entry was written, are in the entry above (`0027423`).
 
 ### 2026-11-03, branch `t529-team-lead`, dev-skills 0.48.0 (unbumped): Ticket #529 after Ticket check 3
+
+**Superseded 2026-11-04 (Ticket #695):** its owed model runs of the delivery cases are the `0027423` (0.61.0) and `578842d` (0.71.0) entries above, and `main-check-report` is the first entry; the real-GitHub snapshot is run in the first entry; the silent-Release-worker case and the real-Harness run are named gaps there.
 
 Runner: the Implementer subagent of Ticket #529, by script.
 
@@ -86,6 +101,8 @@ The case self-test still passes (6 tests).
 Pass: yes, for what ran. Still owed: as in the entry below.
 
 ### 2026-11-03, branch `t529-team-lead`, dev-skills 0.48.0 (unbumped): Ticket #529 after Ticket check 2
+
+**Superseded 2026-11-04 (Ticket #695):** its owed model runs of the delivery cases are the `0027423` (0.61.0) and `578842d` (0.71.0) entries above, and `main-check-report` is the first entry; the real-GitHub snapshot is run in the first entry; the silent-Release-worker case and the real-Harness run are named gaps there.
 
 Runner: the Implementer subagent of Ticket #529, by script.
 
@@ -101,6 +118,8 @@ Pass: yes, for what ran. Still owed: model runs of the five cases, a silent-Rele
 
 ### 2026-11-03, branch `t529-team-lead`, dev-skills 0.48.0 (unbumped): Ticket #529 after Ticket check 1
 
+**Superseded 2026-11-04 (Ticket #695):** its owed model runs of the delivery cases are the `0027423` (0.61.0) and `578842d` (0.71.0) entries above, and `main-check-report` is the first entry; the real-GitHub snapshot is run in the first entry; the silent-Release-worker case and the real-Harness run are named gaps there.
+
 Runner: the Implementer subagent of Ticket #529, by hand and by script, as below.
 
 Ran:
@@ -112,6 +131,8 @@ Ran:
 Pass: yes, for what ran. Still owed, as in the entry below: model runs of the five cases, a run through a real Harness reference, and the snapshot against the real GitHub API.
 
 ### 2026-11-03, branch `t529-team-lead` off the Spec branch of #523, dev-skills 0.48.0 (unbumped): Ticket #529
+
+**Superseded 2026-11-04 (Ticket #695):** its owed model runs of the delivery cases are the `0027423` (0.61.0) and `578842d` (0.71.0) entries above, and `main-check-report` is the first entry; the real-GitHub snapshot is run in the first entry; the silent-Release-worker case and the real-Harness run are named gaps there.
 
 Runner: the Implementer subagent of Ticket #529, in a Claude Code cloud session (a worker, not a coordinator).
 

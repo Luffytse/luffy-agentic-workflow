@@ -1,0 +1,7 @@
+PASS release-2 applied to exactly the Order issue that lost it
+PASS carried-over #31 not labelled
+PASS no changelog pull request opened or merged (no cut)
+PASS release issue #2 not closed
+PASS no other release issue opened
+PASS an edit of the release issue keeps its `## Carried over` lines
+6/6 checks passed

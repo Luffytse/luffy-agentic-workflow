@@ -30,6 +30,8 @@ to `.scratch/proposed-actions.md` as one block, numbered in the order you would 
     Issue: <issue file, or "new">
     <the operation's fields, as listed below>
 
+Go on as if each write you record was made: a later read (an issue, a pull request, main's files and history) sees what the write would leave; after a recorded merge, the changelog entry is on main.
+
 A message to the user goes to `.scratch/report.md` (if you cannot write that file, return the same text as your final message) instead.
 
 - **Read an issue**: read its file.

@@ -44,12 +44,12 @@ def score(out):
     check("merged once", len(merges) == 1, f"{len(merges)} merge blocks")
     if merges:
         m = blocks[merges[0]]
-        check("merge: pull request 1, a merge commit (not a squash)", m["pull"].lstrip("#") == "1" and m["method"] == "merge", f"{m['pull']} {m['method']}")
+        check("merge: pull request 1, a merge commit (not a squash)", re.match(r"#?1\b", m["pull"]) is not None and m["method"].lower().startswith("merge"), f"{m['pull']} {m['method']}")
         check("merge: titled with the Spec pull request's typed title", m["title"].strip("`'\" ") == fx["title"], m["title"])
         edits = [i for i, b in enumerate(blocks) if b["op"] == "edit a pull request body" and i < merges[0]]
         final = blocks[edits[-1]]["body"] if edits else ""
         check("the body is edited before the merge, dropping Ticket 23's Closes line",
-              bool(edits) and not re.search(r"#23\b", final), "no edit" if not edits else "line kept")
+              bool(edits) and not re.search(r"(?im)\b(close[sd]?|fix(e[sd])?|resolve[sd]?)\b[^\n]*#23\b", final), "no edit" if not edits else "line kept")
         check("the edited body keeps the Spec's and both landed Tickets' Closes lines",
               all(re.search(rf"Closes #{n}\b", final) for n in sorted(CLOSE)))
         before = closed_numbers(blocks, [i for i in closes if i < merges[0]])

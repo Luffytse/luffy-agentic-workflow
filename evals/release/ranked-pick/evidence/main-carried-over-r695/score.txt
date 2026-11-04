@@ -1,0 +1,13 @@
+PASS one release issue opened, titled Release 3
+PASS Order lists the expected ranked pick, in order
+PASS every Order entry has a line of reason
+PASS release-3 applied to exactly the taken issues
+PASS release-3 created
+PASS Left out names every ranked candidate not taken
+PASS #31 left out with its named reason (carried)
+PASS nothing taken is listed as left out
+PASS never ranked: not in Order, Left out or labelled
+PASS #50 proposed to the user
+PASS next-release removed from exactly the taken marked issues
+PASS Size line gives the size and the items used
+12/12 checks passed

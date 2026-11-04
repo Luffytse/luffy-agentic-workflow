@@ -5,6 +5,7 @@ wrong runs (each must fail). It proves the builder and the scorer agree; it is n
 Run: python3 evals/implement-spec/closing/test_cases.py [-v]
 """
 import pathlib
+import re
 import subprocess
 import sys
 import tempfile
@@ -38,8 +39,15 @@ REPORT = "Merged pull request 1 with a merge commit. Closed #20, #21 and #22; #2
 REFERENCE = [edit(1), merge(2), close(3, 20), close(4, 21), close(5, 22)]
 STALE = BODY.replace("Closes #22\n", "Closes #22\nCloses #23\n")
 
+BULLET = BODY.replace("Closes #22\n", "Closes #22\n- Closes #23\n")
+SHARED = BODY.replace("Closes #22\n", "Closes #22 and #23\n")
+
+NOTED = BODY.replace("Closes #22\n", "Closes #22\n\nTicket #23 was dropped by the user and stays open.\n")
+
 PLANTED = [
     ("dropped Ticket's Closes line left in the body", [edit(1, STALE), merge(2), close(3, 20), close(4, 21), close(5, 22)]),
+    ("dropped Ticket kept as a bullet Closes line", [edit(1, BULLET), merge(2), close(3, 20), close(4, 21), close(5, 22)]),
+    ("dropped Ticket kept on a shared Closes line", [edit(1, SHARED), merge(2), close(3, 20), close(4, 21), close(5, 22)]),
     ("no body edit at all", [merge(1), close(2, 20), close(3, 21), close(4, 22)]),
     ("dropped Ticket closed as completed", REFERENCE + [close(6, 23)]),
     ("dropped Ticket closed as not planned", REFERENCE + [close(6, 23, "not planned")]),
@@ -60,15 +68,51 @@ def run(out, blocks):
     return r.returncode, r.stdout
 
 
+def rendered_input(out):
+    """The rendered input says what the case means (evals guide, Fixture self-tests). Returns a list of problems."""
+    bad = []
+    repo = out / "repo"
+    prompt = (out / "PROMPT.md").read_text()
+    if "step 8" not in prompt.lower():
+        bad.append("PROMPT.md does not name step 8")
+    if not re.search(r"23.{0,80}(dropped|never landed)|(dropped|never landed).{0,80}23", prompt, re.S):
+        bad.append("PROMPT.md does not say Ticket 23 was dropped")
+    if re.search(r"remove.{0,40}Closes|reconcile", prompt, re.I):
+        bad.append("PROMPT.md states the reconcile rule")
+    pull = (repo / ".scratch/pulls/1.md").read_text()
+    if "State: open" not in pull:
+        bad.append("pull request 1 is not open")
+    for n in (20, 21, 22, 23):
+        if f"Closes #{n}" not in pull:
+            bad.append(f"pull request 1 lacks Closes #{n}")
+    for f in sorted((repo / ".scratch/issues").glob("2*.md")):
+        if "Status: open" not in f.read_text():
+            bad.append(f"{f.name} is not open")
+    log = subprocess.run(["git", "-C", str(repo), "log", "--format=%s", "main..spec-20"], capture_output=True, text=True).stdout
+    if len(log.strip().splitlines()) != 2 or "23" in log:
+        bad.append("spec-20 does not hold exactly two commits (Tickets 21 and 22), none for Ticket 23")
+    for doc in ("boundaries.md", "release.md"):
+        if (repo / "docs/dev-skills" / doc).exists():
+            bad.append(f"docs/dev-skills/{doc} exists")
+    return bad
+
+
 def main():
     failed = 0
     with tempfile.TemporaryDirectory() as tmp:
         out = pathlib.Path(tmp) / "case"
         subprocess.run([sys.executable, str(here / "make_fixture.py"), str(out)], check=True, capture_output=True)
+        for problem in rendered_input(out):
+            failed += 1
+            print("FAIL: rendered input: " + problem)
         code, text = run(out, REFERENCE)
         if code != 0:
             failed += 1
             print("FAIL: reference run does not pass\n" + text)
+        code, text = run(out, [edit(1, NOTED), merge(2), close(3, 20), close(4, 21), close(5, 22)])
+        if code != 0:
+            failed += 1
+            print("FAIL: a body that notes Ticket 23 stays open but has no Closes line for it does not pass\n" + text)
         for label, blocks in PLANTED:
             code, text = run(out, blocks)
             if code == 0:
@@ -80,7 +124,7 @@ def main():
         if run(out, REFERENCE)[0] == 0:
             failed += 1
             print("FAIL: a real file write passes the dry-run check")
-    print(("OK" if not failed else f"{failed} FAILED") + f": 1 case, {len(PLANTED) + 2} scored runs")
+    print(("OK" if not failed else f"{failed} FAILED") + f": 1 case, {len(PLANTED) + 3} scored runs")
     return 1 if failed else 0
 
 

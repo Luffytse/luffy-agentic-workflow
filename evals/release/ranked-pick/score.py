@@ -90,7 +90,9 @@ def main(out, case):
     if exp.get("last") is not None:
         check(f"#{exp['last']} comes last in the Order", got_order[-1:] == [exp["last"]], f"saw {got_order}")
     if exp.get("reasons", True):
-        thin = [n for n, line in order if len(re.sub(r"^.*?#\d+", "", line).split()) < 4]
+        titles = {int(m.group(1)): re.sub(r"^Title:\s*", "", f.read_text().splitlines()[0]) for f in sorted((repo / ".scratch/issues").glob("*.md"))
+                  if (m := re.match(r"(\d+)-", f.name)) and f.read_text().startswith("Title:")}
+        thin = [n for n, line in order if len(re.sub(r"^\W*#?\d+\W*", "", line).replace(titles.get(n, "\0"), "", 1).split()) < 3]
         check("every Order entry has a line of reason", order and not thin, f"thin: {thin}")
 
     added = {b["n"] for b in blocks if b["op"].startswith("apply") and NEXT_LABEL in labels_split(b["add"])}
@@ -218,7 +220,9 @@ def cut_checks(repo, blocks, cut, created):
     for n in cut["shipped"]:
         check(f"#{n} listed as shipped", re.search(rf"^- .*#{n}\b", entry, re.M))
     for n in cut.get("carried", []):
-        check(f"carried-over #{n} not listed as shipped", not re.search(rf"^- .*#{n}\b", entry, re.M))
+        # only a bullet that opens "Nothing shipped" and names the issue is not a shipped listing
+        listed = [l for l in re.findall(rf"^- .*#{n}\b.*$", entry, re.M) if not re.match(r"-\s*\W*nothing shipped", l, re.I)]
+        check(f"carried-over #{n} not listed as shipped", not listed)
     for n in cut["also_merged"]:
         check(f"#{n} under Also merged", re.search(rf"Also merged.*#{n}\b", entry, re.S))
     check("old entry kept below", "## Release 1" in log)

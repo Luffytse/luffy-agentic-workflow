@@ -18,6 +18,25 @@ Pass: yes | no. Lessons: <what to change in implement, if anything>
 
 ## Runs
 
+### 2026-11-04, main `9d1de32`, dev-skills 0.80.0 (no bump): #695 merge-authority and corrective-check cases, ticket flow, through the `merging` load
+
+Run level: decision-level in a subagent
+Setup: the merge-authority builder, `ticket` flow, nine cases (`no-milestone`, `inside-deep-adr`, `inside-boundary`, `outside-boundary`, `no-record-twoway`, `no-record-oneway`, `retro-inside`, `retro-outside`, `unrelated-no-issue`), one fresh regular-tier subagent per case, all in one parallel batch with the `implement-spec` runs, given the skills from a `git archive` of `origin/main` at `9d1de32` and the prompt text only. The six merge-authority cases were told that every step before the merge step was done and the review ready to merge; the three corrective-check cases got `DECISION.md`. Evidence: [`evidence/695/`](evidence/695/), one folder per case with the subagent's `decision.md`; run directory paths read `<runs>`. This run makes the merge-authority runs that the #573 and #638 entries listed as owed, now through step 7's `merging` load.
+Steps: each answer scored by hand against its case's Expected line (the six) or the corrective-check table (the three), as in the `0027423` entry.
+
+| Case | Outcome | Matches |
+| --- | --- | --- |
+| `no-milestone` | agent merge; no bump and no number asked; `Agent-merged rules: docs/dev-skills/adr/0001-greetings-go-to-stdout.md` | yes |
+| `inside-deep-adr` | agent merge; asks for `0.4.0`; `chore(release): 0.4.0` changing only `VERSION` as the last commit; the same rules line | yes |
+| `inside-boundary` | handed to the user, naming "delete production or customer data" and the Boundary record; one-way Door; no bump | yes |
+| `outside-boundary` | the same | yes |
+| `no-record-twoway` | agent merge on the empty record; the rules line | yes |
+| `no-record-oneway` | handed to the user: the empty record allows no irreversible action | yes |
+| `retro-inside`, `retro-outside`, `unrelated-no-issue` | design answer recorded as a comment on pull request 1; the Boundary record only; the thread merges with `Agent-merged rules: REVIEW.md` | yes, all three |
+
+Not exercised: steps 1 to 6, the real bump commit and merge, a regular-tier run on a branch's skill (none changes `implement` here). Single run per case, no variance estimate.
+Pass: yes, decision-level. Lessons: none. Two runs noted the pull request header's Quick level against a changed Always-check rule (arguably Standard); it changes no decision.
+
 ### 2026-11-04, branch `claude/project-thread-bryult` at `dde4766`, base main `91a35d3`, dev-skills 0.78.0 (no bump): #671 main-check case
 
 Run level: decision-level in a subagent
@@ -74,6 +93,8 @@ Pass: yes, decision-level. Lessons: none for #638.
 
 ### 2026-11-04, branch `ticket-638` off `006570d` (the Spec branch, claude/project-thread-28offd), dev-skills 0.61.0 (no bump): #638 no Milestone-issue boundaries, model runs owed
 
+**Superseded 2026-11-04 (Ticket #695):** its model runs are the `0027423` entry below, and the merge-authority cases ran again on main 9d1de32 (dev-skills 0.80.0) in the first entry of this file, through the `merging` load.
+
 Changed: step 7 (and `implement-spec` step 8) reads only the Boundary record; a Milestone issue holds no boundaries of its own, and the retro check's merge no longer reads its `Retro origin` issue's labels. The fixture's Boundary record lost its "Milestone issues" section and its Milestone issue its `## Boundaries` section; the Expected lines for `no-milestone` and `outside-boundary` and the corrective-check table now say the record applies as written.
 
 Checked: `bash evals/implement/merge-authority/test-fixture.sh` gains two fixture checks and one skill check (neither build skill names a Milestone issue's own boundaries or a Milestone-issue test); the skill check fails on the base's `implement` text (2 hits) and the whole script passes after, for both flows.
@@ -83,6 +104,8 @@ Not exercised here: everything a model run covers. The model runs, owed when thi
 Pass: n/a (a fixture check; model runs owed). Lessons: none yet.
 
 ### 2026-11-03, base d4e71bb (the Spec branch, claude/project-thread-0vecgo), dev-skills 0.52.0 (no bump): #573 one merge rule, model runs owed
+
+**Superseded 2026-11-04 (Ticket #695):** the same cases ran at dev-skills 0.61.0 in the `0027423` entry below (a newer version than this entry's 0.52.0), and again on main 9d1de32 (0.80.0) in the first entry of this file.
 
 Changed cases (fixture builder `make-fixture.sh`, `ticket` flow): `no-milestone` (now an agent merge with the `Agent-merged rules:` line), `inside-deep-adr` (new line name), `outside-boundary`, `no-record-twoway` and `no-record-oneway` (new), and the corrective-check cases `retro-inside`, `retro-outside` and `unrelated-no-issue` (all three now merge by the one rule; the Retro origin issue's labels decide only whether a Milestone issue applies). `inside-boundary` is unchanged.
 

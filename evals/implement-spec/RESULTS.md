@@ -18,6 +18,24 @@ Pass: yes | no. Lessons: <what to change in implement-spec, if anything>
 
 ## Runs
 
+### 2026-11-04, main `9d1de32`, dev-skills 0.80.0 (no bump): #695 merge-authority and corrective-check cases, spec flow, through the `merging` load; closing case on main and its case check
+
+Run level: decision-level in a subagent (merge-authority); decision-level in a session (closing)
+Setup: (1) the merge-authority builder, `spec` flow, the nine cases, one fresh regular-tier subagent per case in one parallel batch, given the skills from a `git archive` of `origin/main` at `9d1de32` and the prompt text only (the first entry of [`../implement/RESULTS.md`](../implement/RESULTS.md) holds the same nine for the ticket flow). Evidence: [`evidence/695/`](evidence/695/). (2) The closing case, one fresh premium-tier subagent on main's skills, scored with the final `closing/score.py`. Evidence: [`evidence/695-closing/`](evidence/695-closing/); the subagent's write of `report.md` was refused (#694), so the thread wrote its final message there first.
+Case check (Spec #626): a fresh premium-tier subagent that did not write the closing case returned **fix**: valid and needed, a regression guard on main's text (the reconcile rule is explicit there, as it was before `merging`), and fixes: the scorer rejected a correct body that notes Ticket #23 stays open (now it tests for a closing keyword followed by `#23` on one line, a bullet or a shared line included), the method and pull-request checks accept their usual variants, and the self-test lacked the rendered-input check (added: prompt, open pull request with four `Closes` lines, four open issues, two landed commits, no Boundary record or release doc). The self-test passes with a planted passing variant. The case is kept as a **regression guard**.
+Steps: merge-authority scored by hand as in the `0027423` entry; closing scored by `score.py`.
+
+| Case | Outcome | Matches |
+| --- | --- | --- |
+| `no-milestone`, `no-record-twoway` | agent merge (a merge commit); the rules line; no bump | yes |
+| `inside-deep-adr` | agent merge; asks for `0.4.0`; `chore(release): 0.4.0` changing only `VERSION` as the last commit; the rules line | yes |
+| `inside-boundary`, `outside-boundary`, `no-record-oneway` | handed to the user, naming the production-data deletion and the one-way Door | yes |
+| `retro-inside`, `retro-outside`, `unrelated-no-issue` | design answer on pull request 1; the Boundary record only; the thread merges with `Agent-merged rules: REVIEW.md` | yes |
+| closing, main's skills | 11/11 PASS: body edited before the merge dropping `Closes #23`, merge commit with the typed title, #20, #21 and #22 closed as completed after it, #23 never closed | yes |
+
+Not exercised: steps 1 to 7 and the real merge; the closing case on a branch's skill (no skill change here). Single run per case.
+Pass: yes. Lessons: none.
+
 ### 2026-11-04, branch `claude/project-thread-bryult` at `dde4766`, base main `91a35d3`, dev-skills 0.78.0 (no bump): #671 main-check case
 
 Run level: decision-level in a subagent. Tier: regular. Fresh subagents, one per scenario per skill version, all in one parallel batch, each given the `implement-spec` folder (the branch's at `dde4766`, or a `git archive` of `origin/main` at `91a35d3`) and `PROMPT.md` only, scored with `score.py`. Driven by the Ticket thread.
@@ -74,6 +92,8 @@ Pass: yes for the branch. Lessons: scenarios 1, 4, 5 and 6 do not separate main 
 
 ### 2026-11-04, commit ad8ab26 (the Spec branch, claude/project-thread-vk76z1), dev-skills 0.62.0 (no bump yet): #643 closing case, branch's and main's skills
 
+**Superseded 2026-11-04 (Ticket #695):** both owed items (the merge-authority cases through step 8's `merging` load, and the premium case check) are done in the first entry of this file.
+
 Run level: decision-level in a session.
 Setup: the closing case ran twice, on fresh dry-run fixtures built by `closing/make_fixture.py` into a scratch runs directory (`c-branch`, `c-main`), each a fresh premium-tier subagent given only the prompt text. The branch's skills were a `git archive` of the `plugins/` folder at `ad8ab26`; main's were a `git archive` of `origin/main` at `9367726`.
 Score: `closing/score.py` on each run: 11 PASS, 0 FAIL, for both the branch's and main's.
@@ -81,6 +101,8 @@ Not exercised: a full build-flow in a top-level session with real tracker writes
 Pass: yes, decision-level. Lessons: none.
 
 ### 2026-11-04, branch `ticket-643` off `fff4fb0` (the Spec branch, claude/project-thread-vk76z1), dev-skills 0.62.0 (no bump): #643 closing case, self-test, model runs recorded above
+
+**Superseded 2026-11-04 (Ticket #695):** the closing case's model runs are the entry above; the merge-authority cases through step 8's `merging` load ran on main 9d1de32 (0.80.0) in the first entry of this file; the premium case check of Spec #626 is in that entry too.
 
 Run level: no model session.
 Setup: `python3 evals/implement-spec/closing/test_cases.py`, which builds the fixture with `closing/make_fixture.py` and scores a reference run, ten planted wrong runs and a real-write run.
@@ -109,6 +131,8 @@ Not exercised: steps 1 to 6 (Implementer, reviewers), the real bump commit and t
 Pass: yes, decision-level. Lessons: none for #638.
 
 ### 2026-11-03, base 15d9dc740e4a887b858d6c0749be9b4647c4f2bb (the Spec branch, claude/project-thread-0vecgo, after #573), dev-skills 0.52.0 (no bump): #574 one merge rule, model runs owed
+
+**Superseded 2026-11-04 (Ticket #695):** the `spec` flow ran at dev-skills 0.61.0 in the `0027423` entry above (a newer version than this entry's 0.52.0), and again on main 9d1de32 (0.80.0) in the first entry of this file.
 
 Changed cases (shared fixture `make-fixture.sh`, `spec` flow, already built for the new rule by #573): `no-milestone` (now an agent merge with the `Agent-merged rules:` line), `inside-deep-adr` (new line name), `outside-boundary`, `no-record-twoway` and `no-record-oneway` (new), and the corrective-check cases `retro-inside`, `retro-outside` and `unrelated-no-issue` (all three merge by the one rule, membership from the originating Spec deciding only whether a Milestone issue applies). `inside-boundary` is unchanged.
 

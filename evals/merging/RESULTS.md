@@ -16,7 +16,17 @@ Pass: yes | no. Lessons: <what to change in merging or its callers, if anything>
 
 ## Runs
 
+### 2026-11-04, main `9d1de32`, dev-skills 0.80.0 (no bump), main's skills: #695 case check of the cases and `approval` rerun
+
+Run level: decision-level in a session (the run); no model session (the self-test)
+Setup: the premium case check of Spec #626, by a fresh premium-tier subagent that did not write the cases. It read the `merging` skill folder, its callers and the case files and returned: `no-record` keep, `review-md` keep, `reported-not-merged` keep, `release-bump` keep, `approval` **fix**, `no-release-doc` **drop** (it duplicated `no-record`: both build the same farewell pull request with no release doc and expect a merge with no bump). All six are **regression guards**: main before `merging` had `implement` step 7 holding every rule (the README says both runs score the same), so "fails on main" is waived for them under the guide. Fixes made: `approval` no longer requires the report to name the Boundary record (the skill asks for the action as the record lists it) and accepts "deleting" as well as "delete"; `no-release-doc` is removed from `cases.py`, the README and the self-test (`release-bump` is now paired with `no-record`); `score.py` accepts a bold or backticked `Agent-merged rules:` line; the self-test gained the rendered-input check (Boundary record or none, migration and deploy rule, `REVIEW.md` change, `deploy/` rule and the reported-merge prompt, release doc, `VERSION`). A second fresh premium check after the fixes returned keep for all five, with three small follow-ups, all made.
+Score: `approval` rerun on main's skills (one fresh premium-tier subagent, `<checkout>` a `git archive` of `origin/main` at `9d1de32`) with the final `score.py`: 6/6 PASS, nothing merged or closed, the boundary named. Its `report.md` write was refused (#694); the thread wrote the subagent's final message there before scoring. Evidence: [`evidence/695-approval/`](evidence/695-approval/). Self-test: `python3 evals/merging/test_cases.py`: OK, 5 cases, 37 scored runs.
+Not exercised: the other four cases were not rerun (their scorers changed only in the markup tolerance); the `release` and `implement-spec` callers (`implement-spec`'s merge-authority runs are in its own RESULTS).
+Pass: yes. Lessons: the stated gap the check found: no case runs an empty record with a one-way Door apart from `implement`'s `no-record-oneway`.
+
 ### 2026-11-04, commit ad8ab26 (the Spec branch, claude/project-thread-vk76z1), dev-skills 0.62.0 (no bump yet): #642 six cases, branch's and main's skills
+
+**Superseded 2026-11-04 (Ticket #695):** the premium case check of Spec #626 is in the first entry of this file.
 
 Run level: decision-level in a session.
 Setup: each of the six cases (`no-record`, `approval`, `review-md`, `reported-not-merged`, `no-release-doc`, `release-bump`) ran twice, on fresh dry-run fixtures built by the evals' own `make_fixture.py` into a scratch runs directory: 12 runs, each a fresh premium-tier subagent given only the prompt text. The branch's skills were a `git archive` of the `plugins/` folder at `ad8ab26`; main's were a `git archive` of `origin/main` at `9367726`, where `implement` step 7 holds the rule itself.
@@ -25,6 +35,8 @@ Not exercised: the premium case check of Spec #626 (not landed; still owed); a f
 Pass: yes, decision-level. Lessons: none. The branch's `merging` skill and main's `implement` step 7 gave the same scored behaviour in all six cases.
 
 ### 2026-11-04, branch `ticket-642` off `9367726` (the Spec branch, claude/project-thread-vk76z1), dev-skills 0.62.0 (no bump): #642 new cases, self-test, model runs recorded above
+
+**Superseded 2026-11-04 (Ticket #695):** the premium case check of Spec #626 is in the first entry of this file.
 
 Run level: no model session.
 Setup: `python3 evals/merging/test_cases.py`, which builds all six cases with `make_fixture.py` and scores a reference run and planted wrong runs for each.
