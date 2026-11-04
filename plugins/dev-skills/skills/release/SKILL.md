@@ -97,7 +97,7 @@ Before ranking, check every open issue that carries no release label, does not r
 
 A verdict that is not still valid carries its evidence: the file or text on main, and the commit or pull request when you find it. With 5 issues or fewer, read them yourself; with more, hand them in batches to subagents at the **premium** tier that only read and return each verdict with its evidence, and write nothing. Open the evidence of every verdict that is not still valid yourself before acting on it, and make every write yourself. Read an issue again just before writing to it; if it changed since it was checked, check it again.
 
-- **Already fixed or obsolete**: close it as not planned, with the reason and where on main. A planned feature or a Ticket of a planned Spec (closing it would change the Milestone's agreement), or an issue at `ready-for-human` (it waits on the user), is not closed: it goes to the user as one question, and a planned feature waits for the answer, unranked.
+- **Already fixed or obsolete**: close it as completed, with the reason and where on main: main already has the work, so nothing is left to do, and a planned feature it blocks is unblocked and ranked. A planned feature or a Ticket of a planned Spec (closing it would change the Milestone's agreement), or an issue at `ready-for-human` (it waits on the user), is not closed: it goes to the user as one question, and a planned feature waits for the answer, unranked.
 - **Changed scope**: update the issue: read its whole body, write it whole back with only that change and a one-line note naming what on main changed it, and read it back. A change that would alter the Milestone's goal, acceptance criteria or exclusions is not made: it goes to the user as one question, and that feature waits, unranked.
 - **Cannot tell**: leave the issue as it is; the release issue lists it as unchecked, and it is not ranked.
 - **Still valid**: no write.
@@ -121,7 +121,7 @@ A parked issue is left out, waiting on the user to lift its park. An **unplanned
 Sort every candidate into one list, in descending priority:
 
 1. **Group 1**: severe issues, then issues marked `next-release`; within each, oldest first.
-2. **Group 2**: the planned features, in the order you set this planning (below), each preceded by its open blockers in the order they must land. A blocker already placed higher stays where it is. A feature with a blocker an agent cannot take (parked, not at `ready-for-agent`, or closed as not planned, duplicate or `wontfix`, which never clears) is left out, naming that blocker.
+2. **Group 2**: the planned features, in the order you set this planning (below), each preceded by its open blockers in the order they must land. A blocker already placed higher stays where it is. A feature with a blocker an agent cannot take (parked, not at `ready-for-agent`, or closed without the work done: as not planned, duplicate or `wontfix`, which never clears) is left out, naming that blocker. A blocker closed as completed, the check against main's closes included, is cleared.
 3. **Group 3**: `ready-for-agent` bugs, oldest first.
 
 An issue that meets several conditions goes in its highest group, and first within it: a severe issue also marked `next-release` comes before the other severe issues; a bug that blocks a planned feature goes before that feature in group 2, not in group 3. Each issue appears once. A Spec is one entry, standing for its Tickets.

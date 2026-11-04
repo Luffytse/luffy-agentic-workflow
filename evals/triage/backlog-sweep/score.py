@@ -67,7 +67,8 @@ def main(out):
     check(f"duplicate #{d}'s close links the kept issue #{k}", re.search(rf"#{k}\b", said(d)), said(d)[:120])
 
     o = e["obsolete"]
-    check(f"obsolete #{o} closed", o in closes)
+    check(f"obsolete #{o} closed as {e['obsolete_outcome']} (main already does it: nothing is left to do)",
+          o in closes and closes[o]["outcome"] == e["obsolete_outcome"], closes.get(o, {}).get("outcome", "not closed"))
     check(f"obsolete #{o}'s close gives the reason", len(said(o).split()) >= 6, said(o)[:120])
 
     x = e["expired"]

@@ -85,7 +85,7 @@ The maintainer may:
 
 Only when an **enhancement** (not a bug) is *rejected* as `wontfix`. This applies to enhancement PRs exactly as it does to issues: a rejected PR is recorded here so the same request doesn't return as fresh code.
 
-Do **not** write here when something is closed as `wontfix` because it's **already implemented**. That's a built feature, not a rejected one; recording it would poison the dedup checks with false rejections. Instead, the closing comment points to where the feature already lives.
+Do **not** write here when an issue is closed because it's **already implemented**. That's a built feature, not a rejected one: it closes as completed, without the `wontfix` label, and recording it would poison the dedup checks with false rejections. Instead, the closing comment points to where the feature already lives.
 
 The flow:
 
