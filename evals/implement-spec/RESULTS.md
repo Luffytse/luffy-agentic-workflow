@@ -18,6 +18,25 @@ Pass: yes | no. Lessons: <what to change in implement-spec, if anything>
 
 ## Runs
 
+### 2026-11-04, branch `claude/project-thread-bryult` at `dde4766`, base main `91a35d3`, dev-skills 0.78.0 (no bump): #671 main-check case
+
+Run level: decision-level in a subagent. Tier: regular. Fresh subagents, one per scenario per skill version, all in one parallel batch, each given the `implement-spec` folder (the branch's at `dde4766`, or a `git archive` of `origin/main` at `91a35d3`) and `PROMPT.md` only, scored with `score.py`. Driven by the Ticket thread.
+Setup: the [main-check case](README.md#main-check-check) (`main-check/make_fixture.py <out-dir> fixed|valid|worker`). Evidence: [`evidence/671/`](evidence/671/), one folder per run with `answer.md` and `score.txt`.
+Case check: two fresh premium-tier checks. The first returned keep for `valid` and fix for `fixed` and `worker`: tickets 51 and 52 ask for each script "with a test" and pull request 9 added only the scripts; pull request 9 now adds the matching tests (both in `fixed`, bye only in `worker`), the self-test checks them, and the `valid` scorer no longer fails an incidental "already". The second returned keep, with one fix: the owner record no longer says the owner is reached through the coordinator, which could have led a run to tell the owner only through `Message`.
+Steps: step 1 to the first Implementer's start (a Worker: its ticket's), one run per scenario per version.
+
+| Run | Scorer |
+| --- | --- |
+| branch, `fixed` | 8/8: no Spec branch, worktree or Implementer; "Spec 50 is already fixed on main", naming commit `134bd3a`, pull request 9 and both scripts and tests; stopped |
+| branch, `valid` | 7/7: Spec branch made and pushed, worktrees and Implementers for 51 and 52; building |
+| branch, `worker` | 10/10: nothing made; the coordinator told Ticket 51 is already fixed (commit `4aaa3f6`, pull request 9, `src/bye.sh`), the owner `spec-thread-50` told the same; stopped |
+| main, `fixed` | 7/8, FAIL thread (`waiting`): it found pull request 9 and made nothing, but asked whether pull request 9 counts (by the landed rule neither ticket had landed) and waited |
+| main, `valid` | 7/7: the same build as the branch |
+| main, `worker` | 9/10, FAIL thread (`waiting`): nothing made, the coordinator and owner told about pull request 9, but it asked the coordinator to confirm and waited |
+
+Not exercised: the changed-scope and cannot-tell verdicts, a Spec only part of whose tickets main has, a re-entry after the coordinator's answer, and a full build-flow run. One run per scenario and version, no variance estimate.
+Pass: yes for the branch. Main's `fixed` and `worker` runs fail only on the end state: main's model already noticed the work on main and built nothing, so the change moves the outcome (main asks and waits with no rule for it; the branch reports with evidence and stops), not the noticing. Lessons: none for #671.
+
 ### 2026-11-04, commit 01d5c54 (claude/project-thread-nrdyzw) vs main 617d884, dev-skills 0.72.0 (no bump): ticket-branch case, scenario `waiting` (step 9)
 
 Run level: decision-level in a subagent. Tier: regular. Fresh subagents, one per skill version, each given the `implement-spec` folder (the branch's checkout at 01d5c54, or a `git archive` of main 617d884) and the `waiting` prompt only: no scorer or `fixture.json`.

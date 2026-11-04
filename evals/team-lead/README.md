@@ -10,6 +10,7 @@ Checks of the `team-lead` skill (`plugins/dev-skills/skills/team-lead/`): its sn
 | --- | --- |
 | `test_snapshot.py`, `test_cases.py` | no model session: ordinary commands |
 | the five dry runs (`deliver`, `deliver-stall`, `deliver-pause`, `deliver-lift`, `deliver-earlier`) | decision-level in a subagent: every start, stop, message and check-in is a block in `.scratch/` and every event is scripted, so nothing real is started. A subagent run is not a check that the real Harness starts workers, delivers a check-in or stops one; that is `worker-control`'s check, which needs a top-level session. (Judged from the fixture's prompt; a full build-flow run of these cases has not been tried.) |
+| `main-check-report` | decision-level in a subagent: the coordinator writes what it would do for three scripted worker reports; nothing is run |
 
 ## Snapshot command: unit tests
 
@@ -43,3 +44,7 @@ Cut with the records they tested: the earlier loop's `deliver-checkin-failed` (a
 ### Self-test of the cases
 
 `python3 evals/team-lead/test_cases.py` builds each case and replays a reference run written by hand from the skill text, event by event as a coordinator would, checking at each check-in that the snapshot prints the verdict the case is built to show; the reference must score clean, and planted wrong runs (a quiet check-in that writes, a takeover before the stop reads back, a start while paused, a second user notice about 10 (alone, beside 20, beside the Milestone issue, or without the file name), a second worker beside an old delivery-thread record, a check-in arranged for a planning-only Release worker) must fail, and a mention of 10 inside the park notice for 20 must pass. It proves the fixture, world, snapshot and scorer agree; it is not a model run of the skill.
+
+## Main-check report
+
+**Run level and tier:** decision-level in a subagent, premium tier. Does the coordinator act on a build worker's check against main as `team-lead`'s "A worker reports or asks" says? Case files in [`main-check-report/`](main-check-report/): `STATE.md` (Milestone 1 with planned features #20 and #25, the bug #30 blocking #25, workers on #20 and #30, and what main holds), `PROMPT.md` (three worker reports, each from that state: #30 already fixed, #20 already fixed, #30 changed scope), `EXPECTED.md` (pass and fail per event; keep it away from the session under test) and `test.sh`, which checks the files exist and that the prompt and state name no rule the case scores (it never greps skill text; `scripts/run-tests.sh` runs it). Give a fresh premium-tier subagent the whole `team-lead` folder from the checkout under test (the branch's, then main's from a `git archive`), `STATE.md` and `PROMPT.md`, and score its answer by hand against `EXPECTED.md`. Event 2 (the planned feature not closed but brought to the user, waiting with no worker started) is the one the change moves (in the recorded run main's skill closed #20 itself); event 1 (the not-planned bug closed as completed with where on main once its evidence is opened, its dependent started) is expected to move but may pass on main, whose skill has no rule for such a report; event 3 is a guard.

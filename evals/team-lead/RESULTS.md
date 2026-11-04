@@ -17,6 +17,14 @@ Pass: yes | no. Not exercised: <what this run did not reach>. Lessons: <what to 
 
 ## Runs
 
+### 2026-11-04, branch `claude/project-thread-bryult` at `dde4766`, base main `91a35d3`, dev-skills 0.78.0 (no bump): `main-check-report` after Ticket #671
+
+Run level: decision-level in a subagent
+Runner: the Ticket thread. One fresh premium-tier subagent per skill version, in one parallel batch with the implement and implement-spec runs: the branch's `team-lead` folder at `dde4766` and main's from a `git archive` of `origin/main` at `91a35d3`, each given `STATE.md` and `PROMPT.md` only. Evidence: [`evidence/671/`](evidence/671/), the Ticket thread's summary of each run's final answer with its hand score.
+Case check: two fresh premium-tier checks. The first returned fix: event 2's clause freed the slot without saying the planned feature waits, so a fresh worker could start on #20 (the `team-lead` clause now says that issue waits for the answer, starting no worker, and no other work waits on the reply); event 1 gained the fail "closed without first opening the evidence"; the README now calls event 1 "may pass on main". The second returned keep, with one fix: event 3's note on the updated issue is good but not scored.
+Ran: scored by hand against `EXPECTED.md`, per event. Branch: event 1 pass (evidence opened, #30 closed as completed naming `src/greet.sh` and `4d5e6f7` / pull request #7, a worker started on #25 with its start record); event 2 pass (one question to the user, #20 waits, nothing started); event 3 pass (#30's body updated whole with a note, `w30` told to build the README fix). Main: event 1 pass (it hedged on #30's body, and on its main path closed #30 as completed with where on main and started #25, noting that closing an already-fixed issue is not spelled out in `team-lead`); event 2 FAIL (it closed the planned feature #20 itself, with no question to the user); event 3 pass on the fail list, though it commented on #30 instead of updating the body.
+Pass: yes for the branch (3/3); main 2/3. Not exercised: real tracker writes, real worker starts and the snapshot command. Lessons: none for #671; event 2 is what the change moves.
+
 ### 2026-11-04, commit `578842d` (`claude/project-thread-l41n5a`), dev-skills 0.71.0 (unbumped): `deliver-stall` and `deliver-lift` after Ticket #654
 
 Run level: decision-level in a subagent

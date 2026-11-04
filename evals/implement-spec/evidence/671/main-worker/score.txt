@@ -1,0 +1,12 @@
+Driven by: the Ticket thread, a fresh regular-tier subagent, decision-level, given PROMPT.md and main's skill folder from a git archive of origin/main 91a35d3; scored with score.py.
+PASS answer written
+PASS dry run: branches, origin, worktrees and files unchanged
+PASS spec branch: none made or pushed
+PASS worktrees: none made
+PASS implementers: none started
+PASS message: the ticket 51 is already fixed or obsolete on main
+PASS message: names its evidence on main (the commit, pull request 9 or src/bye.sh)
+PASS others: the Spec's owner spec-thread-50 is told
+PASS others: the owner hears the ticket is already fixed or obsolete
+FAIL thread: stopped: waiting
+9/10 checks passed

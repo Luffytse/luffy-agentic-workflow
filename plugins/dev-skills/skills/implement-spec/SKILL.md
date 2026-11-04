@@ -31,7 +31,18 @@ Optionally, start an **exploration subagent** for what the tickets need explored
 
 Read [continuation.md](continuation.md), only when the tracker label doc maps an agent-only role and a ticket carries another agent's label, you were handed one ticket under a Spec or a continuation handoff is present, or the Spec is closed with a ticket not landed. Otherwise skip it: the rest of this skill holds when every ticket is for you.
 
-Done when you own the Spec (or have stopped), have stated the title, know the graph, the frontier, the foreign and the landed tickets, and know each ticket's **Model tier** (its "Model tier" line, set by `to-tickets`; regular if it has none).
+### Check against main
+
+Once you own the Spec, before step 2 and on every entry, re-entry included, read the Spec and each ticket not landed against freshly fetched main: its code and docs, and the changes merged since it was written. A Worker handed one ticket does this for that ticket, before step 3. This Spec's own branches and pull request are not evidence: the check is for what others merged. Give the Spec (a Worker: its ticket) one verdict; a Spec part of whose tickets main already has is changed scope:
+
+- **still valid**: main still has the problem, or does not yet do what it asks. Go on.
+- **already fixed** or **obsolete**: main no longer has the problem or already does what it asks (reproduce it or read the code to confirm), or what it is about is gone from main. Write no code. Tell the coordinator (the user, when none runs; a Worker also tells the Spec's owner) the verdict and its evidence, the file or text on main and the commit or pull request when you find it, so it can close the issue as completed naming where on main, and any branch or pull request you made; then stop. The coordinator closes or re-plans it.
+- **changed scope**: part of it still holds, or it holds in another place or form. Tell the coordinator what changed, with the same evidence, and wait for its answer, building nothing; a change that would alter the Milestone's goal, acceptance or exclusions it takes to the user.
+- **cannot tell**: the Spec, a ticket or main does not say enough to decide. Tell the coordinator what is missing and wait, as for changed scope.
+
+On the coordinator's answer, re-enter at step 1. Its answer, on the issue or to you, settles this check: do as it says (build as the issues now read, or stop if it closed or re-planned them), checking again only what merged since.
+
+Done when you own the Spec (or have stopped), have stated the title, know the graph, the frontier, the foreign and the landed tickets, know each ticket's **Model tier** (its "Model tier" line, set by `to-tickets`; regular if it has none), and the check against main lets you build.
 
 ## 2. Make the Spec branch
 

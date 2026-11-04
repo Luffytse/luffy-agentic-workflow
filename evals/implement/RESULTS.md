@@ -18,6 +18,23 @@ Pass: yes | no. Lessons: <what to change in implement, if anything>
 
 ## Runs
 
+### 2026-11-04, branch `claude/project-thread-bryult` at `dde4766`, base main `91a35d3`, dev-skills 0.78.0 (no bump): #671 main-check case
+
+Run level: decision-level in a subagent
+Setup: the [main-check case](README.md#main-check-check) (`main-check/make_fixture.py <out-dir> fixed|valid`), one fresh regular-tier subagent per scenario per skill version, all in one parallel batch, each given the `implement` folder (the branch's at `dde4766`, or a `git archive` of `origin/main` at `91a35d3`) and `PROMPT.md` only, scored with `score.py`. Driven by the Ticket thread. Evidence: [`evidence/671/`](evidence/671/), one folder per run with `answer.md` and `score.txt`; run directory paths read `<runs>`.
+Case check: two fresh premium-tier checks. The first returned keep for `valid` and fix for `fixed`: the Ticket asks for the fix "with a test" and pull request 7 fixed only `src/greet.sh`, so under the skill it read as changed scope; pull request 7 now also adds the usage-line test, and the self-test checks it. The second returned keep.
+Steps: step 1 to the Implementer's start, one run per scenario per version.
+
+| Run | Scorer |
+| --- | --- |
+| branch, `fixed` | 7/7: no branch, no brief; "Ticket 40 is already fixed on main", naming `src/greet.sh`, `test.sh`, commit `30b2f0b` and pull request 7, asking the coordinator to close it as completed; stopped |
+| branch, `valid` | 7/7: worktree with `-b ticket-40-usage-typo origin/main`, pushed; Implementer briefed; building |
+| main, `fixed` | 6/7, FAIL thread (`waiting`, not `stopped`): it also fetched, found pull request 7 and made no branch or brief, but asked the coordinator to confirm whether to close the ticket and waited for the answer |
+| main, `valid` | 7/7: the same build as the branch |
+
+Not exercised: the changed-scope and cannot-tell verdicts, a re-entry after the coordinator's answer, the coordinator's close, and a full build-flow run. One run per scenario and version, no variance estimate.
+Pass: yes for the branch. Main's `fixed` run fails only on the end state: on this small fixture main's model already noticed the fix and built nothing, so what the change moves is the outcome, not the noticing. With no rule for this case, main asks and waits; the branch reports the evidence the close needs and stops. Lessons: a fixture where the fix is harder to see (a different file, or no merged pull request record) would test whether main notices at all; not needed for this change.
+
 ### 2026-11-04, base main `5edb3e2`, candidate `ticket-631` at `dcb0492`, dev-skills 0.63.0 (no bump): #631 eval-test case, tests for instructions to an agent
 
 Run level: decision-level in a subagent

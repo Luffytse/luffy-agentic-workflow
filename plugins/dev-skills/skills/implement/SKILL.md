@@ -17,7 +17,18 @@ Fetch the ticket from the issue tracker and state its title. If the reference is
 
 Start at `docs/dev-skills/index.md` and open only the docs that fit the ticket (with no index, fall back to `docs/dev-skills/glossary.md` and `docs/dev-skills/adr/`).
 
-Done when you have stated the title, every blocker is cleared under the tracker doc, and you know the ticket's **Model tier**: premium if the issue says so, otherwise regular.
+### Check against main
+
+Before you make anything for the ticket, on every entry, re-entry included, read it against freshly fetched main: its code and docs, and the changes merged since it was written. Your own branch and pull request are not evidence: the check is for what others merged. Give it one verdict:
+
+- **still valid**: main still has the problem, or does not yet do what the ticket asks. Go on.
+- **already fixed** or **obsolete**: main no longer has the problem or already does what the ticket asks (reproduce it or read the code to confirm), or what it is about is gone from main. Write no code. Tell the coordinator (the user, when none runs) the verdict and its evidence, the file or text on main and the commit or pull request when you find it, so it can close the ticket as completed naming where on main, and any branch or pull request you made; then stop. The coordinator closes or re-plans it.
+- **changed scope**: part of it still holds, or it holds in another place or form. Tell the coordinator what changed, with the same evidence, and wait for its answer, building nothing; a change that would alter the Milestone's goal, acceptance or exclusions it takes to the user.
+- **cannot tell**: the ticket or main does not say enough to decide. Tell the coordinator what is missing and wait, as for changed scope.
+
+On the coordinator's answer, re-enter at step 1. Its answer, on the ticket or to you, settles this check: do as it says (build the ticket as it now reads, or stop if it closed or re-planned it), checking again only what merged since.
+
+Done when you have stated the title, every blocker is cleared under the tracker doc, the check against main lets you build, and you know the ticket's **Model tier**: premium if the issue says so, otherwise regular.
 
 ## 2. Make the Ticket branch
 
