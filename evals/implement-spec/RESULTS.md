@@ -18,6 +18,17 @@ Pass: yes | no. Lessons: <what to change in implement-spec, if anything>
 
 ## Runs
 
+### 2026-11-04, commit 01d5c54 (claude/project-thread-nrdyzw) vs main 617d884, dev-skills 0.72.0 (no bump): ticket-branch case, scenario `waiting` (step 9)
+
+Run level: decision-level in a subagent. Tier: regular. Fresh subagents, one per skill version, each given the `implement-spec` folder (the branch's checkout at 01d5c54, or a `git archive` of main 617d884) and the `waiting` prompt only: no scorer or `fixture.json`.
+Setup: the [ticket-branch case](README.md#ticket-branch-check), scenario `waiting` (`make_fixture.py <out-dir> waiting`, scored with `score.py`): Ticket 32 landed on `spec-30` with its local `ticket-32` and worktree `wt-32`; Ticket 31 has not landed, waits on the user, and keeps an unpushed commit on `ticket-31` in worktree `wt-31`.
+Case check: two fresh premium-tier checks. The first returned fix (no real worktrees in the fixture, scorer forms for deleting `ticket-31`, the Keep check); the second returned fix (backticks, a `Thread:` value in backticks, a trailing aside, prompt wording that tipped the run). Both were fixed, and the final verdict was keep: valid, needed.
+Steps: step 9 cleanup, one run per skill version.
+- Branch, `waiting`: 9/9.
+- Main, `waiting`: 9/9. Its Cleanup was `git worktree remove .../wt-32 && git branch -D ticket-32 && git worktree prune`: it kept `ticket-31`, kept the thread open and named Ticket 31 in the report, because it read step 9 together with steps 6.4 and 3.1 and reasoned that unlanded work stays.
+Not exercised: a model that follows main's step 9 ("remove any worktrees left ... and their local Ticket branches") literally; a full build-flow run. Single run per version, no variance estimate.
+Pass: yes for the branch. Lessons: the contradiction in main's text is real, but a careful model resolves it from steps 3.1 and 6.4, so `waiting` is a guard scenario, not a discriminating one; the skill fix pins the behaviour in the text.
+
 ### 2026-11-04, commit 0d969c8 (claude/project-thread-szfunq) vs main f8760e5, dev-skills 0.68.0 (no bump): ticket-branch case
 
 Run level: decision-level in a subagent. Tier: regular. Fresh subagents, each given the `implement-spec` folder (the branch's checkout, or a `git archive` of main) and the prompt only: no scorer, `fixture.json` or `EXPECTED`. `SKILL.md` has not changed since a9a01db; only `evals/` changed after it.

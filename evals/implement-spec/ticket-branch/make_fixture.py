@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 """Build the ticket-branch case of the implement-spec eval, outside this repo.
 
-Usage: make_fixture.py <out-dir> [reuse|landed]
+Usage: make_fixture.py <out-dir> [reuse|landed|waiting]
 Makes <out-dir>/repo (a git repo with a bare `origin`: `main`, the pushed Spec branch `spec-30` holding Ticket 32's
 squash commit, and a LOCAL branch `ticket-31` that a dead thread's Implementer left with one commit, never pushed),
 <out-dir>/PROMPT.md and <out-dir>/fixture.json (what score.py compares against). Scenario `reuse` (default): Ticket 31 has not landed.
 Scenario `landed`: spec-30 also holds Ticket 31's squash commit (it landed; the thread died before deleting the
-local branch). The decision is step 3.1 on re-entry. See README.md.
+local branch). The decision is step 3.1 on re-entry.
+Scenario `waiting`: step 9 with the Spec thread open. Ticket 32 landed (squash commit on spec-30) and has a local
+`ticket-32` with worktree `wt-32` beside `repo/`; Ticket 31 has not landed and has `ticket-31` with worktree `wt-31`.
+fixture.json also records the worktree list and ticket-32's head. See README.md.
 """
 import json
 import pathlib
@@ -24,7 +27,38 @@ def write(path, text):
     path.write_text(text)
 
 
+def prompt_waiting(repo, out):
+    return f"""# Scripted prompt: implement-spec, ticket-branch case, scenario waiting
+
+Give the text between the lines to a fresh subagent at the regular tier, with its working directory at `{repo}`.
+Give it the whole `implement-spec` folder from the checkout under test (the branch's, then main's from a
+`git archive`), nothing else from this folder. Keep `score.py` and `test_cases.py` away from it.
+
+---
+
+You are the Spec thread for Spec 30 (`.scratch/issues/30-spec.md`), following `implement-spec` (its files are in the
+folder you were given). You have reached step 9. Two local Ticket branches exist, each with a worktree. Ticket 32 landed
+on the Spec branch `spec-30` (its squash commit is there); its branch is `ticket-32`, worktree `{out}/wt-32`. Ticket 31 has
+not landed; its branch is `ticket-31`, worktree `{out}/wt-31`, and the ticket now waits on the user's answer to a question.
+The Spec pull request is open as a draft with Ticket 32's lines. Do the cleanup of step 9 and decide whether you end. Run
+only read-only git commands (log, diff, show, branch, worktree list, rev-parse) and change nothing: no branch, worktree,
+file or commit.
+
+Write `.scratch/answer.md` with exactly these lines:
+
+    Observed: <what you found about the local Ticket branches, in one line>
+    Cleanup: <the git commands that remove what you remove (worktrees and branches), one line joined with `&&`, or `none`>
+    Keep: <only what you leave in place: local Ticket branches and worktrees, or `none`>
+    Thread: <open | ended>
+    Report: <the first lines of what you tell the user about the waiting ticket>
+
+---
+"""
+
+
 def prompt(repo, scenario="reuse"):
+    if scenario == "waiting":
+        return prompt_waiting(repo, repo.parent)
     task = ("Do step 3.1 for Ticket 31 only." if scenario == "reuse" else
             "Decide what to do for Ticket 31, starting at step 3.1, and for the leftovers of the dead thread.")
     state = ("Ticket 31 is the next frontier ticket and a slot is free." if scenario == "reuse" else
@@ -56,8 +90,8 @@ Write `.scratch/answer.md` with exactly these lines:
 
 
 def build(out, scenario="reuse"):
-    if scenario not in ("reuse", "landed"):
-        sys.exit("scenario is reuse or landed")
+    if scenario not in ("reuse", "landed", "waiting"):
+        sys.exit("scenario is reuse, landed or waiting")
     out = pathlib.Path(out).resolve()
     if out.exists():
         sys.exit(f"{out} exists")
@@ -87,15 +121,25 @@ def build(out, scenario="reuse"):
     write(r / "src/bye.sh", '#!/usr/bin/env bash\necho "Goodbye, ${1:-world}!"\n')
     git(r, "add", "-A")
     git(r, "commit", "-q", "-m", "wip: bye command, first pass\n\nTicket #31.")
+    if scenario == "waiting":
+        git(r, "checkout", "-q", "-b", "ticket-32", "main")
+        write(r / "src/shout.sh", '#!/usr/bin/env bash\necho "HELLO, ${1:-world}!"\n')
+        git(r, "add", "-A")
+        git(r, "commit", "-q", "-m", "wip: shout command, pre-squash\n\nTicket #32.")
     git(r, "checkout", "-q", "spec-30")
+    if scenario == "waiting":
+        git(r, "worktree", "add", "-q", str(out / "wt-31"), "ticket-31")
+        git(r, "worktree", "add", "-q", str(out / "wt-32"), "ticket-32")
     (out / "PROMPT.md").write_text(prompt(r, scenario))
     fx = dict(scenario=scenario, ticket_branch=git(r, "rev-parse", "ticket-31"), spec_branch=git(r, "rev-parse", "spec-30"),
-              main=git(r, "rev-parse", "main"), branches=git(r, "branch", "--format=%(refname:short)").split())
+              main=git(r, "rev-parse", "main"), branches=git(r, "branch", "--format=%(refname:short)").split(),
+              ticket32=git(r, "rev-parse", "ticket-32") if scenario == "waiting" else "",
+              worktrees=git(r, "worktree", "list", "--porcelain"))
     (out / "fixture.json").write_text(json.dumps(fx, indent=2) + "\n")
     return out
 
 
 if __name__ == "__main__":
     if len(sys.argv) not in (2, 3):
-        sys.exit("usage: make_fixture.py <out-dir> [reuse|landed]")
+        sys.exit("usage: make_fixture.py <out-dir> [reuse|landed|waiting]")
     print(build(sys.argv[1], *sys.argv[2:]))

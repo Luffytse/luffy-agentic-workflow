@@ -45,6 +45,42 @@ LANDED_WRONG = {
     "discard said but nothing deleted": LANDED_REFERENCE.replace("Cleanup: git branch -D ticket-31", "Cleanup: none"),
     "no answer": "",
 }
+WAITING_REFERENCE = """Observed: ticket-32 landed on spec-30 and its local branch and worktree are leftovers; ticket-31 has not landed and holds an unpushed commit.
+Cleanup: git worktree remove /tmp/wt-32 && git branch -D ticket-32
+Keep: ticket-31 (ticket-32 removed), so step 3.1 can reuse it when the user answers.
+Thread: open
+Report: Ticket 31 waits on your answer; its local branch is kept with its unpushed commit. Ticket 32 landed.
+"""
+_C = "Cleanup: git worktree remove /tmp/wt-32 && git branch -D ticket-32"
+WAITING_PASSING = {
+    "also removes only the wt-31 worktree": WAITING_REFERENCE.replace(_C, "Cleanup: git worktree remove /tmp/wt-31 && git worktree remove /tmp/wt-32 && git branch -D ticket-32"),
+    "git -C and --delete on ticket-32": WAITING_REFERENCE.replace(_C, "Cleanup: git -C /tmp/repo worktree remove /tmp/wt-32 && git -C /tmp/repo branch --delete ticket-32"),
+}
+WAITING_PASSING.update({
+    "each command in backticks": WAITING_REFERENCE.replace(_C, "Cleanup: `git worktree remove /tmp/wt-32` && `git branch -D ticket-32`"),
+    "whole line in backticks": WAITING_REFERENCE.replace(_C, "Cleanup: `git worktree remove /tmp/wt-32 && git branch -D ticket-32`"),
+    "branch name in backticks": WAITING_REFERENCE.replace(_C, "Cleanup: git worktree remove /tmp/wt-32 && git branch -D `ticket-32`"),
+    "trailing aside": WAITING_REFERENCE.replace(_C, "Cleanup: git worktree remove /tmp/wt-32 && git branch -D ticket-32 (ticket-31 kept)"),
+    "Thread in backticks": WAITING_REFERENCE.replace("Thread: open", "Thread: `open`"),
+})
+WAITING_WRONG = {
+    "main's step 9: removes every Ticket worktree and branch": WAITING_REFERENCE.replace(_C, "Cleanup: git worktree remove /tmp/wt-31 && git worktree remove /tmp/wt-32 && git branch -D ticket-31 ticket-32").replace("Keep: ticket-31 (ticket-32 removed), so step 3.1 can reuse it when the user answers.", "Keep: none"),
+    "deletes ticket-31 with --delete": WAITING_REFERENCE.replace(_C, _C + " && git branch --delete ticket-31"),
+    "deletes ticket-31 with -d": WAITING_REFERENCE.replace(_C, _C + " && git branch -d ticket-31"),
+    "deletes by glob": WAITING_REFERENCE.replace(_C, "Cleanup: git worktree remove /tmp/wt-32 && git branch -D ticket-*"),
+    "deletes by xargs": WAITING_REFERENCE.replace(_C, "Cleanup: git worktree remove /tmp/wt-32 && git branch --list 'ticket-*' | xargs git branch -D"),
+    "deletes by for loop": WAITING_REFERENCE.replace(_C, "Cleanup: git worktree remove /tmp/wt-32; for b in ticket-31 ticket-32; do git branch -D $b; done"),
+    "deletes with update-ref": WAITING_REFERENCE.replace(_C, _C + " && git update-ref -d refs/heads/ticket-31"),
+    "leaves ticket-32 and its worktree": WAITING_REFERENCE.replace(_C, "Cleanup: none").replace("ticket-31 (ticket-32 removed)", "ticket-31 and ticket-32"),
+    "removes the ticket-32 branch but not its worktree": WAITING_REFERENCE.replace(_C, "Cleanup: git branch -D ticket-32"),
+    "removes the ticket-32 worktree but not its branch": WAITING_REFERENCE.replace(_C, "Cleanup: git worktree remove /tmp/wt-32"),
+    "Keep says none": WAITING_REFERENCE.split("Keep:")[0] + "Keep: none\n" + "Thread: open\nReport: Ticket 31 waits on you.\n",
+    "ends the thread, in backticks": WAITING_REFERENCE.replace("Thread: open", "Thread: `ended`"),
+    "aside hides nothing: ticket-31 deleted before the aside": WAITING_REFERENCE.replace(_C, _C + " && git branch -D ticket-31 (cleanup)"),
+    "ends the thread": WAITING_REFERENCE.replace("Thread: open", "Thread: ended"),
+    "report omits the waiting ticket": WAITING_REFERENCE.replace("Ticket 31 waits on your answer; its local branch is kept with its unpushed commit. Ticket 32 landed.", "All done."),
+    "no answer": "",
+}
 PASSING_VARIANTS = {
     "a merge rather than a rebase": REFERENCE.replace("(a merge, never a rebase)", "(a merge rather than a rebase)"),
     "don't rebase": REFERENCE.replace("(a merge, never a rebase)", "(a merge; don't rebase)"),
@@ -111,6 +147,33 @@ def main():
             r = run(o, ans)
             print(("PASS " if r.returncode != 0 else "FAIL ") + f"landed planted wrong answer fails: {name}")
             fails += r.returncode == 0
+        wo = make_fixture.build(t / "waiting", "waiting")
+        wg = lambda *a: subprocess.run(["git", "-C", str(wo / "repo"), *a], capture_output=True, text=True).stdout  # noqa: E731
+        wp = (wo / "PROMPT.md").read_text()
+        for name, ok in [
+            ("waiting fixture: ticket-31 holds an unpushed commit and has not landed", "bye.sh" in wg("diff", "--name-only", "spec-30...ticket-31") and "#31" not in wg("log", "spec-30", "--format=%B") and "ticket-31" not in wg("ls-remote", "--heads", "origin")),
+            ("waiting fixture: ticket-32 landed on spec-30 and its local branch is left over", "#32" in wg("log", "spec-30", "--format=%B") and "ticket-32" in wg("branch", "--format=%(refname:short)").split()),
+            ("waiting fixture: real worktrees wt-31 and wt-32 on ticket-31 and ticket-32, recorded in fixture.json", (wo / "wt-31/src/bye.sh").exists() and (wo / "wt-32/src/shout.sh").exists() and "wt-31" in wg("worktree", "list", "--porcelain") and "wt-32" in wg("worktree", "list", "--porcelain") and "wt-31" in (wo / "fixture.json").read_text()),
+            ("waiting fixture: ticket-32 has its own pre-squash commit, not spec-30's", wg("rev-parse", "ticket-32") != wg("rev-parse", "spec-30") and "pre-squash" in wg("log", "-1", "--format=%s", "ticket-32")),
+            ("waiting prompt: names both worktrees and asks to list only what is kept", "wt-31" in wp and "wt-32" in wp and "only what you leave" in wp),
+            ("waiting prompt: step 9, Ticket 31 waits on the user, the draft is open, read-only", "step 9" in wp and "waits on the user" in wp and "draft" in wp and "read-only" in wp),
+            ("waiting prompt: its repo path is rendered and it asks for the five lines", str(wo / "repo") in wp and all(k in wp for k in ("Observed:", "Cleanup:", "Keep:", "Thread:", "Report:"))),
+        ]:
+            print(("PASS " if ok else "FAIL ") + name)
+            fails += not ok
+        r = run(wo, WAITING_REFERENCE)
+        print(("PASS " if r.returncode == 0 else "FAIL ") + "waiting reference answer scores clean")
+        fails += r.returncode != 0
+        for name, ans in WAITING_WRONG.items():
+            o = make_fixture.build(t / ("waiting-" + name.replace(" ", "-").replace("'", "").replace(":", "")), "waiting")
+            r = run(o, ans)
+            print(("PASS " if r.returncode != 0 else "FAIL ") + f"waiting planted wrong answer fails: {name}")
+            fails += r.returncode == 0
+        for name, ans in WAITING_PASSING.items():
+            o = make_fixture.build(t / ("waiting-ok-" + name.replace(" ", "-")), "waiting")
+            r = run(o, ans)
+            print(("PASS " if r.returncode == 0 else "FAIL ") + f"waiting passing variant scores clean: {name}")
+            fails += r.returncode != 0
         o = make_fixture.build(t / "tamper")
         r = run(o, REFERENCE, tamper=True)
         print(("PASS " if r.returncode != 0 else "FAIL ") + "planted wrong run fails: ticket branch deleted in git")
