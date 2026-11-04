@@ -3,11 +3,11 @@ name: retro-planning
 description: Work through this repo's Retro backlog: snapshot the open Retro issues, group them by root cause, walk the user through each group one at a time and act on each call at once (a Ticket, a close, or a spin-off to its own planning), keeping an open record that is closed at the end; at a Release end, agents decide every group and mark the Ticket of each group that joins the next Release. Use when the user asks for Retro planning, when a Release ends, or to resume one whose record is still open.
 ---
 
-A **Retro planning** works through one repo's **Retro backlog** (its open issues labelled `retro`): it merges duplicates, closes one-offs, and turns repeated problems into Tickets. Run this thread at the **premium** tier: the snapshot, verdict, cap, order, spin-off and expiry rules below interact, and each must be applied exactly. Load `model-tiers` by name for the model each tier is in your coding agent; the project's own tier map overrides it.
+A **Retro planning** works through one repo's **Retro backlog** (its open issues labelled `retro`): it merges duplicates, closes one-offs, and turns repeated problems, and one-off proposals for a cheap check that a necessity check confirms, into Tickets. Run this thread at the **premium** tier: the snapshot, verdict, cap, order, spin-off and expiry rules below interact, and each must be applied exactly. Load `model-tiers` by name for the model each tier is in your coding agent; the project's own tier map overrides it.
 
 Plan only the current repo. Its tracker is named in `docs/dev-skills/issue-tracker.md`; with no such file, use the GitHub repo of the checkout's `origin` remote. Read and write only that repo's issues, using the commands that file gives.
 
-**The cap: at most 3 Tickets per planning.** Every Ticket this planning files counts toward it: repeated groups, severe one-offs and failed fixes alike. A spun-off group does not count. Only the user may raise the cap, and only for this planning: when more groups qualify than fit, say so, and keep the cap unless the user raises it. The record notes the cap used and the user's reason. At a Release end there is no cap (see "At a Release end").
+**The cap: at most 3 Tickets per planning.** Every Ticket this planning files counts toward it: repeated groups, severe one-offs, confirmed one-sighting checks and failed fixes alike. A spun-off group does not count. Only the user may raise the cap, and only for this planning: when more groups qualify than fit, say so, and keep the cap unless the user raises it. The record notes the cap used and the user's reason. At a Release end there is no cap (see "At a Release end").
 
 Load `issue-absorption` before reconciling absorption records, classifying the snapshot or carrying out an absorption or close-with-Ticket verdict. Apply its agreement and lifecycle as reference while continuing this planning.
 
@@ -67,9 +67,10 @@ Give each group the first verdict that fits:
 2. **Expire**: the group has had no new vote across 2 plannings. That is: every issue in it has a count of 1 or more under "plannings without a new vote" in the newest record, and none has a new vote. Close it with "reopen if seen again". A group the newest record held back by the cap never expires (at a Release end, nor one it listed as proposed to the user).
 3. **Act**: seen in 2 or more distinct threads.
 4. **Act, severe**: seen in one thread, but severe: lost data, a security problem, or a large waste of time or money.
-5. **Close as `wontfix`**: seen in one thread and not severe. Write the reason.
+5. **Act, one-sighting check**: seen in one thread, not taken by verdicts 1 to 4, and its fix is a **cheap deterministic check** of the project's own tooling (a CI step, a checker rule, a test), not a prose rule. A missing check is not seen again until it bites, so waiting for a second thread would only let it go unfiled. Start a fresh premium-tier subagent and brief it with the group's issues (bodies and comments) and the project's tooling as the default branch has it now, not with your verdict. It answers two questions, each with its evidence: would the proposed check have failed on the real past mistake the issues describe, and does nothing already catch that mistake (no existing CI step, checker rule, test or hook)? Only two yeses **confirm** the check. Confirmed: the group acts, in the step 4 order like any acting group and counted toward the cap, and its reason reads `necessity check: confirmed (<evidence>)`. Not confirmed: its reason reads `necessity check: not confirmed (<why>)` and it takes verdict 6. If no such subagent can be started, decide nothing for the group: keep it open, write `necessity check: not run (<why>)`, and walk it with the `wontfix` groups, proposed as kept open (at a Release end it stays open). A group held back by the cap with this verdict is checked again at the next planning, because the project may have gained the check meanwhile. A group seen in 2 or more threads acts on verdict 3 with no necessity check.
+6. **Close as `wontfix`**: seen in one thread, not severe, and not confirmed under verdict 5 (a prose rule or a judgement call is never checked). Write the reason.
 
-Done when every group, and every issue closing with its Ticket, has a verdict, and every `wontfix` a reason.
+Done when every group, and every issue closing with its Ticket, has a verdict, every `wontfix` a reason, and every one-sighting check proposal its necessity verdict.
 
 ## 4. Order the walk
 
@@ -94,7 +95,7 @@ Show one group, with full details:
 - **Background**: how the skill or workflow works today, at the point the issues touch.
 - **What went wrong**: the concrete incident in each thread that filed or voted on it.
 - **Root cause** the issues share, and the distinct-thread count.
-- **Proposed verdict** with its reason.
+- **Proposed verdict** with its reason, and for a one-sighting check its necessity check's verdict and evidence.
 - For an acting group: the intended outcome and whether to address this problem. Ticket preparation follows that call.
 
 When the call is to address the problem, before the `to-tickets` workflow shows its proposed Ticket (step 6), fetch the default branch and re-read the current state of every issue, pull request and path its draft names, and correct the draft; the votes stay as of the snapshot.
@@ -107,7 +108,7 @@ Done when every group in the walk and every mechanical close has the user's call
 
 ## 6. Carry out a call
 
-- **Address the problem**: invoke the complete `to-tickets` workflow. Pass the intended outcome; source reports explicitly marked as issues to absorb; agreed constraints, failed-fix context and known dependencies; this one group's scope; and the remaining actual-ticket budget. Request one complete Ticket, with a return before publication if investigation requires several. Prefer a mechanical check or hook over a prose rule; pass that preference as a constraint, with a reason required when only prose can address the problem. Do this re-read (step 5) before each time the proposed Ticket is shown, a resumed handoff included. `to-tickets` owns context gathering, investigation, drafting, tier/dependency discussion, concrete-solution approval and verified publication. Include any existing publication identifiers, source mappings, approval and incomplete actions on resume.
+- **Address the problem**: invoke the complete `to-tickets` workflow. Pass the intended outcome (for a one-sighting check, with the necessity check's evidence); source reports explicitly marked as issues to absorb; agreed constraints, failed-fix context and known dependencies; this one group's scope; and the remaining actual-ticket budget. Request one complete Ticket, with a return before publication if investigation requires several. Prefer a mechanical check or hook over a prose rule; pass that preference as a constraint, with a reason required when only prose can address the problem. Do this re-read (step 5) before each time the proposed Ticket is shown, a resumed handoff included. `to-tickets` owns context gathering, investigation, drafting, tier/dependency discussion, concrete-solution approval and verified publication. Include any existing publication identifiers, source mappings, approval and incomplete actions on resume.
   - Reconcile its returned identifiers, source-to-ticket mappings and incomplete actions into the record. A real Ticket counts immediately even when a later label, link, comment or verification failed. Keep the handoff pending and resume its unfinished actions before showing another group; never recreate an existing Ticket.
   - If several Tickets are necessary, return to the user's spin-off decision before any publication. Keep the cap unchanged unless the user explicitly changes it; a larger budget alone does not turn this one-Ticket handoff into permission to publish several.
   - If the solution is declined, preserve both the problem approval and solution rejection, with the user's next call (revise, spin off, close or keep open). A decline creates no Ticket and consumes no slot. Once a solution has been approved and published, update the record without asking for solution approval again.
@@ -141,7 +142,7 @@ At a Release end agents decide: the user is asked nothing per group, except as "
 
 ### Deciding the groups
 
-Take the groups in step 4 order and decide each one yourself, without waiting. Step 3's verdict says whether a group deserves action; the call sets its **disposition**:
+Take the groups in step 4 order and decide each one yourself, without waiting. Step 3's verdict says whether a group deserves action (a confirmed one-sighting check deserves it like any other acting group, and takes the dispositions below by the same tests); the call sets its **disposition**:
 
 - **joins the next Release**: an acting group whose fix blocks a feature of this Milestone or is severe (a security flaw, lost data, a large waste of time or money). Carry it out through step 6's "Address the problem", as changed below, then mark its Ticket with the `next-release` role (the label `docs/dev-skills/triage-labels.md` maps it to). The mark is the whole handoff: `release` reads it, not this record, takes the Ticket into the next Release and removes the mark. Apply no release label. The fix fills a place in the next Release's size like any item; only a severe one joins past the size. A resumed planning gives the mark to any such Ticket still without it.
 - **stays open**: any other acting group, including one an open Ticket or a planned piece of the Milestone already covers. Write the reason down; leave its issues open.
@@ -165,7 +166,7 @@ Propose it and file nothing: the group stays open and its disposition is `propos
 
 ### Dry run
 
-When the caller asks for a dry run (proposals only), run steps 0 to 4 read-only, with no record issue filed and the snapshot read at the current time, then decide each group as above. Write nothing to the tracker: no record, comment, label, close or Ticket, and ask the user nothing. Return each group with its disposition, reason, and for a group that joins the next Release the Ticket it would file, in your reply.
+When the caller asks for a dry run (proposals only), run steps 0 to 4 read-only, with no record issue filed and the snapshot read at the current time, then decide each group as above (a one-sighting check's necessity subagent only reads). Write nothing to the tracker: no record, comment, label, close or Ticket, and ask the user nothing. Return each group with its disposition, reason, and for a group that joins the next Release the Ticket it would file, in your reply.
 
 ## The record
 
@@ -191,6 +192,8 @@ Snapshot time: <the record's creation time>
 | Group | Retro issues | Distinct threads | Verdict | Reason or Ticket |
 |-------|--------------|------------------|---------|------------------|
 | <root cause> | #12, #15 | 3 | Ticket | #40 |
+| <root cause> | #21 | 1 | Ticket | #41; necessity check: confirmed (<evidence>) |
+| <root cause> | #22 | 1 | wontfix | necessity check: not confirmed (<why>) |
 | <root cause> | #13 | 1 | wontfix | <reason> |
 | <root cause> | #14 | 2 | held back by the cap | |
 | <root cause> | #20 | 2 | spun off | <thread link> |

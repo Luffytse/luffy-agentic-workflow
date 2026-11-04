@@ -259,8 +259,11 @@ The open Retro issues of one repo.
 _Avoid_: retro queue, improvement list
 
 **Retro planning**:
-The review of a snapshot of one repo's Retro backlog, which merges duplicates, closes most one-offs and turns at most 3 groups into Tickets. It walks the user through one group at a time and carries out each call at once (at a Release end, see **Release-end Retro planning**). Its record issue, labelled `retro-planning`, is open while it runs and closed at its end; later plannings read only closed records.
+The review of a snapshot of one repo's Retro backlog, which merges duplicates, closes most one-offs and turns at most 3 groups into Tickets (a group seen in one thread acts only if it is severe or its fix is a cheap deterministic check that a **necessity check** confirms). It walks the user through one group at a time and carries out each call at once (at a Release end, see **Release-end Retro planning**). Its record issue, labelled `retro-planning`, is open while it runs and closed at its end; later plannings read only closed records.
 _Avoid_: retro triage, retro review
+
+**Necessity check**:
+The check a fresh premium-tier subagent makes in a Retro planning before a one-thread group whose fix is a cheap deterministic check (a CI step, a checker rule, a test) is acted on: the check would have failed on the real past mistake the Retro issues describe, and nothing already catches it. The planning record shows its verdict in the group's Verdicts row. Not confirmed, the group takes the one-thread `wontfix`.
 
 **Release-end Retro planning**:
 The Retro planning that the caller runs at the end of a Release, with the Triage batch: agents decide every group without asking the user per group, with no 3-Ticket cap, and record each call and reason in the planning record for the Milestone review. A fix joins the next Release only if it blocks a feature of the Milestone or is severe; its Ticket then carries the `next-release` mark, which `release` reads instead of the record; it fills a place in the **Release size** like any item, and only a severe one joins past the size. Any other acting group stays open with a reason, and the rest close. A group that crosses a boundary, changes the Milestone's agreement, or would join the next Release but needs a feature-sized fix is proposed to the user, not filed.
