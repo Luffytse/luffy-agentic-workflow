@@ -31,6 +31,8 @@ An Implementer that reports a criterion as owed to its thread (ADR 0004's eviden
 
 Add one small case in `evals/<skill>/`: a README naming its run level and tier, the fixture prompt, and a scorer or an `EXPECTED.md`. The case fails on main's skill and passes on the pull request's, and both runs are recorded as above. A case that is hard to write (a planning or interview skill, where the behaviour lives in a conversation with the user) is the stated gap: the `**Eval:**` line says why.
 
+A real gap that one of the review's completeness checks of the text finds (the two [REVIEW.md](../../REVIEW.md) Always check lines on fields, conditions and rerun states) also adds an eval case for that path, in the pull request that fixes it; if no case can be written, that is the same stated gap.
+
 ## Case check
 
 Each new case, and each changed expected result (an `EXPECTED.md`, a scorer's expected values, a case's stated meaning), is checked after it is written and before any model run. A fresh **premium**-tier subagent that did not write it reads the whole skill folder, its workflow (the skills it loads and the skills that load it on that path) and the case files, and returns **keep**, **fix** or **drop** for each case, on three questions:

@@ -210,7 +210,7 @@ One batch of questions a skill (`grilling`, `triage`) puts to the user at once. 
 _Avoid_: Round (for a batch of questions)
 
 **REVIEW.md**:
-A short file at a repo's root telling reviewers what Important means there, what to skip, what to always check, and optionally its own Review levels.
+A short file at a repo's root telling reviewers what Important means there, what to skip, what to always check (the **Always check** lines: each a Bug class earlier reviews caught, with its origin and file kinds; a line that checks the text for completeness, not for what an agent will do, adds an eval case for a real gap it finds), and optionally its own Review levels.
 
 **Finder**:
 A reviewer agent that looks for problems and reports candidate Findings. The **standards Finder** and **spec Finder** come from Upstream; at Standard and Deep one **adversarial Finder** takes the angle that fits the change best ("what the change is missing" is one); at Deep a premium **security Finder** is added. Rounds 2 and 3 run one **later-Round Finder**, standards and spec in one.
