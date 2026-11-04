@@ -108,7 +108,7 @@ _Avoid_: validity check, re-triage
 The one list `release` sorts every candidate for the next Release into, once the **Main check** has run (an issue it closed, left unchecked or sent to the user is not ranked), in descending priority: group 1, severe issues and issues marked `next-release`; group 2, the Milestone's planned features, re-ordered each planning (a feature others depend on first, then the one that moves the goal furthest, the Milestone issue's order breaking ties), each preceded by its open blockers; group 3, `ready-for-agent` bugs, oldest first. An issue meeting several conditions goes in its highest group, first within it. A feature the Milestone issue does not list is never ranked; it is proposed to the user.
 
 **Release planning**:
-The last step of `release`: make the **Main check**, sort the candidates that survive it into the **Ranked list**, pick from the top up to the **Release size**, open the release issue and label what it takes, clearing `next-release` from it. It runs with no approval; the user's part is planning the Milestone and its features with `milestone`.
+The last step of `release`: make the **Main check**, sort the candidates that survive it into the **Ranked list**, pick from the top up to the **Release size**, open the release issue and label what it takes, clearing `next-release` from it; when nothing qualifies it opens no release issue, labels nothing and reports that nothing qualified and why. It runs with no approval; the user's part is planning the Milestone and its features with `milestone`.
 _Avoid_: release triage
 
 **Cut steps**:

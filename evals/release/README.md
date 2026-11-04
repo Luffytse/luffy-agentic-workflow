@@ -7,7 +7,7 @@ Checks of the `release` skill (`plugins/dev-skills/skills/release/`) on its one 
 | Check | Run level |
 | --- | --- |
 | `ranked-pick/test_cases.py` | no model session: builds each case and scores a reference run and planted wrong runs |
-| the nine ranked-pick cases (runs kept in `ranked-pick/evidence/`) | decision-level in a subagent: every tracker, pull request and skill-run write is a block in `.scratch/proposed-actions.md`, so nothing real is labelled, opened, merged or closed |
+| the ten ranked-pick cases (runs kept in `ranked-pick/evidence/`) | decision-level in a subagent: every tracker, pull request and skill-run write is a block in `.scratch/proposed-actions.md`, so nothing real is labelled, opened, merged or closed |
 | `main-check/test_cases.py` | no model session: builds the case, checks its rendered input says what each issue means, and scores a reference run and planted wrong runs |
 | the main-check case (runs kept in `main-check/evidence/`) | decision-level in a subagent, as the ranked-pick cases |
 
@@ -24,6 +24,7 @@ Checks of the `release` skill (`plugins/dev-skills/skills/release/`) on its one 
 | `size-reached` | size 3; features #20 to #23; bug #30 | Order #20, #21, #22; #23 and #30 left out with the reason; Used 3 |
 | `severe-past-size` | size 2; three severe bugs (#36 delivery stopped, #31 lost data, #37 a leaked token, oldest first in that order); #35 marked, not severe; features #10, #20 | Order #36, #31, #37 ("Used: 2, plus 1 severe past the size"); #35, #10, #20 left out; #35 keeps its mark |
 | `reorder` | goal "usable from scripts"; features listed #24 colour, #25 JSON output, #26 config loader, with #24 and #25 blocked by #26 | Order #26 (others depend on it), #25 (moves the goal furthest), #24, each with a line of reason |
+| `empty` | size 5; Milestone lists only #20 Quiet flag, blocked by #40, a bug at `ready-for-human` (no agent can take it); #50 a `ready-for-agent` enhancement the Milestone does not list; #34 a bug at `needs-triage`; no severe, marked or `ready-for-agent` bug | nothing qualifies, so nothing is taken: no `Release 3` issue opened, no label created or applied, no mark removed; `.scratch/report.md` says nothing qualified and why (#20 waits on #40, which is at `ready-for-human`), names #20 as left out, and proposes #50 to the user |
 | `no-version` | Release 2 (#2) open: #10 and #20 closed by merged pull requests #7 (`Closes #10`) and #8 (`Fixes #20`); #9 merged with no issue; feature #21 open | the cut: a changelog pull request changing only `CHANGELOG.md`, entry `## Release 2` with `Commits: <Release 1's end>..<main>`, #10 and #20 listed, #9 under "Also merged", no `Versions:` line; merged; notes on #2, #2 closed; `triage` then `retro-planning` run, each with its end-of-Release record; then Release 3 with Order #21 |
 | `old-shape-cut` | as `no-version`, but #2 was written before the Order list: a `**Cap:**` line and a `## Scope` list, no `## Order` | as `no-version`: #2 is the current Release and is cut, not planned again |
 
@@ -31,12 +32,12 @@ Checks of the `release` skill (`plugins/dev-skills/skills/release/`) on its one 
 
 1. Build it into a scratch directory outside this repo.
 2. Start a **fresh** session at the **premium** tier (load `model-tiers` for the model), working directory `<out-dir>/repo`, and give it only the text between the `---` lines of `<out-dir>/PROMPT.md`, with `<checkout>` replaced by the checkout under test. Keep this README, `cases.py`, `score.py` and `test_cases.py` away from it: the Expected column is the answer.
-3. Score it: `python3 evals/release/ranked-pick/score.py <out-dir> <case>`. It prints one line per check and exits 1 when any fails. It reads the `Release 3` issue the run opens (its Order, Left out, Proposed to the user and Size), the label writes and, in `no-version` and `old-shape-cut`, the cut's blocks and their order. Read `.scratch/report.md` too.
+3. Score it: `python3 evals/release/ranked-pick/score.py <out-dir> <case>`. It prints one line per check and exits 1 when any fails. It reads the `Release 3` issue the run opens (its Order, Left out, Proposed to the user and Size; in `empty`, that none is opened), the label writes and, in `no-version` and `old-shape-cut`, the cut's blocks and their order. Read `.scratch/report.md` too.
 4. Run each case on the branch's skill and on main's, and record both in [RESULTS.md](RESULTS.md) with the commit, plugin version and run level.
 
 ### Self-test of the cases
 
-`python3 evals/release/ranked-pick/test_cases.py` builds each case, checks every open issue's claim on the rendered main (a feature is not on main yet, a bug's command shows the bug; `test.sh` passes except in `severe-past-size`, whose #36 says it is red), and scores a reference run (also with `Issue:` lines given as paths) written from the case's expected pick; the reference must pass, and planted wrong runs (two Order entries swapped, a non-severe marked issue taken past the size, an unplanned feature ranked, a `Versions:` line in a repo with no version, the mark left on a taken issue, a severe issue left out, `old-shape-cut` planned again with no cut) must fail. It proves the builder and scorer agree; it is not a model run of the skill.
+`python3 evals/release/ranked-pick/test_cases.py` builds each case, checks every open issue's claim on the rendered main (a feature is not on main yet, a bug's command shows the bug; `test.sh` passes except in `severe-past-size`, whose #36 says it is red), and scores a reference run (also with `Issue:` lines given as paths) written from the case's expected pick; the reference must pass, and planted wrong runs (two Order entries swapped, a non-severe marked issue taken past the size, an unplanned feature ranked, a `Versions:` line in a repo with no version, the mark left on a taken issue, a severe issue left out, `old-shape-cut` planned again with no cut) must fail. For `empty` the reference run opens no release issue and writes no label, with a report that says nothing qualified, why and the proposed #50; planted wrong runs (an empty `Release 3` issue opened, a label applied, a report that does not say nothing qualified) must fail. It proves the builder and scorer agree; it is not a model run of the skill.
 
 ## Main-check case
 

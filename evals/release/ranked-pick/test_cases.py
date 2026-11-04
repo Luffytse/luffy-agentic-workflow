@@ -27,7 +27,14 @@ def block(k, op, issue, fields):
     return f"### {k}. {op}\nIssue: {issue}\n{fields}\n"
 
 
-def reference(case, exp, repo, order=None, labelled=None, cleared=None, left=None, versions=False, used=None, cut=True):
+EMPTY_REPORT = ("Nothing qualified for Release 3, so I opened no release issue and labelled nothing.\n"
+                "- #20 Quiet flag (planned) is left out: its blocker #40 is at ready-for-human, which no agent can take.\n"
+                "- #50 Colour output: an unplanned feature, proposed to you; the Milestone issue does not list it.\n"
+                "- #34 is at needs-triage and is not a candidate.\n")
+
+
+def reference(case, exp, repo, order=None, labelled=None, cleared=None, left=None, versions=False, used=None, cut=True,
+              empty_issue=False):
     order = order if order is not None else exp["order"]
     labelled = labelled if labelled is not None else exp["labelled"]
     cleared = cleared if cleared is not None else exp["cleared"]
@@ -61,8 +68,11 @@ def reference(case, exp, repo, order=None, labelled=None, cleared=None, left=Non
     body = (f"**Goal:** the next step.\n\n**Label:** `release-3`. Every issue in this Release carries it.\n\n"
             f"**Milestone:** #1\n\n**Size:** {size}. Used: {used if used is not None else exp['used']}{past}.\n\n"
             f"## Order\n\n{lines}\n\n## Left out\n\n{lo}\n\n## Proposed to the user\n\n{prop}\n\n## Notes\n\nPosted when cut.\n")
-    out.append(block(k, "Create an issue", "new (60-release-3.md)", f"Title: Release 3\nLabels: none\nParent: none\nBody:\n~~~\n{body}~~~")); k += 1
-    out.append(block(k, "Create a label", "none", "Label: release-3")); k += 1
+    if exp.get("empty") and not empty_issue:
+        body = None
+    if body is not None:
+        out.append(block(k, "Create an issue", "new (60-release-3.md)", f"Title: Release 3\nLabels: none\nParent: none\nBody:\n~~~\n{body}~~~")); k += 1
+        out.append(block(k, "Create a label", "none", "Label: release-3")); k += 1
     for n in sorted(labelled):
         rem = "next-release" if n in cleared else "none"
         out.append(block(k, "Apply / remove labels", f"{n:02d}-x.md", f"Add: release-3\nRemove: {rem}")); k += 1
@@ -150,13 +160,15 @@ class Fixture(unittest.TestCase):
 
 
 class Cases(unittest.TestCase):
-    def run_case(self, case, path="", **wrong):
+    def run_case(self, case, path="", report=None, **wrong):
         with tempfile.TemporaryDirectory() as t:
             repo = make_fixture.build(pathlib.Path(t) / "out", case)
             make_fixture.slug_of.clear()
             text = reference(case, EXPECT[case], repo, **wrong)
             text = re.sub(r"^Issue: (\d)", lambda m: f"Issue: {path}{m.group(1)}", text, flags=re.M)
             (repo / ".scratch/proposed-actions.md").write_text(text)
+            if EXPECT[case].get("empty"):
+                (repo / ".scratch/report.md").write_text(EMPTY_REPORT if report is None else report)
             return subprocess.run([sys.executable, str(HERE / "score.py"), str(repo.parent), case],
                                   capture_output=True, text=True)
 
@@ -197,6 +209,25 @@ class Cases(unittest.TestCase):
 
     def test_old_shape_release_replanned_not_cut_fails(self):
         self.assertEqual(self.run_case("old-shape-cut", cut=False).returncode, 1)
+
+    def test_empty_plan_opens_no_release_issue(self):
+        r = self.run_case("empty")
+        self.assertEqual(r.returncode, 0, r.stdout)
+        self.assertIn("PASS no release issue opened", r.stdout)
+
+    def test_empty_plan_with_an_empty_release_issue_fails(self):
+        r = self.run_case("empty", empty_issue=True)
+        self.assertEqual(r.returncode, 1)
+        self.assertIn("FAIL no release issue opened", r.stdout)
+
+    def test_empty_plan_with_a_label_applied_fails(self):
+        r = self.run_case("empty", labelled={20})
+        self.assertEqual(r.returncode, 1)
+        self.assertIn("FAIL no label created or applied", r.stdout)
+
+    def test_empty_plan_report_silent_about_it_fails(self):
+        r = self.run_case("empty", report="Done.\n")
+        self.assertEqual(r.returncode, 1)
 
     def test_severe_issue_left_out_fails(self):
         e = EXPECT["severe-first"]

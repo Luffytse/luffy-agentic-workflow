@@ -21,7 +21,7 @@ The **heading test**: the changelog has an entry for a Release when it has a lin
 
 Every run, first or rerun, starts here, from freshly fetched main and the tracker; take the first case that fits:
 
-1. An open release issue whose Order lists nothing, or lists an issue that does not carry its label or still carries `next-release` (or a Spec with an open Ticket without the label), is a planning that stopped part way: go to step 5, whose "Rerun first" finishes it. A release issue written before the Order list (a `## Scope` list and no `## Order`) whose label an issue carries is not one: it is the current Release of case 2, and the issues carrying its label are its scope.
+1. An open release issue whose Order lists nothing, or lists an issue that does not carry its label or still carries `next-release` (or a Spec with an open Ticket without the label), is a planning that stopped part way: go to step 5, whose "Rerun first" finishes it (or, when the planning still yields nothing, leaves the issue as it is and reports it: see "When nothing qualifies"). A release issue written before the Order list (a `## Scope` list and no `## Order`) whose label an issue carries is not one: it is the current Release of case 2, and the issues carrying its label are its scope.
 2. An open release issue whose label its issues carry is the **current Release**. If the changelog on main has its entry (the heading test), its changelog pull request merged: go to step 3. Otherwise go to step 1. If several are open, take the oldest and say so in your report.
 3. No open release issue, but open issues carry a release label that no release issue names: a planning stopped before its release issue was opened: go to step 5.
 4. Otherwise, the last release issue is the closed one cut most recently. Go to step 4 unless it holds both end-of-Release records, and then to step 5. With no release issue at all, this is the repo's first Release: go to step 5.
@@ -84,7 +84,7 @@ Done when the closed release issue holds a record for `triage` and one for `retr
 
 With no open Milestone, plan nothing: tell the user the next Release needs a Milestone, planned with `milestone` (a small Release is a Milestone with one Release), list any severe or `next-release` issues waiting, and stop. Otherwise read the Milestone issue: its goal, features in order, acceptance criteria and exclusions.
 
-**Rerun first.** If "Find where you are" found an open release issue whose planning stopped part way: when its Order lists issues, that order stands; rank nothing again and finish only what is missing (see "Write it down"). When its Order lists nothing, plan it as below and write the result into that issue instead of opening another. If open issues carry a release label that no release issue names, those issues are the scope so far: keep each, count it toward the size, rank the rest around them, and open the release issue for the whole set. On every rerun path, an issue in the scope that now reads parked (the tracker doc's **Park** operation) stays in it and is reported as parked and skipped for building; remove no release label.
+**Rerun first.** If "Find where you are" found an open release issue whose planning stopped part way: when its Order lists issues, that order stands; rank nothing again and finish only what is missing (see "Write it down"). When its Order lists nothing, plan it as below and write the result into that issue instead of opening another; when the planning still takes nothing, "When nothing qualifies" applies and that issue gets no Order or label, only the verdicts of the check against main in its `## Checked against main` section. If open issues carry a release label that no release issue names, those issues are the scope so far: keep each, count it toward the size, rank the rest around them, and open the release issue for the whole set. On every rerun path, an issue in the scope that now reads parked (the tracker doc's **Park** operation) stays in it and is reported as parked and skipped for building; remove no release label.
 
 ### Check against main
 
@@ -132,13 +132,21 @@ An issue that meets several conditions goes in its highest group, and first with
 
 Take entries from the top, one item at a time, until the items taken reach the release doc's **Release size**. Once the size is full, every severe issue still in the list joins anyway, past the size; nothing else does. Every ranked candidate not taken is **left out**, with why: the size was reached, a blocker an agent cannot take, or parked.
 
+### When nothing qualifies
+
+When nothing is taken (the ranked list is empty, or every entry in it is left out, so no candidate qualifies), the planning ends here: open no release issue, create and apply no label, remove no `next-release` mark and write nothing else to the tracker beyond what the check against main already did. Report that nothing qualified and why: the unplanned features proposed to the user, each question the check against main raised, each issue unchecked, each parked issue, and each planned feature left out with the blocker an agent cannot take; then stop. This holds on every path:
+
+- **Fresh planning** (no release issue for it): open none.
+- **Rerun first** on an open release issue whose Order lists nothing: open no second issue, write no Order or label into that issue, only the verdicts the check against main made into its `## Checked against main` section (a rerun then skips an issue that already holds one), and report it as the open release issue with nothing to plan. That issue keeps matching case 1, so each rerun plans again: while nothing is taken it reports and stops with no write beyond a verdict not yet recorded, so it never loops or opens another issue; once something qualifies, the rerun writes the plan into that issue.
+- **Dry run**: return the same report, writing nothing.
+
 ### Name it
 
 Fill the release doc's name, label and title forms for the next Release: the last Release's values with the last placeholder raised by one, unless the release doc gives another rule (such as a new Milestone starting again at 1). If a closed issue already carries that label, a dropped Release used the name: take the next value instead. Write the goal in one sentence: what this Release makes true, toward the Milestone's goal.
 
 ### Write it down
 
-Open the release issue, with no release label of its own:
+When at least one entry is taken, open the release issue (when nothing is taken it opens none: see "When nothing qualifies"), with no release label of its own:
 
 ```md
 Title: <the title form, filled>
@@ -176,8 +184,8 @@ Posted as a comment when the Release is cut. Issues filed from now on wait for t
 
 Write `None.` under a heading with nothing in it. Then create the label if the repo lacks it, and apply it to each issue in the Order and to every open Ticket of a Spec in it (its sub-issues, by the tracker doc's way of checking a sub-issue link, and any issue whose body has a `Part of #<spec>` line). Remove `next-release` from each taken issue that carries it, once it carries the release label; an issue left out keeps its mark. Label nothing outside the Order.
 
-Report to the user the Order with its reasons, the size used, what was left out and why, each question the check against main raised, and the features proposed; nothing waits on a reply.
+Report to the user the Order with its reasons, the size used, what was left out and why, each question the check against main raised, and the features proposed; nothing waits on a reply. When nothing qualified there is no Order: the report says so and why, as "When nothing qualifies" says.
 
 When the caller asks for a dry run, run this step read-only: write nothing to the tracker (the check against main closes and edits nothing either) and return the Release it would plan, with the check's verdicts.
 
-Done when the release issue is open with its Goal, Size, Order, Left out, Checked against main and Proposed sections, every issue in the check's scope when it ran has a verdict in it, every issue in its Order (and every open Ticket of a Spec in it) carries the label, no other issue does, and no taken issue still carries `next-release`.
+Done when nothing was taken, no release issue was opened for it, no Order or label was written (an open release issue found by "Rerun first" holds only the verdicts the check made, in its `## Checked against main` section) and the report says that nothing qualified and why; or else the release issue is open with its Goal, Size, Order, Left out, Checked against main and Proposed sections, every issue in the check's scope when it ran has a verdict in it, every issue in its Order (and every open Ticket of a Spec in it) carries the label, no other issue does, and no taken issue still carries `next-release`.

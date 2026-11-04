@@ -1,0 +1,8 @@
+FAIL no release issue opened: 1 opened: ['Release 3']
+FAIL no label created or applied: ['create a label none']
+PASS no next-release mark removed
+FAIL the report says that nothing qualified
+FAIL #50 proposed to the user in the report
+FAIL #20 named in the report as left out or waiting
+FAIL the report says why (the blocker no agent can take)
+1/7 checks passed

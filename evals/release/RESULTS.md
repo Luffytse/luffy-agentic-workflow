@@ -15,6 +15,19 @@ Pass: yes | no. Lessons: <what to change in release, if anything>
 
 ## Runs
 
+### 2026-11-04, branch `claude/project-thread-p4c8ce` (Ticket #652), commit ca6d349, dev-skills 0.74.0 (base, main 9a53412): `empty`
+
+Setup: the new ranked-pick case `empty`: Milestone 1 lists only #20 Quiet flag, blocked by #40 (a bug at `ready-for-human`); #50 an unplanned `ready-for-agent` enhancement; #34 a `needs-triage` bug; Release 2 cut and closed, so the run goes straight to planning Release 3. `release` step 5 now has "When nothing qualifies": nothing taken opens no release issue, labels nothing and reports that nothing qualified and why; a rerun on an open release issue with an empty Order opens no second issue and leaves it as it is. Run level: decision-level, fresh premium-tier subagents made by the Ticket thread, given only the PROMPT.md text, `<checkout>` set to a `git archive` of the branch (ca6d349) or of main (9a53412) with `evals/` removed.
+
+- **Self-test:** `python3 evals/release/ranked-pick/test_cases.py`: 14 tests OK (the `empty` reference run passes; planted runs that open an empty `Release 3` issue, apply a label, or give a report that does not say nothing qualified fail).
+- **Case check (premium, fresh):** keep. Follow-ups made after it: `empty` now expects #20 named in the report as left out or waiting, and a bare "empty" no longer counts as "nothing qualified" in the scorer.
+- **Branch's skill, premium: pass.** No release issue, no label, a report that says nothing qualified and why (#20 waits on #40, which is at `ready-for-human`), and #50 proposed. Scored 6/6 by the scorer of the run; 7/7 by the scorer after the follow-ups (evidence: `ranked-pick/evidence/branch-empty-r652/`).
+- **Main's skill (9a53412), premium: fail.** It opened an empty `Release 3` issue (Order "None.", Used 0, id 51) and created the label `release-3`: the two real failures. Its subagent could not write `.scratch/report.md` (the tool refused), so the report checks fail partly for that gap; 1/6 by the run's scorer, 1/7 after the follow-ups (evidence: `ranked-pick/evidence/main-empty-r652/`, no `report.md`).
+- **Eval:** behaviour change, so the case runs on the branch's skill and on main's (ADR 0013); main fails on the fixed behaviour, the branch passes.
+
+Not exercised: the rerun path (an open release issue whose Order lists nothing), a dry run, a regular-tier run.
+Pass: yes. Lessons: none for the skill; the main run's report could not be written, so the report checks of main say nothing about main's wording.
+
 ### 2026-11-04, branch `claude/project-thread-s7aafz` (Ticket #670), commit 5e5798e, dev-skills 0.72.0 (base, main 617d884, merged into the branch): `main-check` and the ranked-pick cases
 
 Setup: the new case `main-check` (`evals/release/main-check/`), written before the skill text: `release` step 5 now checks every open issue with no release label, not parked and not left to a later Milestone against main before ranking ("Check against main"), and records each verdict in the release issue's `## Checked against main` section. Run level: decision-level in a subagent (every write a block in `.scratch/proposed-actions.md`). Runs made by the Ticket thread: one fresh subagent per run, given only the PROMPT.md text, with `<checkout>` a `git archive` (evals/ removed) of the branch at 5e5798e or of main at 617d884, scored with the branch's scorers; the Implementer rescored every run directory, with the same results. Each run's `proposed-actions.md`, `report.md`, the Release 3 issue it opened (`release-issue.md`) and its score are in `main-check/evidence/<branch|main>-<tier>/` and `ranked-pick/evidence/<branch|main>-<case>-r670/`.

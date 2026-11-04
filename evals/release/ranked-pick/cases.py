@@ -129,6 +129,23 @@ CASES = {
                  created="2026-10-04", body="Read `~/.greetrc` (output format, colour). #24 and #25 need it."),
         ],
     ),
+    # No candidate qualifies: the one planned feature waits on a blocker no agent can take (#40 is at ready-for-human),
+    # there is no ready-for-agent bug and no severe or marked issue; the enhancement the Milestone does not list is only
+    # proposed, and the needs-triage bug is not a candidate. The run opens no release issue, labels nothing, and
+    # reports that nothing qualified and why.
+    "empty": dict(
+        size=5,
+        milestone=[20],
+        issues=[dict(QUIET, blocked_by=[40]),
+            bug(40, "flag-parse", "Flags after the name are dropped", "2026-10-25",
+                "`greet.sh hello Ada -x` ignores `-x`: the parser stops at the name. The quiet flag (#20) needs it. "
+                "Needs a decision on the flag syntax first.", labels=["ready-for-human", "bug"]),
+            dict(n=50, slug="colour", title="Colour output", type="ticket", labels=["ready-for-agent", "enhancement"],
+                 created="2026-09-10", body="Print the greeting in green when stdout is a terminal."),
+            bug(34, "unicode", "Names with accents come out mangled", "2026-08-01", "Reported, not yet triaged.",
+                labels=["needs-triage", "bug"]),
+        ],
+    ),
     # A repo that keeps no version cuts a whole Release: shipped test, changelog entry with no Versions line and no
     # version file, the end-of-Release pass in order, then the plan.
     "no-version": dict(
@@ -168,6 +185,8 @@ EXPECT = {
                              not_ranked=set(), cleared=set(), kept_mark={35}, used=2, past=1),
     "reorder": dict(order=[26, 25, 24], labelled={26, 25, 24}, left_out=set(), not_ranked=set(),
                     cleared=set(), used=3, reasons=True),
+    "empty": dict(order=[], labelled=set(), left_out={20}, not_ranked={34, 50}, proposed={50}, cleared=set(),
+                  used=0, empty=True),
     "no-version": dict(order=[21], labelled={21}, left_out=set(), not_ranked=set(), cleared=set(), used=1,
                        cut=dict(name="Release 2", shipped=[10, 20], also_merged=[9])),
 }

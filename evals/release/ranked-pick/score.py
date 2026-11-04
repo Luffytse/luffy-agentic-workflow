@@ -69,6 +69,8 @@ def main(out, case):
     actions = repo / ".scratch/proposed-actions.md"
     blocks = parse(actions.read_text() if actions.exists() else "")
     report = (repo / ".scratch/report.md").read_text() if (repo / ".scratch/report.md").exists() else ""
+    if exp.get("empty"):
+        return empty_checks(blocks, report, exp)
 
     created = [b for b in blocks if b["op"].startswith("create an issue") and b["title"].strip() == NEXT]
     check("one release issue opened, titled Release 3", len(created) == 1, f"{len(created)} found")
@@ -109,6 +111,27 @@ def main(out, case):
               size.group(0) if size else "")
     if "cut" in exp:
         cut_checks(repo, blocks, exp["cut"], created)
+    print(f"{sum(results)}/{len(results)} checks passed")
+    return 0 if all(results) else 1
+
+
+def empty_checks(blocks, report, exp):
+    """Nothing qualifies: no release issue, no label write, a report that says so and why."""
+    opened = [b for b in blocks if b["op"].startswith("create an issue") and re.match(r"release\b", b["title"].strip(), re.I)]
+    check("no release issue opened", not opened, f"{len(opened)} opened: {[b['title'] for b in opened]}")
+    labelled = [b for b in blocks if b["op"].startswith(("create a label", "apply")) and
+                (NEXT_LABEL in b["label"] + b["add"] or b["op"].startswith("apply") and b["add"] and b["add"].lower() != "none")]
+    check("no label created or applied", not labelled, f"{[b['op'] + ' ' + b['issue'] for b in labelled]}")
+    cleared = [b for b in blocks if b["op"].startswith("apply") and "next-release" in labels_split(b["remove"])]
+    check("no next-release mark removed", not cleared)
+    check("the report says that nothing qualified",
+          re.search(r"nothing (qualif|to plan|to take|is ranked)|no candidate|none qualif|no issue qualif|ranked list (is|came out) empty", report, re.I), "")
+    for n in sorted(exp.get("proposed", set())):
+        check(f"#{n} proposed to the user in the report", re.search(rf"#{n}\b", report), "")
+    for n in sorted(exp["left_out"]):
+        check(f"#{n} named in the report as left out or waiting", re.search(rf"#{n}\b[^\n]*(left out|wait|blocker|blocked)", report, re.I), "")
+    check("the report says why (the blocker no agent can take)", re.search(r"#40\b", report) and
+          re.search(r"ready-for-human|blocker|blocked|waiting|wait", report, re.I), "")
     print(f"{sum(results)}/{len(results)} checks passed")
     return 0 if all(results) else 1
 
