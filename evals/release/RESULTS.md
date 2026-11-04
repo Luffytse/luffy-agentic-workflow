@@ -20,9 +20,12 @@ Pass: yes | no. Lessons: <what to change in release, if anything>
 Setup: the new ranked-pick case `old-shape-cut` (R1-1 of PR #651's Round 1): `no-version`'s fixture with the open Release 2 (#2) written before the Order list (`**Cap:**` line, `## Scope` list, no `## Order`), its issues #10 and #20 labelled `release-2` and closed by merged pull requests.
 
 - **Self-test:** `python3 evals/release/ranked-pick/test_cases.py`: 9 tests OK (reference runs pass all nine cases; a planted run that plans `old-shape-cut` again with no cut fails).
-- **Spec head's skill, literal (red):** "Find where you are" case 1 reads #2's empty Order as a planning that stopped part way, so step 5 plans into #2 and nothing is cut.
+- **Spec head's skill, literal (red, as text):** "Find where you are" case 1 reads #2's empty Order as a planning that stopped part way, so step 5 plans into #2 and nothing is cut.
 - **Branch's skill, literal (green):** case 1 now says such an issue is the current Release of case 2; the changelog has no `## Release 2`, so steps 1 to 5 run as in `no-version`.
-- **Fresh runs:** PENDING: one fresh premium-tier run of `old-shape-cut` on this branch's skill and one on the Spec head's (3e9653c), scored with `score.py`.
+- **Fresh runs (2026-11-04, made by the coordinator):** one fresh premium-tier subagent per text, given only the PROMPT.md text, with `<checkout>` set to a `git archive` copy (evals/ removed) of this branch at ac00325 or of the Spec head at 3e9653c, scored with `score.py` from ac00325. The outputs and scores are in `ranked-pick/evidence/branch-old-shape-cut/` and `ranked-pick/evidence/spec-head-old-shape-cut/`; the Implementer rescored both, with the same results.
+  - **Branch: 20/20.** It read #2 as the current Release by the new clause, cut it, then planned Release 3 with Order #21.
+  - **Spec head: also 20/20.** In its final message it said the literal text would have sent it to plan #2 again ("Read literally, the skill's first case … would have sent it to re-plan instead"), and it read the `## Scope` list as the Order anyway (its report: "I read its Scope as its Order").
+- **Verdict:** this case does not separate the two texts: a careful premium run works around the old wording. The fix makes explicit what the old text left to the agent's judgement; what fails a replan with no cut is the planted wrong run in `test_cases.py`, not a model run. Pass: yes for the branch; the red is literal only.
 
 ### 2026-11-04, branch `ticket-635` (base 7d8ed12), dev-skills 0.61.0 (base): the one path, ranked-pick cases
 
