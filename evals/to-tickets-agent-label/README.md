@@ -42,3 +42,7 @@ Runner: six fresh regular-tier subagents, each given only the `to-tickets` SKILL
 ### Run for #623 (local-files recipe removed from `to-tickets`)
 
 Twelve fresh regular-tier subagents, one per case on the pull request's skill and on main's (`git archive` of cc54278, plugin 0.64.0), each given the skill folder and the fixture's `PROMPT.md`, scored with `score.py`. Subagent runs, not a top-level session. Pull request: all six PASS. Main: five PASS; `conflict` failed on the report wording (it lacked "conflict" for ticket 02), a wording miss, not a label error. The change moved no label result: the fixture's own tracker doc supplies the file shape.
+
+### Run for #692 (repo-label rule added to `to-tickets` step 3)
+
+Six fresh regular-tier subagents (Agent tool, file tools only), one per case, each given only the `to-tickets` and `triage` skills from the branch (head b2b7cbf, plugin 0.79.0) and the fixture's `PROMPT.md`, scored with `score.py`. Subagent runs, not a top-level session; the final reply was saved as `REPORT.txt`. All six PASS: `unrestricted`, `inherited`, `conflict` (01 published, 02 and 03 held, one question), `no-mapping`, `milestone`, `resume` (02 gained `beta-only`, no new ticket). Not run on main: the change adds a repo-label paragraph and moves no agent-label result, so these cases are a regression guard here, not a demonstrated gain.
