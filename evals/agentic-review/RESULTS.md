@@ -4,6 +4,30 @@ One entry per run, newest first. Rerun when a pull request changes how `agentic-
 
 Entries before the review was rebuilt around Round 0 and `review-rounds` ran the earlier review (up to 5 Rounds, rebuttals, the convergence check, Milestone design answers, merge-only Rounds). They are kept as history: the checks they name for those rules were removed with the rules, and a `<depth>` there is the old Review depth.
 
+### 2026-11-04, Script briefs, second run, dev-skills 0.69.0
+
+Run level: decision-level in a subagent that can run shell commands (regular tier); it starts no agent. Two fresh regular-tier subagents, each told to read the case's `PROMPT.md` and do exactly it (one hop: the prompt came from the file, not pasted). Rerun because the branch's skill text changed after the first run below: SKILL.md "Briefing the agents" now names `<finder>.md` and says `verify` takes the same `--level` and `--spec` as the Round's briefs.
+
+Case: `script-briefs/`. Branch run: `plugins/` of the Spec branch at `b229874` (dev-skills 0.69.0). Baseline run: `plugins/` of main at `098821e` (0.69.0). Scored with `python3 evals/agentic-review/script-briefs/score.py <out-dir>`.
+
+| check | main's skill | branch's skill |
+|-------|--------------|----------------|
+| F1 files | FAIL (left: adversarial-finder.md, spec-finder.md, standards-finder.md, verifier.md) | PASS |
+| B1 standards brief | FAIL (finder-standards.md missing) | PASS |
+| B2 spec brief | FAIL (finder-spec.md missing) | PASS |
+| B3 adversarial brief | FAIL (finder-adversarial.md missing) | PASS |
+| B4 Verifier brief | FAIL (verifier.md differs from the script's) | PASS |
+| L1 work tree | PASS | PASS |
+| H1 command named (by hand) | no script exists | named, see below |
+
+Score: main 1/6, branch 6/6.
+
+Branch's run (H1): the agent read SKILL.md, ran `--help`, wrote `round1 --level standard --base main --head planted ... --spec ... --angle "Bugs and edge cases"`, copied the three messages as `standards.md`, `spec.md` and `adversarial.md` into a reports directory outside the repository and the briefs directory, then ran `verify --level standard ... --reports <dir>`. There was no retry this time: the first run's retry is gone with the file-naming wording.
+
+Main's run: the agent again hand-built the briefs with a heredoc-based shell generator; tiers standards and spec regular, adversarial cheap, Verifier regular. Same caveat as the first run: F1 and B1-B3 fail partly on file names, not only on content.
+
+The premium-tier re-check of the case said keep (valid, needed); it fails on main mostly for the right reason, named above (hand-built briefs differ from the script's).
+
 ### 2026-11-04, Script briefs, dev-skills 0.67.0 plus Ticket #649
 
 Run level: decision-level in a subagent that can run shell commands (regular tier); it starts no agent. Two fresh regular-tier subagents, each given `PROMPT.md`'s text only.
@@ -24,7 +48,7 @@ Score: main 1/6, branch 6/6.
 
 Main's run: the agent read SKILL.md, FINDERS.md, VERIFY.md and the docs-index and review-record skills, read the repo with git status, log, diff, merge-base, rev-parse and cat, wrote a generator shell script (heredocs) and ran it to produce all four briefs. Tiers it gave: standards regular, spec regular, adversarial cheap, Verifier regular. It noted gaps in the canned Finder reports and added nothing to the candidate list. Main's F1 and B1-B3 failures come partly from file names (the agent named files `<role>-finder.md`), not only from unmatched content; the case does not show content divergence for B1-B3 on main, only B4 differs in content.
 
-Branch's run: the reply named `review_briefs.py round1 --level standard --base main --head planted --repo <repo> --out <briefs dir> --spec <repo>/.scratch/SPEC.md --angle "bugs and edge cases"`, then `verify ... --level standard --for round1 --reports <dir> --spec ...`. The first `verify`, pointed at the messages directory (files named `<role>-finder.txt`), wrote nothing; the agent copied them as `standards.md`, `spec.md` and `adversarial.md` into a reports directory outside the repository and the briefs directory, reran, and wrote `verifier.md`. Finding: at `5931d20` the skill text said to save each message "to a file named for that Finder" and did not give the name `<finder>.md`, so the agent learned it from the script's failure. The commit that records this entry adds the name to SKILL.md ("Briefing the agents"); that wording was not run.
+Branch's run: the reply named `review_briefs.py round1 --level standard --base main --head planted --repo <repo> --out <briefs dir> --spec <repo>/.scratch/SPEC.md --angle "bugs and edge cases"`, then `verify ... --level standard --for round1 --reports <dir> --spec ...`. The first `verify`, pointed at the messages directory (files named `<role>-finder.txt`), wrote nothing; the agent copied them as `standards.md`, `spec.md` and `adversarial.md` into a reports directory outside the repository and the briefs directory, reran, and wrote `verifier.md`. Finding: at `5931d20` the skill text said to save each message "to a file named for that Finder" and did not give the name `<finder>.md`, so the agent learned it from the script's failure. The commit that records this entry adds the name to SKILL.md ("Briefing the agents"); that wording was run in the second run above, where the retry did not recur.
 
 What it shows: with the Ticket's skill text the agent used the script and its output is byte-identical to the script's; on main the agent hand-built briefs with a generator script. It does not show that the added file-naming phrase removes the retry.
 

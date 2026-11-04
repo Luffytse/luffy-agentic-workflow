@@ -78,7 +78,7 @@ What a Round briefed from the script leaves. The run is a fresh regular-tier sub
 
 | id | Check | Pass when |
 |----|-------|-----------|
-| F1 | files | exactly `finder-standards.md`, `finder-spec.md`, `finder-adversarial.md` and `verifier.md` (the table of `review-rounds` at Standard names three Finders and one Verifier) |
+| F1 | files | exactly `finder-standards.md`, `finder-spec.md`, `finder-adversarial.md` and `verifier.md` (the names come from the script; the table of `review-rounds` at Standard gives the count: three Finders and one Verifier) |
 | B1-B3 | Finder briefs | each is identical to the script's file of that name |
 | B4 | Verifier brief | identical to the script's, so the three messages are carried over unchanged, each under its Finder, and only the Always check line the standards Finder's Bug class names is in it |
 | L1 | work tree | the repository has no new or changed file (the briefs were written outside it) |
