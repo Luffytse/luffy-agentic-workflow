@@ -582,6 +582,56 @@ class VerifierBrief(Base):
         self.assertNotIn("adversarial", r.stderr)
         self.assertEqual(s.files(), [])
 
+    def test_plain_nothing_found_variants_are_accepted_and_prose_is_not(self):
+        for text in ("No issues found.\n", "no findings found\n", "  No candidates found!  \n", "NOTHING FOUND\n",
+                     "Reviewed the diff.\n\nNo issues found\n"):
+            with self.subTest(text=text):
+                s = self.scratch()
+                reports = self.all_clear()
+                reports["standards"] = text
+                r = self.verify(s, reports)
+                self.ok(r)
+                self.assertRegex(r.stdout.lower(), r"no verifier")
+        for text in ("I found no issues in this diff.\n", "No issues found in the parser, but the cache is wrong.\n"):
+            with self.subTest(text=text):
+                s = self.scratch()
+                reports = self.all_clear()
+                reports["standards"] = text
+                r = self.verify(s, reports)
+                self.assertEqual(r.returncode, 3)
+                self.assertIn("standards", r.stderr)
+                self.assertIn("nothing found", r.stderr)
+
+    def test_a_report_of_a_finder_the_arguments_leave_out_is_refused_and_named(self):
+        s = self.scratch()
+        reports = self.all_clear()
+        reports["adversarial"] = "Nothing found.\n"  # standard lists it; leave it, then add one the level lacks
+        reports["security"] = "Nothing found.\n"
+        r = self.verify(s, reports)
+        self.assertNotEqual(r.returncode, 0)
+        self.assertIn("security", r.stderr)
+        self.assertNotIn("adversarial", r.stderr)
+        self.assertIn("--level", r.stderr)
+        self.assertIn("--spec", r.stderr)
+        self.assertEqual(s.files(), [])
+        s = self.scratch()
+        r = self.verify(s, self.all_clear(), spec=False)  # spec.md present, --spec not passed
+        self.assertNotEqual(r.returncode, 0)
+        self.assertIn("spec", r.stderr)
+        self.assertEqual(s.files(), [])
+
+    def test_every_option_of_every_subcommand_has_help_text(self):
+        for cmd in ("round1", "ticket", "fixed", "later", "verify", "disputes"):
+            with self.subTest(cmd=cmd):
+                r = subprocess.run([sys.executable, "-B", str(REVIEW_ROUNDS / SCRIPT_NAME), cmd, "--help"],
+                                   text=True, capture_output=True)
+                self.assertEqual(r.returncode, 0)
+                entries = re.split(r"^  (?=-)", r.stdout.split("options:", 1)[1], flags=re.M)[1:]
+                self.assertTrue(entries)
+                for e in entries:  # the help is on the option's line after a gap, or on the lines below it
+                    first, _, rest = e.partition("\n")
+                    self.assertTrue(re.search(r"\S\s{2,}\S", first) or rest.strip(), "no help: " + first)
+
     def test_a_good_report_next_to_one_bad_report_writes_nothing(self):
         s = self.scratch()
         reports = self.all_clear()
@@ -873,7 +923,9 @@ class LaterVerifier(Base):
     def test_the_round_1_finders_reports_are_not_asked_for(self):
         s = self.scratch()
         last, _ = second_commit(s)
-        self.assertEqual(self.verify_later(s, last, {"standards": finding("First", "x")}).returncode, 3)
+        r = self.verify_later(s, last, {"standards": finding("First", "x")})
+        self.assertEqual(r.returncode, 2)  # a Round 1 Finder's report is one the arguments leave out
+        self.assertIn("standards", r.stderr)
         self.assertEqual(s.files(), [])
 
     def test_off_format_later_report_stops_naming_the_finder(self):
@@ -973,7 +1025,7 @@ class TicketCheck(Base):
         rdir.mkdir()
         (rdir / "standards.md").write_text(finding("First", "x"))
         (rdir / "spec.md").write_text("Nothing found.\n")
-        r = run_cmd(s, "verify", "--for", "ticket", "--base", "feature", "--head", "ticket-1", "--reports", rdir)
+        r = run_cmd(s, "verify", "--for", "ticket", "--base", "feature", "--head", "ticket-1", "--reports", rdir, "--spec", s.spec)
         self.ok(r)
         t = (s.out / "verifier.md").read_text()
         self.assertRegex(t, r"(?i)ticket check")
@@ -1034,7 +1086,7 @@ class FixedPoint(Base):
         rdir.mkdir()
         (rdir / "standards.md").write_text(finding("First", "x"))
         (rdir / "spec.md").write_text("Nothing found.\n")
-        r = run_cmd(s, "verify", "--for", "fixed", "--level", "quick", "--base", "main", "--reports", rdir)
+        r = run_cmd(s, "verify", "--for", "fixed", "--level", "quick", "--base", "main", "--reports", rdir, "--spec", s.spec)
         self.ok(r)
         self.assertRegex((s.out / "verifier.md").read_text(), r"(?i)fixed point")
 

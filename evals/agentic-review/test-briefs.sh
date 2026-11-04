@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Checks the eval's brief builder (briefs.sh), which calls the plugin's review_briefs.py, on the planted fixture: it
+# Checks the eval's briefs.sh, which calls the plugin's review_briefs.py, on the planted fixture: it
 # builds the fixture with setup.sh, builds the briefs at every level and for the Verify-only check, and checks the
 # right files come out and that the fixture's own inputs reach the right brief (the spec, the Always check line for the
 # touched files and not the other one, the candidates). What each brief holds from the skill files is tested by

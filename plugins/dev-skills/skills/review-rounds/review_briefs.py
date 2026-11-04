@@ -41,7 +41,10 @@ the Round is named in the brief). --reports is a directory
 holding one file per Finder of the Round, named <finder>.md with the Finder as the table in SKILL.md names it:
 standards, spec (only with --spec), adversarial (standard and deep), security (deep); for later, one later.md. The thread saves each Finder's
 final message there unchanged. First every report is checked: it must hold one or more Findings in the Finding format
-(a heading and every field line of the format) or "nothing found". A missing, empty or off-format report stops the
+(a heading and every field line of the format) or a line saying nothing found ("nothing found", "no issues found", "no
+findings found" or "no candidates found", any case, punctuation ignored). A report of a Finder the arguments leave out
+(spec.md without --spec, adversarial.md at quick) stops the script with exit 2 naming it: verify takes the Round's own
+--level and --spec (and --round, --for). A missing, empty or off-format report stops the
 script (exit 3) with every such Finder named, and nothing is written; the thread asks that Finder again. A passing
 report goes into the brief byte for byte, in a code fence under a heading naming its Finder. The brief also holds the
 Verifier brief and copy rule (VERIFY.md, FINDERS.md), the Finding format, the Round values, the spec, the design
@@ -514,7 +517,7 @@ def later(args):
 
 # ---- the Verifier brief ----
 
-NOTHING = re.compile(r"^\W*nothing found\W*$", re.I)
+NOTHING = re.compile(r"^\W*(?:nothing|no\s+(?:findings|issues|candidates))\s+found\W*$", re.I)
 
 
 def has_findings(rules, text):
@@ -529,7 +532,7 @@ def report_problem(rules, text):
     if not hs:
         if any(NOTHING.match(line) for line in text.splitlines()):
             return None
-        return "it has no Finding heading and does not say nothing found"
+        return "it has no Finding heading and has no line saying nothing found (\"nothing found\")"
     lines = text.splitlines()
     for n, (i, line) in enumerate(hs):
         block = lines[i + 1:hs[n + 1][0] if n + 1 < len(hs) else len(lines)]
@@ -572,6 +575,11 @@ def build_verify(rules, a):
     if not rdir.is_dir():
         raise Usage("--reports %s is not a directory" % a.reports)
     finders = ["later"] if a.kind == "later" else [r for r in ROLES[a.level] if r != "spec" or spec is not None]
+    extra = sorted(f for f in ("standards", "spec", "adversarial", "security", "later")
+                   if f not in finders and (rdir / (f + ".md")).exists())
+    if extra:
+        raise Usage("--reports holds %s, but this Round's arguments list no such Finder; repeat the Round's own "
+                    "--level and --spec (and --round, --for) here" % ", ".join(f + ".md" for f in extra))
     reports, problems = {}, []
     for f in finders:
         text = read_report(rdir / (f + ".md"))
@@ -650,19 +658,19 @@ def disputes(args):
 
 def common(sp, level=True, base_help=None):
     if level:
-        sp.add_argument("--level", required=True, type=str.lower, choices=LEVELS)
+        sp.add_argument("--level", required=True, type=str.lower, choices=LEVELS, help="the review level Round 0 picked")
     sp.add_argument("--base", required=True, help=base_help)
-    sp.add_argument("--head", default="HEAD")
-    sp.add_argument("--repo", default=".")
-    sp.add_argument("--out", required=True)
+    sp.add_argument("--head", default="HEAD", help="the ref the Round reviews (default HEAD)")
+    sp.add_argument("--repo", default=".", help="the repository directory (default .)")
+    sp.add_argument("--out", required=True, help="the directory the briefs are written to, outside the work tree")
 
 
 def finder_inputs(sp):
-    sp.add_argument("--spec")
-    sp.add_argument("--standards")
-    sp.add_argument("--earlier")
-    sp.add_argument("--design")
-    sp.add_argument("--angle", default=None)
+    sp.add_argument("--spec", help="the spec file; without it there is no spec Finder")
+    sp.add_argument("--standards", help="a file listing standards file paths, one per line")
+    sp.add_argument("--earlier", help="a file of the earlier open Findings with their disputes")
+    sp.add_argument("--design", help="a file of the design answers")
+    sp.add_argument("--angle", default=None, help="the adversarial angle's name; the valid names are in the skill's angle list")
 
 
 def main(argv):
@@ -682,23 +690,24 @@ def main(argv):
     fx.set_defaults(run=fixed)
     lt = sub.add_parser("later", help="the later-Round Finder brief of Round 2 or 3")
     common(lt, base_help="the last Round's head")
-    lt.add_argument("--round", type=int, choices=(2, 3), default=2)
+    lt.add_argument("--round", type=int, choices=(2, 3), default=2, help="the Round number")
     finder_inputs(lt)
     lt.set_defaults(run=later)
     vf = sub.add_parser("verify", help="the Verifier brief from the Finders' reports")
     common(vf, level=False, base_help="as for the Round's own subcommand")
-    vf.add_argument("--level", type=str.lower, choices=LEVELS, default=None)
-    vf.add_argument("--for", dest="for_", choices=("round1", "later", "ticket", "fixed"), default="round1")
-    vf.add_argument("--round", type=int, choices=(2, 3), default=2)
-    vf.add_argument("--reports", required=True)
-    vf.add_argument("--spec")
-    vf.add_argument("--earlier")
-    vf.add_argument("--design")
+    vf.add_argument("--level", type=str.lower, choices=LEVELS, default=None, help="the Round's own --level (not for ticket)")
+    vf.add_argument("--for", dest="for_", choices=("round1", "later", "ticket", "fixed"), default="round1",
+                    help="the kind of Round the reports are for (default round1)")
+    vf.add_argument("--round", type=int, choices=(2, 3), default=2, help="the Round number, for --for later")
+    vf.add_argument("--reports", required=True, help="a directory with one <finder>.md per Finder of the Round")
+    vf.add_argument("--spec", help="the Round's own --spec file; pass it when the Round had a spec Finder")
+    vf.add_argument("--earlier", help="a file of the earlier open Findings with their disputes")
+    vf.add_argument("--design", help="a file of the design answers")
     vf.set_defaults(run=verify)
     dp = sub.add_parser("disputes", help="the Verifier-alone Round: a Verifier brief of only the disputes")
     common(dp, base_help="the last Round's head")
-    dp.add_argument("--round", type=int, choices=(2, 3), default=2)
-    dp.add_argument("--disputes", required=True)
+    dp.add_argument("--round", type=int, choices=(2, 3), default=2, help="the Round number")
+    dp.add_argument("--disputes", required=True, help="a file of the disputed Findings and their disputes")
     dp.set_defaults(run=disputes)
     args = p.parse_args(argv)
     try:
