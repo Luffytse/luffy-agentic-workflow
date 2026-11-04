@@ -1,6 +1,6 @@
 # Boundary record
 
-What the user has agreed agents may do on their own in this repo, which actions are the user's to decide, and the limits agents work within. The merge step of `implement` and `implement-spec` reads this record for every pull request, inside a Milestone or not, instead of a fixed list: the thread merges its pull request unless it crosses a boundary here or, for an issue that carries a Milestone label (or a no-issue corrective check's recorded `Retro origin` that does), in the Milestone issue, or the repo's own rules say a person merges it ([ADR 0004](adr/0004-build-threads-coordinate-and-subagents-code.md), "When the user must review"). A merged version bump is not a published release and is no one-way door here (glossary **Door**). The decision is on [#385](https://github.com/Luffytse/luffy-dev-skills/issues/385#issuecomment-6564185667) and in Milestone 1 ([#396](https://github.com/Luffytse/luffy-dev-skills/issues/396), "Boundaries").
+What the user has agreed agents may do on their own in this repo, which actions are the user's to decide, and the limits agents work within. The merge step of `implement` and `implement-spec` reads this record for every pull request, inside a Milestone or not, instead of a fixed list: the thread merges its pull request unless it crosses a boundary here or the repo's own rules say a person merges it ([ADR 0004](adr/0004-build-threads-coordinate-and-subagents-code.md), "When the user must review"). A merged version bump is not a published release and is no one-way door here (glossary **Door**). The decision is on [#385](https://github.com/Luffytse/luffy-dev-skills/issues/385#issuecomment-6564185667) and in Milestone 1 ([#396](https://github.com/Luffytse/luffy-dev-skills/issues/396), "Boundaries").
 
 - **Irreversible actions agents may take**: any. Nothing here touches user or customer data.
 - **Actions that need the user's approval**: none.
@@ -11,4 +11,4 @@ What the user has agreed agents may do on their own in this repo, which actions 
 
 ## Milestone issues
 
-A Milestone issue may name extra allowed or forbidden actions for its own issues. For an issue that belongs to the Milestone, the Milestone issue wins over this record; for every other issue, this record applies as written.
+A Milestone issue holds no boundaries of its own: this record applies to every issue, inside a Milestone or not (Spec #633). To allow or reserve an action for a Milestone, change this record. The `## Boundaries` section of an earlier Milestone issue, such as Milestone 1's, is history.

@@ -1,0 +1,6 @@
+- What outcome do you want by the end of this Milestone? Please put the goal in one paragraph, in your own words.
+- Which features deliver that goal? For each, is it already planned with its own issue holding its acceptance criteria, or should we plan it now (grill-with-docs, then to-spec and to-tickets, or one lone Ticket)?
+- In what order should the features be built, and one at a time or several at once (how many)?
+- How will you accept the Milestone at its review: what will you check?
+- What is excluded from this Milestone ("nothing" is an answer)?
+- Here is the whole draft Milestone issue, its title "Milestone 1: Farewell and quiet" and its label `milestone-1`: is it right, or what should change?

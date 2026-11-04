@@ -95,7 +95,7 @@ An empty answer to the second question is valid. The build skills read this reco
 
 > What should a Milestone's membership label look like? (recommended: **`milestone-<n>`**, for example `milestone-1`)
 
-Never guess a value. Say that a Milestone issue may add allowed or forbidden actions for its own issues and wins over the record for them; the seed already says so.
+Never guess a value. Say that this record is the only one: a Milestone issue holds no boundaries of its own, so an action to allow or reserve for a Milestone goes here; the seed already says so.
 
 On a re-run, fill the fresh draft of the record from the existing record's values before diffing it, so a value filled in earlier is never shown as a revert to the seed's placeholder; ask again only for a value the existing record lacks, or that the user wants to change.
 

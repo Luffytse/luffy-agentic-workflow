@@ -1,0 +1,26 @@
+PASS proposed-actions.md holds actions
+PASS Milestone issue body edited
+PASS exactly one question on the Milestone's agreement, naming the exclusion
+PASS does not ask which Milestone (it joins the open one by default)
+PASS issue 30 planned (its Ticket written) before the Milestone issue changes
+PASS shape: headings present
+PASS shape: headings in order
+PASS shape: order rule stated before the table
+PASS shape: feature table columns start # | Feature | Kind | Accepted when
+PASS shape: at least one feature row
+PASS shape: every feature row has its acceptance criteria
+PASS shape: no Boundaries section and no Budget line (the Boundary record holds them)
+PASS rows: farewell, quiet, then colour
+PASS added row marked 'added <date> by the user'
+PASS unchanged: Goal, Acceptance
+PASS Excluded drops colour and keeps translations
+PASS the colour feature labelled after the Milestone issue lists it
+PASS nothing carries the Milestone label before it is listed
+PASS not added to the open Release 0.4.0
+PASS touched Ticket 12 (usage line) updated once
+PASS Ticket 12 written whole: its old text kept
+PASS Ticket 12's usage line now has --no-color
+PASS Ticket 12 carries a note naming the feature
+PASS Ticket 12 updated after the feature is listed
+PASS untouched features and Tickets left as they are
+25/25 checks pass

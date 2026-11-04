@@ -19,7 +19,9 @@ for flow in ticket spec; do
         [ -e "$d/repo/.scratch/issues/00-milestone.md" ] && bad "$flow/$case: a no-record case has a Milestone issue" ;;
       *)
         [ -f "$d/repo/docs/dev-skills/boundaries.md" ] || bad "$flow/$case: no Boundary record"
-        grep -q 'Milestone label form' "$d/repo/docs/dev-skills/boundaries.md" 2>/dev/null || bad "$flow/$case: record has no label form" ;;
+        grep -q 'Milestone label form' "$d/repo/docs/dev-skills/boundaries.md" 2>/dev/null || bad "$flow/$case: record has no label form"
+        grep -q 'wins over this record' "$d/repo/docs/dev-skills/boundaries.md" && bad "$flow/$case: record lets a Milestone issue win over it"
+        grep -q '^## Boundaries' "$d/repo/.scratch/issues/00-milestone.md" 2>/dev/null && bad "$flow/$case: Milestone issue holds boundaries of its own" ;;
     esac
     # One merge rule, one listing line: no fixture text uses the old line name or the old membership split.
     grep -rlE 'Milestone review:|outside-a-Milestone|inside list|outside list' "$d/PROMPT.md" "$d/DECISION.md" "$d/repo" --exclude-dir=.git 2>/dev/null | grep -q . && bad "$flow/$case: fixture text keeps the old line name or the old inside/outside split"
@@ -73,6 +75,7 @@ skills="$here/../../../plugins/dev-skills/skills"
 for s in implement implement-spec; do
   grep -q 'Agent-merged rules:' "$skills/$s/SKILL.md" || bad "$s: SKILL.md does not name the Agent-merged rules: line"
   grep -qiE 'Milestone review:|(inside|outside) a Milestone\*{0,2}, bring' "$skills/$s/SKILL.md" && bad "$s: SKILL.md keeps the old line name or an inside/outside merge list"
+  grep -qiE "Milestone issue's own boundaries|Milestone-issue test" "$skills/$s/SKILL.md" && bad "$s: SKILL.md still reads a Milestone issue's own boundaries at merge"
 done
 rm -rf "$out"
 [ "$fail" = 0 ] && echo "OK: merge-authority fixtures" || exit 1

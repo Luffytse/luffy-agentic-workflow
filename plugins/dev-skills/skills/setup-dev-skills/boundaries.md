@@ -10,4 +10,4 @@ What the user has agreed agents may do on their own in this repo, which actions 
 
 ## Milestone issues
 
-A Milestone issue may name extra allowed or forbidden actions for its own issues. For an issue that belongs to the Milestone, the Milestone issue wins over this record; for every other issue, this record applies as written.
+A Milestone issue holds no boundaries of its own: this record applies to every issue, inside a Milestone or not. To allow or reserve an action for a Milestone, change this record.

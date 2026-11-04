@@ -17,6 +17,39 @@ Pass: yes | no. Not exercised: <what this run did not reach>. Lessons: <what to 
 
 ## Runs
 
+### 2026-11-04, commit `0027423` (`ticket-638`), dev-skills 0.61.0 (unbumped): the five delivery dry runs after Ticket #638
+
+Run level: decision-level in a subagent
+Runner: the coordinator. One fresh premium-tier subagent per case was given only the prompt text between the `---` lines, with `<checkout>` set to a `git archive` copy of `0027423` with `evals/` removed.
+Ran: `score.py` on each case. Evidence: [`evidence/638/`](evidence/638/), one folder per case with `proposed-actions.md` and `score.txt`. In the copied evidence, the run directory's path reads `<runs>` and model names read `<model>`, so that the `vendor-model` check in `scripts/check-plugin.sh` passes. The scores were rerun on the edited files and are unchanged.
+
+| Case | Score |
+| --- | --- |
+| `deliver` | 33/33 |
+| `deliver-pause` | 20/20 |
+| `deliver-earlier` | 7/7 |
+| `deliver-stall` | 27/28: FAIL "events 7 to 12: nothing written for 10 and the user not told of it again" |
+| `deliver-lift` | 36/37: FAIL, the same check |
+
+In both failing branch runs, the event 11 message to the user about parking 20 says "With 10-farewell.md also parked, nothing more in Release 1 can start". It names 10 again, so the check fails, although the sentence gives the context for why delivery waits rather than a second notice about 10.
+
+**Baseline on main.** The coordinator ran the same two cases on main's skills. Each fresh premium-tier subagent got the branch fixture (built with `b3134cc`'s `make-fixture.sh`) and a `git archive` of main `c29d3b1` (0.61.0), and was scored with the same `score.py`. Evidence: `evidence/638/main-deliver-stall/` and `evidence/638/main-deliver-lift/`, redacted the same way, with the scores rerun on the edited files and unchanged.
+
+| Case | Main | Main's failures |
+| --- | --- | --- |
+| `deliver-stall` | 26/28 | "event 4: one nudge record on 10-" and "event 9: one nudge record on 20-": the run put both nudge records on the Milestone issue |
+| `deliver-lift` | 34/37 | the same two nudge checks, and "events 7 to 12: nothing written for 10 and the user not told of it again" |
+
+The check the branch runs fail also fails on main, and the steps involved are unchanged in #638's diff. The park line of "Replace a stalled worker" and the scorer are untouched. The audit-trail line kept its "(on the Milestone issue)" and lost only "or the release issue with no Milestone". So the branch's stall and lift FAILs are **Pre-existing**. They come from model variance on a wording-strict check and from an ambiguous record location, not from #638.
+Pass: no for `deliver-stall` and `deliver-lift` on the branch (one Pre-existing check each, read above); yes for the other three. Not exercised: real workers, a real Harness and a real tracker. Follow-up, outside #638: (1) the scorer's "user not told of 10 again" check counts a mention of 10 inside another notice as a second notice; (2) team-lead's audit-trail line lists `nudge` among the records posted "on the Milestone issue", while the scorer and `snapshot.py` look for a nudge record on the worker's issue.
+
+### 2026-11-04, branch `ticket-638` off `006570d`, dev-skills 0.61.0 (unbumped): Ticket #638, the lone-Release path removed
+
+Run level: no model session (unit tests)
+Runner: the Implementer subagent of Ticket #638, by script.
+Ran: `test_snapshot.py` (31 tests) and `test_cases.py` (6 tests), both OK. The fixture's Milestone issue lost its `## Boundaries` section (a Milestone issue holds none now); no case or scorer check read it.
+Pass: yes, for what ran. The five delivery dry runs, owed when this entry was written, are in the entry above (`0027423`).
+
 ### 2026-11-03, branch `t529-team-lead`, dev-skills 0.48.0 (unbumped): Ticket #529 after Ticket check 3
 
 Runner: the Implementer subagent of Ticket #529, by script.

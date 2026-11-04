@@ -177,12 +177,7 @@ $order Each feature is its own issue carrying \`milestone-1\`.
 
 ## Excluded
 
-- Translations.
-
-## Boundaries
-
-- **Budget:** none.
-- None beyond the Boundary record."
+- Translations."
 cat >> "$r/.scratch/issues/00-milestone.md" <<'MD'
 
 ### 2026-11-03T08:30:00Z coordinator
