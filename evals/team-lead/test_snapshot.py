@@ -214,6 +214,48 @@ class MarkdownTracker(unittest.TestCase):
         self.assertEqual(row["Pull request"], "#11 ready since 2026-11-03T14:50:00Z")
         self.assertEqual(row["Verdict"], "pull request ready but not reported")
 
+    def test_a_ready_spec_pull_request_still_in_review_is_active(self):
+        # A Spec thread marks its pull request ready before the review (ADR 0005); its Round comment is the worker at work.
+        self.f.commit("t25", "2026-11-03T14:40:00Z", "readme: hello")
+        self.f.issue("25-hello-doc.md")
+        self.f.pull(11, "25-hello-doc.md", "open", "2026-11-03T14:41:00Z", ready="2026-11-03T14:50:00Z",
+                    comments=[("2026-11-03T14:55:00Z", "worker", "Round 1: no open Findings.")])
+        out = self.f.snapshot("id=w25;issue=25;branch=t25;pr=11;started=2026-11-03T14:10:00Z;reported=2026-11-03T14:20:00Z")
+        row = rows(out.stdout)["w25"]
+        self.assertEqual(row["Pull request"], "#11 ready since 2026-11-03T14:50:00Z")
+        self.assertEqual(row["Verdict"], "active")
+
+    def test_an_open_pull_request_file_with_no_dates_does_not_crash_the_snapshot(self):
+        self.f.commit("t25", "2026-11-03T14:40:00Z", "readme: hello")
+        self.f.issue("25-hello-doc.md")
+        (self.f.repo / ".scratch/pulls/11.md").write_text("Builds: 25-hello-doc.md\nBranch: t25\nState: open\n\n## Comments\n")
+        out = self.f.snapshot("id=w25;issue=25;branch=t25;started=2026-11-03T14:10:00Z")
+        self.assertEqual(out.returncode, 0, out.stderr)
+        self.assertEqual(rows(out.stdout)["w25"]["Verdict"], "active")
+
+    def test_a_ready_pull_request_with_a_fix_pushed_after_ready_is_active(self):
+        self.f.commit("t25", "2026-11-03T14:55:00Z", "fix: Round 1 finding")
+        self.f.issue("25-hello-doc.md")
+        self.f.pull(11, "25-hello-doc.md", "open", "2026-11-03T14:41:00Z", ready="2026-11-03T14:50:00Z")
+        out = self.f.snapshot("id=w25;issue=25;branch=t25;pr=11;started=2026-11-03T14:10:00Z;reported=2026-11-03T14:20:00Z")
+        self.assertEqual(rows(out.stdout)["w25"]["Verdict"], "active")
+
+    def test_a_ready_pull_request_gone_quiet_after_its_review_is_then_tested_for_silence(self):
+        self.f.commit("t25", "2026-11-03T14:40:00Z", "readme: hello")
+        self.f.issue("25-hello-doc.md")
+        self.f.pull(11, "25-hello-doc.md", "open", "2026-11-03T14:41:00Z", ready="2026-11-03T14:50:00Z",
+                    comments=[("2026-11-03T14:55:00Z", "worker", "Round 1: no open Findings.")])
+        out = self.f.snapshot("id=w25;issue=25;branch=t25;pr=11;started=2026-11-03T14:10:00Z", now="2026-11-03T16:00:00Z")
+        self.assertEqual(rows(out.stdout)["w25"]["Verdict"], "silent since 2026-11-03T14:55:00Z")
+
+    def test_a_merged_pull_request_is_flagged_even_with_comments_after_ready(self):
+        self.f.commit("t25", "2026-11-03T12:40:00Z", "readme: hello")
+        self.f.issue("25-hello-doc.md")
+        self.f.pull(11, "25-hello-doc.md", "merged", "2026-11-03T12:41:00Z", ready="2026-11-03T12:45:00Z",
+                    merged="2026-11-03T13:05:00Z", comments=[("2026-11-03T12:55:00Z", "worker", "Round 1: clean.")])
+        row = rows(self.f.snapshot("id=w25;issue=25;branch=t25;pr=11;started=2026-11-03T12:10:00Z").stdout)["w25"]
+        self.assertEqual(row["Verdict"], "pull request ready but not reported")
+
     def test_a_ready_pull_request_already_reported_is_active(self):
         self.f.commit("t25", "2026-11-03T14:40:00Z", "readme: hello")
         self.f.issue("25-hello-doc.md")

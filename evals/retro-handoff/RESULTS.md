@@ -34,3 +34,19 @@ Case `release-end`: inputs in `release-end/fixture/` (the baseline's `src/`, `do
 | This branch's skill | Green: asked no question. Created issues/34.md "Summary report handles empty input" with labels `bug, ready-for-agent, next-release`, "Part of #31", Model tier regular, acceptance criteria including `Closes #12`, no release label. Commented "Absorbed by #34; closes when it is completed." on #12. In #20 set Cap to `none (Release end)`, wrote a Verdicts row "joins the next Release" (#34; blocks Milestone feature #33) and closed the record. #33 untouched. |
 
 Not exercised: the app-server install, tracker transport beyond the local files, and the resume path that gives a missing mark to an existing Ticket.
+
+## 2026-11-04 — #629 first-sighting check
+
+Case `first-sighting` (see the README): built by `first_sighting.py`, self-tested by `test_first_sighting.py` (18 tests: the rendered input says what the case means, #41 names no severe wording, the check really fails on the kept past mistake and no CI step runs it, a reference run passes, and planted runs fail, among them main's both-`wontfix` run). Base: main `5edb3e2`, its skills from a `git archive` of `origin/main`. Candidate: branch `ticket-629` at `635649f` (skill text unchanged since), on the fixture rebuilt from the latest fixture commit. The case asks for a top-level premium-tier session that can start subagents, given only the checkout's skills. A run that could not start a necessity subagent and wrote `necessity check: not run` is reported separately, not as red: it shows the not-run path works and says nothing on whether a confirmed check is acted on.
+
+| Check | Result |
+| --- | --- |
+| Premium case check (fresh premium-tier subagent, whole skill and workflow, before the runs) | FIX, with two fixes: runs need a top-level session because subagents have no Agent tool, and the prompt said "the one Ticket". Both applied (commits `c69746b`, `355173c`). A later run on the first fixture also showed #41 could be judged severe; the later reword of #41 fixed that. No separate link: the verdict is recorded here. |
+| Main's skill (premium subagent, rebuilt fixture) | Red for the right reason: #41 and #42 both closed as `wontfix`, no Ticket, record closed. The scorer is red on the #41 lines (acted on, Absorbed by, necessity row, Ticket filed) and green on #42. An earlier main run on the first fixture judged #41 severe and filed a Ticket (only the necessity-confirmed line failed), which is why #41 was reworded. |
+| This branch's skill (premium subagent, rebuilt fixture) | Not the run the case requires. The subagent had no Agent tool and started 0 subagents, so it took the skill's cannot-start-a-subagent path: #41 kept open, record row `necessity check: not run`, #42 closed as `wontfix`, record closed. The scorer is red on the Ticket lines, by design. This shows the not-run path works; it is not a pass. |
+
+Necessity subagent started: main no (not needed), branch no (no Agent tool). The scorer reads only tracker files and cannot see whether a subagent was started, so this line is the run's own report.
+
+The confirmed-path run (a Ticket for #41 with `necessity check: confirmed`) is therefore not recorded: it needs a top-level session that can start subagents, which the building thread could not make (a nested `claude -p` run was refused by the permission classifier). It is not claimed passed.
+
+Not exercised: the confirmed path above, the app-server install, `to-tickets` itself (the prompt has the run file the Ticket), a necessity check that does not confirm, and a group held back by the cap or decided at a Release end.

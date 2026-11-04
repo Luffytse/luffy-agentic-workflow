@@ -14,7 +14,7 @@ How this repo versions `dev-skills` and cuts a Release with the `release` skill:
   1. Put the line `Versions: <the versions delivered, oldest first, each once, or "none, the version stays X.Y.Z">. Commits: <start>..<end>.` under the entry's goal. The versions delivered are each value the version file reached since the last Release's end commit (the commit its top entry's `Commits:` line ends at).
   2. Change no version: the changelog pull request leaves both manifests as they are.
   3. Run the whole-Release check below on that pull request's branch.
-- **Whole-Release check**: on the changelog pull request's branch, run `bash scripts/check-plugin.sh`, `python3 scripts/test-check-plugin.py` and `claude plugin validate .`, then a clean-up pass: search the repo for sentences that wait on an issue this Release closed (such as "until #<n>") and for text its merges left stale. Fix such text outside `plugins/dev-skills/skills/` in the changelog pull request; file stale skill text as an issue for the next Release planning, so the changelog pull request changes no version.
+- **Whole-Release check**: on the changelog pull request's branch, run `bash scripts/check-plugin.sh`, `bash scripts/run-tests.sh` and `claude plugin validate .`, then a clean-up pass: search the repo for sentences that wait on an issue this Release closed (such as "until #<n>") and for text its merges left stale. Fix such text outside `plugins/dev-skills/skills/` in the changelog pull request; file stale skill text as an issue for the next Release planning, so the changelog pull request changes no version.
 
 Releases here cover the `dev-skills` plugin only. `dai-portal-data` has no release doc of its own yet, so its version is left as it is.
 
@@ -33,7 +33,7 @@ A merge-time step, which the merging thread takes when the `merging` skill runs 
 The last commit of the pull request's own work, with the number the coordinator handed out:
 
 - Update both manifests to the same version; leave their other fields unchanged. The `codex-packaging` check rejects drift.
-- Before pushing, run `bash scripts/check-plugin.sh` and `claude plugin validate .`.
+- Before pushing, run `bash scripts/check-plugin.sh`, `bash scripts/run-tests.sh` and `claude plugin validate .`.
 
 ## Version hand-out
 

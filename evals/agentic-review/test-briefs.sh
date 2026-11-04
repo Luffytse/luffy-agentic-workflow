@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
 # Checks the brief builder (briefs.sh) against the review-rounds skill files: it builds the planted fixture with setup.sh,
 # builds the briefs at every level and for the Verify-only check, and checks each Finder and Verifier gets what the
-# skill says it gets, and nothing it says to leave out. It runs no agent.
+# skill says it gets, and nothing it says to leave out. It runs no agent. It tests the routing (which part goes into
+# which brief), never a skill's wording: each part is found by a line brief-lib.sh cuts from the skill files (the first
+# line of a quoted brief, or the first body line under a section's heading, so a brief that keeps a heading but loses
+# its body fails), so rewording the body of a part does not fail it. Renaming a heading or label brief-lib.sh cuts by
+# does, and brief-lib.sh names it.
 # Usage: bash evals/agentic-review/test-briefs.sh
 set -eu
 here="$(cd "$(dirname "$0")" && pwd)"
@@ -18,10 +22,18 @@ for level in quick standard deep; do bash "$here/briefs.sh" "$tmp/repo" "$level"
 bash "$here/briefs.sh" --verify-only "$tmp/repo" standard >/dev/null
 b="$tmp/repo.briefs"
 
-# What the skill files say, cut out the way a reader would find it.
-shared="$(sed -n 's/^Shared brief: "\(.*\)"$/\1/p' "$skill/FINDERS.md")"
-copy="$(sed -n 's/^Copy rule: "\(.*\)"$/\1/p' "$skill/FINDERS.md")"
-[ -n "$shared" ] && [ -n "$copy" ] || { echo "FAIL: FINDERS.md has no shared brief or copy rule line"; exit 1; }
+# What the skill files say, cut out by brief-lib.sh (it stops with a message if a part is missing); each marker is the
+# first line of a part.
+. "$here/brief-lib.sh"
+load_rules "$skill"
+first() { printf '%s\n' "$1" | sed -n '/./{p;q;}'; }
+# body <section>: the section's first body line, skipping its heading, blank lines, code fences and sub-headings
+body() { printf '%s\n' "$1" | awk 'NR > 1 && !/^[[:space:]]*$/ && !/^```/ && !/^#/ {print; exit}'; }
+shared="$(first "$shared")"; copy="$(first "$copy_rule")"
+format_m="$(body "$format")"; important_m="$(first "$important")"; smell_m="$(body "$smell")"; drift_m="$(body "$drift")"
+for m in "$format_m" "$smell_m" "$drift_m"; do [ -n "$m" ] || { echo "FAIL: a section brief-lib.sh cuts has no body line"; exit 1; }; done
+verifier_m="$(first "$verifier_brief")"; security_m="$(first "$security")"
+angle="Bugs and edge cases"   # briefs.sh's default angle
 always_py="public function without a docstring"   # the fixture's Always check line for the Python files the diff touches
 always_sh="unquoted variable"                      # the fixture's Always check line for shell scripts, which the diff does not touch
 
@@ -41,28 +53,28 @@ for level in quick standard deep; do
     n="$level/$(basename "$f")"
     has "$n has the shared brief" "$f" "$shared"
     has "$n has the copy rule" "$f" "$copy"
-    has "$n has the Finding format" "$f" "- Failure scenario: <"
-    has "$n has the meaning of Important" "$f" "would break behaviour"
+    has "$n has the Finding format" "$f" "$format_m"
+    has "$n has the meaning of Important" "$f" "$important_m"
     has "$n has the Boundary record line" "$f" "The Boundary record: none"
     hasnt "$n has no Always check line for shell scripts" "$f" "$always_sh"
   done
   has "$level standards Finder has the Python Always check line" "$b/$level/finder-standards.md" "$always_py"
-  has "$level standards Finder has the smell baseline (the diff changes code)" "$b/$level/finder-standards.md" "Feature Envy"
-  has "$level standards Finder has the docs index drift check" "$b/$level/finder-standards.md" "docs index drift"
+  has "$level standards Finder has the smell baseline (the diff changes code)" "$b/$level/finder-standards.md" "$smell_m"
+  has "$level standards Finder has the docs index drift check" "$b/$level/finder-standards.md" "$drift_m"
   has "$level spec Finder has the spec" "$b/$level/finder-spec.md" "spare cents"
   hasnt "$level spec Finder has no Always check line" "$b/$level/finder-spec.md" "$always_py"
-  has "$level Verifier has the Verifier brief" "$b/$level/verifier.md" "You decide which Findings are real."
+  has "$level Verifier has the Verifier brief" "$b/$level/verifier.md" "$verifier_m"
   has "$level Verifier has the copy rule" "$b/$level/verifier.md" "$copy"
   hasnt "$level Verifier has no Always check line before any candidate is raised from one" "$b/$level/verifier.md" "$always_py"
 done
 for level in standard deep; do
   f="$b/$level/finder-adversarial.md"
-  has "$level adversarial Finder names its angle" "$f" "one angle: Bugs and edge cases"
+  has "$level adversarial Finder names its angle" "$f" "$angle"
   hasnt "$level adversarial Finder has no Always check line" "$f" "$always_py"
-  hasnt "$level adversarial Finder has no smell baseline" "$f" "Feature Envy"
+  hasnt "$level adversarial Finder has no smell baseline" "$f" "$smell_m"
   hasnt "$level adversarial Finder has no spec" "$f" "spare cents"
 done
-has "deep security Finder has the security brief" "$b/deep/finder-security.md" "source-to-sink path"
+has "deep security Finder has the security brief" "$b/deep/finder-security.md" "$security_m"
 has "deep security Finder has the spec" "$b/deep/finder-security.md" "spare cents"
 
 v="$b/standard-verify-only/verifier.md"

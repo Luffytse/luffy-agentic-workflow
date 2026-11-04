@@ -1,6 +1,6 @@
 # Results
 
-One entry per run of a `triage` eval case, newest first. Rerun when `triage` changes, and record the commit and the plugin version from `plugins/dev-skills/.claude-plugin/plugin.json`. An entry written inside an open pull request names the commit and plugin version it ran on as its base; anything after the entry's last commit is recorded on the pull request, not in the file.
+One entry per run of a `triage` eval case, newest first. Rerun when a pull request changes how `triage` behaves, as the [evals guide](../../docs/dev-skills/evals.md) says, and record the commit and the plugin version from `plugins/dev-skills/.claude-plugin/plugin.json`. An entry written inside an open pull request names the commit and plugin version it ran on as its base; anything after the entry's last commit is recorded on the pull request, not in the file.
 
 ## Template
 

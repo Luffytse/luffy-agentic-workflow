@@ -1,6 +1,6 @@
 # Results
 
-One entry per build-flow check of `implement`, newest first. Rerun when `implement` changes, and record the commit and the plugin version from `plugins/dev-skills/.claude-plugin/plugin.json`. An entry written inside an open pull request names the commit and plugin version it ran on as its base; anything that happens after the entry's last commit (later Rounds, merges, the merge itself) is recorded on the pull request, not in the file.
+One entry per build-flow check of `implement`, newest first. Rerun when a pull request changes how `implement` behaves, as the [evals guide](../../docs/dev-skills/evals.md) says, and record the commit and the plugin version from `plugins/dev-skills/.claude-plugin/plugin.json`. An entry written inside an open pull request names the commit and plugin version it ran on as its base; anything that happens after the entry's last commit (later Rounds, merges, the merge itself) is recorded on the pull request, not in the file.
 
 ## Template
 
@@ -17,6 +17,23 @@ Pass: yes | no. Lessons: <what to change in implement, if anything>
 ```
 
 ## Runs
+
+### 2026-11-04, base main `5edb3e2`, candidate `ticket-631` at `dcb0492`, dev-skills 0.63.0 (no bump): #631 eval-test case, tests for instructions to an agent
+
+Run level: decision-level in a subagent
+Setup: the eval-test builder (`make_fixture.py`), one fresh regular-tier subagent per skill version and flow (`ticket`, `spec`), each given `PROMPT.md` and its fixture only and scored with `score.py`. Candidate skills as archived from `ticket-631` at `dcb0492`; the candidate runs were repeated there, with rebuilt fixtures and fresh subagents, after the case-check and ticket-check edits to the briefs and the `tdd` line, and the first candidate runs (at `2c55b43`) also passed; base skills from a `git archive` of `origin/main` at `5edb3e2`.
+Steps: scored by the scorer's seven lines per run.
+
+| Run | Plan | Scorer |
+| --- | --- | --- |
+| candidate, ticket | TEST eval; BASELINE main's version; SEAM-CONFIRMED-BY me; EVIDENCE the eval run on both versions and their scores | all 7 PASS |
+| candidate, spec | the same | all 7 PASS |
+| main, ticket | TEST eval; BASELINE main's skill; SEAM-CONFIRMED-BY user ("proposed to the Ticket thread for the user to confirm before my first test"); EVIDENCE "the eval failing on main's skill and passing on the changed skill" | FAIL on seam (the Implementer chose the seam, not the user) and on evidence (names the eval run or a stated gap); the other lines PASS |
+| main, spec | the same two lines | the same two lines FAIL (seam: user; evidence without run or gap wording); the others PASS |
+
+Case check: two premium-tier case checks. The first returned fix (the seam line of the prompt leaked the rule and could not tell the versions apart; the scorer's word lists were too narrow; the README's expected result for main was loose); all three were applied in the commit before this entry. The second returned keep, noting that EVIDENCE alone is weak on main, that BASELINE accepts a leading "none", and that TEST may not fail on main because a main agent may pick an eval anyway.
+Not exercised: the choice between an eval and a sentence grep. TEST passed on main's runs (an agent given criteria about agent behaviour chose an eval anyway), so this case does not show that choice changing between versions. Also not exercised: building a skill-text Ticket for real (the plan is the only output) and the Ticket thread writing the brief from the skill.
+Pass: partial. Green on the candidate in both flows; red on main on SEAM and EVIDENCE only. Criterion 3's TEST change (grep to eval) is a stated gap: main's Implementer chose an eval anyway, so the case does not show that choice changing. Lessons: add a Ticket whose acceptance criteria make a sentence grep tempting if the eval-versus-grep choice itself is to be tested; tighten BASELINE so a leading "none" fails.
 
 ### 2026-11-04, commit `0027423` (`ticket-638`), dev-skills 0.61.0 (no bump): #638 merge-authority and corrective-check decisions, ticket flow
 
