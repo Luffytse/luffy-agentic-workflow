@@ -1,6 +1,6 @@
 ---
 name: wayfinder
-description: "Chart work too big for one agent session as a map of decision tickets on the issue tracker, and resolve them one at a time until the route is clear. Use when the user has a large, foggy effort too big for one session (for example \"wayfind this\" or \"map this out\"), before any spec exists."
+description: "Chart work too big for one session as decision tickets, resolved one at a time until the route is clear. Use when the user has a large, foggy effort (for example \"wayfind this\" or \"map this out\"), before any spec exists."
 ---
 
 A loose idea has arrived, too big for one agent session, and wrapped in fog: the way from here to the **destination** isn't visible yet. Wayfinding is about finding that way, not charging at the destination. This skill charts the way as a **shared map** on the repo's issue tracker, then works its **decision tickets** (questions whose resolution is a decision, not slices of a build to execute) one at a time until the route is clear.

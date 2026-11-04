@@ -1,6 +1,6 @@
 ---
 name: setup-project
-description: Drafts a project's instructions for its coordinator: how its threads work, never the state of its work. Use when the user wants to write or update a project's instructions, or when a new repo, kind of thread or standing rule means they are out of date.
+description: "Drafts a project's coordinator instructions: how its threads work, never the state of its work. Use when the user wants to write or update them, or a new repo, thread kind or standing rule makes them stale."
 ---
 
 Draft the **project instructions**: the short text a project's coordinator reads before it starts a thread. It points to thread workflows and docs, and carries the project's own choices. It never holds the state of the work (the map, open specs, plannings or tickets): those change faster than the instructions, so it tells the coordinator where to look them up. The draft lives in the conversation until the coordinator saves it; this thread writes no file (repo `CLAUDE.md` included) and changes no project setting.

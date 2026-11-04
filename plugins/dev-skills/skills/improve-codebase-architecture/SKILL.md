@@ -1,6 +1,6 @@
 ---
 name: improve-codebase-architecture
-description: "Scan a whole codebase for refactors that turn shallow modules into deep ones, present them as a visual HTML report, then grill through the one the user picks. Use when the user asks to improve the architecture, find refactoring candidates, or review the codebase's structure."
+description: "Scan a whole codebase for refactors that deepen shallow modules, as an HTML report, then grill through the user's pick. Use when the user asks to improve the architecture, find refactoring candidates, or review codebase structure."
 ---
 
 # Improve Codebase Architecture

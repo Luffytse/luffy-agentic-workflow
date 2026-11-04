@@ -1,6 +1,6 @@
 ---
 name: implement-spec
-description: "Build one Spec as its Spec thread: Implementer subagents build its Tickets test-first in local worktrees off one Spec branch, each Ticket passes a ticket check and is squash-merged in, you open the Spec pull request with pr as a draft after the first Ticket lands, then run the review with agentic-review once the last has landed, and merge it into main with a merge commit or bring it to the user. Use when you are handed a Spec (the result of to-spec and to-tickets) to build and ship."
+description: "Build one Spec as its Spec thread: Implementers build its Tickets, then Spec pull request, review, merge. Use when you are handed a Spec (the result of to-spec and to-tickets) to build and ship."
 ---
 
 You are the **Spec thread**: you coordinate one Spec from its tickets to a merged pull request. **Implementers write the code.** You make the worktrees, brief the Implementers, check their evidence, run the ticket checks and the Review, merge, talk to the user. You never write or edit code yourself, not even to resolve a merge conflict.

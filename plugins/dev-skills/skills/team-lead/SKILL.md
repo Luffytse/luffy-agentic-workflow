@@ -1,6 +1,6 @@
 ---
 name: team-lead
-description: "Run delivery as the coordinator's team lead: start build workers in order within the limits and start Release workers, react to what workers and the Harness report, hold a check-in only as a safety net (one snapshot command, a quiet check-in writes nothing), nudge a silent worker once and then replace it or park its work, pause and resume on the user's word, and follow the merge-time steps the repo's own docs give; every worker start, state check, end, stop, pause, resume and check-in goes through `worker-control`. Use when planning is done and a Milestone's delivery starts, at every wake while it runs (a worker reporting, a Harness notice, a check-in, the user writing), and when the user asks to pause or resume it."
+description: "Run delivery as the coordinator's team lead: start workers, react to worker and Harness reports, hold check-ins, pause and resume. Use when planning is done and a Milestone's delivery starts, at every wake while it runs (worker report, Harness notice, check-in, user writing), or on a request to pause or resume delivery."
 ---
 
 # Team lead

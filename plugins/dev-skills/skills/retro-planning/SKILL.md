@@ -1,6 +1,6 @@
 ---
 name: retro-planning
-description: Work through this repo's Retro backlog: snapshot the open Retro issues, group them by root cause, walk the user through each group one at a time and act on each call at once (a Ticket, a close, or a spin-off to its own planning), keeping an open record that is closed at the end; at a Release end, agents decide every group and mark the Ticket of each group that joins the next Release. Use when the user asks for Retro planning, when a Release ends, or to resume one whose record is still open.
+description: "Work through this repo's Retro backlog: group open Retro issues by root cause and decide each group, keeping an open record. Use for Retro planning, when a Release ends, or to resume one whose record is still open."
 ---
 
 A **Retro planning** works through one repo's **Retro backlog** (its open issues labelled `retro`): it merges duplicates, closes one-offs, and turns repeated problems, and one-off proposals for a cheap check that a necessity check confirms, into Tickets. Run this thread at the **premium** tier: the snapshot, verdict, cap, order, spin-off and expiry rules below interact, and each must be applied exactly. Load `model-tiers` by name for the model each tier is in your coding agent; the project's own tier map overrides it.

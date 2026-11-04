@@ -1,6 +1,6 @@
 ---
 name: to-tickets
-description: "Split a plan, spec or conversation into tracer-bullet tickets, each declaring what blocks it, and publish them to the tracker. Use when the user says \"break this into tickets\" or \"split into issues\", or asks for vertical slices of an existing spec."
+description: "Split a plan, spec or conversation into tracer-bullet tickets that declare their blockers, and publish them. Use when the user says \"break this into tickets\" or \"split into issues\", or asks for vertical slices of a spec."
 ---
 
 # To Tickets

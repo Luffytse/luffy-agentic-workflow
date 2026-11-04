@@ -1,6 +1,6 @@
 ---
 name: to-spec
-description: "Synthesise the current conversation into a spec and publish it to the issue tracker, with no interview. Use when the user says \"write the spec\", \"turn this into a spec\" or \"make a PRD\" once the plan is settled."
+description: "Synthesise the current conversation into a spec and publish it to the tracker, with no interview. Use when the user says \"write the spec\", \"turn this into a spec\" or \"make a PRD\" once the plan is settled."
 ---
 
 This skill takes the current conversation context and codebase understanding and produces a spec. Do NOT interview the user; just synthesize what you already know.

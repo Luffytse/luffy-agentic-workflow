@@ -1,6 +1,6 @@
 ---
 name: model-tiers
-description: Map a Model tier (cheap, regular, premium) to a model in the coding agent you run in. Use when a skill tells you to run a step or subagent on a tier and you need to know which model that is.
+description: "Map a Model tier (cheap, regular, premium) to a model in the coding agent you run in. Use when a skill tells you to run a step or subagent on a tier."
 user-invocable: false
 ---
 

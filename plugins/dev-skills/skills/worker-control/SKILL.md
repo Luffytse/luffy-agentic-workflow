@@ -1,6 +1,6 @@
 ---
 name: worker-control
-description: Start, check, stop, pause and resume workers in the tool you run in. Detect how workers run here from the tools and records the runtime reports, load that reference (what the tool does by itself, and the start, state, end, stop, pause and check-in methods the coordinator adds, each with its doc page), and run the short check that proves those methods here. Use when a coordinator starts, reads, stops, pauses or schedules workers, or when a caller needs the check that proves them.
+description: "Start, check, stop, pause and resume workers in the tool you run in, and run the check that proves it here. Use when a coordinator starts, reads, stops, pauses or schedules workers, or a caller needs that check."
 user-invocable: false
 ---
 

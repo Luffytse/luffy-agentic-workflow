@@ -1,6 +1,6 @@
 ---
 name: review-rounds
-description: "Run a review's Rounds once agentic-review's Round 0 has picked Quick, Standard or Deep: Finders, a Verifier (unless the Round has nothing to verify), Rank and one comment per Round, at most 3 Rounds, then sort what is still open. Use when Round 0 hands over a Round or a Ticket check."
+description: "Run a review's Rounds (Finders, Verifier, Rank, one comment, at most 3) once agentic-review's Round 0 has picked a level. Use when Round 0 hands over a Round or a Ticket check."
 user-invocable: false
 ---
 

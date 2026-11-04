@@ -1,6 +1,6 @@
 ---
 name: grill-with-docs
-description: "Interview the user relentlessly about a plan or design, recording glossary terms and ADRs as decisions settle. Use when the user says \"grill me\" or wants a plan or design stress-tested while working in a repo."
+description: "Interview the user relentlessly about a plan or design, recording glossary terms and ADRs as decisions settle. Use when the user says \"grill me\" or wants a plan stress-tested while working in a repo."
 ---
 
 Call the Skill tool twice, for "grilling" and "domain-modeling".
