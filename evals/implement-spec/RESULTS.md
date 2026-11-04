@@ -18,6 +18,19 @@ Pass: yes | no. Lessons: <what to change in implement-spec, if anything>
 
 ## Runs
 
+### 2026-11-04, commit 0d969c8 (claude/project-thread-szfunq) vs main f8760e5, dev-skills 0.68.0 (no bump): ticket-branch case
+
+Run level: decision-level in a subagent. Tier: regular. Fresh subagents, each given the `implement-spec` folder (the branch's checkout, or a `git archive` of main) and the prompt only: no scorer, `fixture.json` or `EXPECTED`. `SKILL.md` has not changed since a9a01db; only `evals/` changed after it.
+Setup: the [ticket-branch case](README.md#ticket-branch-check), scenarios `reuse` (a local, never-pushed `ticket-31` holds a wip commit; Ticket 31 has not landed) and `landed` (the pushed `spec-30` also holds Ticket 31's squash commit), each built with `make_fixture.py` and scored with `score.py`.
+Case check: a first premium reviewer returned fix (the scorer's evidence and rebase checks); fixed in e50c4bf, and the `landed` scenario was added after. A second fresh premium pass read the cases before the scorer and prompt fixes below and returned fix for `reuse` (the scorer ignored `Cleanup:`) and fix for `landed` (the prompt said "next frontier ticket" and the scorer did not check the Brief); both were fixed in 28a8627 and 0d969c8. The fixed cases were checked by the self-test and by the model reruns on the final prompt and scorer, not by a third premium pass. `landed` is kept as a stated guard scenario that passes on main by design (`reuse` is the discriminating one).
+Steps: step 3.1 on re-entry, one run per scenario per skill version. The `reuse` answers were made on a9a01db (branch) and main f8760e5 and re-scored with the final scorer; `landed` was rerun with fresh subagents on 0d969c8 and on main f8760e5, on the final prompt.
+- Branch, `reuse`: 10/10.
+- Main, `reuse`: 5/10. It ran `git branch -D ticket-31` and then `git worktree add /tmp/wt-31 -b ticket-31 spec-30`, discarding the surviving wip commit and telling the Implementer not to rely on it; main's text says nothing about a leftover branch, and the run said so itself. The scorer reports five failures: the cleanup check (a delete in `Cleanup:`), the reuse decision, no-new-branch, the handoff and the evidence-check.
+- Branch, `landed`: 7/7.
+- Main, `landed`: 7/7. Main passes because its step 1 already treats a squash commit on the Spec branch as landed, so `landed` does not separate main from the branch (it guards the new text's landed sentence only); `reuse` is the discriminating scenario.
+Not exercised: a full build-flow run; a real Implementer; a conflict while merging the Spec tip in. Single run per version, no variance estimate.
+Pass: yes for the branch. Lessons: none for the skill.
+
 ### 2026-11-04, commits b5b7c0a and ab4c7a4 (claude/project-thread-ypj9u9), dev-skills 0.66.0 (no bump): owner-claim case, branch's and main's skills
 
 Run level: decision-level in a subagent. Tier: regular (fresh subagents).
