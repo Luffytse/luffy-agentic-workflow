@@ -2,6 +2,10 @@
 
 How this repo tests a change to skill text: three layers, each with its own job, and the eval rules every build thread follows (Spec #626, [ADR 0013](adr/0013-skill-changes-are-tested-by-ci-evals-and-review.md)). Read it before opening a pull request that touches `plugins/dev-skills/skills/` or `evals/`. It applies from the commit that adds it: runs that a `RESULTS.md` entry written before it lists as owed are history and stay as written.
 
+## The rule in the plugin
+
+`tdd` and the Implementer briefs of `implement` and `implement-spec` carry one project-independent line: when the change is instructions for an agent (a skill, a prompt, an agent instructions file), its test is an eval, not a grep for a sentence, compared with the default branch's version and scored by scripts first, and the repo's own docs say how to run one; the Implementer chooses that seam without the user and reports the eval run, or its stated gap, as evidence instead of a failing-then-passing code test. This guide is the repo's own doc it points to. The case that tests the rule is the [eval-test check](../../evals/implement/README.md#eval-test-check).
+
 ## Three layers
 
 - **CI**: questions with one right answer from the files, answered by a script with no model, on every pull request. Today the workflow runs `scripts/check-plugin.sh` and `claude plugin validate .`; every deterministic test (fixture self-tests, scorer tests, the checker's own tests) joins it with the test runner of Ticket #627, and until that lands each eval README says how to run its tests by hand. A check tests structure, never a skill's wording, so rewording a skill never fails CI.

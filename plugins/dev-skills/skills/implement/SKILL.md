@@ -30,13 +30,14 @@ Start **one Implementer** subagent on the ticket's tier. Load `model-tiers` by n
 - the ticket link, its worktree path and the Ticket branch, and that it commits there and works only in that worktree, running every git command as `git -C <path> ...` (a shell may start each command back in your checkout);
 - the worktree is a fresh checkout and may need its dependencies installed again;
 - start at `docs/dev-skills/index.md`;
-- build test-first with the `tdd` skill, at seams agreed before the first test;
+- build test-first with the `tdd` skill, at seams agreed before the first test (for instructions to an agent, see the next line);
+- When the change is instructions for an agent (a skill, a prompt, an agent instructions file), its test is an eval, not a grep for a sentence: a fresh agent run on a fixture, compared with the default branch's version and scored by scripts first; the repo's own docs say how to run one, and you choose its seam without the user.
 - before reporting, read the repo's review rules file, if any, and check your diff against each Always-check line as the reviewer will;
 - when the change adds a rule that runs over a sequence of Rounds or steps, before Round 1 list the sequences (each ordering of the events the rule touches, including "it happens again") and write what the text tells the reader to do for each;
 - when an acceptance criterion names a run that needs tools you do not hold (scheduling a check-in, stopping a worker, a recorded run only the top-level session can make), the Ticket thread produces that evidence, not you: build everything else, draft the criterion's eval or record entry with a `PENDING: <the run>` marker in place of each runtime fact you cannot read (for example where skills load from), report the criterion as owed, and never claim it or leave a marker in an entry you call done;
 - before each push, check that `git status -sb` shows the Ticket branch (never a detached HEAD), and after it, report that `git rev-parse origin/<branch>` equals `HEAD`, as evidence the push landed;
 - leave the version as it is on main until the merge step: any commit the repo's merge-time steps ask for, such as a version bump, is made then (step 7), when you are asked;
-- report its evidence: the tests that fail before and pass after, the typecheck or the repo's checks, screenshots for anything visual (or "not visual"), and its one-way-door call (would reverting its commits undo everything the change did, including anything outside git?).
+- report its evidence: the tests that fail before and pass after (for instructions to an agent, the eval run or its stated gap instead), the typecheck or the repo's checks, screenshots for anything visual (or "not visual"), and its one-way-door call (would reverting its commits undo everything the change did, including anything outside git?).
 
 Give trivial jobs, such as rerunning a test suite, to a cheap subagent.
 

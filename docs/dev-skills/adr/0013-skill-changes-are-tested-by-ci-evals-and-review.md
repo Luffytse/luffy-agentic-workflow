@@ -13,7 +13,7 @@ Most changes here are skill text, but the checks were built for code. CI ran onl
 - **An eval run is due on a behaviour change.** The pull request runs the changed skill's cases on its own skill and on main's, and links the results. A wording-only, docs, ADR or eval-only change skips the run and says which kind it is.
 - **No owed runs.** The one allowed gap is a run that cannot be made, stated with its reason. A behaviour change to a skill with no eval adds one small case that fails on main and passes on the pull request; a case that is hard to write is a stated gap. A real gap that a review completeness check of the text finds also adds an eval case for that path.
 - **Cases are checked before they are paid for.** Each new case and each changed expected result gets a fresh premium-tier check (keep, fix or drop) before any model run, and a fixture builder's self-test checks each case's rendered input against its meaning.
-- **The plugin carries a short rule; the repo holds the method.** `tdd` and the Implementer briefs say only that the test for instructions to an agent is an eval compared with main's version, and that the repo's own docs say how to run one (Ticket #631; until it lands, the plugin says nothing about evals). Each project tests differently, and the plugin stays project-independent.
+- **The plugin carries a short rule; the repo holds the method.** `tdd` and the Implementer briefs say only that the test for instructions to an agent is an eval compared with main's version, and that the repo's own docs say how to run one (Ticket #631). Each project tests differently, and the plugin stays project-independent.
 
 ## Considered options
 
