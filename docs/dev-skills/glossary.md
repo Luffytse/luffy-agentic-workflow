@@ -162,6 +162,20 @@ _Avoid_: README, table of contents
 One part of a project that docs are grouped by in the Docs index, such as site, hub or trip plugin. A large glossary is split into one page per Area.
 _Avoid_: section, module
 
+## Testing skills
+
+A change to skill text is tested in three layers, **CI**, **Eval** and **Review**, sorted by one rule: if a script can catch it, it is CI; if you must watch an agent use the skill, it is an eval; if it needs reading for meaning, it is review. A Bug class that keeps coming back moves to the cheapest layer that can catch it (ADR 0013, `docs/dev-skills/evals.md`).
+
+**CI**:
+The layer for questions with one right answer from the files: a script with no model, on every pull request (the plugin checker and `claude plugin validate`; the deterministic tests join it with Ticket #627's runner and until then run by hand). It tests structure, never a skill's wording, so rewording a skill never fails it.
+
+**Eval**:
+The layer that shows what a skill makes an agent do: a fresh agent runs the skill on a fixture, and its output is scored by scripts first, a judge only for what scripts cannot see. Its cases live in `evals/<skill>/`. A pull request that changes how a skill behaves runs that skill's cases on its own skill and on main's (the baseline) and links the results; a wording-only, docs, ADR or eval-only change skips the run and says which kind it is. Nothing is left owed: the one allowed gap is a run that cannot be made, stated with its reason. The third layer is the **Review**.
+_Avoid_: test (for a model run), benchmark
+
+**Case check**:
+The check of a new eval case, or a changed expected result, before any model run: a fresh premium-tier subagent reads the whole skill and its workflow and returns keep, fix or drop (valid, fails on main for the right reason, needed); the verdict goes in the pull request body.
+
 ## Code review
 
 **Review**:

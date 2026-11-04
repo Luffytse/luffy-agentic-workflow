@@ -27,7 +27,7 @@ bash evals/agentic-review/loop/test-fixture.sh
 | Verify-only check | decision-level in a subagent: one Verifier, given its brief, starts nothing |
 | Round 0 | full build-flow in a top-level session, as its steps say (the score reads whether a subagent was started); the level pick itself could be shown decision-level (guess, not yet tried) |
 | Loop, `merge` | full build-flow in a top-level session: Round 2 starts a Finder and a Verifier |
-| Loop, `empty-round` | full build-flow in a top-level session: Round 2 starts a Finder; the score reads the comment's `Verifier: none` line, and that no Verifier was started is checked by hand. A model run is owed (the builder, scorer and reference outcomes are tested; no agent has run it) |
+| Loop, `empty-round` | full build-flow in a top-level session: Round 2 starts a Finder; the score reads the comment's `Verifier: none` line, and that no Verifier was started is checked by hand. No model run is recorded yet (the builder, scorer and reference outcomes are tested; no agent has run it) |
 | Loop, `after-round3` | steps say a top-level session that can start subagents; the sort needs no Finder, so decision-level in a subagent may show it (guess, not yet tried) |
 | the builders' tests | no model session |
 
