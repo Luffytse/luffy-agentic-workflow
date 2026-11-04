@@ -23,5 +23,7 @@ jobs:
         run: npm install -g @anthropic-ai/claude-code
       - name: Run the plugin check script
         run: scripts/check-plugin.sh
+      - name: Run every deterministic test
+        run: scripts/run-tests.sh
       - name: Validate plugins and marketplace
         run: claude plugin validate .
