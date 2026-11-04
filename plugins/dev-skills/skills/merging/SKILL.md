@@ -14,7 +14,7 @@ The caller names:
 
 - **the pull request**, and the issue it builds; for a pull request that builds no issue, the origin its body records (such as a `Retro origin:` line), or none;
 - **the merge method**: a squash or a merge commit, and its title: the pull request's typed title, as `pr` writes it, or the repo's own title convention where its rules set one;
-- **who commits**: who makes each commit the finish needs (a merge of main, a conflict resolution, a commit a merge-time step asks for). A caller that writes no code names its Implementer;
+- **who commits**: who makes each commit the finish needs (a merge of main, a conflict resolution, a commit a merge-time step asks for). A caller that writes no code names its Implementer, and its worktree where it has one;
 - **what makes it ready**: a review that ended ready to merge, or, for a pull request with no review, its checks passing;
 - **its own pre-merge step**, if any; it runs first in "Before the merge", every time that part runs.
 
@@ -50,7 +50,7 @@ Name what stops the merge, so the user can decide quickly: the boundary (the act
 1. Run the caller's own pre-merge step, if it named one.
 2. **Follow the repo's merge-time steps.** Read the repo's own docs for steps to take just before a merge (its `CLAUDE.md` or `AGENTS.md`, and the release doc, `docs/dev-skills/release.md`) and take each one, in the order they give. A step that waits for something, such as a number, waits for it; a commit a step asks for is made by the committer the caller named. Take only the steps those docs give: where they give none, there is none.
 3. **Sync with main.** Fetch main. If the branch lacks commits from main, the committer merges main in (a merge, never a rebase) and pushes. If main was merged since the last Round's recorded head and that merge had conflicts, its resolutions are reviewed as `review-rounds` says under "Merges from main" (the next Round, or after Round 3 its one resolutions check, whose open Importants become bug Tickets); a merge without conflicts needs only the checks.
-4. Rerun the checks on the branch's head, and wait for CI (if the repo has any).
+4. Rerun the checks on the branch's head, in the committer's worktree where it has one, and wait for CI (if the repo has any).
 5. If main moves again before the merge, repeat this part from 1. What a repeat keeps or redoes of a merge-time step's commit is the repo's docs' to say.
 
 ## The merge

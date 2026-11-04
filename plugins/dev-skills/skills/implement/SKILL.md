@@ -68,7 +68,7 @@ Load `merging` by name and follow it to its end: it decides whether you merge or
 
 - the pull request and the Ticket it builds;
 - the method: **squash-merge** into main, titled with the pull request's typed title (or the repo's own title convention), the body as the commit message;
-- the same Implementer as the committer of every commit the finish needs, so you still write no code;
+- the same Implementer, with its worktree path, as the committer of every commit the finish needs, so you still write no code;
 - readiness: the review ended ready to merge (step 6); and no pre-merge step of its own.
 
 Done when `merging` has merged the pull request and closed its issues, or the pull request is with the user and you have named what stops it (its "After the merge" then runs from step 9).
