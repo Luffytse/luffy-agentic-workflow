@@ -6,7 +6,7 @@ Usage:
               [--repo <dir>] [--tracker-doc <file>] [--now <UTC>] [--silent-after <minutes>] [--no-fetch]
 
 A worker's fields: its id, the issue it works on, the branch it pushes, its pull request if any (left out, it is looked
-up by the branch: GitHub's pulls?head= route, or a Markdown pull request file's Branch: line), when it started,
+up by the branch: GitHub's pulls?head= route, or a pull request file's Branch: line), when it started,
 when it last reported to the team lead, when the team lead last resumed it after a pause (activity, so a nudge
 before it is void and the worker gets a full window), and its state as the harness reports it (printed as given). Times are UTC,
 as 2026-11-03T14:40:00Z.
@@ -14,7 +14,7 @@ as 2026-11-03T14:40:00Z.
 The tracker is read the way the tracker doc (default <repo>/docs/dev-skills/issue-tracker.md) says it is kept:
   - GitHub, when the doc uses `gh`: issue and pull request comments, the pull request and its ready event, through
     the `gh api` REST routes (they work where GraphQL does not);
-  - a local Markdown tracker, when the doc says "Issues are files under `<dir>`" (and "Pull requests are files
+  - a tracker kept as files, when the doc says "Issues are files under `<dir>`" (and "Pull requests are files
     under `<dir>`"): comments under "## Comments" as "### <UTC time> <author>" headings; a pull request file's
     State:, Opened:, Ready:, Merged: and Closed: lines.
 Any other tracker, or a read that fails, prints "read by hand" in that row's tracker cells and verdict, and the
@@ -28,7 +28,7 @@ silent-after window); "nudged at <T>, waiting"; "still silent after its nudge at
 for a nudge recorded minutes after its check-in, has passed since the nudge with no activity); "silent since <T>". Activity is a pushed commit, a comment
 on the issue or the pull request, a pull request change, the worker's start, its last report or its resume. Comments
 whose first line starts "<!-- team-lead" or, from the earlier milestone loop, "<!-- milestone " are the team lead's own
-records, never activity; "<!-- team-lead nudge -->" and "<!-- milestone nudge -->" are nudges. In a Markdown tracker
+records, never activity; "<!-- team-lead nudge -->" and "<!-- milestone nudge -->" are nudges. In a tracker kept as files
 only a "### <UTC time> <author>" heading starts a comment; other ### headings belong to the comment above them.
 
 Exit 0 when every row was read, 3 when a row must be read by hand, 2 on a usage error. Writes nothing.
@@ -102,7 +102,7 @@ def last_commit(repo, branch):
 
 
 class MarkdownTracker:
-    name = "local Markdown"
+    name = "files"
 
     def __init__(self, repo, issues, pulls):
         self.issues = repo / issues

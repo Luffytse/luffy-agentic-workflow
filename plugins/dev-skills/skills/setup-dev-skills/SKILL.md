@@ -24,7 +24,7 @@ This is a prompt-driven skill, not a deterministic script. Explore, present what
 Read whatever exists; assume nothing:
 
 - `git remote -v`: which host and which `<owner>/<repo>`? Take it from either URL form, `https://github.com/<owner>/<repo>(.git)` or `git@github.com:<owner>/<repo>(.git)`, and drop a trailing `.git`. Only GitHub is supported. If the remote is not GitHub, tell the user the plugin does not support that tracker yet, and stop.
-- Is the repo reachable? Run `gh api repos/<owner>/<repo>`. Use this REST call, not `gh repo view`: some cloud sessions have `gh` without GraphQL, and `gh repo view`, `gh issue view` and `gh label list` fail there with "GraphQL is not available", and so do the other `gh issue` subcommands (list, create, comment, edit, close): use the session's GitHub tools or the `gh api repos/<owner>/<repo>/issues...` REST routes. A session without `gh` uses the GitHub tools it has for the same reads and writes. If the repo cannot be reached, stop and tell the user what is missing.
+- Is the repo reachable? Use the **Check the repo is reachable** operation of the tracker doc, or of the seed `issue-tracker-github.md` where the repo has no tracker doc yet (a session without `gh` uses the GitHub tools it has for the same read). If the repo cannot be reached, stop and tell the user what is missing.
 - `AGENTS.md` and `CLAUDE.md` at the repo root: does either exist? Is there already an `## Agent skills` section?
 - `docs/dev-skills/glossary.md` (the glossary, or its map once split), and the legacy `CONTEXT.md` / `CONTEXT-MAP.md` at the repo root. If a legacy file exists, offer to `git mv` it to `docs/dev-skills/glossary.md` (a `CONTEXT-MAP.md` becomes the map).
 - `docs/dev-skills/adr/` and any `src/*/docs/adr/` directories.
@@ -33,7 +33,7 @@ Read whatever exists; assume nothing:
 - `docs/dev-skills/boundaries.md`: does the Boundary record exist, and which values has it filled in?
 - `REVIEW.md` at the repo root: does it exist, and which of its sections (Important, Skip, Always check) does it have? An existing one is left as it is (step 3).
 - `docs/dev-skills/index.md`: the docs index, if one exists, and the other docs it should list (`REVIEW.md`, `CONTRIBUTING.md` at the root, in `docs/` or in `.github/`, `docs/dev-skills/out-of-scope/`, README files).
-- The repo's labels: `gh api repos/<owner>/<repo>/labels --paginate --jq '.[].name'`.
+- The repo's labels (the **List labels** operation of the tracker doc, or of the seed `issue-tracker-github.md` where the repo has no tracker doc yet).
 - Monorepo signals: a `pnpm-workspace.yaml`, a `workspaces` field in `package.json`, or a populated `packages/*` with its own `src/`. Their absence means single-context, which is almost every repo.
 
 Done when each item above is a fact or "none".
@@ -156,21 +156,21 @@ Add a `### Boundaries` part to the block, after `### Domain docs` and before `##
 
 Then write the approved files, and `docs/dev-skills/index.md` last.
 
-**Create the labels.** Create every label the skills use that the repo lacks, whether or not `triage` is installed: the label string of each of the 5 state roles, `bug` and `enhancement`, `next-release`, each agent-only label from the table (only when Section B was **yes**), and `wayfinder:map`, `wayfinder:research`, `wayfinder:prototype`, `wayfinder:grilling`, `wayfinder:task` and `parked`. Use `gh api --method POST repos/<owner>/<repo>/labels -f name=<label>` (or the session's GitHub tools); `gh label create` needs GraphQL. Leave `retro`, `retro-planning` and the release labels alone: `retro`, `retro-planning` and `release` create them when first needed.
+**Create the labels.** Create every label the skills use that the repo lacks, whether or not `triage` is installed: the label string of each of the 5 state roles, `bug` and `enhancement`, `next-release`, each agent-only label from the table (only when Section B was **yes**), and `wayfinder:map`, `wayfinder:research`, `wayfinder:prototype`, `wayfinder:grilling`, `wayfinder:task` and `parked`. Use the tracker doc's **Create a label** operation for each. Leave `retro`, `retro-planning` and the release labels alone: `retro`, `retro-planning` and `release` create them when first needed.
 
 ### 5. Check GitHub settings and report
 
-Check, and report each failure to the user. Never change a setting, and never create a ruleset or branch rule. Use `gh api` or the session's GitHub tools.
+Check, and report each failure to the user. Never change a setting, and never create a ruleset or branch rule. Read the settings with the tracker doc's **Read repo settings** operation.
 
 | Check | How | A failure means |
 | --- | --- | --- |
-| Sub-issues and dependencies | `gh api repos/<owner>/<repo>/issues/<n>` on any issue returns `issue_dependencies_summary` and `sub_issues_summary`; report "not checked" when the repo has no issue to probe. Note `gh --version` too: 2.94+ has the `--parent` and `--blocked-by` flags, and older `gh` uses the REST routes in the seed | `to-tickets` and `wayfinder` fall back to `Part of #<n>` and `Blocked by:` lines |
-| Draft PRs | `gh api repos/<owner>/<repo> --jq .private`: `false` passes (public repos allow drafts). A private repo needs a paid plan: the "Upgrade to GitHub Pro" message from the branch protection call below means a free plan, so fail; if the plan cannot be told, report "not checked" | `implement-spec` cannot open the Spec pull request as a draft |
-| Merge methods | `gh api repos/<owner>/<repo> --jq '{allow_squash_merge, allow_merge_commit}'` shows both `true` | `implement` squash-merges and `implement-spec` merges with a merge commit, so one of them cannot merge |
-| Default branch | `gh api repos/<owner>/<repo> --jq .default_branch` is `main` | the build skills assume `main` |
-| Branch protection | `gh api repos/<owner>/<repo>/branches/<default>/protection` and `gh api repos/<owner>/<repo>/rules/branches/<default>`: no required reviews or restriction that stops the agent merging its own pull request | the agent cannot merge; the user must merge |
+| Sub-issues and dependencies | (**Read repo settings**) Any issue's sub-issue and dependency summaries are present; report "not checked" when the repo has no issue to probe. Note whether the installed command-line tool has the native parent and blocked-by options, or only the routes in the seed | `to-tickets` and `wayfinder` fall back to `Part of #<n>` and `Blocked by:` lines |
+| Draft PRs | The repo is public, which allows drafts. A private repo needs a paid plan: the "Upgrade to GitHub Pro" message from the branch protection read means a free plan, so fail; if the plan cannot be told, report "not checked" | `implement-spec` cannot open the Spec pull request as a draft |
+| Merge methods | Both squash merging and merge commits are allowed | `implement` squash-merges and `implement-spec` merges with a merge commit, so one of them cannot merge |
+| Default branch | The default branch is `main` | the build skills assume `main` |
+| Branch protection | Neither classic protection nor branch rules require reviews or restrict who can merge in a way that stops the agent merging its own pull request | the agent cannot merge; the user must merge |
 
-A 404 from the protection call means no classic protection, which passes. A 403 with the "Upgrade to GitHub Pro" message means a free private repo, where branch rules cannot be enforced, which also passes. Any other 403 means the session cannot read it: say "not checked", not "passed".
+A repo with no classic protection passes. A free private repo, where the host says branch rules need a paid plan and cannot be enforced, also passes. Any other refusal means the session cannot read the settings: say "not checked", not "passed".
 
 Done when each row is "ok", a failure with its effect, or "not checked" with the reason.
 

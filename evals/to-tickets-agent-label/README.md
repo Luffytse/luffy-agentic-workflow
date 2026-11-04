@@ -38,3 +38,7 @@ Runner: six fresh regular-tier subagents, each given only the `to-tickets` SKILL
 - `no-mapping`: PASS. Neither labelled; the report named 02 as needing beta's runtime and the missing mapping.
 - `milestone`: PASS. 02 `ready-for-agent, beta-only, milestone-1, release-m1-r1`; 01 both membership labels.
 - `resume`: PASS. 02 gained `beta-only`, no new ticket.
+
+### Run for #623 (local-files recipe removed from `to-tickets`)
+
+Twelve fresh regular-tier subagents, one per case on the pull request's skill and on main's (`git archive` of cc54278, plugin 0.64.0), each given the skill folder and the fixture's `PROMPT.md`, scored with `score.py`. Subagent runs, not a top-level session. Pull request: all six PASS. Main: five PASS; `conflict` failed on the report wording (it lacked "conflict" for ticket 02), a wording miss, not a label error. The change moved no label result: the fixture's own tracker doc supplies the file shape.

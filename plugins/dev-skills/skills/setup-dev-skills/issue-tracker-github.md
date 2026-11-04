@@ -2,7 +2,7 @@
 
 Issues and specs for this repo live as GitHub issues in [`<owner>/<repo>`](https://github.com/<owner>/<repo>). Use the `gh` CLI for all operations. A session without `gh` (some cloud sessions) does the same operations with the GitHub tools it has.
 
-Some cloud sessions have `gh` but no GraphQL: `gh repo view`, `gh issue view`, `gh issue list` and the other `gh issue` subcommands, and `gh label list`, fail with "GraphQL is not available". `gh api repos/<owner>/<repo>/...` (REST) still works, so each operation below also gives its REST route; use that route there, or the session's GitHub tools. `gh api repos/<owner>/<repo>/labels --paginate --jq '.[].name'` lists labels, and `gh api repos/<owner>/<repo>` checks that the repo is reachable.
+Some cloud sessions have `gh` but no GraphQL: `gh repo view`, `gh issue view`, `gh issue list` and the other `gh issue` subcommands, and `gh label list`, fail with "GraphQL is not available". `gh api repos/<owner>/<repo>/...` (REST) still works, so each operation below also gives its REST route; use that route there, or the session's GitHub tools.
 
 ## Conventions
 
@@ -18,6 +18,10 @@ Some cloud sessions have `gh` but no GraphQL: `gh repo view`, `gh issue view`, `
 - **Apply / remove labels**: `gh issue edit <number> --add-label "..."` / `--remove-label "..."`. REST: `gh api --method POST repos/<owner>/<repo>/issues/<number>/labels -f 'labels[]=<label>'` to add and `gh api --method DELETE repos/<owner>/<repo>/issues/<number>/labels/<label>` to remove (URL-encode a label with spaces or a colon, as `wayfinder%3Amap`).
 - **Close**: post the explanation with `gh issue comment <number> --body "..."`, then `gh issue close <number>`. REST: post the comment as in **Comment on an issue**, then `gh api --method PATCH repos/<owner>/<repo>/issues/<number> -f state=closed -f state_reason=completed` (`not_planned` for a wontfix close). On an already-closed issue, `gh issue close --comment` drops the comment and still exits 0.
 - **Park**: mark an issue as parked, or read whether it is. To mark it, add the `parked` label (**Apply / remove labels**), then comment on the issue (**Comment on an issue**) saying why, with a link to the records of the stall that parked it and the pull request, if there is one. To read it, an issue is parked when its labels (**Read an issue**) include `parked`. A parked issue waits on the user: no skill builds it, reviews it or merges its pull request until the user removes the label (**Apply / remove labels**), which lifts the park.
+- **Check the repo is reachable**: `gh api repos/<owner>/<repo>` answers for a repo the session can read. Use this REST call, not `gh repo view`.
+- **List labels**: `gh api repos/<owner>/<repo>/labels --paginate --jq '.[].name'`.
+- **Create a label**: `gh api --method POST repos/<owner>/<repo>/labels -f name=<label>`. `gh label create` needs GraphQL.
+- **Read repo settings**: `gh api repos/<owner>/<repo>` returns `private`, `default_branch`, `allow_squash_merge` and `allow_merge_commit`. `gh api repos/<owner>/<repo>/branches/<default>/protection` and `gh api repos/<owner>/<repo>/rules/branches/<default>` return the branch protection and branch rules: a 404 from the first means no classic protection; a 403 with the "Upgrade to GitHub Pro" message means a free private repo, where branch rules cannot be enforced; any other 403 means the session cannot read them. `gh api repos/<owner>/<repo>/issues/<n>` on any issue returns `issue_dependencies_summary` and `sub_issues_summary`; `gh --version` 2.94+ has the `--parent` and `--blocked-by` flags.
 - **Assign yourself**: `gh issue edit <number> --add-assignee @me`. REST: `gh api --method POST repos/<owner>/<repo>/issues/<number>/assignees -f "assignees[]=$(gh api user --jq .login)"`.
 
 Infer the repo from `git remote -v`; `gh` does this automatically when run inside a clone.
