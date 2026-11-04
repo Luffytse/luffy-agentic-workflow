@@ -626,7 +626,7 @@ class VerifierBrief(Base):
                 r = subprocess.run([sys.executable, "-B", str(REVIEW_ROUNDS / SCRIPT_NAME), cmd, "--help"],
                                    text=True, capture_output=True)
                 self.assertEqual(r.returncode, 0)
-                entries = re.split(r"^  (?=-)", r.stdout.split("options:", 1)[1], flags=re.M)[1:]
+                entries = re.split(r"^  (?=-)", re.split(r"(?:options|optional arguments):", r.stdout, maxsplit=1)[1], flags=re.M)[1:]
                 self.assertTrue(entries)
                 for e in entries:  # the help is on the option's line after a gap, or on the lines below it
                     first, _, rest = e.partition("\n")
