@@ -225,11 +225,11 @@ The open Retro issues of one repo.
 _Avoid_: retro queue, improvement list
 
 **Retro planning**:
-The review of a snapshot of one repo's Retro backlog, which merges duplicates, closes most one-offs and turns at most 3 groups into Tickets. It walks the user through one group at a time and carries out each call at once (inside a Milestone, see **Release-end Retro planning**). Its record issue, labelled `retro-planning`, is open while it runs and closed at its end; later plannings read only closed records.
+The review of a snapshot of one repo's Retro backlog, which merges duplicates, closes most one-offs and turns at most 3 groups into Tickets. It walks the user through one group at a time and carries out each call at once (at a Release end, see **Release-end Retro planning**). Its record issue, labelled `retro-planning`, is open while it runs and closed at its end; later plannings read only closed records.
 _Avoid_: retro triage, retro review
 
 **Release-end Retro planning**:
-Inside a Milestone (a Boundary record naming a Milestone label form and an open Milestone issue), the Retro planning that the caller runs at the end of a Release, with the Triage batch: agents decide every group without asking the user per group, with no 3-Ticket cap, and record each call and reason in the planning record for the Milestone review. A fix joins the next Release only if it touches a feature of the Milestone or is severe, and does not count toward the Release's feature cap; any other acting group stays open with a reason, and the rest close. A group that crosses a boundary, changes the Milestone's agreement, or would join the next Release but needs a feature-sized fix is proposed to the user, not filed. Outside a Milestone Retro planning is unchanged.
+The Retro planning that the caller runs at the end of a Release, with the Triage batch: agents decide every group without asking the user per group, with no 3-Ticket cap, and record each call and reason in the planning record for the Milestone review. A fix joins the next Release only if it blocks a feature of the Milestone or is severe; its Ticket then carries the `next-release` mark, which `release` reads instead of the record, and it does not count toward the Release's feature cap. Any other acting group stays open with a reason, and the rest close. A group that crosses a boundary, changes the Milestone's agreement, or would join the next Release but needs a feature-sized fix is proposed to the user, not filed.
 
 **Spin-off**:
 A group of Retro issues the user wants to discuss further, moved out of a Retro planning into a planning thread of its own, which ends by giving each issue a Ticket or a close. It does not count toward the cap and cannot expire meanwhile.
