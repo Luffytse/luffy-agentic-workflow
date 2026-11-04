@@ -25,7 +25,7 @@ The briefs are in [FINDERS.md](FINDERS.md) and [VERIFY.md](VERIFY.md); read each
 
 In Round 1, gather these and pass them on to Rounds 2 and 3; re-read only a source a new commit changed.
 
-- **Spec:** the issues the pull request body and commit messages reference, fetched through the tracker; a path the user passed; a spec file under `docs/`, `specs/` or `.scratch/` matching the branch. A pull request that references no issue is its own spec: its body. With none, the spec Finder is skipped and the Review says "no spec available".
+- **Spec:** the issues the pull request body and commit messages reference, fetched through the tracker; a path the user passed; a spec file under `docs/` or `specs/` matching the branch. A pull request that references no issue is its own spec: its body. With none, the spec Finder is skipped and the Review says "no spec available".
 - **Standards:** the files that say how code or text is written here (`CLAUDE.md`, `AGENTS.md`, a style guide, `CONTRIBUTING.md`). Start at `docs/dev-skills/index.md` when the repo has one.
 - **`REVIEW.md`**, at the repo root when present: the meaning of Important, the Skip list and the Always check lines, each with the kinds of file it applies to. Without it, **Important** means the change would break behaviour, lose or leak data, contradict the spec or a recorded decision, or make a rollback unsafe; anything else real is a Nit.
 - **Boundary record**, `docs/dev-skills/boundaries.md` when present: what the project marks risky and what needs a person.
