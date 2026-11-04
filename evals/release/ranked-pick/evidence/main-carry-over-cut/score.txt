@@ -1,0 +1,8 @@
+PASS the release issue (#2) is edited with a `## Carried over` section
+PASS the section has a `- #31 <title>: <why>` line
+PASS the section lists only the carried-over issue
+PASS the edit keeps the rest of the release issue
+PASS release-2 removed from #31
+FAIL the line is written before the label is removed: line at block 2, label at block 1
+PASS no other issue loses the label
+6/7 checks passed

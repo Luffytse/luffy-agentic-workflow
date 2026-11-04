@@ -5,7 +5,7 @@ description: "Cut a Release and plan the next: changelog, cut steps, close it, p
 
 # Release
 
-A **Release** is one named step of a Milestone and the items it ships. An **item** is one piece of work: a Spec with its Tickets, a lone Ticket, or a bug, each counted as 1. Every issue in a Release carries its **release label**. One **release issue** holds its goal, its label, its Milestone, the size used, its ranked order, what was left out, the verdicts of its check against main and, once it is cut, its notes; the release issue carries no release label itself. Run this thread at the **premium** tier: the ranking and the reruns are judgement calls. Load `model-tiers` by name for the model each tier is in your coding agent; the project's own tier map overrides it.
+A **Release** is one named step of a Milestone and the items it ships. An **item** is one piece of work: a Spec with its Tickets, a lone Ticket, or a bug, each counted as 1. Every issue in a Release carries its **release label**. One **release issue** holds its goal, its label, its Milestone, the size used, its ranked order, what was left out, the verdicts of its check against main, the issues carried over from it and, once it is cut, its notes; the release issue carries no release label itself. Run this thread at the **premium** tier: the ranking and the reruns are judgement calls. Load `model-tiers` by name for the model each tier is in your coding agent; the project's own tier map overrides it.
 
 The user plans the Milestone and its features with `milestone`; everything in this skill runs without waiting for a reply, except where a step says to stop. A feature to plan is proposed to the user, and nothing waits on the answer. A fix that cannot wait for the next Release is built and merged like any issue; the next changelog entry lists it.
 
@@ -32,9 +32,9 @@ List every issue carrying the current release label, open and closed (where the 
 
 - An issue closed as completed **shipped** when a merged pull request into the default branch closes it with a closing keyword in its body (`Closes #<n>`, `Fixes #<n>`, `Resolves #<n>` and their other tenses). A Ticket merged into a Spec branch shipped when the Spec's pull request, merged into the default branch, closes the Ticket that way. A commit or pull request that only mentions the issue, a negated keyword ("does not close #<n>"), or a close by hand does not count.
 - An issue closed any other way (not planned, duplicate) shipped nothing: list it as **dropped**.
-- An open issue, or one closed as completed that fails the shipped test, **blocks the cut**. Stop and report each one to the user, who waits (rerun once they close) or carries some over. A carried-over issue loses the release label, and the release issue gains a line naming it; a closed issue that failed the shipped test is carried over only after the user reopens it, or counts as shipped once the user confirms the fix is on main. Carried-over issues are candidates in step 5.
+- An open issue, or one closed as completed that fails the shipped test, **blocks the cut**. Stop and report each one to the user, who waits (rerun once they close) or carries some over. A carried-over issue is recorded first and unlabelled second: write its line to the current Release's release issue, `- #<n> <title>: <why>`, under a `## Carried over` heading of its own (made when the first issue is carried, added to after that; skip an issue the section already lists), then remove its release label. A stop between the two writes then loses nothing: a rerun lists issues by label, so it also reads that section: an entry whose label is still on gets it removed, and an entry that already lost its label counts as carried, not as lost; a closed issue that failed the shipped test is carried over only after the user reopens it, or counts as shipped once the user confirms the fix is on main. Carried-over issues are candidates in step 5, which finds them in that section.
 
-Done when every issue with the current release label is shipped or dropped, and every carried-over issue has lost the label.
+Done when every issue with the current release label is shipped or dropped, and every carried-over issue has lost the label and is listed under `## Carried over` in the release issue.
 
 ## 2. Write the changelog entry and run the cut steps
 
@@ -112,7 +112,7 @@ Every open issue that survived the check against main (not closed by it, not wai
 - an issue marked `next-release`;
 - a **planned feature**: one the Milestone issue lists (including any added since the last Release), together with its open blockers (the tracker doc's **Count open blockers** operation); a Ticket of a listed Spec belongs to its Spec;
 - a `ready-for-agent` bug;
-- every issue carried over in step 1.
+- every issue still open that is listed under `## Carried over` in the release issue of the Release just cut (the closed release issue cut most recently, in any run); read that section, not the issue's other text.
 
 A parked issue is left out, waiting on the user to lift its park. An **unplanned feature** (an enhancement, or any other feature-sized issue, that the Milestone issue does not list) is never ranked, whatever its label or whoever suggested it: propose each one to the user in one line, saying the Milestone issue does not list it; the user plans it with `milestone` or not. Any other issue, such as one at `needs-triage`, `needs-info`, `ready-for-human` or `wontfix`, is not a candidate.
 

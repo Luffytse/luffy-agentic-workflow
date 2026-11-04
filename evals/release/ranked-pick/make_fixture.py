@@ -183,6 +183,24 @@ def issue_file(i):
 slug_of = {}
 
 
+def notes_extra(case):
+    return f"\n{case['notes_text']}\n" if case.get("notes_text") else ""
+
+
+def carried_order(case):
+    """Order lines for the issues Release 2 carried over (they were taken into it, so they sit in its Order)."""
+    return "".join(f"{k}. #{n} {t}: taken for its place in the Milestone's order.\n"
+                   for k, (n, t, _) in enumerate(case.get("carried", []), 2))
+
+
+def carried_section(case):
+    """The `## Carried over` section of Release 2's release issue, for a case whose Release 2 carried issues over."""
+    if not case.get("carried"):
+        return ""
+    lines = "\n".join(f"- #{n} {t}: {why}." for n, t, why in case["carried"])
+    return f"## Carried over\n\n{lines}\n\n"
+
+
 def build(out, name):
     case = CASES[name]
     slug_of.clear()
@@ -235,7 +253,7 @@ def build(out, name):
                           f"| --- | --- | --- | --- |\n{rows}\n\n## Excluded\n\n- Translations.\n")
     slug_of[1] = "milestone-1"
     if case.get("cut"):
-        members = [n for n in case["milestone"] if "release-2" in next(i["labels"] for i in issues if i["n"] == n)]
+        members = [i["n"] for i in issues if "release-2" in i["labels"]]
         order = "\n".join(f"{k}. #{n} {next(i['title'] for i in issues if i['n'] == n)}: next in the Milestone's order."
                           for k, n in enumerate(members, 1))
         rel = dict(n=2, slug="release-2", title="Release 2", type="release", labels=[], created="2026-10-16",
@@ -267,8 +285,8 @@ def build(out, name):
         rel = dict(n=2, slug="release-2", title="Release 2", type="release", labels=[], created="2026-10-10",
                    status="closed",
                    body="**Goal:** Hello greets by name.\n\n**Label:** `release-2`. Every issue in this Release carries it.\n\n"
-                        "**Milestone:** #1\n\n**Size:** 5. Used: 1.\n\n## Order\n\n1. #3 Hello command: first in the Milestone's order.\n\n"
-                        "## Left out\n\nNone.\n\n## Notes\n\nPosted as a comment when the Release is cut.\n",
+                        f"**Milestone:** #1\n\n**Size:** 5. Used: {1 + len(case.get('carried', []))}.\n\n## Order\n\n1. #3 Hello command: first in the Milestone's order.\n{carried_order(case)}\n"
+                        f"## Left out\n\nNone.\n\n{carried_section(case)}## Notes\n\nPosted as a comment when the Release is cut.\n{notes_extra(case)}",
                    comments=[("2026-10-16T10:05:00Z", "## Release 2 (2026-10-16)\n\nHello greets by name.\n\n"
                               f"Commits: {c0}..{c1}.\n\n- Hello command (#3)"),
                              ("2026-10-16T11:00:00Z", "<!-- release end-of-Release pass -->\ntriage ran for this Release."),
@@ -301,6 +319,7 @@ You are a Release thread for the repo in your working directory. Load the `relea
 The tracker and pull requests are in dry-run mode: `docs/dev-skills/issue-tracker.md` says how to record each write
 as a block in `.scratch/proposed-actions.md`. Read git history freely; make no commit or branch. The user is away:
 write anything you would tell the user to `.scratch/report.md`, and wait on no reply. Stop when the skill's run ends.
+{case.get('prompt_extra', '')}
 ---
 """)
     return r

@@ -1,0 +1,12 @@
+release-1
+release-2
+milestone-1
+needs-triage
+needs-info
+ready-for-agent
+ready-for-human
+wontfix
+bug
+enhancement
+next-release
+parked

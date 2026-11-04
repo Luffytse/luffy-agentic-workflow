@@ -5,7 +5,8 @@ Usage: score.py <out-dir> <case>
 Prints one line per check (PASS or FAIL with what it saw) and exits 1 when any check fails. See
 evals/release/README.md. The checks read the release issue the run opens for "Release 3" (its Order, Left out,
 Proposed to the user and Size), the label writes, and, in the cut case, the changelog pull request and the order of
-the cut, close and end-of-Release blocks.
+the cut, close and end-of-Release blocks; in carry-over-cut, the `## Carried over` edit of the release issue
+and its order against the label removal.
 """
 import pathlib
 import re
@@ -71,13 +72,18 @@ def main(out, case):
     report = (repo / ".scratch/report.md").read_text() if (repo / ".scratch/report.md").exists() else ""
     if exp.get("empty"):
         return empty_checks(blocks, report, exp)
+    if exp.get("carry"):
+        return carry_checks(blocks, exp["carry"])
 
     created = [b for b in blocks if b["op"].startswith("create an issue") and b["title"].strip() == NEXT]
     check("one release issue opened, titled Release 3", len(created) == 1, f"{len(created)} found")
     body = created[0]["body"] if created else ""
     order = refs(section(body, "Order"), numbered=True)
     got_order = [n for n, _ in order]
-    check("Order lists the expected ranked pick, in order", got_order == exp["order"], f"saw {got_order}, want {exp['order']}")
+    if exp.get("unordered"):  # the skill gives no group to a carried-over issue: only which issues are taken is fixed
+        check("Order lists exactly the expected issues", sorted(got_order) == sorted(exp["order"]), f"saw {got_order}, want {exp['order']}")
+    else:
+        check("Order lists the expected ranked pick, in order", got_order == exp["order"], f"saw {got_order}, want {exp['order']}")
     if exp.get("reasons", True):
         thin = [n for n, line in order if len(re.sub(r"^.*?#\d+", "", line).split()) < 4]
         check("every Order entry has a line of reason", order and not thin, f"thin: {thin}")
@@ -132,6 +138,29 @@ def empty_checks(blocks, report, exp):
         check(f"#{n} named in the report as left out or waiting", re.search(rf"#{n}\b[^\n]*(left out|wait|blocker|blocked)", report, re.I), "")
     check("the report says why (the blocker no agent can take)", re.search(r"#40\b", report) and
           re.search(r"ready-for-human|blocker|blocked|waiting|wait", report, re.I), "")
+    print(f"{sum(results)}/{len(results)} checks passed")
+    return 0 if all(results) else 1
+
+
+def carry_checks(blocks, carry):
+    """Step 1 carries an issue over: its line under `## Carried over` on the release issue, written before the label goes."""
+    n, rel = carry["n"], carry["release"]
+    edits = [b for b in blocks if b["op"].startswith("edit") and b["n"] == 2]
+    sections = [(b["k"], section(b["body"], "Carried over")) for b in edits]
+    sections = [(k, sec) for k, sec in sections if sec.strip()]
+    check("the release issue (#2) is edited with a `## Carried over` section", bool(sections), f"{len(edits)} edits of #2")
+    lines = [ln for _, sec in sections[-1:] for ln in sec.splitlines() if ln.strip()]
+    mine = [ln for ln in lines if re.match(rf"^- #{n}\s+\S.*:\s+\S", ln)]
+    check(f"the section has a `- #{n} <title>: <why>` line", len(mine) == 1, f"saw {lines}")
+    check("the section lists only the carried-over issue", all(re.match(rf"^- #{n}\b", ln) for ln in lines), f"saw {lines}")
+    check("the edit keeps the rest of the release issue", all(h in (edits[-1]["body"] if edits else "") for h in ("## Order", "## Notes")))
+    k_line = sections[0][0] if sections else None
+    k_label = next((b["k"] for b in blocks if b["op"].startswith("apply") and b["n"] == n and f"release-{rel}" in labels_split(b["remove"])), None)
+    check(f"release-{rel} removed from #{n}", k_label is not None)
+    check("the line is written before the label is removed", k_line is not None and k_label is not None and k_line < k_label,
+          f"line at block {k_line}, label at block {k_label}")
+    stray = {b["n"] for b in blocks if b["op"].startswith("apply") and f"release-{rel}" in labels_split(b["remove"])} - {n}
+    check("no other issue loses the label", not stray, f"{sorted(stray)}")
     print(f"{sum(results)}/{len(results)} checks passed")
     return 0 if all(results) else 1
 

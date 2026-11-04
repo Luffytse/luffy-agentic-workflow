@@ -146,6 +146,49 @@ CASES = {
                 labels=["needs-triage", "bug"]),
         ],
     ),
+    # Release 2 (closed, cut in an earlier run) carried two issues over: the release issue's `## Carried over` section
+    # lists #31 (still open) and #34 (closed since), both also in its Order (Used 3); its Notes carry a line shaped like a
+    # carried-over line for #32 outside that section, which a rerun must not read as one.
+    # #31 carries no state label, so only the section makes it a candidate; #32 and #34 are not.
+    "carried-over": dict(
+        size=5,
+        milestone=[20],
+        carried=[(31, "Empty name prints `Hello, !`", "the fix needed a decision on the empty name"),
+                 (34, "Names with accents come out mangled", "the reproduction was missing")],
+        notes_text="- #32 Trailing space after the greeting: not finished, carried to the next Release.",
+        issues=[QUIET,
+            bug(31, "empty-name", "Empty name prints `Hello, !`", "2026-09-15", "`greet.sh hello ''` prints `Hello, !`.",
+                labels=["bug"]),
+            bug(32, "trailing-space", "Trailing space after the greeting", "2026-10-10", "Every greeting ends in a space.",
+                labels=["bug"]),
+            dict(bug(34, "accents", "Names with accents come out mangled", "2026-08-01", "`greet.sh hello Zoë` prints `Zo?`.",
+                     labels=["bug"]), status="closed"),
+        ],
+    ),
+    # Step 1 of a cut: Release 2 is open, #10 and #20 shipped, #31 (open, labelled release-2) blocks the cut and the
+    # user has chosen to carry it over. The run writes its line under `## Carried over` of #2, then removes the label.
+    "carry-over-cut": dict(
+        size=5,
+        milestone=[10, 20, 21],
+        cut=True,
+        carry=dict(n=31, release=2),
+        prompt_extra=("The user has chosen to carry #31 over to the next Release; every other issue of Release 2 shipped.\n"
+                      "Do step 1 only (check the current Release is done, carrying #31 over as the user chose), report in\n"
+                      "`.scratch/report.md`, and stop there: do nothing of steps 2 to 5."),
+        issues=[
+            dict(n=10, slug="farewell", title="Farewell command", type="ticket", labels=["ready-for-agent", "enhancement", "milestone-1", "release-2"],
+                 created="2026-10-02", status="closed", body="Add `greet.sh bye <name>`."),
+            dict(QUIET, labels=QUIET["labels"] + ["release-2"], status="closed"),
+            bug(31, "empty-name", "Empty name prints `Hello, !`", "2026-09-15", "`greet.sh hello ''` prints `Hello, !`.",
+                labels=["ready-for-agent", "bug", "release-2"]),
+            dict(n=21, slug="shout", title="Shout flag", type="ticket", labels=["ready-for-agent", "enhancement", "milestone-1"],
+                 created="2026-10-04", body="`-s` prints the greeting in capitals."),
+        ],
+        pulls=[
+            dict(n=7, title="feat: farewell command", body="Closes #10", file="src/greet.sh", line="# bye\n"),
+            dict(n=8, title="feat: quiet flag", body="Fixes #20", file="src/greet.sh", line="# quiet\n"),
+        ],
+    ),
     # A repo that keeps no version cuts a whole Release: shipped test, changelog entry with no Versions line and no
     # version file, the end-of-Release pass in order, then the plan.
     "no-version": dict(
@@ -187,6 +230,10 @@ EXPECT = {
                     cleared=set(), used=3, reasons=True),
     "empty": dict(order=[], labelled=set(), left_out={20}, not_ranked={34, 50}, proposed={50}, cleared=set(),
                   used=0, empty=True),
+    "carried-over": dict(order=[20, 31], unordered=True, labelled={20, 31}, left_out=set(), not_ranked={32, 34},
+                         cleared=set(), used=2),
+    "carry-over-cut": dict(order=[], labelled=set(), left_out=set(), not_ranked=set(), cleared=set(), used=0,
+                           carry=dict(n=31, release=2)),
     "no-version": dict(order=[21], labelled={21}, left_out=set(), not_ranked=set(), cleared=set(), used=1,
                        cut=dict(name="Release 2", shipped=[10, 20], also_merged=[9])),
 }

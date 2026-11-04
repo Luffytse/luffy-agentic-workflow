@@ -15,6 +15,22 @@ Pass: yes | no. Lessons: <what to change in release, if anything>
 
 ## Runs
 
+### 2026-11-04, branch `claude/project-thread-r70sv3` (Ticket #653), commit 8dd61b0, dev-skills 0.75.0 (base, main e13b66f): `carried-over` and `carry-over-cut`
+
+Setup: two new ranked-pick cases, written with the fix. `carried-over` (step 5 reads the section): Release 2 is closed, cut in an earlier run; #31 and #34 are in its Order (Used 3) and listed under `## Carried over` (#34 closed since); its Notes hold "- #32 ...: not finished, carried to the next Release.", a carried-over-shaped line outside the section. The pick for Release 3 must take #20 and #31 and rank neither #32 nor #34. `carry-over-cut` (step 1 writes the line): Release 2 open, #10 and #20 shipped, #31 open with `release-2` and blocking the cut, the prompt says the user chose to carry #31 over and to stop after step 1; the run must edit #2 to hold one `- #31 <title>: <why>` line under `## Carried over`, before it removes `release-2` from #31. The skill change: step 1 records a carried-over issue that way (line first, label second, an issue the section lists is skipped) and step 5 reads that section of the closed release issue cut most recently. Run level: decision-level in a fresh subagent, premium tier; every write a block in `.scratch/proposed-actions.md`.
+
+- **Self-test:** `python3 evals/release/ranked-pick/test_cases.py`: 20 tests OK (reference runs pass; planted runs that leave #31 out, rank #32 or #34, remove the label first, write no line, use another heading or write the line twice fail).
+- **Case check:** `carried-over`, premium, fresh: fix; the fixes (Release 2's Order, the #32 Notes line, the second case) were made. **`carry-over-cut` has not had its own case check: owed.**
+- **carried-over, branch's skill: 10/10, pass** (Order #20, #31; #32 and #34 not ranked). Evidence: `ranked-pick/evidence/branch-carried-over/`.
+- **carried-over, main's skill (e13b66f): 10/10, pass.** Main's step 5 found #31 from the section by name, so this case does not fail on main; it guards the step-5 read, and the #32 and #34 decoys held on both. Evidence: `evidence/main-carried-over/`.
+- **carry-over-cut, branch's skill: 7/7, pass** (an edit of #2 with `## Carried over` and the `- #31` line, then the label removed). Evidence: `evidence/branch-carry-over-cut/`.
+- **carry-over-cut, main's skill: 6/7, fail** on "the line is written before the label is removed": main removed `release-2` first (block 1), then edited #2 (block 2). This is the case main fails on the fixed behaviour. Evidence: `evidence/main-carry-over-cut/` (with its report).
+- The subagents could not write `.scratch/report.md` (refused for subagents), so reports came as text; only the main carry-over-cut report is kept in evidence.
+- **Eval:** behaviour change, so both cases ran on the branch's skill and on main's (ADR 0013).
+
+Not exercised: the rerun between the two writes of step 1 (a stop after the line, before the label), a dry run, a regular-tier run.
+Pass: yes. Lessons: a skill gap, found by both carried-over runs and filed as an issue by the coordinator: the skill gives a carried-over issue that is not at `ready-for-agent` no ranked group (both branch and main put #31 in the bug group). The `carried-over` case therefore fixes only which issues are taken, not their order.
+
 ### 2026-11-04, branch `claude/project-thread-p4c8ce` (Ticket #652), commit ca6d349, dev-skills 0.74.0 (base, main 9a53412): `empty`
 
 Setup: the new ranked-pick case `empty`: Milestone 1 lists only #20 Quiet flag, blocked by #40 (a bug at `ready-for-human`); #50 an unplanned `ready-for-agent` enhancement; #34 a `needs-triage` bug; Release 2 cut and closed, so the run goes straight to planning Release 3. `release` step 5 now has "When nothing qualifies": nothing taken opens no release issue, labels nothing and reports that nothing qualified and why; a rerun on an open release issue with an empty Order opens no second issue and leaves it as it is. Run level: decision-level, fresh premium-tier subagents made by the Ticket thread, given only the PROMPT.md text, `<checkout>` set to a `git archive` of the branch (ca6d349) or of main (9a53412) with `evals/` removed.

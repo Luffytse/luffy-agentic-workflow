@@ -33,8 +33,28 @@ EMPTY_REPORT = ("Nothing qualified for Release 3, so I opened no release issue a
                 "- #34 is at needs-triage and is not a candidate.\n")
 
 
+def carry_reference(variant=None):
+    """Reference run of carry-over-cut; `variant` plants one wrong run: label_first, no_line, heading, twice."""
+    body = ("**Goal:** Say goodbye and keep quiet.\n\n**Size:** 5. Used: 3.\n\n## Order\n\n1. #10 Farewell command: next.\n"
+            "2. #20 Quiet flag: next.\n3. #31 Empty name prints `Hello, !`: next.\n\n## Left out\n\nNone.\n\n")
+    line = "- #31 Empty name prints `Hello, !`: the user chose to carry it over; the fix is not done.\n"
+    head = "## Carried over" if variant != "heading" else "## Carry-over"
+    if variant == "twice":
+        line += line
+    if variant != "no_line":
+        body += f"{head}\n\n{line}\n"
+    body += "## Notes\n\nPosted as a comment when the Release is cut.\n"
+    edit = block(1, "Edit an issue body", "02-release-2.md", f"Body:\n~~~\n{body}~~~")
+    label = block(2, "Apply / remove labels", "31-empty-name.md", "Add: none\nRemove: release-2")
+    if variant == "label_first":
+        return label.replace("### 2.", "### 1.") + edit.replace("### 1.", "### 2.")
+    return edit + label
+
+
 def reference(case, exp, repo, order=None, labelled=None, cleared=None, left=None, versions=False, used=None, cut=True,
-              empty_issue=False):
+              empty_issue=False, variant=None):
+    if exp.get("carry"):
+        return carry_reference(variant)
     order = order if order is not None else exp["order"]
     labelled = labelled if labelled is not None else exp["labelled"]
     cleared = cleared if cleared is not None else exp["cleared"]
@@ -103,6 +123,7 @@ CLAIMS = {
     "json": lambda r: '"greeting"' not in _run(r, "--json", "hello", "Ada").stdout,
     "config": lambda r: ".greetrc" not in _text(r, "src/greet.sh"),
     "lint": lambda r: "shellcheck" not in _text(r, "test.sh"),
+    "accents": lambda r: True,  # closed: it claims nothing about main
     "usage-typo": lambda r: "usage: greet.sh helo " in _run(r).stderr,
     "empty-name": lambda r: _run(r, "hello", "").stdout.rstrip(" \n") == "Hello, !",  # #33's trailing space aside
     # the issue's own step: greet.sh's exit status in a pipe (PIPESTATUS[0]), not the pipeline's, which is cat's
@@ -187,7 +208,7 @@ class Cases(unittest.TestCase):
     def test_swapped_order_fails(self):
         for case in CASES:
             o = EXPECT[case]["order"]
-            if len(o) > 1:
+            if len(o) > 1 and not EXPECT[case].get("unordered"):
                 with self.subTest(case=case):
                     self.assertEqual(self.run_case(case, order=[o[1], o[0]] + o[2:]).returncode, 1)
 
@@ -228,6 +249,56 @@ class Cases(unittest.TestCase):
     def test_empty_plan_report_silent_about_it_fails(self):
         r = self.run_case("empty", report="Done.\n")
         self.assertEqual(r.returncode, 1)
+
+    def test_carried_over_issue_left_out_fails(self):
+        r = self.run_case("carried-over", order=[20], labelled={20}, used=1)
+        self.assertEqual(r.returncode, 1)
+
+    def test_prose_mention_or_closed_carried_issue_ranked_fails(self):
+        for extra in (32, 34):
+            with self.subTest(extra=extra):
+                r = self.run_case("carried-over", order=[20, 31, extra], labelled={20, 31, extra}, used=3)
+                self.assertEqual(r.returncode, 1)
+
+    def test_carried_over_fixture_renders_the_section(self):
+        with tempfile.TemporaryDirectory() as t:
+            repo = make_fixture.build(pathlib.Path(t) / "out", "carried-over")
+            body = _text(repo, ".scratch/issues/02-release-2.md")
+            sec = re.search(r"^## Carried over\n(.*?)(?=^## )", body, re.S | re.M).group(1)
+            self.assertIn("#31", sec)
+            self.assertIn("#34", sec)
+            self.assertNotIn("#32", sec)
+            self.assertIn("#32", body)  # in Notes, shaped like a carried-over line
+            self.assertIn("carried to the next Release", body)
+            order = re.search(r"^## Order\n(.*?)(?=^## )", body, re.S | re.M).group(1)
+            self.assertIn("#31", order)
+            self.assertIn("#34", order)
+            self.assertIn("Used: 3", body)
+
+    def test_carry_over_cut_reference_passes(self):
+        r = self.run_case("carry-over-cut")
+        self.assertEqual(r.returncode, 0, r.stdout)
+        self.assertIn("PASS the line is written before the label is removed", r.stdout)
+
+    def test_carry_over_cut_wrong_runs_fail(self):
+        for variant, failing in (("label_first", "the line is written before the label is removed"),
+                                 ("no_line", "the release issue (#2) is edited with a `## Carried over` section"),
+                                 ("heading", "the release issue (#2) is edited with a `## Carried over` section"),
+                                 ("twice", "the section has a `- #31 <title>: <why>` line")):
+            with self.subTest(variant=variant):
+                r = self.run_case("carry-over-cut", variant=variant)
+                self.assertEqual(r.returncode, 1, r.stdout)
+                self.assertIn("FAIL " + failing, r.stdout)
+
+    def test_carry_over_cut_fixture_renders_the_blocker(self):
+        with tempfile.TemporaryDirectory() as t:
+            repo = make_fixture.build(pathlib.Path(t) / "out", "carry-over-cut")
+            i31 = _text(repo, ".scratch/issues/31-empty-name.md")
+            self.assertIn("Status: open", i31)
+            self.assertIn("release-2", i31.splitlines()[2])
+            self.assertIn("Status: open", _text(repo, ".scratch/issues/02-release-2.md"))
+            self.assertNotIn("Carried over", _text(repo, ".scratch/issues/02-release-2.md"))
+            self.assertIn("carry #31 over", (repo.parent / "PROMPT.md").read_text())
 
     def test_severe_issue_left_out_fails(self):
         e = EXPECT["severe-first"]
