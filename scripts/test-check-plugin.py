@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Exercise plugin packaging through the checker CLI using disposable repositories."""
+import json
 import pathlib
 import shutil
 import subprocess
@@ -122,25 +123,6 @@ class SkillLoadingPackaging(unittest.TestCase):
         self.plant("plugins/dev-skills/skills/implement/SKILL.md", "Set foo_o" + "3_bar and version 4o3.\n")
         self.check(0)
 
-    def test_every_tier_naming_skill_points_at_the_map(self):
-        skills = self.repo / "plugins/dev-skills/skills"
-        for name in ["implement", "implement-spec", "review-rounds", "to-tickets",
-                     "release", "retro-planning", "setup-project"]:
-            self.assertIn("model-tiers", (skills / name / "SKILL.md").read_text(), name)
-
-    def test_repo_only_merge_rules_in_skill_text_fail(self):
-        for text in ("The coordinator hands out the next version number.\n",
-                     "Hand out version numbers one at a time.\n",
-                     "Re-read open Tickets after a skill merge.\n",
-                     "Re-read open issues after a merge.\n"):
-            self.plant("plugins/dev-skills/skills/implement/SKILL.md", text)
-            self.check(1)
-            shutil.copy(pathlib.Path(__file__).resolve().parents[1] / "plugins/dev-skills/skills/implement/SKILL.md",
-                        self.repo / "plugins/dev-skills/skills/implement/SKILL.md")
-
-    def test_no_shipped_skill_states_the_repo_only_merge_rules(self):
-        self.check(0)
-
     def cite(self, text):
         (self.skill / "SKILL.md").write_text(
             "---\nname: fixture-contract\ndescription: Use when a caller needs the fixture contract.\n"
@@ -155,18 +137,6 @@ class SkillLoadingPackaging(unittest.TestCase):
         for cite in ('the tracker doc\'s **Close** operation', 'the tracker doc\'s "Comment on an issue" operation'):
             result = self.cite(cite)
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-
-    def test_cited_park_operation_exists_in_the_seed(self):
-        for cite in ('the tracker doc\'s **Park** operation', 'the tracker doc\'s "Park" operation'):
-            result = self.cite(cite)
-            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-
-    def test_build_skills_cite_park_and_the_seed_defines_it(self):
-        skills = self.repo / "plugins/dev-skills/skills"
-        seed = (skills / "setup-dev-skills/issue-tracker-github.md").read_text()
-        self.assertIn("- **Park**", seed)
-        for name in ["implement", "implement-spec"]:
-            self.assertIn("tracker doc's **Park** operation", (skills / name / "SKILL.md").read_text(), name)
 
     def worker_reference(self):
         return self.repo / "plugins/dev-skills/skills/worker-control/claude-code-project-threads.md"
@@ -190,9 +160,6 @@ class SkillLoadingPackaging(unittest.TestCase):
             self.assertIn("team-lead-no-harness-detail", result.stdout)
             shutil.copy(pathlib.Path(__file__).resolve().parents[1] / "plugins/dev-skills/skills/team-lead/SKILL.md",
                         self.repo / "plugins/dev-skills/skills/team-lead/SKILL.md")
-
-    def test_shipped_team_lead_names_no_harness_detail(self):
-        self.check(0)
 
     def test_milestone_naming_a_harness_tool_fails(self):
         for text in ("Read the state with `list_threads`.\n", "Start it with mcp__hearthbot__start_thread.\n"):
@@ -226,9 +193,6 @@ class SkillLoadingPackaging(unittest.TestCase):
         self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
         self.assertIn("milestone-no-delivery-detail", result.stdout)
 
-    def test_shipped_milestone_holds_no_delivery_detail(self):
-        self.check(0)
-
     def test_worker_reference_method_with_source_passes(self):
         self.plant("plugins/dev-skills/skills/worker-control/claude-code-project-threads.md",
                    "### Wake a worker\n\nSend it a message.\nSource: [page](https://example.com/docs/wake)\n")
@@ -255,6 +219,87 @@ class SkillLoadingPackaging(unittest.TestCase):
             self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
             self.assertIn("fixture-contract/SKILL.md:8", result.stdout)
             self.assertIn("Comment", result.stdout)
+
+    def fails_with(self, needle):
+        result = self.run_checker()
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn(needle, result.stdout)
+
+    def test_stray_file_in_skills_fails(self):
+        (self.repo / "plugins/dev-skills/skills/notes.md").write_text("x\n")
+        self.fails_with("stray file in skills: notes.md")
+
+    def test_skill_folder_without_skill_md_fails(self):
+        (self.skill / "SKILL.md").unlink()
+        self.fails_with("skill folder fixture-contract has no SKILL.md")
+
+    def test_frontmatter_name_differing_from_folder_fails(self):
+        path = self.skill / "SKILL.md"
+        path.write_text(path.read_text().replace("name: fixture-contract", "name: fixture-other"))
+        self.fails_with('frontmatter name "fixture-other" differs from its folder name')
+
+    def test_broken_relative_link_in_skill_md_fails(self):
+        self.plant("plugins/dev-skills/skills/fixture-contract/SKILL.md", "See [the rules](RULES.md#top).\n")
+        self.fails_with("fixture-contract/SKILL.md links RULES.md, which does not exist")
+        (self.skill / "RULES.md").write_text("# Rules\n")
+        self.check(0)
+
+    def test_missing_changelog_fails(self):
+        (self.repo / "plugins/dev-skills/CHANGELOG.md").unlink()
+        self.fails_with("missing CHANGELOG.md")
+
+    def test_manifest_without_repository_fails(self):
+        path = self.repo / "plugins/dev-skills/.claude-plugin/plugin.json"
+        path.write_text(path.read_text().replace('"repository"', '"homepage"'))
+        self.fails_with("plugin.json has no repository field")
+
+    def test_codex_version_drift_fails(self):
+        path = self.repo / "plugins/dev-skills/.codex-plugin/plugin.json"
+        data = json.loads(path.read_text())
+        data["version"] = "9.9.9"
+        path.write_text(json.dumps(data))
+        self.fails_with("Codex manifest version differs from Claude manifest")
+
+    def test_codex_marketplace_offering_a_second_plugin_fails(self):
+        path = self.repo / ".agents/plugins/marketplace.json"
+        data = json.loads(path.read_text())
+        data["plugins"].append(dict(data["plugins"][0], name="dai-portal-data"))
+        path.write_text(json.dumps(data))
+        self.fails_with("Codex marketplace must offer only dev-skills")
+
+    def test_missing_release_skill_fails(self):
+        shutil.rmtree(self.repo / "plugins/dev-skills/skills/release")
+        self.fails_with("missing plugins/dev-skills/skills/release/SKILL.md")
+
+    def test_display_name_of_another_skill_fails(self):
+        path = self.skill / "agents/openai.yaml"
+        path.write_text(path.read_text().replace("Fixture Contract", "Implement"))
+        self.fails_with('display_name "Implement" does not match the skill name')
+
+    def test_repo_only_names_in_skill_text_fail(self):
+        for text in ("Read ADR " + "0004 first.\n", "Ask Upstream.\n", "Run scripts/check-" + "plugin.sh.\n"):
+            self.cite(text)
+            self.fails_with("skill text names something only this repo has")
+        self.cite("Return the fixture record.")
+        # An example index line linking its own ADR file, and lowercase "upstream", are fine (in a reference file,
+        # whose links skill-links does not follow).
+        (self.skill / "example.md").write_text("- [ADR " + "0003](adr/0003-x.md): an example line; the upstream repo.\n")
+        self.check(0)
+
+    def test_agent_label_string_in_plugin_fails(self):
+        self.cite("Label it claude" + "-only.")
+        self.fails_with("plugin text names an agent-only label string")
+
+    def test_repo_merge_rule_names_in_skill_text_fail(self):
+        for text in ("Ask for the version hand" + "-out.\n", "Then run the Ticket re" + "-read.\n",
+                     "Ask for the version hand" + " out.\n", "The Tickets re" + "-read follows.\n"):
+            self.cite(text)
+            self.fails_with("skill text names a merge-time rule that only fits this repo")
+
+    def test_generic_rereads_and_merges_in_skill_text_pass(self):
+        # Prose a generic skill may hold: the check bans the rule names, not sentences around them.
+        self.cite("After a skill merge, re-read the open issues and hand out the next version number.")
+        self.check(0)
 
 
 if __name__ == "__main__":

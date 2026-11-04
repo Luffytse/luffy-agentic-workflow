@@ -29,7 +29,7 @@ Behaviour checks of the `merging` Base skill (`plugins/dev-skills/skills/merging
 1. Build it into a scratch directory outside this repo.
 2. Start a **fresh** session at the **premium** tier (load `model-tiers` for the model), working directory `<out-dir>/repo`, and give it only the text between the `---` lines of `<out-dir>/PROMPT.md`, with `<checkout>` replaced by the checkout under test. Keep this README, `cases.py`, `score.py` and `test_cases.py` away from it: the Expected column is the answer.
 3. Score it: `python3 evals/merging/score.py <out-dir> <case>`. It prints one line per check and exits 1 when any fails. It reads the blocks in `.scratch/proposed-actions.md` in their order and `.scratch/report.md`, and checks git and the fixture's files are unchanged. Read the report too.
-4. Run each case twice, on fresh fixtures: once on the branch's skills and once on main's (a `git archive` of main into a scratch directory as `<checkout>`). On main before `merging` exists, `implement` step 7 holds the rule itself, so both runs should score the same. Record both in [RESULTS.md](RESULTS.md) with the commit, plugin version and run level. When Spec #626 has landed, each case also gets its premium case check as that Spec sets.
+4. Run each case twice, on fresh fixtures: once on the branch's skills and once on main's (a `git archive` of main into a scratch directory as `<checkout>`). On main before `merging` exists, `implement` step 7 holds the rule itself, so both runs should score the same. Record both in [RESULTS.md](RESULTS.md) with the commit, plugin version and run level. A new case, or a changed expected result, gets its case check first, as the [evals guide](../../docs/dev-skills/evals.md) says.
 
 ### Self-test of the cases
 
