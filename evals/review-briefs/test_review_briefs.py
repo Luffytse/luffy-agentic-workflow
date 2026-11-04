@@ -474,5 +474,221 @@ class Boundaries(Base):
             self.assertNotIn(word, text)
 
 
+# ---- the Verifier brief (review_briefs.py verify) ----
+
+FORMAT_FIELDS = re.findall(r"^- ([^:(]+?)(?: \([^)]*\))?:", FORMAT, re.M)
+VERIFIER_BRIEF = quoted(VERIFY := (REVIEW_ROUNDS / "VERIFY.md").read_text(), "Brief")
+VERIFIER_TIERS = re.search(r"on the (cheap|regular|premium) tier \((cheap|regular|premium) at Deep\)", VERIFY).groups()
+
+
+def finding(title, bug_class, n_locations=3, marker="X"):
+    """A Finding in the Finding format, its fields taken from the skill's format block, with several Locations."""
+    values = {"Bug class": bug_class,
+              "Locations": ", ".join("src/app.py:%d" % (i + 1) for i in range(n_locations))}
+    lines = ["### " + title]
+    for f in FORMAT_FIELDS:
+        lines.append("- %s: %s" % (f, values.get(f, "%s-%s value" % (marker, f))))
+    return "\n".join(lines) + "\n"
+
+
+class VerifierBrief(Base):
+    def verify(self, s, reports, *extra, level="standard", script=None, spec=True, earlier=False):
+        """Write reports (finder -> text or bytes or None for none) to a dir and run the verify subcommand."""
+        rdir = s.root / "reports"
+        rdir.mkdir(exist_ok=True)
+        for old in rdir.iterdir():
+            old.unlink()
+        for name, text in reports.items():
+            if text is None:
+                continue
+            (rdir / ("%s.md" % name)).write_bytes(text if isinstance(text, bytes) else text.encode())
+        args = [sys.executable, "-B", str(script or REVIEW_ROUNDS / SCRIPT_NAME), "verify", "--level", level,
+                "--repo", str(s.repo), "--base", "main", "--out", str(s.out), "--reports", str(rdir),
+                "--design", str(s.design)]
+        if spec:
+            args += ["--spec", str(s.spec)]
+        if earlier:
+            args += ["--earlier", str(s.earlier)]
+        return subprocess.run(args + list(extra), text=True, capture_output=True)
+
+    def all_clear(self, level="standard", spec=True):
+        names = [n for n in table_finders(level) if spec or n != "spec"]
+        return {n: "Nothing found.\n" for n in names}
+
+    def test_a_report_with_several_findings_and_locations_is_carried_over_byte_for_byte(self):
+        s = self.scratch()
+        std = finding("First", "unescaped input", 4) + "\n" + finding("Second", "missing test", 3) + "\n"
+        # odd bytes on purpose: CRLF, trailing spaces, a non-ascii character, no final newline
+        adv = (finding("Third", "off by one", 5).replace("\n", "\r\n").rstrip() + " \u00e9  ").encode()
+        reports = {"standards": std, "spec": "Nothing found.\n", "adversarial": adv}
+        r = self.verify(s, reports)
+        self.ok(r)
+        t = (s.out / "verifier.md").read_bytes()
+        self.assertIn(std.encode(), t)
+        self.assertIn(adv, t)
+        text = t.decode()
+        for name in ("standards", "adversarial"):  # each report sits under a heading naming its Finder
+            m = re.search(r"^#+ .*\b%s\b.*$" % name, text, re.M | re.I)
+            self.assertIsNotNone(m, name)
+        self.assertLess(text.index(std), text.index(adv.decode()))
+        self.assertEqual(s.files(), ["verifier.md"])
+
+    def test_brief_holds_the_verifier_brief_copy_rule_format_and_round_values(self):
+        s = self.scratch()
+        reports = self.all_clear()
+        reports["standards"] = finding("First", "unescaped input")
+        self.ok(self.verify(s, reports, earlier=True))
+        t = (s.out / "verifier.md").read_text()
+        head = git(s.repo, "rev-parse", "feature").strip()
+        for part in (VERIFIER_BRIEF, COPY, FORMAT):
+            self.assertIn(part, t)
+        for marker in ("PLANTED-IMPORTANT", "PLANTED-SKIP", "PLANTED-SPEC", "PLANTED-DESIGN", "PLANTED-EARLIER", head,
+                       "planted change"):
+            self.assertIn(marker, t)
+
+    def test_printed_list_gives_the_verifier_tier_premium_at_deep(self):
+        for level, want in (("quick", VERIFIER_TIERS[0]), ("standard", VERIFIER_TIERS[0]), ("deep", VERIFIER_TIERS[1])):
+            with self.subTest(level=level):
+                s = self.scratch()
+                reports = self.all_clear(level)
+                reports["standards"] = finding("First", "unescaped input")
+                r = self.verify(s, reports, level=level)
+                self.ok(r)
+                line = next(l for l in r.stdout.splitlines() if "verifier.md" in l)
+                self.assertIn("Verifier", line)
+                self.assertIn(want, line)
+
+    def test_missing_empty_and_off_format_reports_each_stop_and_are_all_named(self):
+        bad = {"missing": None, "empty": "", "blank": "  \n\n", "prose": "Looks fine to me, no problems.\n",
+               "partial": "### A title\n- Severity (proposed): Nit\n", "no-heading": "- Bug class: x\n- Locations: a:1\n"}
+        for kind, text in bad.items():
+            with self.subTest(kind=kind):
+                s = self.scratch()
+                reports = self.all_clear("deep")
+                reports["adversarial"] = text
+                r = self.verify(s, reports, level="deep")
+                self.assertEqual(r.returncode, 3, r.stdout + r.stderr)
+                self.assertIn("adversarial", r.stderr)
+                for ok in ("standards", "spec", "security"):
+                    self.assertNotIn(ok, r.stderr)
+                self.assertEqual(s.files(), [])
+        s = self.scratch()
+        reports = self.all_clear("deep")
+        reports.update({"standards": None, "spec": "", "security": "prose only\n"})
+        r = self.verify(s, reports, level="deep")
+        self.assertEqual(r.returncode, 3)
+        for name in ("standards", "spec", "security"):
+            self.assertIn(name, r.stderr)
+        self.assertNotIn("adversarial", r.stderr)
+        self.assertEqual(s.files(), [])
+
+    def test_a_good_report_next_to_one_bad_report_writes_nothing(self):
+        s = self.scratch()
+        reports = self.all_clear()
+        reports["standards"] = finding("First", "unescaped input")
+        reports["spec"] = ""
+        self.assertEqual(self.verify(s, reports).returncode, 3)
+        self.assertEqual(s.files(), [])
+
+    def test_a_finding_missing_a_field_of_the_format_is_off_format(self):
+        for field in FORMAT_FIELDS:
+            with self.subTest(field=field):
+                s = self.scratch()
+                text = re.sub(r"^- %s.*\n" % re.escape(field), "", finding("First", "x"), flags=re.M)
+                reports = self.all_clear()
+                reports["standards"] = text
+                r = self.verify(s, reports)
+                self.assertEqual(r.returncode, 3)
+                self.assertIn("standards", r.stderr)
+
+    def test_nothing_found_in_every_report_and_no_earlier_finding_writes_no_verifier_brief(self):
+        s = self.scratch()
+        s.out.mkdir()
+        (s.out / "verifier.md").write_text("stale")
+        r = self.verify(s, self.all_clear())
+        self.ok(r)
+        self.assertEqual(s.files(), [])
+        self.assertRegex(r.stdout.lower(), r"no verifier")
+
+    def test_nothing_found_still_gets_a_verifier_when_an_earlier_finding_is_open(self):
+        s = self.scratch()
+        r = self.verify(s, self.all_clear(), earlier=True)
+        self.ok(r)
+        t = (s.out / "verifier.md").read_text()
+        self.assertIn("PLANTED-EARLIER", t)
+        self.assertIn("verifier.md", r.stdout)
+
+    def test_always_check_lines_only_for_the_bug_class_a_candidate_names(self):
+        s = self.scratch()
+        reports = self.all_clear()
+        reports["standards"] = finding("A py thing", "py line")  # names the REVIEW.md line "py line"
+        self.ok(self.verify(s, reports))
+        t = (s.out / "verifier.md").read_text()
+        self.assertIn("PLANTED-PY", t)
+        for gone in ("PLANTED-SH", "PLANTED-DOCS", "PLANTED-ANY"):  # even lines that fit the changed files stay out
+            self.assertNotIn(gone, t)
+        self.assertIn(RECORD_TERMS, t)
+
+    def test_no_always_check_line_when_no_candidate_names_one(self):
+        s = self.scratch()
+        reports = self.all_clear()
+        reports["adversarial"] = finding("Something", "unrelated kind of problem")
+        self.ok(self.verify(s, reports))
+        t = (s.out / "verifier.md").read_text()
+        for gone in ("PLANTED-PY", "PLANTED-SH", "PLANTED-DOCS", "PLANTED-ANY", RECORD_TERMS):
+            self.assertNotIn(gone, t)
+
+    def test_two_candidates_name_two_lines(self):
+        s = self.scratch()
+        reports = self.all_clear()
+        reports["standards"] = finding("One", "Py Line") + "\n" + finding("Two", "the sh line broke")
+        self.ok(self.verify(s, reports))
+        t = (s.out / "verifier.md").read_text()
+        self.assertIn("PLANTED-PY", t)
+        self.assertIn("PLANTED-SH", t)
+        self.assertNotIn("PLANTED-DOCS", t)
+
+    def test_heading_inside_a_code_fence_is_not_a_finding(self):
+        s = self.scratch()
+        reports = self.all_clear()
+        reports["standards"] = "Nothing found.\n\n```\n### example\n```\n"
+        self.ok(self.verify(s, reports))
+
+    def test_no_spec_means_no_spec_finder_is_expected(self):
+        s = self.scratch()
+        reports = self.all_clear(spec=False)
+        reports["standards"] = finding("One", "x")
+        self.ok(self.verify(s, reports, spec=False))
+        self.assertEqual(s.files(), ["verifier.md"])
+
+    def test_a_missing_verifier_section_stops_with_its_name_and_exit_3(self):
+        s = self.scratch()
+        skills = pathlib.Path(s.root) / "skills"
+        for name in ("review-rounds", "review-record", "docs-index"):
+            shutil.copytree(SKILLS / name, skills / name)
+        f = skills / "review-rounds/VERIFY.md"
+        f.write_text(f.read_text().replace("Brief:", "Text:"))
+        reports = self.all_clear()
+        reports["standards"] = finding("One", "x")
+        r = self.verify(s, reports, script=skills / "review-rounds" / SCRIPT_NAME)
+        self.assertEqual(r.returncode, 3)
+        self.assertIn("verifier", r.stderr.lower())
+        self.assertEqual(s.files(), [])
+
+    def test_usage_errors_and_an_output_directory_in_the_work_tree(self):
+        s = self.scratch()
+        reports = self.all_clear()
+        reports["standards"] = finding("One", "x")
+        self.assertEqual(self.verify(s, reports, "--level", "mega").returncode, 2)
+        s2 = self.scratch()
+        r = subprocess.run([sys.executable, "-B", str(REVIEW_ROUNDS / SCRIPT_NAME), "verify", "--level", "quick",
+                            "--repo", str(s2.repo), "--base", "main", "--out", str(s2.repo / "b"),
+                            "--reports", str(s2.root)], text=True, capture_output=True)
+        self.assertEqual(r.returncode, 2)
+        r = subprocess.run([sys.executable, "-B", str(REVIEW_ROUNDS / SCRIPT_NAME), "verify", "--level", "quick",
+                            "--repo", str(s2.repo), "--base", "main", "--out", str(s2.out)], text=True, capture_output=True)
+        self.assertEqual(r.returncode, 2)  # --reports is required
+
+
 if __name__ == "__main__":
     unittest.main()

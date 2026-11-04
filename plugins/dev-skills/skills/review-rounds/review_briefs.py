@@ -5,11 +5,27 @@ Usage:
   review_briefs.py round1 --level quick|standard|deep --base <ref> --out <dir>
                    [--head <ref>] [--repo <dir>] [--spec <file>] [--standards <file>] [--earlier <file>]
                    [--design <file>] [--angle <name>]
+  review_briefs.py verify --level quick|standard|deep --base <ref> --out <dir> --reports <dir>
+                   [--head <ref>] [--repo <dir>] [--spec <file>] [--earlier <file>] [--design <file>]
 
 round1 writes the briefs for Round 1 of a review at the level Round 0 picked: the standards and spec Finders at
 quick; plus the adversarial Finder at standard; plus the security Finder at deep (the table in SKILL.md). Without
---spec there is no spec Finder. Later subcommands (the Verifier brief, later Rounds, a Ticket check, a fixed point)
-extend this CLI; each subcommand is a function of the same shape as round1.
+--spec there is no spec Finder. Later subcommands (later Rounds, a Ticket check, a fixed point) extend this CLI; each
+subcommand is a function of the same shape as round1.
+
+verify writes the Verifier's brief (verifier.md) for a Round 1 whose Finders have reported. --reports is a directory
+holding one file per Finder of the Round, named <finder>.md with the Finder as the table in SKILL.md names it:
+standards, spec (only with --spec), adversarial (standard and deep), security (deep). The thread saves each Finder's
+final message there unchanged. First every report is checked: it must hold one or more Findings in the Finding format
+(a heading and every field line of the format) or "nothing found". A missing, empty or off-format report stops the
+script (exit 3) with every such Finder named, and nothing is written; the thread asks that Finder again. A passing
+report goes into the brief byte for byte, in a code fence under a heading naming its Finder. The brief also holds the
+Verifier brief and copy rule (VERIFY.md, FINDERS.md), the Finding format, the Round values, the spec, the design
+answers, the earlier open Findings with their disputes (--earlier), the meaning of Important and the Skip list, and
+only the Always check lines whose name a candidate's Bug class matches (same words, ignoring case and punctuation, or
+one containing the other), with the review-record meaning. When every report is "nothing found" and --earlier is
+absent or empty, no Verifier runs: nothing is written, any old verifier.md is removed, and the output says so. The
+Verifier's tier (premium at Deep) is in the printed line.
 
 Inputs the thread passes, all files: --spec (the spec's text), --standards (a list of standards files, one path per
 line, relative to --repo), --earlier (the earlier open Findings with their disputes), --design (the design answers),
@@ -22,9 +38,9 @@ falls back to the skill's default.
 Every brief sentence is cut out of the skill's brief files (FINDERS.md, DEEP.md, SKILL.md here; the review-record and
 docs-index skills beside this one) when the script runs; none is copied into it. A section it cannot find stops it
 with a message naming the section (exit 3) and nothing is written. --out must be outside the work tree; the script
-replaces the finder-*.md files already there, and writes nothing else anywhere. It calls only `git`.
+replaces the finder-*.md (verify: verifier.md) files already there, and writes nothing else anywhere. It calls only `git`.
 
-Exit 0 written, 2 usage error, 3 a section could not be found. Prints one line per file: file, role, tier.
+Exit 0 written, 2 usage error, 3 a section could not be found or a Finder report is missing, empty or off-format (verify). Prints one line per file: file, role, tier.
 """
 import argparse
 import fnmatch
@@ -53,6 +69,10 @@ class MissingSection(Exception):
 
 
 class Usage(Exception):
+    pass
+
+
+class BadReports(Exception):
     pass
 
 
@@ -160,6 +180,17 @@ class Rules:
         self.index_contract = strip_front_matter(read_skill_file("docs-index/SKILL.md"))
         if not self.index_contract:
             raise MissingSection("docs-index contract")
+        verify = read_skill_file("review-rounds/VERIFY.md")
+        self.verifier_brief = quoted(verify, "Brief", "Verifier brief")
+        m = re.search(r"on the (cheap|regular|premium) tier \((cheap|regular|premium) at Deep\)", verify)
+        if not m:
+            raise MissingSection("Verifier tier")
+        self.verifier_tiers = m.groups()
+        self.format_level = len(re.match(r"#+", re.search(r"^#+ .*$", self.format.split("```", 1)[1], re.M)
+                                         .group(0)).group(0)) if "```" in self.format else 0
+        self.format_fields = re.findall(r"^- ([^:(]+?)(?: \([^)]*\))?:", self.format, re.M)
+        if not self.format_level or not self.format_fields:
+            raise MissingSection("Finding format fields")
         self.tiers = {
             "standards": tier(finders, "## Standards Finder", "Standards Finder"),
             "spec": tier(finders, "## Spec Finder", "Spec Finder"),
@@ -263,19 +294,36 @@ def fence(text):
     return "%s\n%s\n%s" % (ticks, text.rstrip("\n"), ticks)
 
 
-def build_round1(rules, a):
-    repo = pathlib.Path(a.repo).resolve()
-    toplevel = pathlib.Path(git(repo, "rev-parse", "--show-toplevel").strip()).resolve()
-    out = pathlib.Path(a.out).resolve()
-    if out == toplevel or toplevel in out.parents:
-        raise Usage("--out must be outside the work tree (%s)" % toplevel)
-    head = git(repo, "rev-parse", a.head).strip()
-    base = a.base
-    git(repo, "rev-parse", "--verify", base + "^{commit}")
-    commits = git(repo, "log", "--oneline", "%s..%s" % (base, head)).strip() or "(none)"
-    changed = [p for p in git(repo, "diff", "--name-only", "-z", "%s...%s" % (base, head)).split("\0") if p]
-    diff_cmd = "git -C %s diff %s...%s" % (repo, base, head)
+class RoundValues:
+    """What a Round's briefs share: the diff command, commits and head from git, and the repo's REVIEW.md, Boundary
+    record and docs index when present."""
 
+    def __init__(self, rules, a):
+        self.repo = repo = pathlib.Path(a.repo).resolve()
+        toplevel = pathlib.Path(git(repo, "rev-parse", "--show-toplevel").strip()).resolve()
+        self.out = pathlib.Path(a.out).resolve()
+        if self.out == toplevel or toplevel in self.out.parents:
+            raise Usage("--out must be outside the work tree (%s)" % toplevel)
+        self.head = head = git(repo, "rev-parse", a.head).strip()
+        self.base = base = a.base
+        git(repo, "rev-parse", "--verify", base + "^{commit}")
+        commits = git(repo, "log", "--oneline", "%s..%s" % (base, head)).strip() or "(none)"
+        self.changed = [p for p in git(repo, "diff", "--name-only", "-z", "%s...%s" % (base, head)).split("\0") if p]
+        diff_cmd = "git -C %s diff %s...%s" % (repo, base, head)
+        self.important, self.skip, self.always = review_md_parts(repo)
+        boundary_path = repo / "docs/dev-skills/boundaries.md"
+        self.boundary = boundary_path.read_text().strip() if boundary_path.is_file() else None
+        self.has_index = (repo / "docs/dev-skills/index.md").is_file()
+        self.diff_part = "Diff command:\n\n%s\n\nCommits:\n\n%s" % (fence(diff_cmd), fence(commits))
+        self.important_part = "## Meaning of Important\n\n%s" % (
+            self.important + "\n\n" + rules.important_default if self.important and "default" in self.important.lower()
+            else self.important or rules.important_default)
+        self.skip_part = "## Skip list\n\n%s" % (self.skip or "None.")
+
+
+def build_round1(rules, a):
+    rv = RoundValues(rules, a)
+    repo, out, head, base, changed = rv.repo, rv.out, rv.head, rv.base, rv.changed
     spec = read_text_file(a.spec, "spec") if a.spec else None
     earlier = read_text_file(a.earlier, "earlier Findings file") if a.earlier else None
     design = read_text_file(a.design, "design answers file") if a.design else None
@@ -287,21 +335,15 @@ def build_round1(rules, a):
                 standards.append((rel, read_text_file(repo / rel, "standards file")))
     angle = angle_text(rules, a.angle)  # validated at every level, written in only where an adversarial Finder runs
 
-    important, skip, always = review_md_parts(repo)
-    boundary_path = repo / "docs/dev-skills/boundaries.md"
-    boundary = boundary_path.read_text().strip() if boundary_path.is_file() else None
-    has_index = (repo / "docs/dev-skills/index.md").is_file()
+    boundary, has_index, always = rv.boundary, rv.has_index, rv.always
     has_code = any(is_code(p) for p in changed)
     lines = [text for text, globs in always if applies(globs, changed)]
 
     round_part = "\n\n".join([
         "## This Round\n\nRound 1 of the review, level %s. Head: `%s`. Base: `%s`." % (a.level.capitalize(), head, base),
-        "Diff command:\n\n%s" % fence(diff_cmd),
-        "Commits:\n\n%s" % fence(commits),
-        "## Meaning of Important\n\n%s" % (
-            important + "\n\n" + rules.important_default if important and "default" in important.lower()
-            else important or rules.important_default),
-        "## Skip list\n\n%s" % (skip or "None."),
+        rv.diff_part,
+        rv.important_part,
+        rv.skip_part,
         "## Boundary record\n\n%s" % (boundary or "None: the project has no Boundary record."),
     ])
     common = "\n\n".join([
@@ -359,6 +401,113 @@ def round1(args):
         print("%s\t%s Finder\t%s tier" % (out / name, role, rules.tiers[role]))
 
 
+# ---- the Verifier brief ----
+
+NOTHING = re.compile(r"^\W*nothing found\W*$", re.I)
+
+
+def has_findings(rules, text):
+    return any(level == rules.format_level for _i, level, _l in headings(text))
+
+
+def report_problem(rules, text):
+    """Why a Finder's report is neither Findings in the Finding format nor "nothing found"; None when it is one."""
+    if not text.strip():
+        return "it is empty"
+    hs = [(i, line) for i, level, line in headings(text) if level == rules.format_level]
+    if not hs:
+        if any(NOTHING.match(line) for line in text.splitlines()):
+            return None
+        return "it has no Finding heading and does not say nothing found"
+    lines = text.splitlines()
+    for n, (i, line) in enumerate(hs):
+        block = lines[i + 1:hs[n + 1][0] if n + 1 < len(hs) else len(lines)]
+        for f in rules.format_fields:
+            if not any(re.match(r"^- %s(?: \([^)]*\))?:" % re.escape(f), b) for b in block):
+                return "Finding '%s' has no '%s' line" % (line.lstrip("# ").strip(), f)
+    return None
+
+
+def words(s):
+    return " ".join(re.findall(r"\w+", s.lower()))
+
+
+def named_by(always_text, classes):
+    """True when a candidate's Bug class names the Always check line (the bold name starting the line)."""
+    m = re.match(r"- \*\*(.+?)\*\*", always_text)
+    name = words(m.group(1)) if m else ""
+    return bool(name) and any(c and (name in c or c in name) for c in map(words, classes))
+
+
+def read_report(path):
+    try:
+        return pathlib.Path(path).read_bytes().decode("utf-8", "surrogateescape")
+    except OSError:
+        return None
+
+
+def raw_fence(text):
+    """The text unchanged in a code fence longer than any backtick run inside it."""
+    ticks = "`" * max(3, max((len(r) for r in re.findall(r"`+", text)), default=0) + 1)
+    return "%s\n%s%s%s" % (ticks, text, "" if text.endswith("\n") else "\n", ticks)
+
+
+def build_verify(rules, a):
+    rv = RoundValues(rules, a)
+    spec = read_text_file(a.spec, "spec") if a.spec else None
+    earlier = read_text_file(a.earlier, "earlier Findings file") if a.earlier else None
+    design = read_text_file(a.design, "design answers file") if a.design else None
+    rdir = pathlib.Path(a.reports)
+    if not rdir.is_dir():
+        raise Usage("--reports %s is not a directory" % a.reports)
+    finders = [r for r in ROLES[a.level] if r != "spec" or spec is not None]
+    reports, problems = {}, []
+    for f in finders:
+        text = read_report(rdir / (f + ".md"))
+        why = "there is no report file %s.md" % f if text is None else report_problem(rules, text)
+        if why:
+            problems.append("%s Finder: %s" % (f, why))
+        else:
+            reports[f] = text
+    if problems:
+        raise BadReports("; ".join(problems))
+    raised = [t for t in reports.values() if has_findings(rules, t)]
+    if not raised and not (earlier and earlier.strip()):
+        return rv.out, None
+    classes = [m.group(1) for t in raised for m in re.finditer(r"^- Bug class:[ \t]*(.*)$", t, re.M)]
+    lines = [text for text, _globs in rv.always if named_by(text, classes)]
+    parts = [
+        "# Verifier brief", rules.verifier_brief,
+        "## This Round\n\nRound 1 of the review, level %s. Head: `%s`. Base: `%s`." % (a.level.capitalize(), rv.head,
+                                                                                    rv.base),
+        rv.diff_part, rv.important_part, rv.skip_part,
+        "## The spec, the earlier open Findings and the design answers",
+        "The spec:\n\n%s" % (fence(spec) if spec else "None available."),
+        "Earlier open Findings and their disputes:\n\n%s" % (earlier.strip() if earlier and earlier.strip() else "None."),
+        "Design answers:\n\n%s" % (design.strip() if design else "None."),
+        "## Always check lines the candidates were raised from\n\n" + ("\n".join(lines) + "\n\n" + rules.record_terms
+                                                                    if lines else "None."),
+        "## Copy rule\n\n" + rules.copy_rule,
+        rules.format,
+        "## Candidates, tagged with their Finder",
+    ]
+    for f in finders:
+        parts.append("### Report of the %s Finder\n\n%s" % (f, raw_fence(reports[f])))
+    return rv.out, "\n\n".join(parts) + "\n"
+
+
+def verify(args):
+    rules = Rules()
+    out, text = build_verify(rules, args)
+    out.mkdir(parents=True, exist_ok=True)
+    (out / "verifier.md").unlink(missing_ok=True)
+    if text is None:
+        print("no Verifier runs: every Finder reported nothing found and no earlier Finding is open; nothing written")
+        return
+    (out / "verifier.md").write_bytes(text.encode("utf-8", "surrogateescape"))
+    print("%s\tVerifier\t%s tier" % (out / "verifier.md", rules.verifier_tiers[1 if args.level == "deep" else 0]))
+
+
 def main(argv):
     p = argparse.ArgumentParser(prog="review_briefs.py", description=__doc__.split("\n\n")[0])
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -374,14 +523,28 @@ def main(argv):
     r1.add_argument("--design")
     r1.add_argument("--angle", default=None)
     r1.set_defaults(run=round1)
+    vf = sub.add_parser("verify", help="the Verifier brief from the Finders' reports")
+    vf.add_argument("--level", required=True, type=str.lower, choices=LEVELS)
+    vf.add_argument("--base", required=True)
+    vf.add_argument("--head", default="HEAD")
+    vf.add_argument("--repo", default=".")
+    vf.add_argument("--out", required=True)
+    vf.add_argument("--reports", required=True)
+    vf.add_argument("--spec")
+    vf.add_argument("--earlier")
+    vf.add_argument("--design")
+    vf.set_defaults(run=verify)
     args = p.parse_args(argv)
     try:
-        if args.angle is None:
+        if args.cmd == "round1" and args.angle is None:
             args.angle = Rules().angles[0][0]
         args.run(args)
     except Usage as e:
         print("review_briefs.py: %s" % e, file=sys.stderr)
         return 2
+    except BadReports as e:
+        print("review_briefs.py: ask these Finders again, nothing was written: %s" % e, file=sys.stderr)
+        return 3
     except MissingSection as e:
         print("review_briefs.py: could not find %s in the skill files; nothing was written" % e, file=sys.stderr)
         return 3
