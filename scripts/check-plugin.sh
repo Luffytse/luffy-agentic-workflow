@@ -23,7 +23,7 @@
 #   vendor-model-names           no vendor model name in the repo's text (ADR 0002): Claude, GPT (spaced or hyphenated), o-series (o1, o3, o4-mini) and Gemini names
 #   no-person-names              no person's name in skill or doc text
 #   repo-free-skill-text         skill text names nothing that exists only in this repo
-#   no-repo-merge-rules          skill text does not state this repo's merge-time rules (the version hand-out, the Ticket re-read after a skill merge); a skill says to follow the repo's own docs
+#   no-repo-merge-rules          skill text does not name this repo's merge-time rules (the version hand-out, the Ticket re-read); a skill says to follow the repo's own docs
 #   no-agent-label-strings       the plugin names no repo's agent-only label strings (a repo maps the role in its triage-labels.md)
 #   tracker-operation-names      each operation cited as the tracker doc's **Name** or "Name" operation exists as a bold bullet in every issue-tracker seed
 #   worker-reference-sources     each worker-control reference has methods, each method a Source: line with a doc link, each Detect and harness fact bullet a doc link
@@ -218,12 +218,13 @@ fi
 
 # no-repo-merge-rules: the version hand-out (the coordinator gives each skill-changing pull request its number, one at a
 # time) and the Ticket re-read after a skill merge are this repo's own merge-time rules (CLAUDE.md, docs/dev-skills/release.md).
-# Skill text only says to follow the merge-time steps the repo's own docs give, so it describes neither: no handing out
-# of version numbers, no "version hand-out", no "skill merge".
-hits="$(grep -rniE --include='*.md' --include='*.yaml' 'hand(s|ed|ing)? out (the |a |an |each |next |no |any |further |new )*(version )?numbers?|numbers? (is |are )?handed out|version hand-?out|skill merge|re-?read(s|ing)? (of )?(the )?open (issues|tickets)' "$skills")"
+# Skill text only says to follow the merge-time steps the repo's own docs give, so it never names either rule: no
+# "version hand-out", no "Ticket re-read" (hyphenated, spaced or joined; "Tickets" too). Names only, never the prose
+# around them: whether a sentence restates a rule in other words is the Review's question (REVIEW.md, "plugin text names nothing only this repo has").
+hits="$(grep -rniE --include='*.md' --include='*.yaml' 'version hand[- ]?out|tickets? re[- ]?read' "$skills")"
 if [ -n "$hits" ]; then
   echo "$hits"
-  bad "skill text states a merge-time rule that only fits this repo (the version hand-out, the Ticket re-read after a skill merge); say to follow the merge-time steps the repo's own docs give"
+  bad "skill text names a merge-time rule that only fits this repo (the version hand-out, the Ticket re-read); say to follow the merge-time steps the repo's own docs give"
 fi
 
 # no-agent-label-strings: the plugin speaks of the "agent-only" label role, never of one repo's label strings for it

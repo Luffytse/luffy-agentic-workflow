@@ -7,7 +7,7 @@ Does `to-tickets` give a Ticket whose acceptance criteria demonstrably require o
 - [`cases.py`](cases.py): the six cases and their expected labels (below), shared by the other scripts.
 - [`make_fixture.py`](make_fixture.py): `python3 make_fixture.py <out-dir> <case>` builds a scratch repo (local-files tracker doc, triage-labels doc with or without the agent-only mapping, release and Boundary docs, `.scratch/greeter/SPEC.md` with the approved breakdown, `PROMPT.md`, and for `resume` the two tickets filed earlier).
 - [`score.py`](score.py): `python3 score.py <out-dir> <case>` reads the labels back from `.scratch/greeter/issues/*.md` and checks `REPORT.txt`, the run's final reply saved by hand.
-- [`test_cases.py`](test_cases.py): the scorer's self-test (a reference run per case passes, twelve planted wrong runs fail) and a check that the skill step, the glossary entry and the docs index carry the rule. Run `python3 evals/to-tickets-agent-label/test_cases.py`; it prints `ok`.
+- [`test_cases.py`](test_cases.py): the scorer's self-test (a reference run per case passes, twelve planted wrong runs fail) and a check that the inherited case's rendered Spec names only the source's runtime. It reads no skill or doc text. Run `python3 evals/to-tickets-agent-label/test_cases.py`; it prints `ok`.
 
 ## Cases
 
