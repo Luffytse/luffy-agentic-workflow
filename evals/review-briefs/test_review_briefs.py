@@ -945,7 +945,7 @@ class DisputesRound(Base):
         d = s.write_at(s.root / "disputes.md", self.disputes_text if text is None else text)
         return run_cmd(s, "disputes", "--level", level, "--round", rnd, "--base", last, "--disputes", d)
 
-    def test_writes_only_a_verifier_brief_holding_only_the_disputes(self):
+    def test_writes_only_a_verifier_brief_holding_the_disputes_and_the_judging_rules(self):
         s = self.scratch()
         last, head = second_commit(s)
         r = self.dispute(s, last)
@@ -957,7 +957,9 @@ class DisputesRound(Base):
         self.assertIn("PLANTED-DISPUTE-ARGUMENT", t)
         self.assertIn(head, t)
         self.assertIn("Round 2", t)
-        for gone in ("PLANTED-SPEC", "PLANTED-DESIGN", "PLANTED-EARLIER", "PLANTED-IMPORTANT", "PLANTED-SKIP",
+        self.assertIn("PLANTED-IMPORTANT", t)
+        self.assertIn("PLANTED-SKIP", t)
+        for gone in ("PLANTED-SPEC", "PLANTED-DESIGN", "PLANTED-EARLIER",
                      "PLANTED-BOUNDARY", "PLANTED-PY", "second commit", "Diff command", FORMAT, RECORD_TERMS):
             self.assertNotIn(gone, t)
 

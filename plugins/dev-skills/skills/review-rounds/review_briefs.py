@@ -32,8 +32,9 @@ the pull request's new commits since the last Round's head (the command in SKILL
 security brief and the spec (DEEP.md). Its tier is the one in the SKILL.md table (premium at deep).
 
 disputes is a Round that is the Verifier alone on disputes (VERIFY.md): it writes verifier.md holding the Verifier
-brief, the copy rule, the head and the file given as --disputes (the disputed Findings with their disputes, written by
-the thread, byte for byte) and nothing else: no diff, spec, design answers, Skip list or Always check lines.
+brief, the copy rule, the head, the meaning of Important and the Skip list (from REVIEW.md, as for verify), and the
+file given as --disputes (the disputed Findings with their disputes, written by the thread, byte for byte) and nothing
+else: no diff, spec, design answers or Always check lines.
 
 verify writes the Verifier's brief (verifier.md) for a Round whose Finders have reported; --for names the Round as the
 subcommands above do (default round1; ticket needs no --level; later takes --round and --level, round 2 by default, and
@@ -335,6 +336,14 @@ def fence(text):
     return "%s\n%s\n%s" % (ticks, text.rstrip("\n"), ticks)
 
 
+def judging_parts(rules, important, skip):
+    """The brief's Meaning of Important and Skip list parts, from REVIEW.md's two sections (defaults when absent)."""
+    return ("## Meaning of Important\n\n%s" % (
+        important + "\n\n" + rules.important_default if important and "default" in important.lower()
+        else important or rules.important_default),
+            "## Skip list\n\n%s" % (skip or "None."))
+
+
 class RoundValues:
     """What a Round's briefs share: the diff command, commits and head from git, and the repo's REVIEW.md, Boundary
     record and docs index when present. args.kind says which Round: round1, ticket (a Ticket branch against its Spec
@@ -384,10 +393,7 @@ class RoundValues:
             self.diff_part += "\n\nUntracked new files:\n\n%s" % fence("\n".join(untracked) or "(none)")
         if self.kind == "later":
             self.diff_part += "\n\n" + rules.later_sentence
-        self.important_part = "## Meaning of Important\n\n%s" % (
-            self.important + "\n\n" + rules.important_default if self.important and "default" in self.important.lower()
-            else self.important or rules.important_default)
-        self.skip_part = "## Skip list\n\n%s" % (self.skip or "None.")
+        self.important_part, self.skip_part = judging_parts(rules, self.important, self.skip)
 
 
 def out_dir(repo, out):
@@ -635,7 +641,8 @@ def verify(args):
 
 
 def disputes(args):
-    """The Verifier alone on disputes (SKILL.md, Not clean): only the disputed Findings and their disputes."""
+    """The Verifier alone on disputes (SKILL.md, Not clean): the disputed Findings and their disputes, with the meaning of
+    Important and the Skip list its calls use."""
     rules = Rules()
     repo = pathlib.Path(args.repo).resolve()
     out = out_dir(repo, args.out)
@@ -644,10 +651,12 @@ def disputes(args):
     if not text.strip():
         raise Usage("--disputes %s is empty: a Verifier-alone Round needs a disputed Finding" % args.disputes)
     base = git(repo, "rev-parse", "--verify", args.base + "^{commit}").strip()
+    important_part, skip_part = judging_parts(rules, *review_md_parts(repo)[:2])
     body = "\n\n".join([
         "# Verifier brief", rules.verifier_brief,
         "## This Round\n\nRound %d of the review, the Verifier alone on disputes, level %s. Head: `%s`. "
         "Last Round's head: `%s`. Repository: `%s`." % (args.round, args.level.capitalize(), head, base, repo),
+        important_part, skip_part,
         "## Copy rule\n\n" + rules.copy_rule,
         "## Disputed Findings and their disputes\n\n" + raw_fence(text),
     ]) + "\n"
@@ -704,7 +713,7 @@ def main(argv):
     vf.add_argument("--earlier", help="a file of the earlier open Findings with their disputes")
     vf.add_argument("--design", help="a file of the design answers")
     vf.set_defaults(run=verify)
-    dp = sub.add_parser("disputes", help="the Verifier-alone Round: a Verifier brief of only the disputes")
+    dp = sub.add_parser("disputes", help="the Verifier-alone Round: a Verifier brief of the disputes, the meaning of Important and the Skip list")
     common(dp, base_help="the last Round's head")
     dp.add_argument("--round", type=int, choices=(2, 3), default=2, help="the Round number")
     dp.add_argument("--disputes", required=True, help="a file of the disputed Findings and their disputes")

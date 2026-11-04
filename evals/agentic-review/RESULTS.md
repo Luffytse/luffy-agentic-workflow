@@ -4,6 +4,24 @@ One entry per run, newest first. Rerun when a pull request changes how `agentic-
 
 Entries before the review was rebuilt around Round 0 and `review-rounds` ran the earlier review (up to 5 Rounds, rebuttals, the convergence check, Milestone design answers, merge-only Rounds). They are kept as history: the checks they name for those rules were removed with the rules, and a `<depth>` there is the old Review depth.
 
+### 2026-11-04, dev-skills 0.71.0, Verify-only, Standard
+
+Run level: decision-level in a subagent, as the README says: one fresh regular-tier subagent per run, given its `verifier.md` and no other input. Branch run: `38bbea8` (the Verifier-alone brief carries the meaning of Important and the Skip list), plugin 0.71.0. Baseline run: main `7dc6244` (0.71.0, from a `git archive`). Both on the Standard fixture from `setup.sh`, brief from `briefs.sh --verify-only <fixture> standard`. Driven by the thread, which scored with `EXPECTED.md`.
+
+| id | main's skill | branch's skill |
+|----|--------------|----------------|
+| V-a | dropped: `amount_cents` is always an `int` from `parse_amount` (`money.py:6`), `format_cents` emits only digits, sign and dot, a non-number raises; not dropped as a repeat of V-d | same |
+| V-b | dropped: the loop walks the `list(pending)` copy (`split.py:29`); the run gave `[(Ben, Ana, 1000), (Caro, Ana, 1000)]`, Dan unpaid only because of `:27` | same |
+| V-c | kept, Important, caused by this change, `splitter/split.py:27` (`settle` gave `[]`) | same |
+| V-d | kept, Important, caused by this change, Locations exactly `splitter/report.py:11` and `splitter/report.py:16` (`:12` removed) | same |
+
+Locations counted within their own file: yes, in both runs.
+Pass: yes, both runs, 4/4.
+
+Extras, both runs, outside the check: spare cents given to the last people (`split.py:11`) and the docs-index entry for `docs/splitting.md` missing; the branch run also noted `index.md:5` still pointing to `currency.md`.
+
+What it shows: no regression. The change affects only the Verifier-alone `disputes` brief and the sentence of `VERIFY.md` about it, and the Verify-only check builds neither; `briefs.sh --verify-only` output is byte-identical on this branch and on main once the scratch directory name is normalised (10468 and 10466 bytes before that, the gap being `fx-branch` against `fx-main`) so the check's input did not move. The Verifier-alone `disputes` brief is out of scope of this check (it uses `verify`); `evals/review-briefs/test_review_briefs.py` (`DisputesRound`) covers it.
+
 ### 2026-11-04, Script briefs, second run, dev-skills 0.69.0
 
 Run level: decision-level in a subagent that can run shell commands (regular tier); it starts no agent. Two fresh regular-tier subagents, each told to read the case's `PROMPT.md` and do exactly it (one hop: the prompt came from the file, not pasted). Rerun because the branch's skill text changed after the first run below: SKILL.md "Briefing the agents" now names `<finder>.md` and says `verify` takes the same `--level` and `--spec` as the Round's briefs.
