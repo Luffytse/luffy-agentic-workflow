@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Tests of the review-rounds brief script (review_briefs.py round1) as a command, on scratch git repos.
+"""Tests of the review-rounds brief script (review_briefs.py: round1, ticket, fixed, later, verify, disputes) as a command, on scratch git repos.
 
 Run: python3 evals/review-briefs/test_review_briefs.py
 Each test builds a scratch repo with a planted change, writes the inputs to files, runs the script and reads the briefs
@@ -675,6 +675,13 @@ class VerifierBrief(Base):
         self.assertIn("verifier", r.stderr.lower())
         self.assertEqual(s.files(), [])
 
+    def test_round_1_verifier_still_says_round_1(self):
+        s = self.scratch()
+        reports = self.all_clear()
+        reports["standards"] = finding("First", "x")
+        self.ok(self.verify(s, reports))
+        self.assertIn("Round 1 of", (s.out / "verifier.md").read_text())
+
     def test_usage_errors_and_an_output_directory_in_the_work_tree(self):
         s = self.scratch()
         reports = self.all_clear()
@@ -688,6 +695,370 @@ class VerifierBrief(Base):
         r = subprocess.run([sys.executable, "-B", str(REVIEW_ROUNDS / SCRIPT_NAME), "verify", "--level", "quick",
                             "--repo", str(s2.repo), "--base", "main", "--out", str(s2.out)], text=True, capture_output=True)
         self.assertEqual(r.returncode, 2)  # --reports is required
+
+
+# ---- later Rounds, the Verifier alone on disputes, Ticket checks and fixed points ----
+
+LATER_SENTENCE = re.search(r'In Rounds 2 and 3, add: "(.*?)"', FINDERS).group(1)
+LATER_DIFF = re.search(r"`(git log -p [^`]*<last-head>[^`]*)`", SKILL).group(1)
+LATER_ROW = next(l for l in cut(SKILL, "## Who runs").splitlines() if l.startswith("| Rounds 2 and 3"))
+LATER_TIERS = re.search(r"\((cheap|regular|premium); (cheap|regular|premium) at Deep\)", LATER_ROW).groups()
+
+
+def run_cmd(s, sub, *args, out=None, env=None, script=None):
+    argv = [sys.executable, "-B", str(script or REVIEW_ROUNDS / SCRIPT_NAME), sub, "--repo", str(s.repo),
+            "--out", str(out or s.out)]
+    return subprocess.run(argv + [str(a) for a in args], text=True, capture_output=True, env=env)
+
+
+def inputs(s):
+    return ["--spec", s.spec, "--standards", s.standards, "--earlier", s.earlier, "--design", s.design]
+
+
+def second_commit(s, msg="second commit"):
+    """A new commit on feature after the planted change; returns (previous head, new head)."""
+    before = git(s.repo, "rev-parse", "HEAD").strip()
+    s.write("src/app.py", "def f():\n    return 3\n")
+    git(s.repo, "add", "-A")
+    git(s.repo, "commit", "-q", "-m", msg)
+    return before, git(s.repo, "rev-parse", "HEAD").strip()
+
+
+class LaterRound(Base):
+    def later(self, s, last, level="standard", *extra, with_inputs=True):
+        return run_cmd(s, "later", "--level", level, "--base", last, "--round", 2,
+                       *(inputs(s) if with_inputs else []), *extra)
+
+    def test_writes_one_later_round_finder_brief_and_nothing_else(self):
+        for level in ("quick", "standard", "deep"):
+            with self.subTest(level=level):
+                s = self.scratch()
+                last, _ = second_commit(s)
+                self.ok(self.later(s, last, level))
+                self.assertEqual(s.files(), ["finder-later.md"])
+
+    def test_holds_both_finders_inputs_and_briefs_in_full(self):
+        s = self.scratch()
+        last, head = second_commit(s)
+        self.ok(self.later(s, last))
+        t = s.brief("finder-later.md")
+        for part in (STANDARDS_BRIEF, SPEC_BRIEF, SHARED, COPY, FORMAT, SMELL, DRIFT, INDEX_CONTRACT, RECORD_TERMS,
+                     EARLIER_LINE):
+            self.assertIn(part, t)
+        for marker in ("PLANTED-SPEC", "PLANTED-STANDARD", "PLANTED-EARLIER", "PLANTED-DESIGN", "PLANTED-IMPORTANT",
+                       "PLANTED-SKIP", "PLANTED-BOUNDARY", "PLANTED-PY", "PLANTED-ANY"):
+            self.assertIn(marker, t)
+        self.assertNotIn("PLANTED-SH", t)  # no shell script changed in the new commits
+        self.assertNotIn(ADV_BRIEF.split("<angle>")[0], t)
+
+    def test_holds_the_diff_from_the_last_head_and_the_new_commits_sentence(self):
+        s = self.scratch()
+        last, head = second_commit(s)
+        self.ok(self.later(s, last))
+        t = s.brief("finder-later.md")
+        self.assertIn(LATER_SENTENCE, t)
+        self.assertIn("second commit", t)
+        self.assertNotIn("planted change", t)  # that commit was reviewed in the last Round
+        self.assertIn(head, t)
+        self.assertIn(last, t)
+        words = LATER_DIFF.replace("<last-head>", last).split()
+        self.assertTrue(any(all(w in line for w in words[:3] + [last]) for line in t.splitlines()), t)
+        self.assertRegex(t, r"Round 2")
+
+    def test_a_merge_from_main_brings_only_its_conflict_resolutions(self):
+        s = self.scratch()
+        last, _ = second_commit(s)
+        git(s.repo, "switch", "-q", "main")
+        s.write("other.txt", "from main\n")
+        git(s.repo, "add", "-A")
+        git(s.repo, "commit", "-q", "-m", "main-only commit")
+        git(s.repo, "switch", "-q", "feature")
+        git(s.repo, "merge", "-q", "--no-ff", "-m", "Merge main", "main")
+        self.ok(self.later(s, last))
+        t = s.brief("finder-later.md")
+        self.assertIn("Merge main", t)
+        self.assertNotIn("main-only commit", t)  # first-parent commit list
+        self.assertNotIn("other.txt", t.split("Diff command:")[0])
+
+    def test_tier_and_security_brief_by_level(self):
+        for level in ("quick", "standard", "deep"):
+            with self.subTest(level=level):
+                s = self.scratch()
+                last, _ = second_commit(s)
+                r = self.later(s, last, level)
+                self.ok(r)
+                t = s.brief("finder-later.md")
+                line = next(l for l in r.stdout.splitlines() if "finder-later.md" in l)
+                self.assertIn(LATER_TIERS[1] if level == "deep" else LATER_TIERS[0], line)
+                if level == "deep":
+                    self.assertIn(SECURITY_BRIEF, t)
+                else:
+                    self.assertNotIn(SECURITY_BRIEF, t)
+
+    def test_the_spec_text_appears_once_at_every_level(self):
+        for level in ("quick", "standard", "deep"):
+            with self.subTest(level=level):
+                s = self.scratch()
+                last, _ = second_commit(s)
+                self.ok(self.later(s, last, level))
+                self.assertEqual(s.brief("finder-later.md").count("PLANTED-SPEC"), 1)
+
+    def test_no_spec_leaves_out_the_spec_brief(self):
+        s = self.scratch()
+        last, _ = second_commit(s)
+        self.ok(run_cmd(s, "later", "--level", "standard", "--base", last, "--round", 2))
+        t = s.brief("finder-later.md")
+        self.assertIn(STANDARDS_BRIEF.split("(a)")[0], t)
+        self.assertNotIn(SPEC_BRIEF, t)
+
+    def test_round_must_be_2_or_3_and_the_base_must_exist(self):
+        s = self.scratch()
+        last, _ = second_commit(s)
+        self.assertEqual(run_cmd(s, "later", "--level", "quick", "--base", last, "--round", 1).returncode, 2)
+        self.assertEqual(run_cmd(s, "later", "--level", "quick", "--base", "nope", "--round", 2).returncode, 2)
+        self.assertEqual(s.files(), [])
+
+    def test_a_missing_later_section_stops_with_its_name(self):
+        for rel, old, new, name in (("review-rounds/FINDERS.md", "In Rounds 2 and 3, add:", "In later rounds, add:",
+                                     "new-commits sentence"),
+                                    ("review-rounds/SKILL.md", "<last-head>", "<previous>", "later-Round diff")):
+            with self.subTest(name=name):
+                s = self.scratch()
+                skills = pathlib.Path(s.root) / "skills"
+                for d in ("review-rounds", "review-record", "docs-index"):
+                    shutil.copytree(SKILLS / d, skills / d)
+                f = skills / rel
+                f.write_text(f.read_text().replace(old, new))
+                last, _ = second_commit(s)
+                r = run_cmd(s, "later", "--level", "quick", "--base", last, "--round", 2,
+                            script=skills / "review-rounds" / SCRIPT_NAME)
+                self.assertEqual(r.returncode, 3, r.stderr)
+                self.assertEqual(s.files(), [])
+
+
+class LaterVerifier(Base):
+    def verify_later(self, s, last, reports, level="standard", rnd=2, earlier=True):
+        rdir = s.root / "reports"
+        rdir.mkdir(exist_ok=True)
+        for old in rdir.iterdir():
+            old.unlink()
+        for name, text in reports.items():
+            (rdir / ("%s.md" % name)).write_text(text)
+        args = ["--for", "later", "--round", rnd, "--level", level, "--base", last, "--reports", rdir, "--spec", s.spec,
+                "--design", s.design] + (["--earlier", s.earlier] if earlier else [])
+        return run_cmd(s, "verify", *args)
+
+    def test_a_later_round_verifier_expects_the_later_finders_report_and_says_the_right_round(self):
+        s = self.scratch()
+        last, _ = second_commit(s)
+        r = self.verify_later(s, last, {"later": finding("First", "x")})
+        self.ok(r)
+        t = (s.out / "verifier.md").read_text()
+        self.assertIn("Round 2", t)
+        self.assertNotIn("Round 1 of", t)
+        self.assertIn("second commit", t)
+        self.assertNotIn("planted change", t)
+        self.assertIn(finding("First", "x"), t)
+        self.assertIn("PLANTED-EARLIER", t)
+        self.assertIn(VERIFIER_BRIEF, t)
+
+    def test_round_3_and_the_deep_tier(self):
+        s = self.scratch()
+        last, _ = second_commit(s)
+        r = self.verify_later(s, last, {"later": finding("First", "x")}, level="deep", rnd=3)
+        self.ok(r)
+        self.assertIn("Round 3", (s.out / "verifier.md").read_text())
+        self.assertIn(VERIFIER_TIERS[1], next(l for l in r.stdout.splitlines() if "verifier.md" in l))
+
+    def test_the_round_1_finders_reports_are_not_asked_for(self):
+        s = self.scratch()
+        last, _ = second_commit(s)
+        self.assertEqual(self.verify_later(s, last, {"standards": finding("First", "x")}).returncode, 3)
+        self.assertEqual(s.files(), [])
+
+    def test_off_format_later_report_stops_naming_the_finder(self):
+        s = self.scratch()
+        last, _ = second_commit(s)
+        r = self.verify_later(s, last, {"later": "prose\n"})
+        self.assertEqual(r.returncode, 3)
+        self.assertIn("later", r.stderr)
+
+
+class DisputesRound(Base):
+    def setUp(self):
+        self.disputes_text = ("R1-2 (src/app.py:2): the return value is wrong.\nDispute: PLANTED-DISPUTE-ARGUMENT, "
+                              "run `python -c 1` shows exit 0.\n")
+
+    def dispute(self, s, last, level="standard", rnd=2, text=None):
+        d = s.write_at(s.root / "disputes.md", self.disputes_text if text is None else text)
+        return run_cmd(s, "disputes", "--level", level, "--round", rnd, "--base", last, "--disputes", d)
+
+    def test_writes_only_a_verifier_brief_holding_only_the_disputes(self):
+        s = self.scratch()
+        last, head = second_commit(s)
+        r = self.dispute(s, last)
+        self.ok(r)
+        self.assertEqual(s.files(), ["verifier.md"])
+        t = s.brief("verifier.md")
+        self.assertIn(VERIFIER_BRIEF, t)
+        self.assertIn(COPY, t)
+        self.assertIn("PLANTED-DISPUTE-ARGUMENT", t)
+        self.assertIn(head, t)
+        self.assertIn("Round 2", t)
+        for gone in ("PLANTED-SPEC", "PLANTED-DESIGN", "PLANTED-EARLIER", "PLANTED-IMPORTANT", "PLANTED-SKIP",
+                     "PLANTED-BOUNDARY", "PLANTED-PY", "second commit", "Diff command", FORMAT, RECORD_TERMS):
+            self.assertNotIn(gone, t)
+
+    def test_tier_is_premium_at_deep(self):
+        for level, want in (("quick", VERIFIER_TIERS[0]), ("deep", VERIFIER_TIERS[1])):
+            with self.subTest(level=level):
+                s = self.scratch()
+                last, _ = second_commit(s)
+                r = self.dispute(s, last, level)
+                self.ok(r)
+                line = next(l for l in r.stdout.splitlines() if "verifier.md" in l)
+                self.assertIn(want, line)
+
+    def test_missing_or_empty_disputes_file_is_a_usage_error(self):
+        s = self.scratch()
+        last, _ = second_commit(s)
+        self.assertEqual(self.dispute(s, last, text="  \n").returncode, 2)
+        self.assertEqual(run_cmd(s, "disputes", "--level", "quick", "--base", last, "--round", 2,
+                                 "--disputes", s.root / "none.md").returncode, 2)
+        self.assertEqual(s.files(), [])
+
+    def test_out_in_the_work_tree_is_refused(self):
+        s = self.scratch()
+        last, _ = second_commit(s)
+        d = s.write_at(s.root / "disputes.md", self.disputes_text)
+        r = run_cmd(s, "disputes", "--level", "quick", "--round", 2, "--base", last, "--disputes", d,
+                    out=s.repo / "b")
+        self.assertEqual(r.returncode, 2)
+
+
+class TicketCheck(Base):
+    def setUp_ticket(self, s):
+        """feature is the Spec branch; ticket-1 is a Ticket branch with its own commit."""
+        git(s.repo, "switch", "-q", "-c", "ticket-1")
+        s.write("src/ticket.py", "x = 1\n")
+        git(s.repo, "add", "-A")
+        git(s.repo, "commit", "-q", "-m", "ticket work")
+
+    def test_writes_the_quick_round_1_briefs_with_the_ticket_branch_against_the_spec_branch(self):
+        s = self.scratch()
+        self.setUp_ticket(s)
+        r = run_cmd(s, "ticket", "--base", "feature", "--head", "ticket-1", *inputs(s))
+        self.ok(r)
+        self.assertEqual(s.files(), sorted("finder-%s.md" % n for n in table_finders("quick")))
+        head = git(s.repo, "rev-parse", "ticket-1").strip()
+        for name in s.files():
+            t = s.brief(name)
+            self.assertIn("ticket work", t)
+            self.assertNotIn("planted change", t)  # that is on the Spec branch
+            self.assertIn(head, t)
+            self.assertRegex(t, r"git -C \S+ diff \S*feature\S*ticket-1|git -C \S+ diff \S*feature\S*" + head[:7])
+            self.assertRegex(t, r"(?i)ticket check")
+        self.assertIn("PLANTED-PY", s.brief("finder-standards.md"))  # src/ticket.py is a .py file
+        self.assertNotIn("PLANTED-DOCS", s.brief("finder-standards.md"))  # no docs file in the Ticket's diff
+
+    def test_ticket_check_has_no_level_option_and_never_runs_more_than_quick(self):
+        s = self.scratch()
+        self.setUp_ticket(s)
+        self.assertEqual(run_cmd(s, "ticket", "--base", "feature", "--level", "deep").returncode, 2)
+
+    def test_a_ticket_check_verifier_says_ticket_check_and_expects_quick_reports(self):
+        s = self.scratch()
+        self.setUp_ticket(s)
+        rdir = s.root / "reports"
+        rdir.mkdir()
+        (rdir / "standards.md").write_text(finding("First", "x"))
+        (rdir / "spec.md").write_text("Nothing found.\n")
+        r = run_cmd(s, "verify", "--for", "ticket", "--base", "feature", "--head", "ticket-1", "--reports", rdir)
+        self.ok(r)
+        t = (s.out / "verifier.md").read_text()
+        self.assertRegex(t, r"(?i)ticket check")
+        self.assertNotIn("Round 1 of", t)
+        self.assertIn("ticket work", t)
+        self.assertIn(VERIFIER_TIERS[0], next(l for l in r.stdout.splitlines() if "verifier.md" in l))
+
+
+class FixedPoint(Base):
+    def test_writes_round_1_briefs_for_the_diff_since_the_point_and_lists_untracked_files(self):
+        for level in ("quick", "standard", "deep"):
+            with self.subTest(level=level):
+                s = self.scratch()
+                s.write("brand_new.txt", "untracked\n")
+                r = run_cmd(s, "fixed", "--level", level, "--base", "main", *inputs(s))
+                self.ok(r)
+                self.assertEqual(s.files(), sorted("finder-%s.md" % n for n in table_finders(level)))
+                for name in s.files():
+                    t = s.brief(name)
+                    self.assertIn("brand_new.txt", t)
+                    self.assertIn("planted change", t)
+                    self.assertRegex(t, r"git -C \S+ diff .*main")
+                    self.assertRegex(t, r"(?i)fixed point")
+
+    def test_the_diff_command_counts_the_working_tree_and_the_file_list_includes_untracked_new_files(self):
+        s = self.scratch()
+        s.write("src/app.py", "def f():\n    return 99\n")  # uncommitted edit
+        s.write("tools/run.sh", "echo hi\n")                  # untracked, and a shell script
+        self.ok(run_cmd(s, "fixed", "--level", "quick", "--base", "main", *inputs(s)))
+        t = s.brief("finder-standards.md")
+        self.assertIn("tools/run.sh", t)
+        self.assertIn("PLANTED-SH", t)  # an untracked file counts for the kinds of file
+        diff_cmd = re.search(r"git -C \S+ diff [^\n]*", t).group(0)
+        self.assertNotIn("...", diff_cmd)  # not a committed-only three-dot range
+        out = subprocess.run(diff_cmd.split(), text=True, capture_output=True).stdout
+        self.assertIn("return 99", out)
+
+    def test_a_tracked_file_is_not_listed_as_untracked_and_no_untracked_means_none(self):
+        s = self.scratch()
+        git(s.repo, "add", "CLAUDE.md")
+        git(s.repo, "commit", "-q", "-m", "track it")
+        self.ok(run_cmd(s, "fixed", "--level", "quick", "--base", "main"))
+        t = s.brief("finder-spec.md") if (s.out / "finder-spec.md").exists() else s.brief("finder-standards.md")
+        self.assertRegex(t, r"(?i)untracked new files:\s*\n+\s*`+\s*\n\(none\)")
+
+    def test_the_point_may_be_a_commit_a_tag_or_a_branch(self):
+        s = self.scratch()
+        sha = git(s.repo, "rev-parse", "main").strip()
+        git(s.repo, "tag", "v1", "main")
+        for ref in (sha, "v1", "main", "feature~1"):
+            with self.subTest(ref=ref):
+                self.ok(run_cmd(s, "fixed", "--level", "quick", "--base", ref))
+        self.assertEqual(run_cmd(s, "fixed", "--level", "quick", "--base", "no-such-ref").returncode, 2)
+
+    def test_a_fixed_point_verifier_says_so_and_reads_round_1_reports(self):
+        s = self.scratch()
+        rdir = s.root / "reports"
+        rdir.mkdir()
+        (rdir / "standards.md").write_text(finding("First", "x"))
+        (rdir / "spec.md").write_text("Nothing found.\n")
+        r = run_cmd(s, "verify", "--for", "fixed", "--level", "quick", "--base", "main", "--reports", rdir)
+        self.ok(r)
+        self.assertRegex((s.out / "verifier.md").read_text(), r"(?i)fixed point")
+
+
+class Cli(Base):
+    def test_verify_for_defaults_to_round_1_and_unknown_kinds_are_usage_errors(self):
+        s = self.scratch()
+        rdir = s.root / "reports"
+        rdir.mkdir()
+        self.assertEqual(run_cmd(s, "verify", "--for", "weekly", "--level", "quick", "--base", "main",
+                                 "--reports", rdir).returncode, 2)
+        self.assertEqual(run_cmd(s, "verify", "--base", "main", "--reports", rdir).returncode, 2)  # no level
+
+    def test_the_new_subcommands_call_only_git_and_write_only_to_out(self):
+        s = self.scratch()
+        last, _ = second_commit(s)
+        bin_dir = pathlib.Path(s.root) / "bin"
+        bin_dir.mkdir()
+        (bin_dir / "git").symlink_to(shutil.which("git"))
+        env = {"PATH": str(bin_dir), "HOME": str(s.root), "GIT_CONFIG_NOSYSTEM": "1"}
+        status = git(s.repo, "status", "--porcelain")
+        self.ok(run_cmd(s, "later", "--level", "deep", "--base", last, "--round", 2, env=env))
+        self.ok(run_cmd(s, "fixed", "--level", "deep", "--base", "main", env=env))
+        self.assertEqual(status, git(s.repo, "status", "--porcelain"))
 
 
 if __name__ == "__main__":

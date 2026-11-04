@@ -5,17 +5,41 @@ Usage:
   review_briefs.py round1 --level quick|standard|deep --base <ref> --out <dir>
                    [--head <ref>] [--repo <dir>] [--spec <file>] [--standards <file>] [--earlier <file>]
                    [--design <file>] [--angle <name>]
-  review_briefs.py verify --level quick|standard|deep --base <ref> --out <dir> --reports <dir>
-                   [--head <ref>] [--repo <dir>] [--spec <file>] [--earlier <file>] [--design <file>]
+  review_briefs.py ticket --base <spec branch> --head <ticket branch> --out <dir> [the same options, no --level]
+  review_briefs.py fixed  --level quick|standard|deep --base <fixed point> --out <dir> [the same options as round1]
+  review_briefs.py later  --level quick|standard|deep --round 2|3 --base <last Round's head> --out <dir>
+                   [--head <ref>] [--repo <dir>] [--spec <file>] [--standards <file>] [--earlier <file>] [--design <file>]
+  review_briefs.py verify [--for round1|later|ticket|fixed] [--round 2|3] [--level ...] --base <ref> --out <dir>
+                   --reports <dir> [--head <ref>] [--repo <dir>] [--spec <file>] [--earlier <file>] [--design <file>]
+  review_briefs.py disputes --level quick|standard|deep --round 2|3 --base <last Round's head> --out <dir>
+                   --disputes <file> [--head <ref>] [--repo <dir>]
 
-round1 writes the briefs for Round 1 of a review at the level Round 0 picked: the standards and spec Finders at
-quick; plus the adversarial Finder at standard; plus the security Finder at deep (the table in SKILL.md). Without
---spec there is no spec Finder. Later subcommands (later Rounds, a Ticket check, a fixed point) extend this CLI; each
-subcommand is a function of the same shape as round1.
+One subcommand per kind of Round; --base is the ref the Round's diff starts from. round1 writes the briefs for Round 1
+of a review at the level Round 0 picked: the standards and spec Finders at quick; plus the adversarial Finder at
+standard; plus the security Finder at deep (the table in SKILL.md). Without --spec there is no spec Finder.
 
-verify writes the Verifier's brief (verifier.md) for a Round 1 whose Finders have reported. --reports is a directory
+ticket is a Ticket check, one Quick Round (SKILL.md, Ticket checks): the round1 briefs at quick for the Ticket branch
+(--head) diffed against the Spec branch (--base); the briefs say Ticket check.
+
+fixed is a review since a fixed point, Round 1 only: the round1 briefs for `git diff --merge-base <fixed point>` (the
+working tree counts, as agentic-review gives it) and `git log <fixed point>..HEAD`, with the untracked new files
+(`git ls-files --others --exclude-standard`) listed in the brief and counted for the kinds of file.
+
+later is Round 2 or 3: it writes finder-later.md, the one later-Round Finder doing the standards and spec Finders' work
+(FINDERS.md, Later-Round Finder): both Finders' inputs and both briefs (the spec brief only with --spec), the diff of
+the pull request's new commits since the last Round's head (the command in SKILL.md's pin step, --base standing for
+<last-head>), the commits first-parent only, and the new-commits sentence from FINDERS.md. At deep it also holds the
+security brief and the spec (DEEP.md). Its tier is the one in the SKILL.md table (premium at deep).
+
+disputes is a Round that is the Verifier alone on disputes (VERIFY.md): it writes verifier.md holding the Verifier
+brief, the copy rule, the head and the file given as --disputes (the disputed Findings with their disputes, written by
+the thread, byte for byte) and nothing else: no diff, spec, design answers, Skip list or Always check lines.
+
+verify writes the Verifier's brief (verifier.md) for a Round whose Finders have reported; --for names the Round as the
+subcommands above do (default round1; ticket needs no --level; later takes --round and --level, round 2 by default, and
+the Round is named in the brief). --reports is a directory
 holding one file per Finder of the Round, named <finder>.md with the Finder as the table in SKILL.md names it:
-standards, spec (only with --spec), adversarial (standard and deep), security (deep). The thread saves each Finder's
+standards, spec (only with --spec), adversarial (standard and deep), security (deep); for later, one later.md. The thread saves each Finder's
 final message there unchanged. First every report is checked: it must hold one or more Findings in the Finding format
 (a heading and every field line of the format) or "nothing found". A missing, empty or off-format report stops the
 script (exit 3) with every such Finder named, and nothing is written; the thread asks that Finder again. A passing
@@ -38,7 +62,7 @@ falls back to the skill's default.
 Every brief sentence is cut out of the skill's brief files (FINDERS.md, DEEP.md, SKILL.md here; the review-record and
 docs-index skills beside this one) when the script runs; none is copied into it. A section it cannot find stops it
 with a message naming the section (exit 3) and nothing is written. --out must be outside the work tree; the script
-replaces the finder-*.md (verify: verifier.md) files already there, and writes nothing else anywhere. It calls only `git`.
+replaces the finder-*.md (verify and disputes: verifier.md) files already there, and writes nothing else anywhere. It calls only `git`.
 
 Exit 0 written, 2 usage error, 3 a section could not be found or a Finder report is missing, empty or off-format (verify). Prints one line per file: file, role, tier.
 """
@@ -191,6 +215,20 @@ class Rules:
         self.format_fields = re.findall(r"^- ([^:(]+?)(?: \([^)]*\))?:", self.format, re.M)
         if not self.format_level or not self.format_fields:
             raise MissingSection("Finding format fields")
+        m = re.search(r'In Rounds 2 and 3, add: "(.*?)"', finders)
+        if not m:
+            raise MissingSection("new-commits sentence for Rounds 2 and 3")
+        self.later_sentence = m.group(1)
+        m = re.search(r"`(git log -p [^`]*<last-head>[^`]*)`", skill)
+        if not m:
+            raise MissingSection("later-Round diff command")
+        self.later_diff = m.group(1)
+        section(finders, "## Later-Round Finder", "Later-Round Finder")
+        row = re.search(r"^\| Rounds 2 and 3[^\n]*$", skill, re.M)
+        m = row and re.search(r"\((cheap|regular|premium); (cheap|regular|premium) at Deep\)", row.group(0))
+        if not m:
+            raise MissingSection("tier of the later-Round Finder")
+        self.later_tiers = m.groups()
         self.tiers = {
             "standards": tier(finders, "## Standards Finder", "Standards Finder"),
             "spec": tier(finders, "## Spec Finder", "Spec Finder"),
@@ -296,34 +334,71 @@ def fence(text):
 
 class RoundValues:
     """What a Round's briefs share: the diff command, commits and head from git, and the repo's REVIEW.md, Boundary
-    record and docs index when present."""
+    record and docs index when present. args.kind says which Round: round1, ticket (a Ticket branch against its Spec
+    branch), fixed (since a fixed point, the working tree counting) or later (Rounds 2 and 3, since the last head)."""
 
     def __init__(self, rules, a):
         self.repo = repo = pathlib.Path(a.repo).resolve()
-        toplevel = pathlib.Path(git(repo, "rev-parse", "--show-toplevel").strip()).resolve()
-        self.out = pathlib.Path(a.out).resolve()
-        if self.out == toplevel or toplevel in self.out.parents:
-            raise Usage("--out must be outside the work tree (%s)" % toplevel)
+        self.out = out_dir(repo, a.out)
+        self.kind, self.round = a.kind, a.round
         self.head = head = git(repo, "rev-parse", a.head).strip()
         self.base = base = a.base
         git(repo, "rev-parse", "--verify", base + "^{commit}")
-        commits = git(repo, "log", "--oneline", "%s..%s" % (base, head)).strip() or "(none)"
-        self.changed = [p for p in git(repo, "diff", "--name-only", "-z", "%s...%s" % (base, head)).split("\0") if p]
-        diff_cmd = "git -C %s diff %s...%s" % (repo, base, head)
+        level = a.level.capitalize()
+        untracked = []
+        if self.kind == "fixed":  # as agentic-review gives it: the working tree counts, untracked new files too
+            diff_cmd = "git -C %s diff --merge-base %s" % (repo, base)
+            commits = git(repo, "log", "--oneline", "%s..%s" % (base, head)).strip() or "(none)"
+            untracked = [p for p in git(repo, "ls-files", "--others", "--exclude-standard", "-z").split("\0") if p]
+            self.changed = [p for p in git(repo, "diff", "--name-only", "-z", "--merge-base", base).split("\0") if p]
+            self.changed += [p for p in untracked if p not in self.changed]
+            self.label = "Review since a fixed point (Round 1 only), level %s. Head: `%s`. Fixed point: `%s`." % (
+                level, head, base)
+        elif self.kind == "later":  # the pin step of SKILL.md: only the pull request's new commits
+            diff_cmd = rules.later_diff.replace("<last-head>", base).replace("HEAD", head)
+            diff_cmd = diff_cmd.replace("git ", "git -C %s " % repo, 1)
+            commits = git(repo, "log", "--oneline", "--first-parent", "%s..%s" % (base, head)).strip() or "(none)"
+            names = git(repo, "log", "--first-parent", "--remerge-diff", "--name-only", "--format=", "-z",
+                        "%s..%s" % (base, head))
+            self.changed = sorted({p for p in re.split(r"[\0\n]", names) if p})
+            self.label = "Round %d of the review, level %s. Head: `%s`. Last Round's head (base): `%s`." % (
+                self.round, level, head, base)
+        else:
+            diff_cmd = "git -C %s diff %s...%s" % (repo, base, head)
+            commits = git(repo, "log", "--oneline", "%s..%s" % (base, head)).strip() or "(none)"
+            self.changed = [p for p in git(repo, "diff", "--name-only", "-z", "%s...%s" % (base, head)).split("\0") if p]
+            if self.kind == "ticket":
+                self.label = ("Ticket check (one Quick Round on a Ticket branch against its Spec branch). "
+                              "Head: `%s`. Spec branch (base): `%s`." % (head, base))
+            else:
+                self.label = "Round 1 of the review, level %s. Head: `%s`. Base: `%s`." % (level, head, base)
         self.important, self.skip, self.always = review_md_parts(repo)
         boundary_path = repo / "docs/dev-skills/boundaries.md"
         self.boundary = boundary_path.read_text().strip() if boundary_path.is_file() else None
         self.has_index = (repo / "docs/dev-skills/index.md").is_file()
         self.diff_part = "Diff command:\n\n%s\n\nCommits:\n\n%s" % (fence(diff_cmd), fence(commits))
+        if self.kind == "fixed":
+            self.diff_part += "\n\nUntracked new files:\n\n%s" % fence("\n".join(untracked) or "(none)")
+        if self.kind == "later":
+            self.diff_part += "\n\n" + rules.later_sentence
         self.important_part = "## Meaning of Important\n\n%s" % (
             self.important + "\n\n" + rules.important_default if self.important and "default" in self.important.lower()
             else self.important or rules.important_default)
         self.skip_part = "## Skip list\n\n%s" % (self.skip or "None.")
 
 
+def out_dir(repo, out):
+    toplevel = pathlib.Path(git(repo, "rev-parse", "--show-toplevel").strip()).resolve()
+    out = pathlib.Path(out).resolve()
+    if out == toplevel or toplevel in out.parents:
+        raise Usage("--out must be outside the work tree (%s)" % toplevel)
+    return out
+
+
 def build_round1(rules, a):
+    """The briefs of Round 1, a Ticket check or a fixed point (args.kind), or the one later-Round Finder's."""
     rv = RoundValues(rules, a)
-    repo, out, head, base, changed = rv.repo, rv.out, rv.head, rv.base, rv.changed
+    repo, out, changed = rv.repo, rv.out, rv.changed
     spec = read_text_file(a.spec, "spec") if a.spec else None
     earlier = read_text_file(a.earlier, "earlier Findings file") if a.earlier else None
     design = read_text_file(a.design, "design answers file") if a.design else None
@@ -340,7 +415,7 @@ def build_round1(rules, a):
     lines = [text for text, globs in always if applies(globs, changed)]
 
     round_part = "\n\n".join([
-        "## This Round\n\nRound 1 of the review, level %s. Head: `%s`. Base: `%s`." % (a.level.capitalize(), head, base),
+        "## This Round\n\n" + rv.label,
         rv.diff_part,
         rv.important_part,
         rv.skip_part,
@@ -362,22 +437,35 @@ def build_round1(rules, a):
     def brief(title, text, *parts):
         return "\n\n".join(["# %s" % title, text, round_part, *parts, common]) + "\n"
 
+    keep = {"a"} | ({"b"} if has_code else set()) | ({"c"} if lines else set()) | ({"d"} if has_index else set())
+    std_parts = [
+        "## Standards files\n\n" + ("\n\n".join("`%s`:\n\n%s" % (r, fence(t)) for r, t in standards)
+                                    if standards else "None."),
+        "## Always check lines for the files this diff touches\n\n" + ("\n".join(lines) if lines else "None.")
+        + ("\n\n" + rules.record_terms if lines else ""),
+    ]
+    if has_code:
+        std_parts.append(rules.smell)
+    if has_index:
+        std_parts.append(rules.drift + "\n\n## Docs index contract\n\n" + rules.index_contract)
+    std_parts.append(spec_part)
+
     files = {}
+    if rv.kind == "later":
+        # One Finder does the standards and spec Finders' work: both inputs and both briefs, (a) to (d) of each.
+        text = "Do the work of both briefs below on this Round's diff.\n\n## Standards Finder brief\n\n" \
+               + drop_items(rules.standards_brief, keep)
+        if spec is not None:
+            text += "\n\n## Spec Finder brief\n\n" + rules.spec_brief
+        parts = list(std_parts)
+        if a.level == "deep":
+            text += "\n\n## Security Finder brief\n\n" + rules.security_brief
+        files["finder-later.md"] = ("later", brief("Later-Round Finder brief", text, *parts))
+        return out, files, rv
     roles = ROLES[a.level]
     if "standards" in roles:
-        keep = {"a"} | ({"b"} if has_code else set()) | ({"c"} if lines else set()) | ({"d"} if has_index else set())
-        parts = []
-        parts.append("## Standards files\n\n" + ("\n\n".join("`%s`:\n\n%s" % (r, fence(t)) for r, t in standards)
-                                                 if standards else "None."))
-        parts.append("## Always check lines for the files this diff touches\n\n" + ("\n".join(lines) if lines else "None.")
-                     + ("\n\n" + rules.record_terms if lines else ""))
-        if has_code:
-            parts.append(rules.smell)
-        if has_index:
-            parts.append(rules.drift + "\n\n## Docs index contract\n\n" + rules.index_contract)
-        parts.append(spec_part)
         files["finder-standards.md"] = ("standards", brief("Standards Finder brief",
-                                                           drop_items(rules.standards_brief, keep), *parts))
+                                                           drop_items(rules.standards_brief, keep), *std_parts))
     if "spec" in roles and spec is not None:
         files["finder-spec.md"] = ("spec", brief("Spec Finder brief", rules.spec_brief, spec_part))
     if "adversarial" in roles:
@@ -386,19 +474,42 @@ def build_round1(rules, a):
         sec = "The spec:\n\n%s" % (fence(spec) if spec else "None available.")
         files["finder-security.md"] = ("security", brief("Security Finder brief", rules.security_brief,
                                                          "## The spec\n\n" + sec))
-    return out, files
+    return out, files, rv
 
 
-def round1(args):
-    rules = Rules()
-    out, files = build_round1(rules, args)
+def write_finders(rules, args):
+    out, files, _rv = build_round1(rules, args)
     out.mkdir(parents=True, exist_ok=True)
     for old in out.glob("finder-*.md"):
         old.unlink()
     for name, (_role, text) in files.items():
         (out / name).write_text(text)
     for name, (role, _text) in files.items():
-        print("%s\t%s Finder\t%s tier" % (out / name, role, rules.tiers[role]))
+        if role == "later":
+            tier_name = rules.later_tiers[1 if args.level == "deep" else 0]
+            print("%s\tlater-Round Finder\t%s tier" % (out / name, tier_name))
+        else:
+            print("%s\t%s Finder\t%s tier" % (out / name, role, rules.tiers[role]))
+
+
+def round1(args):
+    args.kind, args.round = "round1", 1
+    write_finders(Rules(), args)
+
+
+def ticket(args):
+    args.kind, args.round, args.level = "ticket", 1, "quick"
+    write_finders(Rules(), args)
+
+
+def fixed(args):
+    args.kind, args.round = "fixed", 1
+    write_finders(Rules(), args)
+
+
+def later(args):
+    args.kind = "later"
+    write_finders(Rules(), args)
 
 
 # ---- the Verifier brief ----
@@ -460,7 +571,7 @@ def build_verify(rules, a):
     rdir = pathlib.Path(a.reports)
     if not rdir.is_dir():
         raise Usage("--reports %s is not a directory" % a.reports)
-    finders = [r for r in ROLES[a.level] if r != "spec" or spec is not None]
+    finders = ["later"] if a.kind == "later" else [r for r in ROLES[a.level] if r != "spec" or spec is not None]
     reports, problems = {}, []
     for f in finders:
         text = read_report(rdir / (f + ".md"))
@@ -478,8 +589,7 @@ def build_verify(rules, a):
     lines = [text for text, _globs in rv.always if named_by(text, classes)]
     parts = [
         "# Verifier brief", rules.verifier_brief,
-        "## This Round\n\nRound 1 of the review, level %s. Head: `%s`. Base: `%s`." % (a.level.capitalize(), rv.head,
-                                                                                    rv.base),
+        "## This Round\n\n" + rv.label,
         rv.diff_part, rv.important_part, rv.skip_part,
         "## The spec, the earlier open Findings and the design answers",
         "The spec:\n\n%s" % (fence(spec) if spec else "None available."),
@@ -497,6 +607,14 @@ def build_verify(rules, a):
 
 
 def verify(args):
+    args.kind = {"round1": "round1", "later": "later", "ticket": "ticket", "fixed": "fixed"}[args.for_]
+    if args.kind == "ticket":
+        if args.level not in (None, "quick"):
+            raise Usage("a Ticket check is one Quick Round; --level %s does not fit" % args.level)
+        args.level = "quick"
+    elif args.level is None:
+        raise Usage("--level is required")
+    args.round = args.round if args.kind == "later" else 1
     rules = Rules()
     out, text = build_verify(rules, args)
     out.mkdir(parents=True, exist_ok=True)
@@ -508,35 +626,83 @@ def verify(args):
     print("%s\tVerifier\t%s tier" % (out / "verifier.md", rules.verifier_tiers[1 if args.level == "deep" else 0]))
 
 
+def disputes(args):
+    """The Verifier alone on disputes (SKILL.md, Not clean): only the disputed Findings and their disputes."""
+    rules = Rules()
+    repo = pathlib.Path(args.repo).resolve()
+    out = out_dir(repo, args.out)
+    head = git(repo, "rev-parse", args.head).strip()
+    text = read_text_file(args.disputes, "disputes file")
+    if not text.strip():
+        raise Usage("--disputes %s is empty: a Verifier-alone Round needs a disputed Finding" % args.disputes)
+    base = git(repo, "rev-parse", "--verify", args.base + "^{commit}").strip()
+    body = "\n\n".join([
+        "# Verifier brief", rules.verifier_brief,
+        "## This Round\n\nRound %d of the review, the Verifier alone on disputes, level %s. Head: `%s`. "
+        "Last Round's head: `%s`. Repository: `%s`." % (args.round, args.level.capitalize(), head, base, repo),
+        "## Copy rule\n\n" + rules.copy_rule,
+        "## Disputed Findings and their disputes\n\n" + raw_fence(text),
+    ]) + "\n"
+    out.mkdir(parents=True, exist_ok=True)
+    (out / "verifier.md").write_text(body)
+    print("%s\tVerifier\t%s tier" % (out / "verifier.md", rules.verifier_tiers[1 if args.level == "deep" else 0]))
+
+
+def common(sp, level=True, base_help=None):
+    if level:
+        sp.add_argument("--level", required=True, type=str.lower, choices=LEVELS)
+    sp.add_argument("--base", required=True, help=base_help)
+    sp.add_argument("--head", default="HEAD")
+    sp.add_argument("--repo", default=".")
+    sp.add_argument("--out", required=True)
+
+
+def finder_inputs(sp):
+    sp.add_argument("--spec")
+    sp.add_argument("--standards")
+    sp.add_argument("--earlier")
+    sp.add_argument("--design")
+    sp.add_argument("--angle", default=None)
+
+
 def main(argv):
     p = argparse.ArgumentParser(prog="review_briefs.py", description=__doc__.split("\n\n")[0])
     sub = p.add_subparsers(dest="cmd", required=True)
     r1 = sub.add_parser("round1", help="Round 1 Finder briefs")
-    r1.add_argument("--level", required=True, type=str.lower, choices=LEVELS)
-    r1.add_argument("--base", required=True)
-    r1.add_argument("--head", default="HEAD")
-    r1.add_argument("--repo", default=".")
-    r1.add_argument("--out", required=True)
-    r1.add_argument("--spec")
-    r1.add_argument("--standards")
-    r1.add_argument("--earlier")
-    r1.add_argument("--design")
-    r1.add_argument("--angle", default=None)
+    common(r1, base_help="the pull request's base")
+    finder_inputs(r1)
     r1.set_defaults(run=round1)
+    tk = sub.add_parser("ticket", help="Ticket-check Finder briefs: one Quick Round, --head the Ticket branch")
+    common(tk, level=False, base_help="the Spec branch")
+    finder_inputs(tk)
+    tk.set_defaults(run=ticket)
+    fx = sub.add_parser("fixed", help="Round 1 Finder briefs for the changes since a fixed point")
+    common(fx, base_help="the fixed point: a commit, branch, tag or merge-base")
+    finder_inputs(fx)
+    fx.set_defaults(run=fixed)
+    lt = sub.add_parser("later", help="the later-Round Finder brief of Round 2 or 3")
+    common(lt, base_help="the last Round's head")
+    lt.add_argument("--round", type=int, choices=(2, 3), default=2)
+    finder_inputs(lt)
+    lt.set_defaults(run=later)
     vf = sub.add_parser("verify", help="the Verifier brief from the Finders' reports")
-    vf.add_argument("--level", required=True, type=str.lower, choices=LEVELS)
-    vf.add_argument("--base", required=True)
-    vf.add_argument("--head", default="HEAD")
-    vf.add_argument("--repo", default=".")
-    vf.add_argument("--out", required=True)
+    common(vf, level=False, base_help="as for the Round's own subcommand")
+    vf.add_argument("--level", type=str.lower, choices=LEVELS, default=None)
+    vf.add_argument("--for", dest="for_", choices=("round1", "later", "ticket", "fixed"), default="round1")
+    vf.add_argument("--round", type=int, choices=(2, 3), default=2)
     vf.add_argument("--reports", required=True)
     vf.add_argument("--spec")
     vf.add_argument("--earlier")
     vf.add_argument("--design")
     vf.set_defaults(run=verify)
+    dp = sub.add_parser("disputes", help="the Verifier-alone Round: a Verifier brief of only the disputes")
+    common(dp, base_help="the last Round's head")
+    dp.add_argument("--round", type=int, choices=(2, 3), default=2)
+    dp.add_argument("--disputes", required=True)
+    dp.set_defaults(run=disputes)
     args = p.parse_args(argv)
     try:
-        if args.cmd == "round1" and args.angle is None:
+        if getattr(args, "angle", 0) is None:
             args.angle = Rules().angles[0][0]
         args.run(args)
     except Usage as e:
