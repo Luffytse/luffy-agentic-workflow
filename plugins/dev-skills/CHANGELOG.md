@@ -2,6 +2,29 @@
 
 What each version of `dev-skills` brought, newest first. Each pull request that changes a skill bumps the version, and each Release adds one entry here covering everything since the last Release: its goal, the versions it delivered, the issues it shipped, and what a project using the plugin must do when something breaks. Entries up to 0.25.0 are one per version, when only a Release bumped it.
 
+## Milestone 1 · Release 8 (2026-11-04)
+
+Release planning, merging, and skill testing now follow one agreed path: a version-free, command-free `release` that ranks its picks, one `merging` Base skill, CI and evals that test skill changes, a script that builds the review briefs, and command-free, tracker-neutral skills with shorter descriptions.
+
+Versions: 0.61.0, 0.62.0, 0.63.0, 0.64.0, 0.65.0, 0.66.0, 0.67.0, 0.68.0, 0.69.0, 0.70.0, 0.71.0. Commits: f9e3464..b64f8f9.
+
+- `release` runs one version-free, command-free path with a ranked Release planning; the Triage batch sweeps the backlog, Retro planning and `milestone` mark joining issues `next-release`, and every plan is a Milestone (#633: #634, #635, #636, #637, #638)
+- A hidden `merging` Base skill owns the finish of every pull request for `implement`, `implement-spec` and `release` (#641: #642, #643, #644)
+- CI, evals and review each cover their own part of skill development: one runner for every deterministic test, the evals guide and ADR 0013, Retro planning acts on a confirmed cheap check at its first sighting, `tdd` names an eval as the test for agent instructions (#626: #627, #628, #629, #630, #631, #632)
+- A script builds each review Round's Finder and Verifier briefs, and `review-rounds` runs it (#645: #646, #647, #648, #649)
+- `setup-dev-skills`, `retro` and `triage` say what to find or do, never which command to run (#639)
+- Local-files tracker text is removed from the skills (#623)
+- Skill descriptions are trimmed, with a description-selection eval (#621)
+- `implement-spec`'s "Done when" agrees with step 9, and `team-lead` no longer reads a reviewing Spec pull request as finished (#602)
+- `implement-spec` records which thread owns a Spec, so a second Spec thread stops or takes over instead of building it too (#608)
+- `implement-spec` step 3.1 reuses a Ticket branch a dead thread left (#609)
+
+Also merged: `implement-spec` Continuation moved to its own file (#618, #625).
+
+### What to do
+
+- A project that cuts Releases with `release` reruns `setup-dev-skills` so its release doc carries the versioning policy, Release name, size and cut steps, and so the `next-release` label exists; `release` stops and says so when the release doc lacks them.
+
 ## Milestone 1 · Release 7 (2026-11-03)
 
 A Spec whose Tickets belong to different agents (Claude and Codex) can now be planned, built and finished without improvising, and the Implementer evidence gap is closed.
