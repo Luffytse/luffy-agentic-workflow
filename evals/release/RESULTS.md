@@ -19,7 +19,7 @@ Pass: yes | no. Lessons: <what to change in release, if anything>
 
 Setup: the new ranked-pick case `old-shape-cut` (R1-1 of PR #651's Round 1): `no-version`'s fixture with the open Release 2 (#2) written before the Order list (`**Cap:**` line, `## Scope` list, no `## Order`), its issues #10 and #20 labelled `release-2` and closed by merged pull requests.
 
-- **Self-test:** `python3 evals/release/ranked-pick/test_cases.py`: 9 tests OK (reference runs pass all nine cases; a planted run that plans `old-shape-cut` again with no cut fails).
+- **Self-test:** `python3 evals/release/ranked-pick/test_cases.py`: 8 tests OK (reference runs pass all nine cases, in one test; a planted run that plans `old-shape-cut` again with no cut fails).
 - **Spec head's skill, literal (red, as text):** "Find where you are" case 1 reads #2's empty Order as a planning that stopped part way, so step 5 plans into #2 and nothing is cut.
 - **Branch's skill, literal (green):** case 1 now says such an issue is the current Release of case 2; the changelog has no `## Release 2`, so steps 1 to 5 run as in `no-version`.
 - **Fresh runs (2026-11-04, made by the coordinator):** one fresh premium-tier subagent per text, given only the PROMPT.md text, with `<checkout>` set to a `git archive` copy (evals/ removed) of this branch at ac00325 or of the Spec head at 3e9653c, scored with `score.py` from ac00325. The outputs and scores are in `ranked-pick/evidence/branch-old-shape-cut/` and `ranked-pick/evidence/spec-head-old-shape-cut/`; the Implementer rescored both, with the same results.
