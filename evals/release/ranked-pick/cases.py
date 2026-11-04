@@ -184,7 +184,7 @@ CASES = {
         carry=dict(n=31, release=2),
         prompt_extra=("The user has chosen to carry #31 over to the next Release; every other issue of Release 2 shipped.\n"
                       "Do step 1 only (check the current Release is done, carrying #31 over as the user chose), report in\n"
-                      "`.scratch/report.md`, and stop there: do nothing of steps 2 to 5."),
+                      "`.scratch/report.md` (if you cannot write that file, return the same text as your final message), and stop there: do nothing of steps 2 to 5."),
         issues=[
             dict(n=10, slug="farewell", title="Farewell command", type="ticket", labels=["ready-for-agent", "enhancement", "milestone-1", "release-2"],
                  created="2026-10-02", status="closed", body="Add `greet.sh bye <name>`."),

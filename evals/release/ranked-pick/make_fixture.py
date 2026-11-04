@@ -30,7 +30,7 @@ to `.scratch/proposed-actions.md` as one block, numbered in the order you would 
     Issue: <issue file, or "new">
     <the operation's fields, as listed below>
 
-A message to the user goes to `.scratch/report.md` instead.
+A message to the user goes to `.scratch/report.md` (if you cannot write that file, return the same text as your final message) instead.
 
 - **Read an issue**: read its file.
 - **List issues**: read every file under `.scratch/issues/`.
@@ -320,7 +320,7 @@ You are a Release thread for the repo in your working directory. Load the `relea
 
 The tracker and pull requests are in dry-run mode: `docs/dev-skills/issue-tracker.md` says how to record each write
 as a block in `.scratch/proposed-actions.md`. Read git history freely; make no commit or branch. The user is away:
-write anything you would tell the user to `.scratch/report.md`, and wait on no reply. Stop when the skill's run ends.
+write anything you would tell the user to `.scratch/report.md` (if you cannot write that file, return the same text as your final message), and wait on no reply. Stop when the skill's run ends.
 {case.get('prompt_extra', '')}
 ---
 """)

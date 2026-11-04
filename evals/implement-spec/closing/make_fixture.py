@@ -65,7 +65,7 @@ from step 8 through step 9's report. The tracker is the dry-run one in `docs/dev
 tracker, pull request and git write as a block in `.scratch/proposed-actions.md`, change no other file and make no
 commit. An Implementer on the Spec branch is reachable by message: a commit it would make is a **Commit to a branch**
 block with `By: Implementer`. The user answers no question: when you would bring the pull request to the user, write
-what you would tell them to `.scratch/report.md` and stop. Write your step 9 report to `.scratch/report.md` too.
+what you would tell them to `.scratch/report.md` (if you cannot write that file, return the same text as your final message) and stop. Write your step 9 report to `.scratch/report.md` too.
 
 ---
 

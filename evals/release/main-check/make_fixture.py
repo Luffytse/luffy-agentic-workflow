@@ -104,7 +104,7 @@ are in dry-run mode, so every write is recorded as a block in `.scratch/proposed
 `docs/dev-skills/issue-tracker.md` says how. Main is the `main` branch of this repo, already fetched: read its code,
 docs and git history freely, and run its scripts; make no commit or branch. If the skill tells you to start
 subagents and you cannot, do their part yourself and say so in the report. The user is away: write anything you
-would tell or ask the user to `.scratch/report.md`, and wait on no reply. Stop when the skill's run ends.
+would tell or ask the user to `.scratch/report.md` (if you cannot write that file, return the same text as your final message), and wait on no reply. Stop when the skill's run ends.
 ---
 """)
     return r

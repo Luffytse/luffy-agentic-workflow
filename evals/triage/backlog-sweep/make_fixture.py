@@ -185,7 +185,7 @@ just cut and its release issue, #4 (`.scratch/issues/04-release-3.md`), is close
 
 The tracker is in dry-run mode: `docs/dev-skills/issue-tracker.md` says how to record each write as a block in
 `.scratch/proposed-actions.md`. Read git history and run the code freely; make no commit or branch. The user is
-away: write anything you would tell the user to `.scratch/report.md`, and wait on no reply. Stop when the Triage
+away: write anything you would tell the user to `.scratch/report.md` (if you cannot write that file, return the same text as your final message), and wait on no reply. Stop when the Triage
 batch ends; plan no Release.
 ---
 """)

@@ -186,7 +186,7 @@ The layer that shows what a skill makes an agent do: a fresh agent runs the skil
 _Avoid_: test (for a model run), benchmark
 
 **Case check**:
-The check of a new eval case, or a changed expected result, before any model run: a fresh premium-tier subagent reads the whole skill and its workflow and returns keep, fix or drop (valid, fails on main for the right reason, needed); the verdict goes in the pull request body.
+The check of a new eval case, or a changed expected result, before any model run: a fresh premium-tier subagent reads the whole skill and its workflow and returns keep, fix or drop (valid, fails on main for the right reason, needed; a regression guard, a rule main already passes after one fixture redesign, is kept without the second); the verdict goes in the pull request body.
 
 ## Code review
 

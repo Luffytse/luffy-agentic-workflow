@@ -320,7 +320,7 @@ start. Change no other file. The user is scripted: append every question you ask
 one `- ` line each, then take the answer from "The user's answers" below; when a question is not covered there, add
 ` (unanswered)` to its line, treat it as unanswered, and do not guess an answer. Today is 2026-11-02.
 
-When you stop, write `.scratch/report.md`: the last message you would send the user, and what the skill says comes
+When you stop, write `.scratch/report.md` (if you cannot write that file, return the same text as your final message): the last message you would send the user, and what the skill says comes
 next and what it waits for.
 TXT
   if [ "$case_" = plan ]; then

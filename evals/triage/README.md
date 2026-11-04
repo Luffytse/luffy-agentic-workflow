@@ -32,7 +32,7 @@ No other issue gains `next-release`, no release label is applied, every comment 
 
 1. Build it into a scratch directory outside this repo.
 2. Start a **fresh** session at the **premium** tier (load `model-tiers` for the model), working directory `<out-dir>/repo`, and give it only the text between the `---` lines of `<out-dir>/PROMPT.md`, with `<checkout>` replaced by the checkout under test. Keep this README, `sweep_case.py`, `score.py` and `test_cases.py` away from it: the Expected column is the answer.
-3. Score it: `python3 evals/triage/backlog-sweep/score.py <out-dir>`. It prints one line per check and exits 1 when any fails. Read `.scratch/report.md` too.
+3. Score it: `python3 evals/triage/backlog-sweep/score.py <out-dir>`. It prints one line per check and exits 1 when any fails. Read `.scratch/report.md` too. If the run cannot write `.scratch/report.md`, it returns the report text as its final message and the thread writes that text to the file before scoring, the same way for the branch and main runs ([evals guide](../../docs/dev-skills/evals.md#making-model-runs)).
 4. Run it on the branch's skill and on main's, and record both in [RESULTS.md](RESULTS.md) with the commit, plugin version and run level; keep each run's `.scratch/proposed-actions.md`, `.scratch/report.md` and score in `backlog-sweep/evidence/<branch|main>/` (`branch/` and `main/` hold the runs of #636; the runs of Ticket #680 are in `680-branch/` and `680-main/`).
 
 ### Self-test of the case

@@ -16,7 +16,7 @@ Build each case with the `spec` flow: `bash evals/implement/merge-authority/make
 
 1. `python3 evals/implement-spec/closing/make_fixture.py <out-dir>`.
 2. Start a **fresh** premium-tier session (load `model-tiers`) in `<out-dir>/repo` with the text of `<out-dir>/PROMPT.md` between its `---` lines, `<checkout>` replaced by the checkout under test. Keep `closing/score.py` and `test_cases.py` away from it.
-3. `python3 evals/implement-spec/closing/score.py <out-dir>`. Run it twice on fresh fixtures, on the branch's skills and on main's (a `git archive` of main). Record both in [RESULTS.md](RESULTS.md).
+3. `python3 evals/implement-spec/closing/score.py <out-dir>`. Run it twice on fresh fixtures, on the branch's skills and on main's (a `git archive` of main). Record both in [RESULTS.md](RESULTS.md). If the run cannot write `.scratch/report.md`, it returns the report text as its final message and the thread writes that text to the file before scoring, the same way for both runs ([evals guide](../../docs/dev-skills/evals.md#making-model-runs)).
 
 `python3 evals/implement-spec/closing/test_cases.py` (add `-v`) scores a reference run, which must pass, and planted wrong runs, each of which must fail: the dropped Ticket's line left in the body, no body edit, the dropped Ticket closed (completed or not planned), a landed Ticket or the Spec left open, a close before the merge, a squash, the tracker's default merge title, no merge, and a real file write. It is not a model run.
 
