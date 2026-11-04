@@ -14,6 +14,19 @@ Pass: yes | no. Lessons: <what to change in triage, if anything>
 
 ## Runs
 
+### 2026-11-04, branch `ticket-692` (Ticket #692, Spec #690), dev-skills 0.78.1 (base, main 56def67): repo-labels cases `table` and `empty`
+
+Setup: the repo-labels cases (`evals/triage/repo-labels/`), written before the skill text. The skill change: `triage` holds the repo labels rule (Roles, **Repo labels**) and applies it in the single-issue path and part 1 of the batch. Run level: decision-level in fresh regular-tier subagents, each given only the `PROMPT.md` text with `<checkout>` replaced (the branch's worktree, or a `git archive` of main 56def67). The Implementer built the cases and could not start subagents; the Spec thread makes the model runs.
+
+- **Self-test:** `python3 evals/triage/repo-labels/test_cases.py`: 16 tests OK (the reference runs pass; every planted wrong run fails; the rendered files say what each case means).
+- **Main's skill, literal walkthrough (red):** main's `triage` knows no Repo labels table, so a run labels roles only. Scored with a run that applies only the roles to #10 to #14: `table` 8/13 (FAIL: #10 lacks `frontend`, #12 lacks `backend`, #13 lacks `backend` and keeps `frontend`, no comment on #13); `empty` 8/8 (a repo with no rows sees no change).
+- **Case check (premium, fresh reviewer, before any run):** `empty` keep; `table` fix (the user-named `backend` on #14 had to be named in the prompt, and the check on #13 had to require a comment naming `frontend`); both fixed, and the runs below used the fixed cases.
+- **Runs** (run by the Spec thread; regular tier, decision-level fresh subagents; branch = commit 8684ca5, dev-skills 0.78.1; main = `git archive` of 56def67). Evidence: `repo-labels/evidence/692-<branch|main>-<case>/` (`score.txt`, `proposed-actions.md`, `report.md`).
+  - **Branch's skill, `table`: 13/13, pass.** **`empty`: 8/8, pass.**
+  - **Main's skill, `table`: 13/13, pass. `empty`: 8/8, pass.** The main `table` run could not write `report.md`: the Write tool refused it for that subagent, so that directory holds no `report.md`.
+  - **What this shows:** neither triage case separates the branch from main in these runs. Main's agent read the Repo labels table and its "when it applies" lines and applied and removed the labels itself (it removed `frontend` from #13 with a comment and kept the named `backend` on #14), so the walkthrough's red prediction for main did not hold. Both cases are regression guards for the new rule (and `empty` for "no rows, no change"), not discriminators.
+- **Eval:** behaviour change, so the cases run on the branch's skill and on main's (ADR 0013).
+
 ### 2026-11-04, branch `claude/project-thread-gpmghz` (Ticket #680), commit 5fb3c74, dev-skills 0.75.1 (base, main d66fb5b): backlog-sweep case
 
 Setup: the backlog-sweep case's expected result for the obsolete #32 changes from closed (any outcome) to closed as **completed**, with the reason. The skill change: sweep test 3 (Obsolete) and the single-issue "already implemented" outcome close as completed, not as not planned or `wontfix`, so a planned feature such an issue blocks is unblocked. Run level: decision-level in fresh subagents, premium tier, each given only the `PROMPT.md` text with `<checkout>` replaced (the branch's worktree at 5fb3c74, or a `git archive` of main d66fb5b). The Implementer built the case; the Ticket thread made the runs.

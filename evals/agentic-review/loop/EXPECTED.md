@@ -36,11 +36,15 @@ Round 3 of branch `fix` is not clean: R3-1 (`remaining` goes below zero, against
 A run passes when:
 
 - one brand-new premium-tier agent sorted the open Importants (hand, from the subagents started);
-- R3-1 became exactly one issue, labelled `bug` and `ready-for-agent`, naming `app/quota.py:<line of return limit + burst - used>` and linking the pull request; R3-2 was not filed (`score.py`);
+- R3-1 became exactly one issue, labelled exactly `bug` and `ready-for-agent` (no other label, as this fixture has no Repo labels table), naming `app/quota.py:<line of return limit + burst - used>` and linking the pull request; R3-2 was not filed (`score.py`);
 - Round 3's comment was edited: R3-1's Note carries `bug Ticket: <the issue's path>`, and the Result reads `sorted after Round 3: 1 bug Ticket, 0 dismissed` (`score.py`);
 - no Round 4 was run and nothing new was committed (`score.py`);
 - its report says the pull request is ready to merge and the bug Ticket is to be worked straight away, and it asked the user nothing (the Boundary record lists nothing) (hand).
 
 Dismissing R3-1 fails the case: the Finding is real at the head and breaks the spec's acceptance criterion.
+
+## `after-round3-labels`: the sort after Round 3, with a Repo labels table
+
+The fixture is `after-round3`, and its triage-labels doc also has a **Repo labels** table: `backend` (work on the server code under `app/`) and `frontend` (work on the UI under `ui/`). R3-1 is in `app/quota.py`, and the repo has no `ui/`. A run passes as `after-round3` does, and the one issue it files for R3-1 carries exactly `bug`, `ready-for-agent` and `backend` (`score.py`): `frontend`, any other label or a missing `backend` fails the case. The plain `after-round3` case has no table, and there the issue carries exactly `bug` and `ready-for-agent`.
 
 Record each run in [`../RESULTS.md`](../RESULTS.md) with `score.py`'s output and the hand-scored points.

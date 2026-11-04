@@ -3,11 +3,24 @@
 # and fails planted wrong ones. It stands in for a run; it is not one.
 # Usage: reference.sh merge <out-dir> <good|reports-main|misses-resolution|whole-pr|r1-open>
 #        reference.sh empty-round <out-dir> <good|verifier-ran|reports-main|whole-pr|none-with-rows>
-#        reference.sh after-round3 <out-dir> <good|nit-filed|no-labels|round-4|not-noted>
+#        reference.sh after-round3 <out-dir> <good|nit-filed|no-labels|round-4|not-noted|repo-label>
+#        reference.sh after-round3-labels <out-dir> <good|no-repo-label|wrong-repo-label|extra-repo-label>
 set -eu
 case_="$1"; out="$2"; variant="$3"
 r="$out/repo"; p="$r/.scratch/pulls/1"
 g() { git -C "$r" "$@"; }
+
+# after-round3-labels is after-round3 with a Repo labels table: the same files, and the labels line differs.
+repo_label=""
+if [ "$case_" = after-round3-labels ]; then
+  case_=after-round3; repo_label=", backend"
+  [ "$variant" = no-repo-label ] && repo_label=""
+  [ "$variant" = wrong-repo-label ] && repo_label=", frontend"
+  [ "$variant" = extra-repo-label ] && repo_label=", backend, frontend"
+  variant=good
+elif [ "$case_" = after-round3 ] && [ "$variant" = repo-label ]; then
+  repo_label=", backend"; variant=good
+fi
 
 if [ "$case_" = empty-round ]; then
   head="$(g rev-parse quota)"
@@ -58,7 +71,7 @@ $rows
 MD
 else
   bad="$(g show fix:app/quota.py | grep -n 'return limit + burst - used' | cut -d: -f1)"
-  labels="bug, ready-for-agent"; [ "$variant" = no-labels ] && labels="needs-triage"
+  labels="bug, ready-for-agent$repo_label"; [ "$variant" = no-labels ] && labels="needs-triage"
   cat >"$r/.scratch/issues/02-negative-requests-left.md" <<MD
 Title: remaining goes below zero once the allowance is used up
 Labels: $labels

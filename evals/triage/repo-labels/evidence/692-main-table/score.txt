@@ -1,0 +1,14 @@
+PASS the run wrote tracker blocks at all
+PASS #10 ends with ['frontend']
+PASS #12 ends with ['backend']
+PASS #13 ends with ['backend']
+PASS #14 ends with ['backend']
+PASS #10 does not end with ['backend']
+PASS #11 does not end with ['backend', 'frontend']
+PASS #12 does not end with ['frontend']
+PASS #13 does not end with ['frontend']
+PASS #13's removal of `frontend` is explained in a comment on #13 that names it
+PASS no label outside the roles and the Repo labels table is applied
+PASS no label is created
+PASS every comment starts with the triage disclaimer
+13/13 checks passed

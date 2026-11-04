@@ -90,9 +90,27 @@ check "after-round3: the untouched fixture fails (nothing sorted yet)" '! score 
 cp -R "$tmp/a" "$tmp/a0"
 bash "$here/reference.sh" after-round3 "$tmp/a" good
 check "after-round3: a right sort passes" 'score after-round3 "$tmp/a"'
-for bad in nit-filed no-labels round-4 not-noted; do
+for bad in nit-filed no-labels round-4 not-noted repo-label; do
   rm -rf "$tmp/a2"; cp -R "$tmp/a0" "$tmp/a2"; bash "$here/reference.sh" after-round3 "$tmp/a2" "$bad"
   check "after-round3: planted wrong outcome '$bad' fails" '! score after-round3 "$tmp/a2"'
+done
+
+# ---- after-round3-labels: the same sort, in a repo with a Repo labels table
+bash "$here/make-fixture.sh" "$tmp/l" after-round3-labels >/dev/null
+r="$tmp/l/repo"
+check "labels: the triage-labels doc has the Repo labels section with backend and frontend rows" \
+  'grep -q "^## Repo labels" "$r/docs/dev-skills/triage-labels.md" && grep -q "^| \`backend\` | .*app/" "$r/docs/dev-skills/triage-labels.md" && grep -q "^| \`frontend\` | .*ui/" "$r/docs/dev-skills/triage-labels.md"'
+check "labels: the plain after-round3 doc has no Repo labels section" '! grep -q "Repo labels" "$tmp/a0/repo/docs/dev-skills/triage-labels.md"'
+check "labels: R3-1 is in app/quota.py, which only the backend row fits" 'grep -qE "^\| R3-1 \|.*app/quota.py" "$r/.scratch/pulls/1/03-round-3.md" && [ ! -e "$r/ui" ]'
+check "labels: the prompt says where to load skills the skills name from" 'grep -q "<checkout>/dev-skills/skills/<name>/SKILL.md" "$tmp/l/PROMPT.md"'
+check "labels: the prompt does not name a label" '! grep -qiE "backend|frontend|repo label" "$tmp/l/PROMPT.md"'
+check "labels: the untouched fixture fails (nothing sorted yet)" '! score after-round3-labels "$tmp/l"'
+cp -R "$tmp/l" "$tmp/l0"
+bash "$here/reference.sh" after-round3-labels "$tmp/l" good
+check "labels: a right sort (bug, ready-for-agent, backend) passes" 'score after-round3-labels "$tmp/l"'
+for bad in no-repo-label wrong-repo-label extra-repo-label; do
+  rm -rf "$tmp/l2"; cp -R "$tmp/l0" "$tmp/l2"; bash "$here/reference.sh" after-round3-labels "$tmp/l2" "$bad"
+  check "labels: planted wrong outcome '$bad' fails" '! score after-round3-labels "$tmp/l2"'
 done
 
 if [ "$fails" -gt 0 ]; then echo "$fails check(s) failed"; exit 1; fi
