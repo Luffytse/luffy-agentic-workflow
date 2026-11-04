@@ -6,7 +6,8 @@ Usage: score.py <case-dir> [--script <review_briefs.py>]
 same inputs (the branch's script by default, even when the run was made on main's skill, so main's hand-built briefs
 are compared with the script's) and compares them byte for byte with the files the run left in <case-dir>/repo.briefs/round/.
 Checks: F1 exactly the four files; B1-B3 the three Finder briefs identical to the script's; B4 the Verifier brief
-identical to the script's, which holds the three canned messages byte for byte; L1 nothing written inside the
+identical to the script's, which holds the three canned messages byte for byte (a Finder brief's report path is compared
+with the run's own directory in its place); L1 nothing written inside the
 repository. Exit 0 when every check passes. Hand-scored besides: the reply names the command it ran (H1).
 Keep this file away from the subagent under test.
 """
@@ -23,7 +24,7 @@ FILES = ["finder-standards.md", "finder-spec.md", "finder-adversarial.md", "veri
 REPORTS = {"standards": "standards-finder.txt", "spec": "spec-finder.txt", "adversarial": "adversarial-finder.txt"}
 
 
-def expected(case: pathlib.Path, script: pathlib.Path, tmp: pathlib.Path) -> dict:
+def expected(case: pathlib.Path, script: pathlib.Path, tmp: pathlib.Path, run_dir: pathlib.Path) -> dict:
     repo = case / "repo"
     common = ["--base", "main", "--head", "planted", "--repo", str(repo), "--spec", str(repo / ".scratch/SPEC.md")]
     reports = tmp / "reports"
@@ -36,13 +37,15 @@ def expected(case: pathlib.Path, script: pathlib.Path, tmp: pathlib.Path) -> dic
         r = subprocess.run([sys.executable, str(script), *argv], capture_output=True, text=True)
         if r.returncode != 0:
             raise SystemExit(f"the script failed ({r.returncode}): {r.stderr.strip()}")
-    return {f: (out / f).read_bytes() for f in FILES}
+    # A Finder brief names its report file under its own out directory; write the run's directory in its place.
+    here, there = str(out.resolve()).encode(), str(run_dir.resolve()).encode()
+    return {f: (out / f).read_bytes().replace(here, there) for f in FILES}
 
 
 def score(case: pathlib.Path, script: pathlib.Path) -> list:
-    with tempfile.TemporaryDirectory() as t:
-        want = expected(case, script, pathlib.Path(t))
     got_dir = case / "repo.briefs" / "round"
+    with tempfile.TemporaryDirectory() as t:
+        want = expected(case, script, pathlib.Path(t), got_dir)
     found = sorted(p.name for p in got_dir.iterdir()) if got_dir.is_dir() else []
     rows = [("F1", found == sorted(FILES), f"files left: {found or 'none'}")]
     for i, f in enumerate(FILES, 1):

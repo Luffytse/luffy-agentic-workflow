@@ -6,7 +6,8 @@ It builds the fixture and checks the rendered input a Release thread reads (main
 pull requests, the Milestone issue, the issue bodies) makes each expected verdict decidable from main. Then it writes
 a reference run by hand from the expected outcome and scores it: the reference must pass, and planted wrong runs (the
 planned feature closed, the later-Milestone issue edited or given a row, the section missing, a wrong verdict, an
-unchecked issue ranked, a close with no evidence, the closes made after the release issue) must fail. It is not a
+unchecked issue ranked, a close with no evidence, an already-fixed issue closed as not planned, the feature it blocks
+left out, the closes made after the release issue) must fail. It is not a
 model run of the skill: see evals/release/README.md and RESULTS.md for the model runs.
 """
 import pathlib
@@ -21,10 +22,10 @@ sys.path.insert(0, str(HERE))
 from main_case import EXPECT  # noqa: E402
 import make_fixture  # noqa: E402
 
-TITLES = {20: "Quiet flag", 21: "Shout flag", 30: "Typo in usage text", 31: "Names with spaces are cut at the first space",
+TITLES = {20: "Quiet flag", 21: "Shout flag", 22: "Help flag", 30: "Typo in usage text", 31: "Names with spaces are cut at the first space",
           32: "--version always prints 0.0.0", 33: "test.sh does not test bye", 34: "greet sometimes fails",
           45: "Colour output"}
-ROWS = {20: "still valid", 21: "already fixed: main's src/greet.sh takes `-s` since #8",
+ROWS = {20: "still valid", 21: "already fixed: main's src/greet.sh takes `-s` since #8", 22: "still valid",
         30: "already fixed: main's usage line in src/greet.sh says `hello` since #7",
         31: "changed scope: #9 fixed `hello`; `bye` still cuts the name in src/greet.sh",
         32: "obsolete: #10 dropped `--version` from src/greet.sh",
@@ -42,7 +43,7 @@ def block(k, op, issue, fields):
 
 
 def reference(rows=None, closes=None, edits=None, order=None, section=True, plan_first=False, report="#21",
-              question=True, left="None.", path=""):
+              question=True, left="None.", path="", outcome="completed"):
     rows = dict(ROWS) if rows is None else rows
     closes = dict(CLOSE_REASON) if closes is None else closes
     edits = {31: NEW_31} if edits is None else edits
@@ -53,7 +54,7 @@ def reference(rows=None, closes=None, edits=None, order=None, section=True, plan
                        "Body:\n~~~\nChecked against main: main already does this since #8 (src/greet.sh `-s`). "
                        "Close this planned feature?\n~~~"))
     for n, reason in sorted(closes.items()):
-        checks.append(("Close", f"{n:02d}-x.md", f"Outcome: not planned\nReason: {reason}"))
+        checks.append(("Close", f"{n:02d}-x.md", f"Outcome: {outcome}\nReason: {reason}"))
     for n, text in sorted(edits.items()):
         checks.append(("Edit an issue body", f"{n:02d}-x.md", f"Body:\n~~~\n{text}\n~~~"))
     lines = "\n".join(f"{j}. #{n} {TITLES[n]}: taken for its group and place in the ranked list." for j, n in enumerate(order, 1))
@@ -121,6 +122,18 @@ class Fixture(unittest.TestCase):
         self.assertRegex(ms, r"\| #21 Shout flag \|")
         self.assertIn("Status: open", self.issue(21))
 
+    def test_planned_feature_22_blocked_by_30_and_not_on_main(self):
+        body = self.issue(22)
+        self.assertIn("Blocked by: 30-usage-typo.md", body)
+        self.assertIn("Status: open", body)
+        self.assertIn("Status: open", self.issue(30))
+        self.assertRegex(self.issue(1), r"\| #22 Help flag \|")
+        self.assertNotIn("-h", (self.repo / "src/greet.sh").read_text())
+        self.assertEqual(self.sh("-h").returncode, 2)  # no -h yet: it prints the usage line as an error
+        # the dry-run tracker reads a blocker closed as not planned as uncleared, as the tracker doc does
+        self.assertIn("unless it has a `Closed as: not planned` line",
+                      (self.repo / "docs/dev-skills/issue-tracker.md").read_text())
+
     def test_valid_issues_20_and_33_still_true_on_main(self):
         self.assertNotIn("-q", (self.repo / "src/greet.sh").read_text())
         self.assertRegex(self.issue(1), r"\| #20 Quiet flag \|")
@@ -142,7 +155,7 @@ class Fixture(unittest.TestCase):
             self.assertNotRegex(text, r"(?i)\b(close[sd]?|fix(e[sd])?|resolve[sd]?) #\d+")
             sha = re.search(r"Merge commit: (\w+)", text).group(1)
             self.assertEqual(subprocess.run(["git", "-C", str(self.repo), "merge-base", "--is-ancestor", sha, "main"]).returncode, 0)
-        for n in (20, 21, 30, 31, 32, 33, 34, 45):
+        for n in (20, 21, 22, 30, 31, 32, 33, 34, 45):
             self.assertIn("Status: open", self.issue(n))
         self.assertIn("Status: closed", self.issue(2))
         self.assertIn("retro-planning ran for this Release.", self.issue(2))
@@ -208,6 +221,18 @@ class Scorer(unittest.TestCase):
     def test_close_without_evidence_fails(self):
         self.assertEqual(self.score(closes={**CLOSE_REASON, 30: "No longer happens."}).returncode, 1)
         self.assertEqual(self.score(rows={**ROWS, 32: "obsolete"}).returncode, 1)
+
+    def test_fixed_issue_closed_as_not_planned_fails(self):
+        self.assertEqual(self.score(outcome="not planned").returncode, 1)
+
+    def test_feature_blocked_by_the_fixed_issue_left_out_fails(self):
+        left = "- #22 Help flag: blocked by #30, closed as not planned, which never clears."
+        self.assertEqual(self.score(order=[20, 31, 33], left=left).returncode, 1)
+        self.assertEqual(self.score(left=left).returncode, 1)
+
+    def test_features_either_way_round_pass(self):
+        r = self.score(order=[22, 20, 31, 33])
+        self.assertEqual(r.returncode, 0, r.stdout)
 
     def test_check_after_ranking_fails(self):
         self.assertEqual(self.score(plan_first=True).returncode, 1)

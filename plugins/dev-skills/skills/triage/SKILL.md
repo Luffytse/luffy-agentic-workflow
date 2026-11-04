@@ -49,7 +49,7 @@ Every triaged issue should carry exactly one category role and one state role (t
 
 These are canonical role names. The actual label strings used in the issue tracker may differ. The mapping should have been provided to you. If not, tell the user to run `setup-dev-skills`.
 
-State transitions: an unlabeled issue normally goes to `needs-triage` first; from there it moves to `needs-info`, `ready-for-agent`, `ready-for-human`, or `wontfix`. `needs-info` returns to `needs-triage` once the reporter replies. The maintainer can override at any time; flag transitions that look unusual and ask before proceeding.
+State transitions: an unlabeled issue normally goes to `needs-triage` first; from there it moves to `needs-info`, `ready-for-agent`, `ready-for-human` or `wontfix`, or closes as completed when it is already implemented. `needs-info` returns to `needs-triage` once the reporter replies. The maintainer can override at any time; flag transitions that look unusual and ask before proceeding.
 
 ## Invocation
 
@@ -76,7 +76,7 @@ Show counts and a one-line summary per item. Let the maintainer pick.
 
 ## Triage a specific issue or PR
 
-1. **Gather context.** If the issue is labelled `retro`, stop: it is a Retro issue, planned in batches, so skip it. Otherwise read the full issue or PR (body, comments, labels, author, dates; for a PR, the diff too). Parse any prior triage notes so you don't re-ask resolved questions. Explore the codebase: start at `docs/dev-skills/index.md` (with no index, fall back to `docs/dev-skills/glossary.md` and `docs/dev-skills/adr/`), open only the docs that fit, and respect ADRs in the area. Run two checks against the codebase: (a) **redundancy**: search for an existing implementation of the requested behavior by domain concept (not just the request's wording), and report where you looked. If found, it's an already-implemented `wontfix` (step 5). (b) **prior rejection**: read `docs/dev-skills/out-of-scope/*.md` and surface any that resembles this request.
+1. **Gather context.** If the issue is labelled `retro`, stop: it is a Retro issue, planned in batches, so skip it. Otherwise read the full issue or PR (body, comments, labels, author, dates; for a PR, the diff too). Parse any prior triage notes so you don't re-ask resolved questions. Explore the codebase: start at `docs/dev-skills/index.md` (with no index, fall back to `docs/dev-skills/glossary.md` and `docs/dev-skills/adr/`), open only the docs that fit, and respect ADRs in the area. Run two checks against the codebase: (a) **redundancy**: search for an existing implementation of the requested behavior by domain concept (not just the request's wording), and report where you looked. If found, it's already implemented (step 5). (b) **prior rejection**: read `docs/dev-skills/out-of-scope/*.md` and surface any that resembles this request.
 
 2. **Recommend.** Tell the maintainer your category and state recommendation with reasoning, plus a brief codebase summary relevant to the request (including whether it's already implemented). Wait for direction.
 
@@ -88,8 +88,8 @@ Show counts and a one-line summary per item. Let the maintainer pick.
    - `ready-for-agent`: post an agent brief comment ([AGENT-BRIEF.md](AGENT-BRIEF.md)), and set `next-release` when the issue is severe or blocks a planned feature (see Roles).
    - `ready-for-human`: same structure as an agent brief, but note why it can't be delegated (judgment calls, external access, design decisions, manual testing).
    - `needs-info`: post triage notes (template below).
-   - For `wontfix`, close the issue, with the comment depending on *why*:
-     - **Already implemented**: the change already exists in the codebase. Point to where it lives; do **not** write to `docs/dev-skills/out-of-scope/` (that KB is for *rejected* requests, not built ones).
+   - **Already implemented**: the change already exists on main. Close the issue as completed, without the `wontfix` label, and with a comment pointing to where it lives on main (the commit or pull request when you find it). Main already has the work, so an issue it blocks is unblocked. Write nothing to `docs/dev-skills/out-of-scope/` (that KB is for *rejected* requests, not built ones).
+   - For `wontfix`, close the issue as not planned, with the comment depending on *why*:
      - **Rejected (bug)**: give a polite explanation, then close.
      - **Rejected (enhancement)**: write to `docs/dev-skills/out-of-scope/`, link to it from a comment, then close ([OUT-OF-SCOPE.md](OUT-OF-SCOPE.md)).
    - `needs-triage`: apply the role. Optional comment if there's partial progress.
@@ -129,7 +129,7 @@ The Release thread runs the batch at a Release end, naming the Release just clos
 For every open `needs-triage` issue:
 
 1. Gather context and verify the claim (steps 1 and 3 of "Triage a specific issue or PR"). Where the issue needs fleshing out (step 4), settle it by reading the code, docs, ADRs, the Milestone issue and the issue's comments; ask nobody.
-2. Decide the category and the state, with the Roles rules for `next-release` and agent-found enhancements. When "Goes to the user" applies to the issue, apply nothing (no brief, no label change) and leave it `needs-triage`. Otherwise apply the outcome as step 5 says: an agent brief for `ready-for-agent`, a brief for `ready-for-human`, triage notes for `needs-info`, a reasoned close for `wontfix`.
+2. Decide the category and the state, with the Roles rules for `next-release` and agent-found enhancements. When "Goes to the user" applies to the issue, apply nothing (no brief, no label change) and leave it `needs-triage`. Otherwise apply the outcome as step 5 says: an agent brief for `ready-for-agent`, a brief for `ready-for-human`, triage notes for `needs-info`, a close as completed for an already-implemented one, a reasoned close for `wontfix`.
 3. Record the decision on the issue in a comment: category, state, any mark and the reason.
 
 Done when no open issue but those waiting on the user is at `needs-triage`.
@@ -140,7 +140,7 @@ The **sweep** keeps the `ready-for-agent` backlog true, since Release planning r
 
 1. **Agent-found enhancement**: move it to `ready-for-human`, with a comment saying why. Nothing else in the sweep touches it.
 2. **Duplicate**: it reports the same problem or asks for the same change as another open issue. Keep the one with the fuller brief (the older when they are even), close the other as a duplicate (as not planned where the tracker has no duplicate outcome) with a comment linking the kept issue, and comment on the kept issue anything only the closed one said.
-3. **Obsolete**: main's current code no longer has the problem or already does what the issue asks; reproduce it or read the code to confirm. Close it as not planned, since it shipped nothing itself, with the reason: where on main it is fixed or done, and the commit or pull request when you find it.
+3. **Obsolete**: main's current code no longer has the problem or already does what the issue asks; reproduce it or read the code to confirm. Close it as completed, since main already has the work and nothing is left to do, with the reason: where on main it is fixed or done, and the commit or pull request when you find it. A planned feature it blocks is then unblocked, as a close as completed counts as done.
 4. **Needs the mark**: it is severe or blocks a planned feature and lacks `next-release`: set it, with a comment giving the reason.
 5. **Expired**: it is listed under "Left out" in the release issues of each of the last 3 Releases cut (the one just closed and the two before it). Find the two earlier release issues by the name, label and title forms the repo's release doc (`docs/dev-skills/release.md`) gives (the Releases whose names come just before the closed one's), and read only each one's "Left out" section. Close it as not planned, with a comment naming those Releases and saying "reopen to bring it back". With fewer than 3 Releases cut, nothing expires. A planned feature, a Ticket of a planned Spec, a parked issue and one already marked `next-release` never expire.
 
@@ -164,7 +164,7 @@ The issue keeps its labels until the user answers, and the summary lists it as w
 
 ### The summary
 
-At the end, post one comment on the release issue. It starts with the disclaimer and then the heading `## Triage batch`, and lists every issue the run decided, changed in the sweep or handled at once since the last summary, one row each: issue, category, state, reason, and one outcome of `next-release`, `stays open`, `ready-for-human`, `closed` (duplicate, obsolete or `wontfix`), `expired`, `waiting on the user` or `handled at once`. An issue the sweep left as it was gets no row. A rerun for the same release issue posts a new comment under the same heading, covering only what it decided; an issue whose comment from this batch is already on it is not decided again.
+At the end, post one comment on the release issue. It starts with the disclaimer and then the heading `## Triage batch`, and lists every issue the run decided, changed in the sweep or handled at once since the last summary, one row each: issue, category, state, reason, and one outcome of `next-release`, `stays open`, `ready-for-human`, `closed` (duplicate, obsolete, already implemented or `wontfix`), `expired`, `waiting on the user` or `handled at once`. An issue the sweep left as it was gets no row. A rerun for the same release issue posts a new comment under the same heading, covering only what it decided; an issue whose comment from this batch is already on it is not decided again.
 
 ### Dry run
 

@@ -4,7 +4,8 @@
 Usage: score.py <out-dir>
 Prints one line per check (PASS or FAIL with what it saw) and exits 1 when any check fails. See
 evals/release/README.md. The checks read the "Release 3" issue the run opens (its Order and its
-"## Checked against main" section), the close, edit and label blocks, their order, and .scratch/report.md.
+"## Checked against main" section and its Left out list), the close, edit and label blocks, their order, and
+.scratch/report.md.
 """
 import importlib.util
 import pathlib
@@ -103,13 +104,14 @@ def main(out):
     check("no row for an issue outside the check's scope", not extra, f"extra rows {sorted(extra)}")
 
     closes = {b["n"]: b for b in blocks if b["op"].startswith("close") and b["n"] != own}
-    check("closed exactly the already-fixed and obsolete issues that are not planned features",
+    check("closed exactly the already-fixed and obsolete issues, the planned feature aside",
           set(closes) == EXPECT["closed"], f"saw {sorted(closes)}, want {sorted(EXPECT['closed'])}")
     for n in EXPECT["closed"]:
         b = closes.get(n)
         reason = (b["raw"] if b else "") + "".join(c["body"] for c in blocks if c["op"].startswith("comment") and c["n"] == n)
-        check(f"#{n} closed as not planned", b and re.search(r"^Outcome:\s*not planned", b["raw"], re.M | re.I),
-              b["raw"].strip() if b else "no close")
+        want = EXPECT["close_outcome"]
+        check(f"#{n} closed as {want} (main already has it: nothing is left to do)",
+              b and re.search(rf"^Outcome:\s*{want}\b", b["raw"], re.M | re.I), b["raw"].strip() if b else "no close")
         marks = EXPECT["evidence"][n]
         check(f"#{n} close names where on main", names_evidence(reason, marks, sha_for(marks)), reason.strip()[:120])
     for n in EXPECT["asked"]:
@@ -142,8 +144,15 @@ def main(out):
           k_plan is not None and writes and max(writes) < k_plan, f"writes {writes}, release issue {k_plan}")
 
     order = [n for n, _ in rp.refs(rp.section(body, "Order"), numbered=True)]
-    check("Order ranks only issues that survived the check", order == EXPECT["order"],
-          f"saw {order}, want {EXPECT['order']}")
+    a, b2 = EXPECT["either_order"]
+    swapped = [b2 if n == a else a if n == b2 else n for n in EXPECT["order"]]
+    check("Order ranks only issues that survived the check", order in (EXPECT["order"], swapped),
+          f"saw {order}, want {EXPECT['order']} (#{a} and #{b2} either way round)")
+    left = rp.section(body, "Left out")
+    for n, blocker in EXPECT["unblocked"].items():
+        check(f"#{n} (a planned feature whose blocker #{blocker} main already fixes) is ranked", n in order,
+              f"Order {order}")
+        check(f"#{n} is not left out", not re.search(rf"#{n}\b", left), left.strip()[:160])
     added = {b["n"] for b in blocks if b["op"].startswith("apply") and NEXT_LABEL in rp.labels_split(b["add"])}
     check(f"{NEXT_LABEL} applied to exactly the taken issues", added == EXPECT["labelled"],
           f"saw {sorted(added)}, want {sorted(EXPECT['labelled'])}")

@@ -3,8 +3,8 @@
 
 Run: python3 evals/triage/backlog-sweep/test_cases.py
 It builds the fixture, writes a reference run by hand from the expected outcome, and scores it: the reference must
-pass, and planted wrong runs (a duplicate closed with no link, an obsolete issue closed with no reason, the issue
-left out twice expired, the expired issue closed without "reopen to bring it back", an agent-found enhancement
+pass, and planted wrong runs (a duplicate closed with no link, an obsolete issue closed with no reason or as not
+planned, the issue left out twice expired, the expired issue closed without "reopen to bring it back", an agent-found enhancement
 expired or put at ready-for-agent, the planned feature expired, the feature-blocker left unmarked, a release label
 applied, no summary, a comment without the disclaimer) must fail. It is not a model run of the skill: see
 evals/triage/README.md and RESULTS.md for the model runs.
@@ -34,7 +34,7 @@ def reference(drop=(), extra=(), replace=None):
         "obs-comment": ("Comment on an issue", 32,
                         f"Body:\n~~~\n{d}\n\nObsolete: since #8 `src/greet.sh` defaults the name to `world`, so "
                         "`greet.sh hello` prints `Hello, world!`.\n~~~"),
-        "obs-close": ("Close", 32, "Outcome: not planned\nReason: obsolete, main's greet.sh greets the world when no name is given."),
+        "obs-close": ("Close", 32, "Outcome: completed\nReason: obsolete, main's greet.sh greets the world when no name is given."),
         "exp-comment": ("Comment on an issue", 33,
                         f"Body:\n~~~\n{d}\n\nLeft out of Releases 1, 2 and 3 in a row, so it expires. Reopen to bring it back.\n~~~"),
         "exp-close": ("Close", 33, "Outcome: not planned\nReason: left out of 3 Releases in a row; reopen to bring it back."),
@@ -77,7 +77,11 @@ class Sweep(unittest.TestCase):
         self.fails(reference(drop={"dup-comment"}, replace={"dup-close": ("Close", 31, "Outcome: duplicate\nReason: a duplicate.")}))
 
     def test_obsolete_closed_without_a_reason_fails(self):
-        self.fails(reference(drop={"obs-comment"}, replace={"obs-close": ("Close", 32, "Outcome: not planned\nReason: obsolete.")}))
+        self.fails(reference(drop={"obs-comment"}, replace={"obs-close": ("Close", 32, "Outcome: completed\nReason: obsolete.")}))
+
+    def test_obsolete_closed_as_not_planned_fails(self):
+        self.fails(reference(replace={"obs-close": ("Close", 32, "Outcome: not planned\nReason: obsolete, main's greet.sh "
+                                                               "greets the world when no name is given.")}))
 
     def test_issue_left_out_twice_expired_fails(self):
         self.fails(reference(extra=[("Close", 34, "Outcome: not planned\nReason: expired; reopen to bring it back.")]))

@@ -78,6 +78,7 @@ ISSUES = [
 EXPECT = dict(
     duplicate=31, kept=30,
     obsolete=32,
+    obsolete_outcome="completed",  # main already does it: nothing is left to do, so nothing waits on it
     expired=33,
     stay_open={20, 30, 34, 36, 40, 41, 50, 51},
     next_release={40, 41},

@@ -87,6 +87,8 @@ SKILL = (REVIEW_ROUNDS / "SKILL.md").read_text()
 SHARED = quoted(FINDERS, "Shared brief")
 COPY = quoted(FINDERS, "Copy rule")
 FORMAT = cut(FINDERS, "## Finding format")
+REPORT_FORMAT = cut(FINDERS, "## Report format")
+REPORT_FILE = quoted(FINDERS, "Report file")
 SMELL = cut(FINDERS, "### Smell baseline")
 DRIFT = cut(FINDERS, "### Docs index drift")
 STANDARDS_BRIEF = quoted(cut(FINDERS, "## Standards Finder"), "Brief")
@@ -227,7 +229,7 @@ class Contents(Base):
         for name in s.files():
             with self.subTest(file=name):
                 t = s.brief(name)
-                for part in (SHARED, COPY, FORMAT):
+                for part in (SHARED, COPY, FORMAT, REPORT_FORMAT):
                     self.assertIn(part, t)
                 self.assertIn("PLANTED-IMPORTANT", t)
                 self.assertIn("PLANTED-SKIP", t)
@@ -273,6 +275,39 @@ class Contents(Base):
         self.assertIn("PLANTED-SPEC", t)
         for gone in ("PLANTED-PY", "PLANTED-STANDARD", SMELL):
             self.assertNotIn(gone, t)
+
+
+class ReportFile(Base):
+    def test_each_finder_brief_names_its_own_report_file_and_carries_the_report_format(self):
+        s = self.scratch()
+        self.ok(s.run("deep"))
+        for name in s.files():
+            finder = name[len("finder-"):-len(".md")]
+            with self.subTest(file=name):
+                t = s.brief(name)
+                path = str(s.out.resolve() / "reports" / ("%s.md" % finder))
+                self.assertIn(REPORT_FILE.replace("<report path>", path), t)
+                self.assertIn(REPORT_FORMAT, t)
+                self.assertNotIn("<report path>", t)
+                for other in ("standards", "spec", "adversarial", "security"):
+                    if other != finder:
+                        self.assertNotIn(str(s.out.resolve() / "reports" / ("%s.md" % other)), t)
+
+    def test_the_later_round_finder_writes_later_md(self):
+        s = self.scratch()
+        last, _ = second_commit(s)
+        self.ok(run_cmd(s, "later", "--level", "standard", "--base", last, "--round", 2))
+        self.assertIn(str(s.out.resolve() / "reports" / "later.md"), s.brief("finder-later.md"))
+
+    def test_a_rerun_removes_stale_report_files_but_makes_no_reports_directory(self):
+        s = self.scratch()
+        self.ok(s.run("quick"))
+        self.assertNotIn("reports", s.files())
+        (s.out / "reports").mkdir()
+        (s.out / "reports" / "standards.md").write_text("old\n")
+        (s.out / "reports" / "security.md").write_text("old\n")
+        self.ok(s.run("quick"))
+        self.assertEqual(sorted(p.name for p in (s.out / "reports").iterdir()), [])
 
 
 class AlwaysCheck(Base):
@@ -492,10 +527,11 @@ def finding(title, bug_class, n_locations=3, marker="X"):
 
 
 class VerifierBrief(Base):
-    def verify(self, s, reports, *extra, level="standard", script=None, spec=True, earlier=False):
-        """Write reports (finder -> text or bytes or None for none) to a dir and run the verify subcommand."""
-        rdir = s.root / "reports"
-        rdir.mkdir(exist_ok=True)
+    def verify(self, s, reports, *extra, level="standard", script=None, spec=True, earlier=False, default_dir=False):
+        """Write reports (finder -> text or bytes or None for none) to a dir and run the verify subcommand;
+        default_dir writes them to <out>/reports and passes no --reports."""
+        rdir = (s.out if default_dir else s.root) / "reports"
+        rdir.mkdir(parents=True, exist_ok=True)
         for old in rdir.iterdir():
             old.unlink()
         for name, text in reports.items():
@@ -503,8 +539,9 @@ class VerifierBrief(Base):
                 continue
             (rdir / ("%s.md" % name)).write_bytes(text if isinstance(text, bytes) else text.encode())
         args = [sys.executable, "-B", str(script or REVIEW_ROUNDS / SCRIPT_NAME), "verify", "--level", level,
-                "--repo", str(s.repo), "--base", "main", "--out", str(s.out), "--reports", str(rdir),
-                "--design", str(s.design)]
+                "--repo", str(s.repo), "--base", "main", "--out", str(s.out), "--design", str(s.design)]
+        if not default_dir:
+            args += ["--reports", str(rdir)]
         if spec:
             args += ["--spec", str(s.spec)]
         if earlier:
@@ -540,7 +577,7 @@ class VerifierBrief(Base):
         self.ok(self.verify(s, reports, earlier=True))
         t = (s.out / "verifier.md").read_text()
         head = git(s.repo, "rev-parse", "feature").strip()
-        for part in (VERIFIER_BRIEF, COPY, FORMAT):
+        for part in (VERIFIER_BRIEF, COPY, FORMAT, REPORT_FORMAT):
             self.assertIn(part, t)
         for marker in ("PLANTED-IMPORTANT", "PLANTED-SKIP", "PLANTED-SPEC", "PLANTED-DESIGN", "PLANTED-EARLIER", head,
                        "planted change"):
@@ -650,6 +687,87 @@ class VerifierBrief(Base):
                 r = self.verify(s, reports)
                 self.assertEqual(r.returncode, 3)
                 self.assertIn("standards", r.stderr)
+
+    def test_a_report_with_marked_notes_passes_and_its_notes_are_not_findings(self):
+        s = self.scratch()
+        notes = "## Notes\n\n- (a) Documented standards: clear\n- (b) Smells: clear\n- Always check `py line`: clear\n"
+        std = finding("First", "unescaped input") + "\n" + finding("Second", "missing test") + "\n" + notes
+        reports = self.all_clear()
+        reports["standards"] = std
+        r = self.verify(s, reports)
+        self.ok(r)
+        self.assertIn(std.encode(), (s.out / "verifier.md").read_bytes())  # carried byte for byte, notes included
+        # the last Finding's field block ends at the notes: a missing last field is still caught there
+        broken = finding("Only", "x").replace("- Evidence: ", "- Evidenc: ") + "\n" + notes
+        reports["standards"] = broken
+        r = self.verify(s, reports)
+        self.assertEqual(r.returncode, 3)
+        self.assertIn("standards", r.stderr)
+
+    def test_a_finding_missing_a_field_is_refused_with_the_report_format_in_the_message(self):
+        s = self.scratch()
+        reports = self.all_clear()
+        reports["standards"] = "### A title\n- Severity (proposed): Nit\n"
+        r = self.verify(s, reports)
+        self.assertEqual(r.returncode, 3)
+        self.assertIn("## Notes", r.stderr)
+        self.assertIn("Report format", r.stderr)
+
+    def test_a_section_label_heading_is_refused_naming_the_rule(self):
+        for label in ("### (a) Documented standards broken", "## (a) Documented standards broken", "#### Sub label",
+                      "# Review report"):
+            with self.subTest(label=label):
+                s = self.scratch()
+                reports = self.all_clear()
+                reports["standards"] = label + "\n\n" + finding("First", "x")
+                r = self.verify(s, reports)
+                self.assertEqual(r.returncode, 3, r.stdout + r.stderr)
+                self.assertIn("standards", r.stderr)
+                self.assertIn("## Notes", r.stderr)
+                self.assertEqual(s.files(), [])
+
+    def test_two_notes_sections_or_findings_after_notes_are_refused(self):
+        for kind, text in (("two", finding("First", "x") + "\n## Notes\n\na\n\n## Notes\n\nb\n"),
+                           ("after", finding("First", "x") + "\n## Notes\n\na\n\n" + finding("Late", "y")),
+                           ("before", "## Notes\n\na\n\n" + finding("Late", "y")),
+                           ("nothing-two", "Nothing found.\n\n## Notes\n\na\n\n## Notes\n\nb\n")):
+            with self.subTest(kind=kind):
+                s = self.scratch()
+                reports = self.all_clear()
+                reports["standards"] = text
+                r = self.verify(s, reports)
+                self.assertEqual(r.returncode, 3, r.stdout + r.stderr)
+                self.assertIn("standards", r.stderr)
+                self.assertIn("## Notes", r.stderr)
+
+    def test_nothing_found_with_a_notes_section_passes_and_counts_as_nothing_found(self):
+        s = self.scratch()
+        reports = self.all_clear()
+        reports["standards"] = "Nothing found.\n\n## Notes\n\n- (a) clear\n- (b) clear\n"
+        r = self.verify(s, reports)
+        self.ok(r)
+        self.assertRegex(r.stdout.lower(), r"no verifier")
+        self.assertEqual(s.files(), [])
+
+    def test_notes_with_a_code_fenced_heading_are_still_notes(self):
+        s = self.scratch()
+        reports = self.all_clear()
+        reports["standards"] = finding("First", "x") + "\n## Notes\n\n```\n### example\n## other\n```\n"
+        self.ok(self.verify(s, reports))
+
+    def test_reports_default_to_the_reports_directory_under_out_and_explicit_reports_still_work(self):
+        s = self.scratch()
+        reports = self.all_clear()
+        reports["standards"] = finding("First", "unescaped input")
+        r = self.verify(s, reports, default_dir=True)
+        self.ok(r)
+        self.assertIn(reports["standards"].encode(), (s.out / "verifier.md").read_bytes())
+        s2 = self.scratch()
+        self.ok(self.verify(s2, reports))  # explicit --reports elsewhere
+        s3 = self.scratch()
+        r = self.verify(s3, {}, default_dir=True)  # no report files in the default directory
+        self.assertEqual(r.returncode, 3)
+        self.assertIn("standards", r.stderr)
 
     def test_nothing_found_in_every_report_and_no_earlier_finding_writes_no_verifier_brief(self):
         s = self.scratch()

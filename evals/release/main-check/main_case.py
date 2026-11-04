@@ -7,7 +7,8 @@ Issue numbers are the issue file prefixes (#30 is .scratch/issues/30-*.md). Rele
 both end-of-Release records, so the run goes straight to planning Release 3. After Release 2's end, four pull
 requests merged into main that close no issue: #7 fixes the usage typo (#30), #8 adds the shout flag (#21, a
 planned feature), #9 fixes names with spaces for `hello` only (#31's `bye` half is still true), #10 drops
-`--version` (#32's subject).
+`--version` (#32's subject). The planned feature #22 is blocked by #30, so it is ranked only when the check closes #30
+as completed (a close as not planned would never clear it).
 """
 
 GOAL = "Round out the greeter's options."
@@ -60,6 +61,10 @@ ISSUES = [
     dict(n=21, slug="shout", title="Shout flag", type="ticket", labels=["ready-for-agent", "enhancement", "milestone-1"],
          created="2026-10-03", body="`-s` before the command prints the greeting in capitals: "
                                     "`greet.sh -s hello Ada` prints `HELLO, ADA!`."),
+    dict(n=22, slug="help", title="Help flag", type="ticket", labels=["ready-for-agent", "enhancement", "milestone-1"],
+         created="2026-10-04", blocked_by=[30],
+         body="`-h` prints the usage line to standard output and exits 0: `greet.sh -h` prints the same line the "
+              "script prints when no command is given. Blocked by #30: the usage line it prints must say `hello` first."),
     bug(30, "usage-typo", "Typo in usage text", "2026-09-01",
         "Run `greet.sh` with no command: the usage line says `greet.sh helo|bye <name>`. It should say `hello`."),
     bug(31, "name-spaces", "Names with spaces are cut at the first space", "2026-09-05",
@@ -78,23 +83,26 @@ ISSUES = [
                                     "among the features it was built with."),
 ]
 
-MILESTONE_FEATURES = [20, 21]
+MILESTONE_FEATURES = [20, 21, 22]
 LATER = 45  # the Milestone issue leaves it to the next Milestone
 
 # Verdict classes the scorer accepts for each issue in the check's scope. Already fixed and obsolete take the same
 # action (close, or for a planned feature, the user), so either is accepted for the three closed-or-asked issues.
 GONE = {"already fixed", "obsolete"}
 EXPECT = dict(
-    verdicts={20: {"still valid"}, 21: GONE, 30: GONE, 31: {"changed scope"}, 32: GONE, 33: {"still valid"},
-              34: {"cannot tell"}},
+    verdicts={20: {"still valid"}, 21: GONE, 22: {"still valid"}, 30: GONE, 31: {"changed scope"}, 32: GONE,
+              33: {"still valid"}, 34: {"cannot tell"}},
     # where the evidence lives on main: the pull request number, or the file
     evidence={21: ["#8", "greet.sh"], 30: ["#7", "greet.sh"], 31: ["#9", "greet.sh"], 32: ["#10", "greet.sh"]},
     closed={30, 32},
+    close_outcome="completed",  # main already has the fix or change: nothing is left to do, so nothing waits on it
+    unblocked={22: 30},  # a planned feature whose only blocker the check closes: ranked, not left out
     edited={31},
     asked={21},  # a planned feature that main already does: goes to the user, not closed, not ranked
     unchecked={34},
     untouched={45},
-    order=[20, 31, 33],
-    labelled={20, 31, 33},
-    used=3,
+    order=[20, 22, 31, 33],
+    either_order=(20, 22),  # neither feature depends on the other: the re-order may put either first
+    labelled={20, 22, 31, 33},
+    used=4,
 )

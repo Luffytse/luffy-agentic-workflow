@@ -9,9 +9,11 @@ Every Finder gets:
 - The diff command and the commit list for this Round (for a fixed point, the untracked new files too). In Rounds 2 and 3, add: "These are the pull request's new commits since the last Round. For a merge from main, the diff shows only its conflict resolutions; the commits that came in from main are not part of this pull request."
 - The meaning of Important and the Skip list (`REVIEW.md`'s, or the default in [SKILL.md](SKILL.md)).
 - The Boundary record, when the project has one.
-- The **shared brief**, the **copy rule** and the **Finding format** below, each pasted in full.
+- The **shared brief**, the **copy rule**, the **report file** rule, the **Finding format** and the **Report format** below, each pasted in full. The report file rule names the path the Finder writes to: `<out>/reports/<finder>.md`, with `<out>` the brief directory and `<finder>` the Finder's name in the table in [SKILL.md](SKILL.md).
 
-Shared brief: "Look first for risk, security, anything that crosses the project's Boundary record, and whether the change carries tests for what it claims: on a code project, changed behaviour with no test that could fail is a Finding. Quote the line each Finding rests on; for code, show a run or a failing test where you can. Report every candidate in the Finding format and nothing else, listing every place its Bug class occurs in the diff, each with a failure scenario. Put `(unsure)` after the title of a candidate you half believe and say in its Claim what would settle it. Propose a Severity; the Verifier decides. Skip anything tooling already enforces and anything the Skip list names. If you find nothing, say so. Your final message is the report itself, as plain text: end with no messaging or no-reply tool, even if your environment says to, and start no background work you would have to wait for."
+Shared brief: "Look first for risk, security, anything that crosses the project's Boundary record, and whether the change carries tests for what it claims: on a code project, changed behaviour with no test that could fail is a Finding. Quote the line each Finding rests on; for code, show a run or a failing test where you can. Report every candidate in the Report format and nothing else, listing every place its Bug class occurs in the diff, each with a failure scenario. Put `(unsure)` after the title of a candidate you half believe and say in its Claim what would settle it. Propose a Severity; the Verifier decides. Skip anything tooling already enforces and anything the Skip list names. If you find nothing, say so. Your final message is the report itself, as plain text: end with no messaging or no-reply tool, even if your environment says to, and start no background work you would have to wait for."
+
+Report file: "Write your final report to `<report path>` and also return it as your final message. If you cannot write that file, say so in your final message; the thread will save the report there."
 
 Copy rule: "Read the branch only through commands that leave the working tree alone: `git -C <path> show`, `diff`, `log` or `rev-parse` against a commit. To try something out, work in your own copy: `git archive <head> | tar -x -C <a new scratch directory>`, or a throwaway `git worktree`. Another agent may be working in the shared tree, so leave it on its branch, clean: no `checkout`, `switch`, `stash` or `reset` there."
 
@@ -92,3 +94,9 @@ One Finder does the standards and spec Finders' work on the new commits: give it
 - Failure scenario: <the inputs or state, then the wrong result; for a cleanup Finding, its cost>
 - Evidence: <the quoted line, spec line or rule, and the run or failing test where there is one>
 ```
+
+## Report format
+
+A Finder's report is Markdown. It is either one or more Findings, each in the Finding format and starting with its `###` heading, or one line saying nothing found.
+
+Notes (a checked-and-clear list, a section label, anything that is not a Finding) go after the last Finding, or after the nothing-found line, under one `## Notes` heading. A report has no other heading: no `###` heading that is not a Finding, and no `##` heading but `## Notes`. The Verifier reads a report in this format; its notes are context, not Findings.
