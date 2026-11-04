@@ -64,7 +64,7 @@ CASES = {
             dict(n=21, slug="shout", title="Shout flag", type="ticket", labels=["ready-for-agent", "enhancement", "milestone-1"],
                  created="2026-10-04", body="`-s` prints the greeting in capitals."),
             TYPO,
-            bug(31, "empty-name", "Empty name prints a double space", "2026-09-15", "`greet.sh hello ''` prints `Hello, !`."),
+            bug(31, "empty-name", "Empty name prints `Hello, !`", "2026-09-15", "`greet.sh hello ''` prints `Hello, !`."),
             bug(32, "exit-code", "Unknown command exits 0 from a pipe", "2026-10-01", "`greet.sh nope | cat` exits 0."),
             bug(33, "trailing-space", "Trailing space after the greeting", "2026-10-10", "Every greeting ends in a space."),
             bug(34, "unicode", "Names with accents come out mangled", "2026-08-01", "Reported, not yet triaged.",

@@ -36,7 +36,7 @@ def parse(text):
         files = {f.group(1).strip(): f.group(2) for f in re.finditer(r"^File:\s*(\S+)\s*\n~~~\n(.*?)\n~~~", rest, re.S | re.M)}
         line = lambda k: (re.search(rf"^{k}:\s*(.*)$", rest, re.M) or [None, ""])[1].strip()  # noqa: E731
         issue = line("Issue")
-        num = re.match(r"(?:#)?(\d+)", issue.replace("new (", ""))
+        num = re.match(r"\s*#?(\d+)", issue.rsplit("/", 1)[-1])  # "30-x.md", "#30", or a path to the file
         blocks.append(dict(k=int(m.group(1)), op=m.group(2).strip().lower(), issue=issue,
                            n=int(num.group(1)) if num and not issue.startswith("new") else None,
                            title=line("Title"), add=line("Add"), remove=line("Remove"), label=line("Label"),

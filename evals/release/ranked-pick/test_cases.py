@@ -9,7 +9,9 @@ repo with no version, the mark left on a taken issue, a severe issue left out, a
 again instead of cut) must fail. It is not a model run of the
 skill: see evals/release/README.md and RESULTS.md for the model runs.
 """
+import os
 import pathlib
+import re
 import subprocess
 import sys
 import tempfile
@@ -67,12 +69,94 @@ def reference(case, exp, repo, order=None, labelled=None, cleared=None, left=Non
     return "\n".join(out)
 
 
+def _run(repo, *args, env=None):
+    return subprocess.run(["bash", "src/greet.sh", *args], cwd=repo, capture_output=True, text=True,
+                          env=dict(os.environ, **(env or {})))
+
+
+def _text(repo, f):
+    return (repo / f).read_text()
+
+
+# What each open issue claims about main, checked on the rendered fixture: every open issue of every case must be
+# true on its main (evals.md "Fixture self-tests"), since release checks every open issue against main before
+# ranking. A feature's claim is that main does not do it yet.
+CLAIMS = {
+    "farewell": lambda r: "Goodbye" not in _run(r, "bye", "Ada").stdout,
+    "bye-code": lambda r: "Goodbye" not in _run(r, "bye", "Ada").stdout,
+    "bye-usage": lambda r: "bye" not in _run(r).stderr,
+    "quiet": lambda r: _run(r, "-q", "hello", "Ada").stdout != "Hello, Ada!",
+    "shout": lambda r: "HELLO, ADA!" not in _run(r, "-s", "hello", "Ada").stdout,
+    "name-file": lambda r: _names_file_not_read(r),
+    "count": lambda r: _run(r, "-n", "2", "hello", "Ada").stdout.count("Hello") != 2,
+    "colour": lambda r: not re.search(r"\\033|\\e\[|tput|colou?r", _text(r, "src/greet.sh")),
+    "json": lambda r: '"greeting"' not in _run(r, "--json", "hello", "Ada").stdout,
+    "config": lambda r: ".greetrc" not in _text(r, "src/greet.sh"),
+    "lint": lambda r: "shellcheck" not in _text(r, "test.sh"),
+    "usage-typo": lambda r: "usage: greet.sh helo " in _run(r).stderr,
+    "empty-name": lambda r: _run(r, "hello", "").stdout.rstrip(" \n") == "Hello, !",  # #33's trailing space aside
+    # the issue's own step: greet.sh's exit status in a pipe (PIPESTATUS[0]), not the pipeline's, which is cat's
+    "exit-code": lambda r: subprocess.run(["bash", "-c", "bash src/greet.sh nope | cat; exit ${PIPESTATUS[0]}"], cwd=r,
+                                          capture_output=True).returncode == 0,
+    "trailing-space": lambda r: _run(r, "hello", "Ada").stdout == "Hello, Ada! \n",
+    "unicode": lambda r: True,  # at needs-triage, "Reported, not yet triaged": it claims nothing about main
+    "flag-parse": lambda r: _run(r, "hello", "Ada", "-x").stdout == _run(r, "hello", "Ada").stdout == "Hello, Ada!\n",
+    # read, not run: running it would write the shared /tmp/greet.log
+    "name-log": lambda r: re.search(r'printf .*"\$\{2:-\}" >> /tmp/greet\.log; chmod 0666 /tmp/greet\.log\ncase', _text(r, "src/greet.sh")),
+    "profile": lambda r: _profile_overwritten(r),
+    "ci-red": lambda r: _test_sh(r).returncode != 0
+                        and "(#9)" in subprocess.run(["git", "-C", str(r), "log", "--format=%s"], capture_output=True, text=True).stdout,
+    "token-log": lambda r: "s3cret-token" in _test_sh(r, {"REGISTRY_TOKEN": "s3cret-token"}).stdout,
+    "slow-test": lambda r: re.search(r"^sleep 10$", _text(r, "test.sh"), re.M),
+}
+
+
+def _test_sh(repo, env=None):
+    """test.sh as CI runs it, minus its 10 s sleep (slow-test checks that line on its own)."""
+    return subprocess.run(["bash", "-c", "sed '/^sleep 10$/d' test.sh | bash"], cwd=repo, capture_output=True, text=True,
+                          env=dict(os.environ, **(env or {})))
+
+
+def _names_file_not_read(repo):
+    with tempfile.TemporaryDirectory() as d:
+        f = pathlib.Path(d, "names")
+        f.write_text("Ada\nBob\n")
+        return "Hello, Bob" not in _run(repo, "-f", str(f), "hello").stdout
+
+
+def _profile_overwritten(repo):
+    with tempfile.TemporaryDirectory() as home:
+        pathlib.Path(home, ".profile").write_text("export PATH=/usr/bin\n")
+        _run(repo, "hello", "Ada", "--save", env={"HOME": home})
+        return pathlib.Path(home, ".profile").read_text() == "Hello, Ada!\n"
+
+
+class Fixture(unittest.TestCase):
+    """Each case's rendered main makes every open issue's claim true; test.sh passes except where an issue says not."""
+
+    def test_every_open_issue_is_true_on_main(self):
+        for case, data in CASES.items():
+            with self.subTest(case=case), tempfile.TemporaryDirectory() as t:
+                repo = make_fixture.build(pathlib.Path(t) / "out", case)
+                for i in data["issues"]:
+                    if i.get("status", "open") != "open":
+                        continue
+                    self.assertIn(i["slug"], CLAIMS, f"#{i['n']} has no claim check")
+                    self.assertTrue(CLAIMS[i["slug"]](repo), f"{case}: #{i['n']} {i['title']} is not true on main")
+                red = any(i["slug"] == "ci-red" for i in data["issues"])
+                ok = _test_sh(repo).returncode == 0
+                self.assertEqual(ok, not red, f"{case}: test.sh {'passes' if ok else 'fails'} on main")
+                self.assertEqual(_run(repo, "hello", "Ada").stdout.rstrip(" \n"), "Hello, Ada!")
+
+
 class Cases(unittest.TestCase):
-    def run_case(self, case, **wrong):
+    def run_case(self, case, path="", **wrong):
         with tempfile.TemporaryDirectory() as t:
             repo = make_fixture.build(pathlib.Path(t) / "out", case)
             make_fixture.slug_of.clear()
-            (repo / ".scratch/proposed-actions.md").write_text(reference(case, EXPECT[case], repo, **wrong))
+            text = reference(case, EXPECT[case], repo, **wrong)
+            text = re.sub(r"^Issue: (\d)", lambda m: f"Issue: {path}{m.group(1)}", text, flags=re.M)
+            (repo / ".scratch/proposed-actions.md").write_text(text)
             return subprocess.run([sys.executable, str(HERE / "score.py"), str(repo.parent), case],
                                   capture_output=True, text=True)
 
@@ -80,6 +164,12 @@ class Cases(unittest.TestCase):
         for case in CASES:
             with self.subTest(case=case):
                 r = self.run_case(case)
+                self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+
+    def test_issue_lines_given_as_paths_pass(self):
+        for case in ("severe-first", "no-version"):
+            with self.subTest(case=case):
+                r = self.run_case(case, path=".scratch/issues/")
                 self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
 
     def test_swapped_order_fails(self):
