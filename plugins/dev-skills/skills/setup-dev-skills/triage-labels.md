@@ -29,6 +29,13 @@ An agent that sees another agent's label does not work the issue. An issue with 
 
 When a skill mentions a role (e.g. "apply the AFK-ready triage label"), use the corresponding label string from this table.
 
+## Repo labels
+
+Labels this repo records for its own kinds of work, each with one line saying when it applies. They are not triage roles and have no effect beyond sitting on the issue. An empty table means the repo has none.
+
+| Label in our tracker | When it applies |
+| -------------------- | --------------- |
+
 ## Other labels
 
 `retro` and `retro-planning` are not triage roles. A `retro` issue carries no `needs-triage` and is left out of triage. The `wayfinder:*` labels mark a wayfinder map and its tickets; see `issue-tracker.md`. `parked` marks an issue that, inside a Milestone, had a stalled thread that could not be taken over safely or a feature that stalled twice, or that the user parked, and now waits on the user; it is the tracker doc's **Park** operation's label, set and read there. In a repo that cuts Releases, the release labels (the label prefix in `release.md` plus a version) mark the issues of one Release; see `release.md`.
