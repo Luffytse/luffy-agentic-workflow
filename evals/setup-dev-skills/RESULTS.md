@@ -31,7 +31,7 @@ Main (d66fb5b), regular tier:
 - `fresh`: FAIL. No `## Repo labels` section, `security` not created and not in the tracker, no candidates offered, no labels-of-its-own question and so no recommended no.
 - `none`: FAIL only on "the doc has a `## Repo labels` section with a table": main ignores that seed section. Its agent asked the question itself from the prompt and recommended no.
 - `rerun-drop`: PASS, every check. The case does not tell main from the branch: main's agent kept the `frontend` row, dropped `backend` from the doc, deleted no label and asked a labels-of-its-own question recommended yes on its own, because the prompt names the drop.
-Note: the runs above used the skill text at 757cbcc/7d7e8b8; a later edit (13c5162 and after) drops "its description" from the line-drafting step because List labels returns names only. The runs were not repeated: the fixtures do not depend on that source.
+Note: the runs above used the skill text at 757cbcc/7d7e8b8; a later edit, in 012145c on the Spec branch, drops the phrase "its description" from the line-drafting step because List labels returns names only. The runs were not repeated: the fixtures do not depend on that source.
 Pass: yes. The branch passes 3 of 3; main fails `fresh` and `none`. `rerun-drop` is a regression guard for the never-delete rule, not a branch-versus-main discriminator. Lessons: a prompt that names the drop and the rows lets main reach the same outcome; a harder `rerun-drop` would not name the drop until the table is shown.
 
 ### 2026-11-04, commit (this Ticket's commit), base c29d3b1, dev-skills 0.61.0: Section E scorer and case 2 runs a to d
