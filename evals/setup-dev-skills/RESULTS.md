@@ -16,6 +16,24 @@ Pass: yes | no. Lessons: <what to change, if anything>
 
 ## Runs
 
+### 2026-11-04, commit (this Ticket's commit), base c29d3b1, dev-skills 0.61.0: Section E scorer and case 2 runs a to d
+
+Setup: `score_release_doc.py` on the old release doc seed (from main) and on the three fixture docs in `fixtures/`, filled from the new seed by a script, one per policy. Then the coordinator ran fresh regular-tier subagents of this branch's `setup-dev-skills` on scratch fixtures with the case 2 answers. A logging stub `gh` recorded every call, so the remote was never reached.
+
+Before (the old seed on main as it stands, unfilled, since it has no field a run could fill for size or policy): `none` 5 FAIL, `pull-requests-bump` 6 FAIL, `releases-bump` 6 FAIL. After (new seed): each fixture doc scores 0 FAIL for its policy.
+
+Runs (coordinator's observations):
+- a (policy none, no version in `package.json`): Section E asked, in order, uses Releases, policy (recommended none), name form, size 5, changelog path and prefix, cut steps, whole-Release check. Scorer 10/10 PASS. `CLAUDE.md` got `### Releases`. The stub's log shows `gh api --method POST repos/example-org/scratch-app/labels -f name=next-release`, one of 14 labels created.
+- b (pull requests bump): scorer 11/11 PASS. Section E also asked which files bump, how the number is given, the version file and field, and whether the bump commit needs anything else. Same `next-release` POST.
+- c (Releases bump): scorer 11/11 PASS. It also asked the version file and extra bump pull request steps. Same `next-release` POST.
+- d (re-run over an old doc with `Bump mode: pull requests bump`, a version file, changelog, prefix and check, but no Release name, size or policy): it took the mode as the policy and asked for the size and cut steps. Scorer 11/11 PASS. Gap found: the doc also lacked a Release name form, and the skill's re-run sentence ("ask only for what the doc lacks: the Release size and the cut steps") made the agent write the default name without asking. Fixed in `SKILL.md`: the re-run asks for every field the doc lacks, the name form included. After the fix (3f69833) a fresh regular-tier agent reran d: it asked, in order, for the Release name form, the Release size and the cut steps, and the scorer gave 11/11 PASS on the doc it wrote.
+
+Label creation is proven against a logging `gh` stub, not a real remote.
+
+Not exercised: a real remote creating the label.
+
+Pass: yes for a, b and c; d passed the scorer but exposed the gap above, now fixed and rerun. Lessons: a re-run's missing fields must be listed from the doc, not from the usual two.
+
 ### 2026-11-03, commit 1b5a6ff, dev-skills 0.49.0 (base main 1a17cd7): fresh headless sessions after the docs/dev-skills/ move (#552)
 
 Setup: the README's scratch repo (made-up remote `https://github.com/example-org/scratch-app.git`, `README.md`, `package.json`, one commit) in a temporary directory. Each run was a fresh headless `claude -p` session with the checkout's plugin loaded by `--plugin-dir <checkout>/plugins/dev-skills` (the session's init record lists `dev-skills` at that path), tools limited to reading and writing files and read-only `git`, and the scripted answers given up front in the prompt, so the session logged the questions it would ask rather than holding a live conversation. Run 1 on the regular tier. Run 2, the re-run on run 1's committed result: two attempts on the regular tier stopped early on a model safeguard false positive before writing anything, and the third, on the premium tier, completed.

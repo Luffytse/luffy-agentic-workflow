@@ -6,8 +6,14 @@ How this repo versions `dev-skills` and cuts a Release with the `release` skill:
 - **Version file**: `plugins/dev-skills/.claude-plugin/plugin.json`, the `"version"` field. This is the canonical source for reading the current version, and for locating Releases up to 0.25.0 in git history.
 - **Synchronized version copy**: `plugins/dev-skills/.codex-plugin/plugin.json`, the `"version"` field. A bump changes only the version field in both manifests, to the same version. Do not use this copy to locate Release history: its creation introduces the existing version without cutting a Release.
 - **Changelog**: `plugins/dev-skills/CHANGELOG.md`, newest entry first. One entry per Release, covering everything since the last Release, listing the versions it delivered and its start and end commits (its `Versions:` and `Commits:` line).
+- **Versioning policy**: pull requests bump (the **Bump mode** line above is the same fact under its earlier name).
 - **Label prefix**: `release-`.
 - **Release name**: `Milestone <m> · Release <n>`, with the label `release-m<m>-r<n>` (for example `release-m1-r1`) on every issue in it and a release issue titled `Release Milestone <m> · Release <n>`. A Release is named, not numbered; the next Release in the same Milestone raises `<n>`, and a new Milestone starts again at `<n>` = 1. Releases up to 0.25.0 were numbered (`release-X.Y.Z`, titled `Release X.Y.Z`).
+- **Release size**: 10. A Release takes at most 10 items, counted of any kind: a Spec with its Tickets is 1, a lone Ticket is 1, a bug is 1. A severe issue (a security hole, lost data, delivery stopped) joins past the size.
+- **Cut steps**: after the changelog entry is written, in this order:
+  1. Put the line `Versions: <the versions delivered, oldest first, each once, or "none, the version stays X.Y.Z">. Commits: <start>..<end>.` under the entry's goal. The versions delivered are each value the version file reached since the last Release's end commit (the commit its top entry's `Commits:` line ends at).
+  2. Change no version: the changelog pull request leaves both manifests as they are.
+  3. Run the whole-Release check below on that pull request's branch.
 - **Whole-Release check**: on the changelog pull request's branch, run `bash scripts/check-plugin.sh`, `python3 scripts/test-check-plugin.py` and `claude plugin validate .`, then a clean-up pass: search the repo for sentences that wait on an issue this Release closed (such as "until #<n>") and for text its merges left stale. Fix such text outside `plugins/dev-skills/skills/` in the changelog pull request; file stale skill text as an issue for the next Release planning, so the changelog pull request changes no version.
 
 Releases here cover the `dev-skills` plugin only. `dai-portal-data` has no release doc of its own yet, so its version is left as it is.

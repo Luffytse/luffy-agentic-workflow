@@ -1,21 +1,47 @@
 # Releases
 
-How this repo versions and cuts a Release with the `release` skill: where the version lives, who bumps it, where the changelog goes, how Releases and their labels are named, and the whole-Release check.
+How this repo cuts a Release with the `release` skill: how Releases are named and sized, where the changelog goes, what the cut runs, and the repo's versioning policy.
 
-- **Bump mode**: `<Releases bump | pull requests bump>`. _(Releases bump: ordinary pull requests leave the version alone and a Release's bump pull request changes it. Pull requests bump: every pull request that changes `<the files that bump the version>` bumps it as its last commit, with the number given just before merge; a Release opens no bump pull request, and writes its changelog entry in a changelog pull request that changes no version.)_
+- **Versioning policy**: `<none | pull requests bump | Releases bump>`. _(Keep only the matching "Policy:" section below and delete the other two. Delete every italic note in parentheses when you fill this in.)_
+- **Release name**: `<name form, label form and release issue title form, each with <...> placeholders>`. _(A Release is named, never numbered by a version. Default: the name `Release <n>`, the label `release-<n>` and the title `Release <n>`; `<n>` counts up.)_
+- **Release size**: `<number of items>`. _(Default 5. A Release takes at most this many items, counted of any kind: a Spec with its Tickets is 1, a lone Ticket is 1, a bug is 1. A severe issue joins past it.)_
+- **Changelog**: `<path to CHANGELOG.md>`, newest entry first. One entry per Release, covering everything merged since the last Release, with its start and end commits.
+- **Label prefix**: `release-`. _(The label form above starts with it.)_
+- **Cut steps**: what the cut runs after the changelog entry is written, in order; the policy section below adds its own. `<none>` _(List here anything else this repo's cut must change or run. Optionally a between-Releases step, for a fix that cannot wait for the next Release.)_
+- **Whole-Release check**: `<the checks to run on the changelog pull request's branch, and any clean-up pass>`. _(Recommended: the repo's own checks.)_
+
+## Policy: none
+
+_(Keep this section only when the policy is none; otherwise delete it.)_ This repo keeps no version. A Release's changelog entry lists no versions, and no cut step changes a version.
+
+## Policy: pull requests bump
+
+_(Keep this section only when the policy is pull requests bump; otherwise delete it.)_ Each pull request that changes `<the files that bump the version>` bumps the version as its last commit, with the number given as `<how the number is given, for example by the person who merges>`. A Release opens no pull request to bump: its changelog pull request changes no version.
+
 - **Version file**: `<path to the file that holds the version>`, the `<field or line that holds it>`. A bump changes only this value in it.
-- **Changelog**: `<path to CHANGELOG.md>`, newest entry first.
-- **Label prefix**: `release-`. _(When Releases bump, a Release's label is `release-X.Y.Z`, for example `release-1.4.0`, and its release issue is titled `Release X.Y.Z`.)_
-- **Release name**: `<name form, label form and release issue title form, each with <...> placeholders>`. _(Only when pull requests bump: a Release is named, not numbered. For example the name `Phase <n>`, the label `release-p<n>` and the title `Release Phase <n>`. Delete this line when Releases bump.)_
-- **Whole-Release check**: `<the checks to run on the changelog pull request's branch, and any clean-up pass>`. _(Only when pull requests bump. Delete this line when Releases bump.)_
+- **Extra cut step**: the changelog entry carries the line `Versions: <the versions delivered, oldest first, each once, or "none, the version stays X.Y.Z">. Commits: <start>..<end>.` under the goal. The versions delivered are each value the version file reached since the last Release's end commit.
 
-## The bump commit
+### The bump commit
 
-_(Only when pull requests bump; delete this section when Releases bump.)_ The merging thread adds it as the pull request's last commit, just before merge, with the number given as `<how the number is given, for example by the person who merges>`:
+The merging thread adds it as the pull request's last commit, just before merge:
 
 - Change the version in the version file, and nothing else in it.
 - Anything else the bump commit must change or run, such as a second file that repeats the version or a check to run before pushing. None.
 
-## Extra steps in the bump pull request
+## Policy: Releases bump
 
-_(Only when Releases bump; delete this section when pull requests bump.)_ None. _(List here anything else this repo's bump pull request must change or run, such as a second file that repeats the version or a check to run before pushing.)_
+_(Keep this section only when the policy is Releases bump; otherwise delete it.)_ Ordinary pull requests merge to main with no version change. Only a Release's **bump pull request** changes the version, and the user merges it.
+
+- **Version file**: `<path to the file that holds the version>`, the `<field or line that holds it>`. A bump changes only this value in it.
+- **Size of each change**, by what a project using this one must do:
+  - **patch**: a fix. Something now does what it already promised; no project has to change anything.
+  - **minor**: something new that breaks nothing, such as a new command, skill, step or option.
+  - **major**: a breaking change: a project using this one must do something, because a name it calls was renamed or removed, the format of a file it keeps changed, or a label or setting it needs changed.
+  - **rides along**: typos, decision records and repo-only changes (docs, tests, evals and tooling that do not ship) never decide the size.
+- **The new version**: the biggest size among the changes since the last Release, raised on the current version with every part after it set to 0. While the version is below 1.0.0, a breaking change bumps the minor part instead, and the changelog entry gets a "What to do" list for it. 1.0.0 is cut only when the user declares the project stable; never propose it on your own.
+- **Extra cut steps**, in order:
+  1. Read every change since the last Release's end commit, give it a size, and write one line on why for each change above patch.
+  2. Change the version in the version file, and add the changelog entry, whose line under the goal reads `Versions: <the new version>. Commits: <start>..<end>.`
+  3. Open the **bump pull request** with the changelog entry, titled `chore(release): <name>` (or by the repo's own title convention, keeping the name in it). Its body names the release issue, gives the size with the line on why for each change above patch, lists the dropped issues, and asks the user to confirm the size. Its Door is one-way: a cut version reaches every project that installs it.
+  4. The user merges it; never merge it yourself. If the user picks another size, change the version, the entry and the pull request's title, and push again.
+- **Extra steps in the bump pull request**: None. _(List here anything else it must change or run, such as a second file that repeats the version or a check to run before pushing.)_
