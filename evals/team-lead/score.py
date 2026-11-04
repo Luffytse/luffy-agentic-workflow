@@ -75,6 +75,14 @@ def user(blocks):
     return ops(blocks, "Message the user")
 
 
+ABOUT_10 = re.compile(r"10-farewell|farewell|\bSpec 10\b|#?\b10\b")
+
+
+def about_10(b):
+    """A user message that mentions 10 (its file, its name or its number)."""
+    return bool(ABOUT_10.search(b["body"]))
+
+
 def quiet(ev, k, why):
     check(f"event {k}: {why}: a quiet check-in writes nothing", ev.get(k) == [],
           ", ".join(b["op"] for b in ev.get(k, [])) or "event missing")
@@ -208,8 +216,10 @@ def score_stall(ev, lift=False):
     park(ev, 11, "20-")
     quiet(ev, 12, "every feature parked or waiting")
     later = [b for k in ev if 7 <= k <= 12 for b in ev[k]]
-    check("events 7 to 12: nothing written for 10 and the user not told of it again",
-          not any(b["issue"].startswith("10-") for b in later) and not any("10-farewell" in b["body"] for b in user(later)))
+    # A mention of 10 is allowed only inside event 11's one park notice for 20 (park() limits it to one message).
+    others = [b for k in ev if 7 <= k <= 12 and k != 11 for b in user(ev[k])]
+    check("events 7 to 12: nothing written for 10, and no user message about 10 except a mention inside event 11's one park notice for 20",
+          not any(b["issue"].startswith("10-") for b in later) and not any(about_10(b) for b in others))
     if not lift:
         return
     e13 = ev.get(13, [])

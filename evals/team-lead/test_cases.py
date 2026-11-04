@@ -5,8 +5,9 @@ Run: python3 evals/team-lead/test_cases.py
 For each case it builds the fixture, replays a reference run written by hand from the skill text (REFERENCE below),
 event by event as a coordinator would (world.py first, then that event's blocks), checks at every check-in that the
 snapshot command prints the verdicts the case is built to show, and scores the run: the reference must pass, and a
-planted wrong run (a quiet check-in that writes, a takeover before the stop reads back, a pause that starts work) must
-fail. It is not a model run: see evals/team-lead/README.md and RESULTS.md for what that leaves owed.
+planted wrong run (a quiet check-in that writes, a takeover before the stop reads back, a pause that starts work, a
+second user notice about 10 in any wording, even beside other issues) must fail, and a mention of 10 inside the one
+park notice for 20 must pass. It is not a model run: see evals/team-lead/README.md and RESULTS.md for what that leaves owed.
 """
 import pathlib
 import subprocess
@@ -252,6 +253,32 @@ class Cases(unittest.TestCase):
         r = self.replay("deliver", run)
         self.assertEqual(r.returncode, 1, r.stdout)
         self.assertIn("FAIL event 1", r.stdout)
+
+    def test_a_mention_of_10_beside_the_parked_20_passes(self):
+        run = dict(STALL)
+        run[11] = parked("20-quiet.md", "a second stall; with 10-farewell.md also parked, nothing more can start",
+                         "Its stop read back stopped at 15:03Z: no writer remains.")
+        r = self.replay("deliver-stall", run)
+        self.assertEqual(r.returncode, 0, r.stdout)
+
+    def second_notice_fails(self, body):
+        run = dict(STALL)
+        run[10] = STALL[10] + [user(body)]
+        r = self.replay("deliver-stall", run)
+        self.assertEqual(r.returncode, 1, r.stdout)
+        self.assertIn("FAIL events 7 to 12", r.stdout)
+
+    def test_a_second_notice_about_10_fails(self):
+        self.second_notice_fails("10-farewell.md is parked: its stop did not read back.")
+
+    def test_a_second_notice_that_also_names_20_fails(self):
+        self.second_notice_fails("10-farewell.md is parked, and 20-quiet.md is running.")
+
+    def test_a_second_notice_that_names_the_milestone_issue_fails(self):
+        self.second_notice_fails("10-farewell.md is parked: see 00-milestone.md.")
+
+    def test_a_second_notice_without_the_file_name_fails(self):
+        self.second_notice_fails("Spec 10 (farewell) is still parked.")
 
     def test_a_start_while_paused_fails(self):
         run = dict(PAUSE)

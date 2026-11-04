@@ -22,7 +22,7 @@ Delivery is **event-driven**. A wake is a worker reporting or asking, a Harness 
 **Audit trail.** Post each record with **Comment on an issue**, first line `<!-- team-lead <kind> -->`:
 
 - `start`, on the issue the worker builds (a Release worker's on its release issue, or on the Milestone issue when it only plans): the worker's id as `worker-control` returned it, its skill, model tier, Review level if any, start time and session or history reference. A replacement's record adds `Takes over from <worker>; <its stop read back, or its end as read>, at <time>.`
-- `nudge`, `parked` (with the **Park** operation), `pause` and `resume` (on the Milestone issue), `check-in` when it is arranged or ended (the same issue).
+- `nudge` and `parked` (with the **Park** operation), on the issue the worker builds; `pause`, `resume` and `check-in` (when arranged or ended), on the Milestone issue.
 
 Records of the earlier `<!-- milestone ... -->` forms on an issue count as their team-lead counterparts: `delivery thread` as `start` (its second line names the worker), `delivery thread ended` as that worker's end, `nudge`, `stall` (a nudged worker found still silent), `parked`, `park lifted` (the user's lift), `pause` and `resume`, and `check-in`, `check-in ended` and `stand-up` as `check-in`. A worker such a record names is read through `worker-control` like any other: while it reads running, it holds its slot and no second worker starts.
 

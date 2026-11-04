@@ -17,6 +17,21 @@ Pass: yes | no. Not exercised: <what this run did not reach>. Lessons: <what to 
 
 ## Runs
 
+### 2026-11-04, commit `578842d` (`claude/project-thread-l41n5a`), dev-skills 0.71.0 (unbumped): `deliver-stall` and `deliver-lift` after Ticket #654
+
+Run level: decision-level in a subagent
+Runner: the Ticket thread. One fresh premium-tier subagent per case per skill version, each given the checkout's skill text (the branch's, which is `fd2c798`'s `SKILL.md`, unchanged by `578842d`; main's from a `git archive` of `7dc6244`, 0.71.0), the case's fixture prompt and nothing else; `evals/` was kept away from it. Scored with the final `score.py` of `578842d`.
+Ran: `score.py` on each run. Evidence: [`evidence/654/`](evidence/654/), one folder per run with `proposed-actions.md` and `score.txt`. In the copied evidence, the run directory's path reads `<runs>` and model names read `<model>`, so that the `vendor-model-names` check in `scripts/check-plugin.sh` passes. The scores were rerun on the edited files.
+
+| Case | Branch | Main |
+| --- | --- | --- |
+| `deliver-stall` | 28/28 | 28/28 |
+| `deliver-lift` | 37/37 | 37/37 |
+
+Pass: yes. The change is to where the `nudge` and `parked` records go (the worker's issue; the Milestone issue keeps `pause`, `resume` and `check-in`). The branch's four nudge records (two per run) are all on the worker's issue (10-farewell.md, 20-quiet.md). Main's two runs this time also put them on the worker's issue and so passed. The #638 baseline's two main runs put the nudge on the Milestone issue and failed 2 checks each, so the ambiguity in main's line shows in only some runs; this run does not show the change moving a result, and the line's value is that it removes the chance of the other reading.
+The scorer change: the mention rule of the check "events 7 to 12". The scorer on main (before the fix) fails `branch-deliver-stall`, `main-deliver-stall` and `main-deliver-lift`: their event 11 park notice for 20 mentions 10-farewell.md as context ("With 10-farewell.md also parked, ..."). It would pass `branch-deliver-lift`, whose event 11 notice does not mention 10. The final scorer passes all four. The #638 evidence has the same failure ("events 7 to 12" in its `deliver-stall` and `deliver-lift` runs).
+Not exercised: `deliver`, `deliver-pause` and `deliver-earlier` were not re-run. Their `pause`, `resume` and `check-in` records did not move, but `deliver` and `deliver-pause` also check a nudge record on the worker's issue, which the changed line now states, and those two checks were not run against it. Real workers, a real Harness and a real tracker. Case check (premium subagent that did not write the cases): the changed check "events 7 to 12": fix, fixed in `578842d` (the three escapes closed: a repeat notice that also names 20-quiet.md, one that names 00-milestone.md, one with no file name); the mention-beside-20 test: keep; the second-notice test: fix, moved to event 10 with three escape tests added; the `SKILL.md` line: keep, covered by the existing nudge-record checks (events 4 and 9) and the park-record check. Lessons: none.
+
 ### 2026-11-04, commit `0027423` (`ticket-638`), dev-skills 0.61.0 (unbumped): the five delivery dry runs after Ticket #638
 
 Run level: decision-level in a subagent
