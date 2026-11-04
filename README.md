@@ -103,7 +103,7 @@ codex plugin add dev-skills@luffy-dev
 
 Codex loads a cached copy, so after editing the clone, repeat `codex plugin add dev-skills@luffy-dev` and start a new session (restart the desktop app if using it). `marketplace upgrade` applies to Git sources, not local paths. To return to GitHub, remove the local marketplace source, then repeat the Codex install steps above. See the [official packaging docs](https://developers.openai.com/plugins/build/plugins#how-local-marketplaces-work) for local marketplace behavior.
 
-For `dev-skills`, run `scripts/check-plugin.sh` and `claude plugin validate .` before pushing.
+For `dev-skills`, run `scripts/check-plugin.sh`, `scripts/run-tests.sh` (every `test*` file under `evals/` and `scripts/`; a new test joins by its name) and `claude plugin validate .` before pushing.
 
 ## Layout
 

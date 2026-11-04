@@ -17,7 +17,7 @@ Words used here (Finder, Verifier, Finding, Bug class, Review level, Model tier 
 - `release` reads this repo's bump mode ("pull requests bump") and Release name from `docs/dev-skills/release.md`.
 - When a `dev-skills` skill runs in this repo, follow the checkout's copy (`plugins/dev-skills/skills/<name>/`) on main, not the installed one, because main may be ahead of the installed plugin cache. A pull request that changes a skill is reviewed with main's version of that skill unless the pull request says otherwise.
 - Before each push, search the edited file and repository for the changed rule's key terms. For a Shared rule, update its owner, consumers, record shapes and descriptions together, including any unmigrated shared copies. Independent policies may differ. For every changed rule, also resolve contradictions in parallel sentences within the skill and stale repository descriptions in the glossary, ADRs, index, READMEs and checker messages. An "as in step N" reference imports every bullet of that step: read it in the caller's context. Update related text in the same commit; a miss found after pushing gets a new commit. `REVIEW.md` checks the same consistency boundary.
-- Run `claude plugin validate .` (Claude Code's checker for plugin files) before pushing a change to a plugin or to `marketplace.json`.
+- Run `claude plugin validate .` (Claude Code's checker for plugin files) before pushing a change to a plugin or to `marketplace.json`. Run `scripts/run-tests.sh` (every `test*` file under `evals/` and `scripts/`) before pushing a change under `evals/` or `scripts/`.
 
 ## Merge-time steps
 

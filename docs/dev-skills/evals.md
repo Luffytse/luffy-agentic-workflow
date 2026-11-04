@@ -8,7 +8,7 @@ How this repo tests a change to skill text: three layers, each with its own job,
 
 ## Three layers
 
-- **CI**: questions with one right answer from the files, answered by a script with no model, on every pull request. Today the workflow runs `scripts/check-plugin.sh` and `claude plugin validate .`; every deterministic test (fixture self-tests, scorer tests, the checker's own tests) joins it with the test runner of Ticket #627, and until that lands each eval README says how to run its tests by hand. A check tests structure, never a skill's wording, so rewording a skill never fails CI.
+- **CI**: questions with one right answer from the files, answered by a script with no model, on every pull request. The workflow runs `scripts/check-plugin.sh` and `claude plugin validate .`; every deterministic test (fixture self-tests, scorer tests, the checker's own tests) is run by `scripts/run-tests.sh`, which finds each `test*` file under `evals/` and `scripts/` by its name (Ticket #627). The workflow step that calls it is committed by hand, and until it is in the workflow CI does not run those tests, so run `scripts/run-tests.sh` before pushing. A check tests structure, never a skill's wording, so rewording a skill never fails CI.
 - **Eval**: what a skill makes an agent do. A fresh agent runs the skill on a fixture; its output is scored by scripts first, and by a judge only for what scripts cannot see. Each skill's cases live in `evals/<skill>/`, whose README names each case's run level and tier.
 - **Review**: judgement on the text, by `agentic-review` with this repo's [REVIEW.md](../../REVIEW.md). It reviews eval files like any other file.
 
