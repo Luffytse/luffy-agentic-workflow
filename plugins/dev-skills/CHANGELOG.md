@@ -2,6 +2,21 @@
 
 What each version of `dev-skills` brought, newest first. Each pull request that changes a skill bumps the version, and each Release adds one entry here covering everything since the last Release: its goal, the versions it delivered, the issues it shipped, and what a project using the plugin must do when something breaks. Entries up to 0.25.0 are one per version, when only a Release bumped it.
 
+## Milestone 1 · Release 9 (2026-11-04)
+
+Release planning checks every open issue against main, `release` handles its empty and carried-over cases, and the team-lead eval, the Verifier-alone brief and `implement-spec`'s cleanup agree with their own rules.
+
+Versions: 0.72.0, 0.73.0, 0.73.1, 0.74.0, 0.75.0, 0.75.1. Commits: b64f8f9..0867a6b.
+
+- Release planning reads every open issue against main and records a verdict for each before ranking (#670)
+- `release` opens no release issue when the ranked list is empty (#652)
+- Carried-over issues get a fixed section in the release issue that step 5 reads (#653)
+- `team-lead` nudge records go on the worker's issue, and its eval fails only a second notice (#654)
+- The Verifier-alone brief carries the meaning of Important and the Skip list (#664)
+- `implement-spec` step 9 keeps the Ticket branch of an unlanded waiting ticket (#666)
+
+Also merged: CI runs `scripts/run-tests.sh`, committed by hand (7dc6244).
+
 ## Milestone 1 · Release 8 (2026-11-04)
 
 Release planning, merging, and skill testing now follow one agreed path: a version-free, command-free `release` that ranks its picks, one `merging` Base skill, CI and evals that test skill changes, a script that builds the review briefs, and command-free, tracker-neutral skills with shorter descriptions.
