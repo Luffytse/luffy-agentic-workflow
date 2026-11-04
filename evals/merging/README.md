@@ -1,6 +1,6 @@
 # merging eval
 
-Behaviour checks of the `merging` Base skill (`plugins/dev-skills/skills/merging/`), the finish of a pull request that `implement` step 7 loads: who merges (from the Boundary record only, empty when missing), the `Agent-merged rules:` line, what the user is told, the repo's merge-time steps (a version bump only where the repo's release doc gives one), the merge with the caller's method, and closing issues only after the merge is confirmed on the tracker. Each case watches what a Ticket thread does on a fixture; none reads the skill's sentences, so rewording the skill never fails a case. Each run gets an entry in [RESULTS.md](RESULTS.md).
+Behaviour checks of the `merging` Base skill (`plugins/dev-skills/skills/merging/`), the finish of a pull request that `implement` step 7, `implement-spec` step 8 and `release` (its changelog pull request) load: who merges (from the Boundary record only, empty when missing), the `Agent-merged rules:` line, what the user is told, the repo's merge-time steps (a version bump only where the repo's release doc gives one), the merge with the caller's method, and closing issues only after the merge is confirmed on the tracker. Each case watches what a Ticket thread does on a fixture; none reads the skill's sentences, so rewording the skill never fails a case. Each run gets an entry in [RESULTS.md](RESULTS.md).
 
 ## Run level
 

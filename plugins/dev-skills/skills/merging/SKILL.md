@@ -22,7 +22,7 @@ The caller names:
 
 Read the Boundary record (`docs/dev-skills/boundaries.md`). With no Boundary record, read an empty one: no irreversible action is allowed to agents and no action needs the user's approval. The record applies exactly as written to every pull request, inside a Milestone or not; it is the only source of boundaries (a Milestone issue holds none of its own).
 
-Something **crosses a boundary** when it takes, or its merge would take, an action the Boundary record says needs the user's approval; or when its Door is one-way and the record does not allow agents to take each of its irreversible actions. A fix, a design answer or a bug Ticket crosses a boundary the same way a pull request does.
+Something **crosses a boundary** when it takes, or its merge would take, an action the Boundary record says needs the user's approval; or when its Door is one-way and the record does not allow agents to take each of its irreversible actions; or when it goes past a budget or other limit the record sets. A fix, a design answer or a bug Ticket crosses a boundary the same way a pull request does.
 
 Bring the pull request to the user, and do not merge it, only if any of these holds:
 

@@ -40,7 +40,7 @@ Adversarial Finders get no Always check lines; the standards Finder gets only th
 
 ## Stopping for a person
 
-The review stops for a person only when a fix, a design answer, a bug Ticket or the merge would cross something the project's **Boundary record** lists. The Round comment's Result then reads `waiting on a boundary: <what would be crossed>` until the user's answer clears it; a resumed session asks for that answer if none is on the pull request, then continues the step that was waiting. Nothing else in the review stops for the user; the build skills' own merge lists (ADR 0004) still decide who merges.
+The review stops for a person only when a fix, a design answer, a bug Ticket or the merge would cross a boundary as the `merging` skill defines it (an action the project's **Boundary record** says needs the user's approval, a one-way door it does not allow agents, or a limit or budget it sets). The Round comment's Result then reads `waiting on a boundary: <what would be crossed>` until the user's answer clears it; a resumed session asks for that answer if none is on the pull request, then continues the step that was waiting. Nothing else in the review stops for the user; the build skills' own merge lists (ADR 0004) still decide who merges.
 
 ## Records
 

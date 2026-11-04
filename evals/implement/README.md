@@ -4,7 +4,7 @@ Build-flow checks of `implement`. Each run gets an entry in [RESULTS.md](RESULTS
 
 ## Merge-authority check
 
-Does the Ticket thread read the Boundary record (empty when there is none) with one merge rule, whatever the ticket's labels, inside a Milestone or not, and then merge (with the `Agent-merged rules:` line when it changes a rules file or carries a design answer) or bring the pull request to the user, naming what stops it?
+Does the Ticket thread, through `merging`, read the Boundary record (empty when there is none) with one merge rule, whatever the ticket's labels, inside a Milestone or not, and then merge (with the `Agent-merged rules:` line when it changes a rules file or carries a design answer) or bring the pull request to the user, naming what stops it?
 
 ### Fixture
 

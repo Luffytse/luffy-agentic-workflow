@@ -87,7 +87,7 @@ On a re-run over a release doc that has a "Bump mode" line and no versioning pol
 
 > Which actions must come to you for approval, for example deleting production or customer data? (recommended: **none** for a repo with no data of value, else ask the user to name them)
 
-An empty answer to the second question is valid. The build skills read this record in place of a fixed list when they decide who merges, for every pull request, so never add actions the user did not name.
+An empty answer to the second question is valid. `merging` reads this record in place of a fixed list when it decides who merges, for every pull request, so never add actions the user did not name.
 
 > Is there a budget agents must stay within, such as a paid service, an API quota or a token limit? (recommended: **none**)
 

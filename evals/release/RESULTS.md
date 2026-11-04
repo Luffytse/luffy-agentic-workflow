@@ -15,6 +15,13 @@ Pass: yes | no. Lessons: <what to change in release, if anything>
 
 ## Runs
 
+### 2026-11-04, branch `ticket-644` (Spec #641, Ticket #644), dev-skills 0.62.0 (base, Spec branch commit fff4fb0): model runs OWED
+
+Setup: step 4 of `release` now merges the changelog pull request by loading `merging` (its checks passing make it ready; fetching main and redoing the end commit, entry, cut steps and check when main moved past the end commit is `release`'s own pre-merge step), and "Before you start" no longer reads the Boundary record itself. Only the self-test was run: `python3 evals/release/ranked-pick/test_cases.py` passes (8 tests, no model session).
+Steps: no ranked-pick case was run on the branch's skill or on main's; the cut cases `no-version` and `old-shape-cut` are the ones this change can affect.
+Not exercised: every model run. OWED: the nine ranked-pick cases on this branch's skills and on main's, at the premium tier, decision-level in a subagent, recorded here with commit and plugin version.
+Pass: not claimed. Lessons: none yet.
+
 ### 2026-11-04, branch `review-fix` (Spec #633 Round 1 fixes, base 3e9653c), dev-skills 0.61.0 (base): `old-shape-cut`
 
 Setup: the new ranked-pick case `old-shape-cut` (R1-1 of PR #651's Round 1): `no-version`'s fixture with the open Release 2 (#2) written before the Order list (`**Cap:**` line, `## Scope` list, no `## Order`), its issues #10 and #20 labelled `release-2` and closed by merged pull requests.

@@ -20,7 +20,7 @@ Releases here cover the `dev-skills` plugin only. `dai-portal-data` has no relea
 
 ## The bump at merge
 
-A merge-time step, which the merging thread takes when the `merging` skill runs the repo's merge-time steps (`implement-spec` states the same step in its own step 8 until it loads `merging`): just before the merge of each pull request that changes a file under `plugins/dev-skills/skills/`, the user's merge too. A pull request that changes no such file gets no number and no bump.
+A merge-time step, which the merging thread takes when the `merging` skill runs the repo's merge-time steps (`implement`, `implement-spec` and `release` load `merging` at their merge step): just before the merge of each pull request that changes a file under `plugins/dev-skills/skills/`, the user's merge too. A pull request that changes no such file gets no number and no bump.
 
 1. Get the next version number just before the merge, from the coordinator as "Version hand-out" below says, and wait for it.
 2. Have the committer the merge names (an Implementer of the merging thread) add the bump as the pull request's last commit, with "The bump commit" steps below, and push.
