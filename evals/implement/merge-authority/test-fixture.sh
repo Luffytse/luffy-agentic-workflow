@@ -81,5 +81,7 @@ done
 [ -f "$skills/merging/SKILL.md" ] || bad "merging: no SKILL.md"
 grep -q '`merging`' "$skills/implement/SKILL.md" || bad "implement: SKILL.md does not load merging"
 grep -qE 'Read the Boundary record|gh (pr|api)[^`]*merge|Bump the version' "$skills/implement/SKILL.md" && bad "implement: SKILL.md keeps its own Boundary reading, bump step or merge command"
+grep -q '`merging`' "$skills/implement-spec/SKILL.md" || bad "implement-spec: SKILL.md does not load merging"
+grep -qE 'Read the Boundary record|gh (pr|api)[^`]*merge|Bump the version' "$skills/implement-spec/SKILL.md" && bad "implement-spec: SKILL.md keeps its own Boundary reading, bump step or merge command"
 rm -rf "$out"
 [ "$fail" = 0 ] && echo "OK: merge-authority fixtures" || exit 1
