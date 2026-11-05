@@ -263,7 +263,7 @@ class SkillLoadingPackaging(unittest.TestCase):
     def test_codex_marketplace_offering_a_second_plugin_fails(self):
         path = self.repo / ".agents/plugins/marketplace.json"
         data = json.loads(path.read_text())
-        data["plugins"].append(dict(data["plugins"][0], name="dai-portal-data"))
+        data["plugins"].append(dict(data["plugins"][0], name="other-plugin"))
         path.write_text(json.dumps(data))
         self.fails_with("Codex marketplace must offer only dev-skills")
 

@@ -1,8 +1,7 @@
-# luffy-dev-skills
+# luffy-agentic-workflow
 
-A Claude Code and Codex plugin marketplace, named `luffy-dev`. Each plugin lives under `plugins/<name>/`. The Claude Code catalog, `.claude-plugin/marketplace.json`, lists both plugins; the Codex catalog, `.agents/plugins/marketplace.json`, lists only `dev-skills`.
+A Claude Code and Codex plugin marketplace, named `luffy-agentic-workflow`, holding one plugin, `dev-skills`, under `plugins/dev-skills/`. Both catalogs, `.claude-plugin/marketplace.json` and `.agents/plugins/marketplace.json`, list only `dev-skills`. This repo is public; its history was rewritten when it left the private archive `Luffytse/luffy-dev-skills` (ADR 0014).
 
-- `dai-portal-data`: tooling for the local DAI Portal Postgres database.
 - `dev-skills`: the development skill set used across projects, skills that began as Matt Pocock's, now our own, plus our own review pipeline. See `docs/dev-skills/adr/`.
 
 Words used here (Finder, Verifier, Finding, Bug class, Review level, Model tier and so on) are defined in `docs/dev-skills/glossary.md`. Decisions are in `docs/dev-skills/adr/`. Start at `docs/dev-skills/index.md`, which says which doc to read for what.

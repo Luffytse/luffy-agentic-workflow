@@ -1,16 +1,11 @@
 {
-  "name": "luffy-dev",
+  "name": "luffy-agentic-workflow",
   "owner": {
     "name": "lufei.xie",
     "email": "12742482+Luffytse@users.noreply.github.com"
   },
-  "description": "Personal Claude Code plugin marketplace — internal tooling and project-specific skill bundles.",
+  "description": "Plugin marketplace for the dev-skills agentic development workflow.",
   "plugins": [
-    {
-      "name": "dai-portal-data",
-      "source": "./plugins/dai-portal-data",
-      "description": "Local DAI Portal Postgres docker lifecycle commands and a verified query cookbook against the example_db schema."
-    },
     {
       "name": "dev-skills",
       "source": "./plugins/dev-skills",

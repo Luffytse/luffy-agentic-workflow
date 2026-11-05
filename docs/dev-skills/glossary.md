@@ -1,11 +1,11 @@
-# luffy-dev-skills
+# luffy-agentic-workflow
 
 A plugin marketplace: the skills coding agents use, packaged so every project and every agent session can load them.
 
 ## Packaging
 
 **Marketplace**:
-The catalog in this repo (`luffy-dev`) that lists the plugins an agent can install.
+The catalog in this repo (`luffy-agentic-workflow`) that lists the plugins an agent can install.
 _Avoid_: store, registry
 
 **Plugin**:
