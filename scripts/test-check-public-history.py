@@ -23,6 +23,8 @@ SESSION_LINK = "https://" + "claude.ai/code/" + "session_01" + "AbCdEfGhIjKlMnOp
 HOME_PATH = "/" + "Users/patmac" + "/work/notes.md"
 PLUGIN_DIR = "plugins/" + "dai-portal-data"
 DB_NAME = "dai" + "_widgets_dev"
+CSE_ID = "cse_01" + "AbCdEfGhIjKlMnOpQrStUv"
+TRIG_ID = "trig_01" + "AbCdEfGhIjKlMnOpQrStUv"
 
 
 def git(repo, *args, env=None, check=True):
@@ -129,6 +131,39 @@ class CheckPublicHistory(unittest.TestCase):
         self.assert_fails_naming(sha, "session link")
         sha2 = self.repo.commit("docs: r2\n", {"r2.md": "session `" + SESSION_LINK.rsplit("/", 1)[1] + "`\n"})
         self.assert_fails_naming(sha2, "session link")
+
+    def test_code_session_and_trigger_ids_fail(self):
+        sha = self.repo.commit("docs: r\n", {"r.md": "session `" + CSE_ID + "` done\n"})
+        self.assert_fails_naming(sha, "session link")
+        sha2 = self.repo.commit("chore: t\n\nFired by trigger " + TRIG_ID + ".\n", {"t.md": "t\n"})
+        self.assert_fails_naming(sha2, "session link")
+
+    def test_root_commit_is_scanned_whatever_the_user_config(self):
+        repo = Repo(self.root / "rooted")
+        sha = repo.commit("add plugin\n", {PLUGIN_DIR + "/README.md": "plugin\n"})
+        repo.commit("drop plugin\n", remove=[PLUGIN_DIR])
+        env = dict(os.environ, GIT_CONFIG_COUNT="2", GIT_CONFIG_KEY_0="log.showRoot", GIT_CONFIG_VALUE_0="false",
+                   GIT_CONFIG_KEY_1="log.diffMerges", GIT_CONFIG_VALUE_1="first-parent")
+        result = subprocess.run([sys.executable, str(CHECK), "--repo", str(repo.path)], text=True,
+                                capture_output=True, env=env)
+        out = result.stdout + result.stderr
+        self.assertEqual(result.returncode, 1, out)
+        self.assertTrue(any(line.startswith("FAIL " + sha) and "dai-portal path" in line
+                            for line in out.splitlines()), out)
+
+    def test_counts_of_derived_values_are_printed_and_zero_emails_warn(self):
+        result = run_check(self.repo.path)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("derived 0 personal emails, 0 hostnames, 0 database names, 0 terms", result.stdout)
+        self.assertIn("WARNING", result.stdout)
+        self.assertIn("--source", result.stdout)
+        source = Repo(self.root / "source")
+        source.commit("init\n", {"x": "x\n"}, author="Pat <" + PERSONAL_EMAIL + ">")
+        result = run_check(self.repo.path, "--source", str(source.path))
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("derived 1 personal emails,", result.stdout)
+        self.assertNotIn("WARNING", result.stdout)
+        self.assertNotIn(PERSONAL_EMAIL, result.stdout)
 
     def test_project_link_in_a_commit_message_fails(self):
         link = "https://" + "claude.ai/code/" + "project/chan_01AbCdEfGhIjKlMnOp"

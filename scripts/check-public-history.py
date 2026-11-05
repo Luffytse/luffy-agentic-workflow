@@ -8,13 +8,16 @@ the commit and what it found, on:
     noreply@github.com, any *@users.noreply.github.com, Anthropic's noreply@anthropic.com), and any known
     personal email in a commit message or file;
   - hostname: an email at a Mac's .local hostname, and any known such hostname, in a message or file;
-  - session link: a claude.ai session, project, chat or share link, a bare claude.ai session id, or a
-    Claude session trailer line, in a message or file (the bare https://claude.ai/code link is fine);
+  - session link: a claude.ai session, project, chat or share link, a bare claude.ai session id, a Claude
+    Code session id (cse_ and 01) or trigger id (trig_ and 01), or a Claude session trailer line, in a
+    message or file (the bare https://claude.ai/code link is fine);
   - home path: a macOS home-folder path (the Users folder, a name, a slash) in a message or file;
   - private term: a database name of the dai-portal-data plugin, or a term from --terms, in a message or
     file outside that plugin's folder.
 It passes on a clean history and prints PASS with the counts. Each unique blob is read once (git cat-file
---batch), and a file finding names the oldest commit that brought that blob in, with its path.
+--batch), and a file finding names the oldest commit that brought that blob in, with its path. Its git log
+runs with --root and --diff-merges=separate, so a user's log.showRoot or log.diffMerges setting cannot hide
+a commit's files.
 
 Where the private values come from. This file is published with the history it guards, so it holds no
 personal email, Mac user or host name and no database name, and its own patterns are written so that they
@@ -26,6 +29,10 @@ derived at run time, from the checked repo itself and from each --source repo (t
     folder's name up to its first hyphen) in any file the plugin folder ever held;
   - anything else: a local terms file passed as --terms, one literal per line, # for comments, matched
     without regard to case. Keep it outside the repo; never commit it.
+It prints how many values of each kind it derived (never the values). A repo that is already rewritten
+holds no personal email of its own, so a check of it (the public repo, say) needs --source pointing at a
+full clone of the private, unrewritten repo; without one it derives no personal emails and cannot find
+them in files or messages, and it prints a WARNING (the exit code is unchanged).
 
 Usage: scripts/check-public-history.py [--repo DIR] [--ref REF ...] [--source DIR ...] [--terms FILE]
 Exit codes: 0 clean, 1 findings, 2 usage or git error.
@@ -43,9 +50,12 @@ MAX_LINES = 300
 # Generic patterns, matched against commit messages and file contents (bytes).
 SESSION_PATTERNS = [
     re.compile(rb"claude\.ai/(?:code/)?(?:session_|sessions/|projects?/|chat/|share/)[^\s)\]>\"'`]*", re.I),
-    re.compile(rb"\bsession_01[A-Za-z0-9]{20,}"),
     re.compile(rb"\bclaude-session[ \t]*:", re.I),
 ]
+# Bare ids, by prefix; the rewrite turns each into <prefix>_REMOVED.
+ID_PATTERNS = {prefix: re.compile(rb"\b" + prefix.encode() + rb"_01[A-Za-z0-9]{20,}")
+               for prefix in ("session", "cse", "trig")}
+SESSION_PATTERNS += list(ID_PATTERNS.values())
 HOME_PATTERN = re.compile(rb"[/]Users[/][^/\s]+[/]")
 LOCAL_EMAIL_PATTERN = re.compile(rb"[\w.+-]+@[\w-]+(?:\.[\w-]+)*\.local\b", re.I)
 IDENT_LINE = re.compile(rb"^(author|committer|tagger) (.*?) <([^>]*)>", re.M)
@@ -90,7 +100,7 @@ def list_commits(repo, refs):
 def blob_origins(repo, refs):
     """Map each blob to the oldest commit (and path) whose diff brought it in, and list plugin paths."""
     out = git(repo, "-c", "core.quotePath=false", "log", *rev_args(refs), "--raw", "-z", "--no-abbrev",
-              "--no-renames", "-m", "--format=%x01%H", "--")
+              "--no-renames", "--root", "--diff-merges=separate", "--no-show-signature", "--format=%x01%H", "--")
     origins, plugin_paths = {}, {}
     commit, meta = None, None
     for token in out.split(b"\0"):
@@ -165,14 +175,25 @@ def scan_text(content, term_patterns, skip_terms=False):
                 yield kind, m.group(0)
 
 
-def check(repo, refs=None, sources=(), terms_file=None):
-    """Return (findings, commit count, blob count). A finding is (commit, where, kind, detail)."""
+def private_values(repo, refs=None, sources=(), terms_file=None):
+    """The private values to look for: derived from the repo and each source, plus the --terms file.
+
+    Returns (terms, counts): terms maps kind -> set of literals; counts names how many of each were found."""
     terms = derive_terms(repo, refs)
     for source in sources:
         for kind, values in derive_terms(source).items():
             terms[kind] |= values
-    if terms_file:
-        terms["private term"] |= read_terms_file(terms_file)
+    extra = read_terms_file(terms_file) if terms_file else set()
+    counts = {"personal emails": len(terms["personal email"]), "hostnames": len(terms["hostname"]),
+              "database names": len(terms["private term"]), "terms": len(extra)}
+    terms["private term"] |= extra
+    return terms, counts
+
+
+def check(repo, refs=None, sources=(), terms_file=None, terms=None):
+    """Return (findings, commit count, blob count). A finding is (commit, where, kind, detail)."""
+    if terms is None:
+        terms, _ = private_values(repo, refs, sources, terms_file)
     term_patterns = compile_terms(terms)
     findings = []
 
@@ -213,7 +234,14 @@ def main(argv=None):
     parser.add_argument("--terms", help="a local file of extra private terms, one per line")
     args = parser.parse_args(argv)
     try:
-        findings, commits, blobs = check(args.repo, args.ref, args.source, args.terms)
+        terms, counts = private_values(args.repo, args.ref, args.source, args.terms)
+        print("Private values: derived " + ", ".join(f"{n} {kind}" for kind, n in counts.items())
+              + " from --terms (values not printed).")
+        if counts["personal emails"] == 0:
+            print("WARNING: derived 0 personal emails. If this repo is already rewritten, pass --source "
+                  "pointing at a full clone of the private, unrewritten repo, or personal emails in files and "
+                  "messages go unfound.")
+        findings, commits, blobs = check(args.repo, args.ref, terms=terms)
     except (GitError, OSError) as error:
         print(f"ERROR: {error}", file=sys.stderr)
         return 2

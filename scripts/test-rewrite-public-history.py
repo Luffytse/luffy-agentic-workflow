@@ -45,9 +45,11 @@ def seed(root):
                {"README.md": "Hi, the `" + DB + "` schema. Mail " + helpers.PERSONAL_EMAIL + "\n"},
                author=helpers.CLAUDE, committer=MAC)
     src.commit("chore: drop plugin\n", remove=[PLUGIN], author=MAC, committer="GitHub <noreply@github.com>")
-    src.commit("docs: evidence\n\nPlanned in [the thread](" + PROJECT_LINK + ").\n\n" + CO_AUTHOR + "\n",
+    src.commit("docs: evidence\n\nPlanned in [the thread](" + PROJECT_LINK + ").\nTrigger " + helpers.TRIG_ID
+               + ".\n\n" + CO_AUTHOR + "\n",
                {"evals/r.md": "Run in " + helpers.HOME_PATH + "\n" + helpers.SESSION_LINK + "\n"
-                + "_Made by [Claude Code](" + helpers.SESSION_LINK + ")_ in session `" + SESSION_ID + "`.\n"},
+                + "_Made by [Claude Code](" + helpers.SESSION_LINK + ")_ in session `" + SESSION_ID + "`.\n"
+                + "Code session `" + helpers.CSE_ID + "`, trigger " + helpers.TRIG_ID + ".\n"},
                author=helpers.OWNER, committer="GitHub <noreply@github.com>")
     git(src.path, "tag", "v1")
     git(src.path, "branch", "side")
@@ -99,7 +101,8 @@ class RewritePublicHistory(unittest.TestCase):
         msgs = messages(self.work)
         self.assertEqual(msgs[0].strip(), "feat: add plugin")
         self.assertEqual(msgs[1].strip(), "docs: readme\n\nUses the example_db schema.\n\n" + CO_AUTHOR)
-        self.assertEqual(msgs[2].strip(), "docs: evidence\n\nPlanned in [the thread](https://claude.ai/code).\n\n"
+        self.assertEqual(msgs[2].strip(), "docs: evidence\n\nPlanned in [the thread](https://claude.ai/code).\nTrigger trig_REMOVED."
+                         "\n\n"
                          + CO_AUTHOR)
         idents = set(git(self.work, "log", "--format=%an <%ae>%n%cn <%ce>", "main").splitlines())
         self.assertEqual(idents, {"Claude <noreply@anthropic.com>", "GitHub <noreply@github.com>",
@@ -108,7 +111,7 @@ class RewritePublicHistory(unittest.TestCase):
                          "Hi, the `example_db` schema. Mail " + OWNER_EMAIL)
         self.assertEqual(git(self.work, "show", "main:evals/r.md"),
                          "Run in ~/work/notes.md\n_Made by [Claude Code](https://claude.ai/code)_ in session "
-                         "`session_REMOVED`.")
+                         "`session_REMOVED`.\nCode session `cse_REMOVED`, trigger trig_REMOVED.")
         self.assertNotIn(PLUGIN, git(self.work, "log", "--name-only", "--format=", "main"))
 
     def test_push_sends_only_main(self):

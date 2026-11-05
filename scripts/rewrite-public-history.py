@@ -12,7 +12,8 @@ git filter-repo:
   - in commit messages and in text files: replaces each personal email with that no-reply address, each Mac
     hostname with my-mac and each dai-portal database name with example_db; deletes Claude session trailer
     lines and lines that hold only a claude.ai session or project link; turns any other such link into the
-    bare https://claude.ai/code link and a bare session id into session_REMOVED; rewrites home-folder paths
+    bare https://claude.ai/code link and a bare session, Claude Code session (cse_) or trigger (trig_) id
+    into session_REMOVED, cse_REMOVED or trig_REMOVED; rewrites home-folder paths
     (the Users folder, a name, a slash) to ~/; replaces each --terms entry with [removed]. Every other line
     of a message is kept, Co-Authored-By lines included.
 Then it runs scripts/check-public-history.py on the result's main, with the private values of the source,
@@ -111,7 +112,7 @@ def replace_rules(terms, extra_terms):
     rules.append(rule(r"(?m)^[ \t]*(?:https?://)?" + link + r"[ \t]*(?:\r?\n|\Z)", ""))
     rules.append(rule(r"(?mi)^[ \t]*claude-session[ \t]*:[^\n]*(?:\n|\Z)", ""))
     rules.append(rule(r"(?:https?://)?" + link, "https://claude.ai/code"))
-    rules.append(rule(check.SESSION_PATTERNS[1].pattern, "session_REMOVED"))
+    rules += [rule(pattern.pattern, prefix + "_REMOVED") for prefix, pattern in check.ID_PATTERNS.items()]
     rules.append(rule(check.HOME_PATTERN.pattern, "~/"))
     return rules
 
