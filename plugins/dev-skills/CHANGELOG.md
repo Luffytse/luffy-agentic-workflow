@@ -4,7 +4,7 @@ What each version of `dev-skills` brought, newest first. Each pull request that 
 
 ## Move to a public repo (2026-11-05)
 
-`dev-skills` moved to its own repo, `Luffytse/luffy-agentic-workflow`, with a rewritten history (ADR 0014). Issue and pull request numbers up to #720 in this changelog and in the docs refer to the private archive `Luffytse/luffy-dev-skills`, and the commits recorded on past Releases' `Commits:` lines are the archive's IDs, which do not resolve here. The marketplace is now `luffy-agentic-workflow`: a project that installed `dev-skills@luffy-dev` adds the new marketplace and installs `dev-skills@luffy-agentic-workflow`. No skill text changed.
+`dev-skills` moved to its own repo, `Luffytse/luffy-agentic-workflow`, with a rewritten history (ADR 0014). Bare issue and pull request numbers in text written before the move on 2026-11-05 (ADRs 0001 to 0013, changelog entries before the move entry, eval results and evidence, and the issues moved from the archive, which link their original) refer to the private archive `Luffytse/luffy-dev-skills`; from the move on, a bare number means this repo's issue, and a reference to an archive issue is written in full as `Luffytse/luffy-dev-skills#<n>`. The commits recorded on past Releases' `Commits:` lines are the archive's IDs, which do not resolve here. The marketplace is now `luffy-agentic-workflow`: a project that installed `dev-skills@luffy-dev` adds the new marketplace and installs `dev-skills@luffy-agentic-workflow`. No skill text changed.
 
 Versions: none, the version stays 1.0.0.
 
