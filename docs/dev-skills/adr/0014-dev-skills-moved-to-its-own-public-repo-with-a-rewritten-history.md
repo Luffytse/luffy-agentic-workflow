@@ -26,3 +26,4 @@ On 2026-11-05 `dev-skills` moved out of the private repo `Luffytse/luffy-dev-ski
 - `dai-portal-data` is no longer in this repo's catalogs, docs or checker; it lives on only in the private archive.
 - The rewrite and check scripts stay in the repo as the record of how the history was made.
 - Reading an old issue number needs the archive; the docs index and changelog say so.
+- The repo was recreated once, on 2026-11-05, before it went public: the merges of its first two pull requests had been stamped with the owner's account email, so main was rewritten again and pushed to a new, empty repo of the same name. The commits titled `(#12)` and `(#13)` name pull requests of that first copy, which no longer exist; this repo's own pull requests restart above them. A merge here must be made from an account whose GitHub email is private, and `scripts/check-public-history.py` runs on main before any change of visibility.
