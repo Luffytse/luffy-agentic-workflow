@@ -1,6 +1,6 @@
 # Issue tracker: GitHub
 
-Issues and specs for this repo live as GitHub issues in [`Luffytse/luffy-dev-skills`](https://github.com/Luffytse/luffy-dev-skills). Use the `gh` CLI for all operations. A session without `gh` (some cloud sessions) does the same operations with the GitHub tools it has.
+Issues and specs for this repo live as GitHub issues in [`Luffytse/luffy-agentic-workflow`](https://github.com/Luffytse/luffy-agentic-workflow). Use the `gh` CLI for all operations. A session without `gh` (some cloud sessions) does the same operations with the GitHub tools it has.
 
 Some cloud sessions have `gh` but no GraphQL: `gh repo view`, `gh issue view`, `gh issue list` and the other `gh issue` subcommands, and `gh label list`, fail with "GraphQL is not available". `gh api repos/<owner>/<repo>/...` (REST) still works, so each operation below also gives its REST route; use that route there, or the session's GitHub tools.
 

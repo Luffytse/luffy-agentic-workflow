@@ -1,7 +1,7 @@
 {
-  "name": "luffy-dev",
+  "name": "luffy-agentic-workflow",
   "interface": {
-    "displayName": "luffy-dev"
+    "displayName": "luffy-agentic-workflow"
   },
   "plugins": [
     {

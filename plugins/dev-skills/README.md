@@ -9,15 +9,15 @@ The development skills as one plugin for Claude Code and Codex: the path from `w
 From inside Claude Code:
 
 ```
-/plugin marketplace add https://github.com/Luffytse/luffy-dev-skills
-/plugin install dev-skills@luffy-dev
+/plugin marketplace add https://github.com/Luffytse/luffy-agentic-workflow
+/plugin install dev-skills@luffy-agentic-workflow
 ```
 
 Or from the shell:
 
 ```bash
-claude plugin marketplace add https://github.com/Luffytse/luffy-dev-skills
-claude plugin install dev-skills@luffy-dev
+claude plugin marketplace add https://github.com/Luffytse/luffy-agentic-workflow
+claude plugin install dev-skills@luffy-agentic-workflow
 ```
 
 Skills are namespaced, for example `dev-skills:wayfinder`. For a Claude project, add the plugin in Project settings.
@@ -27,9 +27,9 @@ Skills are namespaced, for example `dev-skills:wayfinder`. For a Claude project,
 From the shell (verified with Codex CLI `0.166.0-alpha.5.1`):
 
 ```bash
-codex plugin marketplace add https://github.com/Luffytse/luffy-dev-skills
-codex plugin add dev-skills@luffy-dev
-codex plugin list --marketplace luffy-dev --json
+codex plugin marketplace add https://github.com/Luffytse/luffy-agentic-workflow
+codex plugin add dev-skills@luffy-agentic-workflow
+codex plugin list --marketplace luffy-agentic-workflow --json
 ```
 
 The list should show `dev-skills` installed and enabled. Start a new Codex session to load the skills. Both agents use the same `skills/` tree.
@@ -39,16 +39,16 @@ The list should show `dev-skills` installed and enabled. Start a new Codex sessi
 For Claude Code:
 
 ```bash
-/plugin marketplace update luffy-dev
+/plugin marketplace update luffy-agentic-workflow
 # Or from the shell:
-claude plugin marketplace update luffy-dev
+claude plugin marketplace update luffy-agentic-workflow
 ```
 
 For Codex with the GitHub marketplace:
 
 ```bash
-codex plugin marketplace upgrade luffy-dev
-codex plugin add dev-skills@luffy-dev
+codex plugin marketplace upgrade luffy-agentic-workflow
+codex plugin add dev-skills@luffy-agentic-workflow
 ```
 
 Start a new Codex session after updating (restart the desktop app if using it).
@@ -58,20 +58,20 @@ Start a new Codex session after updating (restart the desktop app if using it).
 For Claude Code:
 
 ```bash
-claude plugin marketplace add /path/to/luffy-dev-skills
-claude plugin install dev-skills@luffy-dev
+claude plugin marketplace add /path/to/luffy-agentic-workflow
+claude plugin install dev-skills@luffy-agentic-workflow
 ```
 
 For Codex:
 
 ```bash
-# If luffy-dev is already configured from GitHub, remove that source first:
-codex plugin marketplace remove luffy-dev
-codex plugin marketplace add /path/to/luffy-dev-skills
-codex plugin add dev-skills@luffy-dev
+# If luffy-agentic-workflow is already configured from GitHub, remove that source first:
+codex plugin marketplace remove luffy-agentic-workflow
+codex plugin marketplace add /path/to/luffy-agentic-workflow
+codex plugin add dev-skills@luffy-agentic-workflow
 ```
 
-Codex loads a cached copy. After editing the clone, repeat `codex plugin add dev-skills@luffy-dev` and start a new session (restart the desktop app if using it). `marketplace upgrade` applies to Git sources, not local paths. To return to GitHub, remove the local marketplace source, then repeat the Codex install steps. See the [official packaging docs](https://developers.openai.com/plugins/build/plugins#how-local-marketplaces-work).
+Codex loads a cached copy. After editing the clone, repeat `codex plugin add dev-skills@luffy-agentic-workflow` and start a new session (restart the desktop app if using it). `marketplace upgrade` applies to Git sources, not local paths. To return to GitHub, remove the local marketplace source, then repeat the Codex install steps. See the [official packaging docs](https://developers.openai.com/plugins/build/plugins#how-local-marketplaces-work).
 
 Run `scripts/check-plugin.sh` and `claude plugin validate .` from the repo root before pushing.
 

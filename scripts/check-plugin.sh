@@ -125,7 +125,7 @@ try:
     require(skill_paths(codex) == skill_paths(claude) == ["./skills"], "Codex and Claude manifests must use the shared ./skills tree")
     require((root / "skills").is_dir(), "shared skills directory is missing")
     entries = marketplace["plugins"]
-    require(marketplace["name"] == "luffy-dev", "Codex marketplace name differs from luffy-dev")
+    require(marketplace["name"] == "luffy-agentic-workflow", "Codex marketplace name differs from luffy-agentic-workflow")
     require(len(entries) == 1 and entries[0]["name"] == claude["name"], "Codex marketplace must offer only dev-skills")
     source = entries[0]["source"]
     require(source == {"source": "local", "path": "./plugins/dev-skills"}, "Codex marketplace must use the shared dev-skills plugin")
@@ -187,12 +187,12 @@ if [ -n "$hits" ]; then
 fi
 
 # no-person-names: no person's name in skill or doc text: text says "the user", never the maintainer's name.
-# The marketplace and repo names (luffy-dev, luffy-dev-skills), the GitHub owner Luffytse and the project name
+# The marketplace and repo names (luffy-agentic-workflow, and the earlier luffy-dev, luffy-dev-skills), the GitHub owner Luffytse and the project name
 # luffydev are not people. Checks skills/ and the plugin README, and the repo's CLAUDE.md and
-# docs/ (all of it, the glossary in docs/dev-skills/ included). Not the manifests (author fields) or dai-portal-data.
+# docs/ (all of it, the glossary in docs/dev-skills/ included). Not the manifests (author fields).
 # Paths are relative to each root (in a subshell, so cwd is unchanged), so a checkout
 # under a home folder named after its user cannot trip the check. awk keeps the script portable (no GNU-only flags).
-name_awk='{l=tolower($0); gsub(/luffy-dev-skills|luffy-dev|luffytse|luffydev/,"",l); if (l ~ /lufei|luffy/) print FILENAME ":" FNR ": " $0}'
+name_awk='{l=tolower($0); gsub(/luffy-agentic-workflow|luffy-dev-skills|luffy-dev|luffytse|luffydev/,"",l); if (l ~ /lufei|luffy/) print FILENAME ":" FNR ": " $0}'
 name_hits="$(
   (cd "$root" && find skills README.md -type f -print0 2>/dev/null | xargs -0 awk "$name_awk" 2>/dev/null)
   (cd "$repo" && find CLAUDE.md docs -type f -print0 2>/dev/null | xargs -0 awk "$name_awk" 2>/dev/null)
@@ -209,7 +209,7 @@ fi
 # another plugin. An example docs index line that links its own ADR file ("[ADR 0003](adr/0003-...") is fine.
 hits="$(grep -rnE --include='*.md' --include='*.yaml' 'ADR [0-9]{4}|\bUpstream\b' "$skills" | grep -vE '\[ADR [0-9]{4}\]\(adr/')"
 hits="$hits
-$(grep -rniE --include='*.md' --include='*.yaml' 'luffydev|luffytse|luffy-dev|lufei|check-plugin|dai-portal' "$skills")"
+$(grep -rniE --include='*.md' --include='*.yaml' 'luffydev|luffytse|luffy-dev|luffy-agentic-workflow|lufei|check-plugin|dai-portal' "$skills")"
 hits="$(printf '%s\n' "$hits" | grep .)"
 if [ -n "$hits" ]; then
   echo "$hits"

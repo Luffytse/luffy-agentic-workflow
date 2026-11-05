@@ -2,6 +2,12 @@
 
 What each version of `dev-skills` brought, newest first. Each pull request that changes a skill bumps the version, and each Release adds one entry here covering everything since the last Release: its goal, the versions it delivered, the issues it shipped, and what a project using the plugin must do when something breaks. Entries up to 0.25.0 are one per version, when only a Release bumped it.
 
+## Move to a public repo (2026-11-05)
+
+`dev-skills` moved to its own repo, `Luffytse/luffy-agentic-workflow`, with a rewritten history (ADR 0014). Issue and pull request numbers up to #720 in this changelog and in the docs refer to the private archive `Luffytse/luffy-dev-skills`, and the commits recorded on past Releases' `Commits:` lines are the archive's IDs, which do not resolve here. The marketplace is now `luffy-agentic-workflow`: a project that installed `dev-skills@luffy-dev` adds the new marketplace and installs `dev-skills@luffy-agentic-workflow`. No skill text changed.
+
+Versions: none, the version stays 1.0.0.
+
 ## 1.0.0 (2026-11-04)
 
 The user declared `dev-skills` stable at the end of Milestone 1 (#396): the autonomous Milestone workflow its ten Releases built is 1.0.0. No skill text changes since Milestone 1 · Release 10.

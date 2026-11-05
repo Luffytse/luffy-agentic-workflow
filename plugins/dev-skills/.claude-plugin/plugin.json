@@ -6,7 +6,7 @@
     "name": "lufei.xie",
     "email": "12742482+Luffytse@users.noreply.github.com"
   },
-  "repository": "https://github.com/Luffytse/luffy-dev-skills",
+  "repository": "https://github.com/Luffytse/luffy-agentic-workflow",
   "license": "MIT",
   "keywords": ["skills", "tdd", "agentic-review", "grilling", "domain-modeling"],
   "skills": ["./skills"]

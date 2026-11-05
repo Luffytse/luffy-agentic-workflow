@@ -2,7 +2,7 @@
 
 The approved seam is the selected caller's review handoff and fix coordination, plus its application of configured tracker operations and role-to-label mappings. Use fixture files only; no real issue or PR writes.
 
-Follow the isolated-home authentication, local candidate installation and fresh app-server protocol in [issue absorption](../issue-absorption/README.md) and [skill loading](../skill-loading/README.md). Each case gets an empty home and a copy of `fixture/`. Install the source with `codex plugin marketplace add <absolute-checkout>` and `codex plugin add dev-skills@luffy-dev`. This is a local-source check, not a GitHub install.
+Follow the isolated-home authentication, local candidate installation and fresh app-server protocol in [issue absorption](../issue-absorption/README.md) and [skill loading](../skill-loading/README.md). Each case gets an empty home and a copy of `fixture/`. Install the source with `codex plugin marketplace add <absolute-checkout>` and `codex plugin add dev-skills@luffy-agentic-workflow`. This is a local-source check, not a GitHub install.
 
 For the baseline, archive the recorded pre-migration commit, install it and select only `dev-skills:implement`. For each candidate case select only its named caller using the path returned by `skills/list` with forceReload. Send the retained `prompt.txt`; do not inject review bodies. Use a fresh ephemeral runtime, the regular tier, explicit provider `openai`, fallback disabled and fixture workspace-write access. Run app-server with network inference access; the fixture itself must not call the real tracker.
 

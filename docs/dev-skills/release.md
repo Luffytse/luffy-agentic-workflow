@@ -16,7 +16,9 @@ How this repo versions `dev-skills` and cuts a Release with the `release` skill:
   3. Run the whole-Release check below on that pull request's branch.
 - **Whole-Release check**: on the changelog pull request's branch, run `bash scripts/check-plugin.sh`, `bash scripts/run-tests.sh` and `claude plugin validate .`, then a clean-up pass: search the repo for sentences that wait on an issue this Release closed (such as "until #<n>") and for text its merges left stale. Fix such text outside `plugins/dev-skills/skills/` in the changelog pull request; file stale skill text as an issue for the next Release planning, so the changelog pull request changes no version.
 
-Releases here cover the `dev-skills` plugin only. `dai-portal-data` has no release doc of its own yet, so its version is left as it is.
+Releases here cover the `dev-skills` plugin, the only plugin in this repo.
+
+Issue and pull request numbers up to #720 refer to the private archive `Luffytse/luffy-dev-skills`, and the commits recorded for past Releases (`Commits:` lines) are the archive's IDs; the history here was rewritten (ADR 0014), so those IDs do not resolve in this repo.
 
 ## The bump at merge
 
