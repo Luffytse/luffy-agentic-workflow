@@ -2,6 +2,16 @@
 
 What each version of `dev-skills` brought, newest first. Each pull request that changes a skill bumps the version, and each Release adds one entry here covering everything since the last Release: its goal, the versions it delivered, the issues it shipped, and what a project using the plugin must do when something breaks. Entries up to 0.25.0 are one per version, when only a Release bumped it.
 
+## 1.0.0 (2026-11-04)
+
+The user declared `dev-skills` stable at the end of Milestone 1 (#396): the autonomous Milestone workflow its ten Releases built is 1.0.0. No skill text changes since Milestone 1 · Release 10.
+
+Versions: 1.0.0.
+
+- Version 1.0.0 (#396)
+
+From 1.0.0 on, a breaking change bumps the major version (ADR 0008).
+
 ## Milestone 1 · Release 10 (2026-11-04)
 
 The final Release of Milestone 1: build threads confirm their issue still holds on main, setup records repo labels that triage and planning apply, Finders share one report format with the Verifier, already-done issues close as completed, `release` handles carried-over issues, parallel Tickets never edit the same doc lines, and the evals docs and owed eval runs are cleaned up.

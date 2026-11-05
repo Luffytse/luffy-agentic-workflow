@@ -26,9 +26,11 @@ Versions follow semantic versioning (semver.org), with "breaking" defined for sk
 - **minor (Y):** a new or changed skill that breaks nothing, such as a new skill or a new step or option in one.
 - **major (X):** a breaking change, meaning a project using the plugin must do something: a skill is renamed or removed, the format of a repo doc that `setup-dev-skills` writes changes, or a label the skills need changes.
 
-While the plugin is below 1.0.0, a breaking change bumps the minor part instead, and the Release's `CHANGELOG.md` entry says what a project must do.
+While the plugin was below 1.0.0, a breaking change bumped the minor part instead. From 1.0.0 on, a breaking change bumps the major part. Either way, the Release's `CHANGELOG.md` entry says what a project must do.
 
-**1.0** is the autonomous Milestone workflow ([Define the Milestone agreement and completion boundary](https://github.com/Luffytse/luffy-dev-skills/issues/383)). It is cut after the three proof Milestone runs of [Define the evidence required to declare 1.0 stable](https://github.com/Luffytse/luffy-dev-skills/issues/387#issuecomment-6563675991) pass and the user declares it; a failed run is filed as a bug and repeated after the fix ([#391 comment](https://github.com/Luffytse/luffy-dev-skills/issues/391#issuecomment-6563676756)).
+**1.0** is the autonomous Milestone workflow ([Define the Milestone agreement and completion boundary](https://github.com/Luffytse/luffy-dev-skills/issues/383)). It was to be cut after the three proof Milestone runs of [Define the evidence required to declare 1.0 stable](https://github.com/Luffytse/luffy-dev-skills/issues/387#issuecomment-6563675991) passed and the user declared it (amended below); a failed run is filed as a bug and repeated after the fix ([#391 comment](https://github.com/Luffytse/luffy-dev-skills/issues/391#issuecomment-6563676756)).
+
+Amended 2026-11-04: the user declared 1.0 stable at the end of Milestone 1 (#396), after its last Release was cut, and asked to ship it as 1.0.0. The three proof Milestone runs had not run yet. They still follow Milestone 1, as #396's exclusions say, and a failed run is still filed as a bug. They no longer gate the version.
 
 ## How a Release works
 
