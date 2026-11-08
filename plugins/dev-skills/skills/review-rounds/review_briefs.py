@@ -66,7 +66,7 @@ Inputs the thread passes, all files: --spec (the spec's text), --standards (a li
 line, relative to --repo), --earlier (the earlier open Findings with their disputes), --design (the design answers),
 and --angle, a name from the adversarial angle list in FINDERS.md (default: the first, "Bugs and edge cases").
 Round values come from git: the diff command, commit list and head. From the repo it reads, when present, REVIEW.md
-(the meaning of Important, the Skip list, the Always check lines with the kinds of file they apply to),
+(the meaning of Important, the Skip list, the Always check lines, each `- **<Bug class>** (files: `glob`; from ...): ...`, `(files: all)` for every diff),
 docs/dev-skills/boundaries.md (the Boundary record) and docs/dev-skills/index.md (the docs index); each absent one
 falls back to the skill's default.
 
@@ -303,7 +303,11 @@ def read_text_file(path, what):
 
 
 def review_md_parts(repo):
-    """(important, skip, always lines as (text, globs)) from REVIEW.md; each None / empty when absent."""
+    """(important, skip, always lines as (text, globs)) from REVIEW.md; each None / empty when absent.
+
+    An Always check line is `- **<Bug class>** (files: `glob`, `glob`; from ...): what to look for`; `(files: all)`
+    says it applies to every diff (no globs). A line with no globs and not `all` still applies to every diff, and the
+    brief run warns about it (see unscoped)."""
     path = repo / "REVIEW.md"
     if not path.is_file():
         return None, None, []
@@ -330,6 +334,14 @@ def review_md_parts(repo):
         m = re.search(r"\(files: ([^)]*)\)", text)
         lines.append((text, re.findall(r"`([^`]+)`", m.group(1)) if m else []))
     return body("Important"), body("Skip"), lines
+
+
+def unscoped(text):
+    """True when an Always check line says neither globs nor `(files: all)`; it still applies to every diff."""
+    m = re.search(r"\(files: ([^)]*)\)", text)
+    if m and re.search(r"`[^`]+`", m.group(1)):
+        return False
+    return not (m and m.group(1).split(";")[0].strip() == "all")
 
 
 def applies(globs, changed):
@@ -397,6 +409,10 @@ class RoundValues:
             else:
                 self.label = "Round 1 of the review, level %s. Head: `%s`. Base: `%s`." % (level, head, base)
         self.important, self.skip, self.always = review_md_parts(repo)
+        for text, _globs in self.always:
+            if unscoped(text):
+                print("Always check line has no file scope; write (files: `glob`) or (files: all): %s"
+                      % text[:60].replace("\n", " "), file=sys.stderr)
         boundary_path = repo / "docs/dev-skills/boundaries.md"
         self.boundary = boundary_path.read_text().strip() if boundary_path.is_file() else None
         self.has_index = (repo / "docs/dev-skills/index.md").is_file()
