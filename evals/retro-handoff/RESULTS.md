@@ -50,3 +50,15 @@ Necessity subagent started: main no (not needed), branch no (no Agent tool). The
 The confirmed-path run (a Ticket for #41 with `necessity check: confirmed`) is therefore not recorded: it needs a top-level session that can start subagents, which the building thread could not make (a nested `claude -p` run was refused by the permission classifier). It is not claimed passed.
 
 Not exercised: the confirmed path above, the app-server install, `to-tickets` itself (the prompt has the run file the Ticket), a necessity check that does not confirm, and a group held back by the cap or decided at a Release end.
+
+## 2026-11-08 — #32 Retro scope
+
+Case `scope` (see the README): built by `scope.py`, self-tested by `test_scope.py` (20 tests: the rendered input says what the case means, a reference run passes, and planted wrong runs fail, among them main's behaviour). Regular tier, subagent runs, no dialogue or events kept; the branch's and main's skills are taken from checkouts.
+
+| Check | Result |
+| --- | --- |
+| Premium case check (fresh premium-tier subagent, whole skill folder and case files, before the runs) | PENDING: case check verdict (keep, fix or drop) |
+| Main's skill | PENDING: main run (expected red: no Scope in the record, #54 decided here, no refiling) |
+| This branch's skill | PENDING: branch run (expected green on every scorer line) |
+
+PENDING: Not exercised (to be filled after the runs; candidates: a Retro that mixes scopes, a re-run that finds a Scope already assigned in an earlier record).

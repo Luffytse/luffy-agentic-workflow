@@ -88,7 +88,7 @@ Read this first, then open only the docs whose line fits your work. Specs and ti
 
 ## Retros
 
-- [Retro handoff eval](../../evals/retro-handoff/README.md): installed `retro-planning` delegation, approval, cap and resume fixtures. Read when changing the handoff to `to-tickets` or the one-sighting check verdict (case `first-sighting`).
+- [Retro handoff eval](../../evals/retro-handoff/README.md): installed `retro-planning` delegation, approval, cap and resume fixtures. Read when changing the handoff to `to-tickets`, the one-sighting check verdict (case `first-sighting`), or a Retro's Scope (case `scope`).
 - [Retro handoff results](../../evals/retro-handoff/RESULTS.md): observed dialogue and tracker artifacts for the complete workflow handoff. Read when assessing its approval, cap and resume coverage.
 
 - [Issue absorption eval](../../evals/issue-absorption/README.md): fixture-only lifecycle, publication and closing-line decisions; read when rerunning the absorption contract migration checks. [Results](../../evals/issue-absorption/RESULTS.md) record actual consumer loads and behavior.
