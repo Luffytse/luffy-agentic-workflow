@@ -53,7 +53,7 @@ Not exercised: the confirmed path above, the app-server install, `to-tickets` it
 
 ## 2026-11-08 — #32 Retro scope
 
-Case `scope` (see the README): built by `scope.py`, self-tested by `test_scope.py` (20 tests: the rendered input says what the case means, a reference run passes, and planted wrong runs fail, among them main's behaviour). Regular tier, subagent runs, no dialogue or events kept; the branch's and main's skills are taken from checkouts.
+Case `scope` (see the README): built by `scope.py`, self-tested by `test_scope.py` (27 tests: the rendered input says what the case means, a reference run passes, and planted wrong runs fail, among them main's behaviour). Regular tier, subagent runs, no dialogue or events kept; the branch's and main's skills are taken from checkouts.
 
 | Check | Result |
 | --- | --- |

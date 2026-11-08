@@ -65,7 +65,7 @@ State: open
 Labels: enhancement, ready-for-agent, next-release
 Created: 2026-11-08
 Absorbs #51, #52.
-Fix: the limit is the environment's, so it goes in worker-control's Harness reference and in Startup verification, one place, not in the skills that start work.
+Fix: the limit is the environment's, so it goes in worker-control's Harness reference and in Startup verification, one place, not a sentence in each skill that starts work.
 ## Done when
 worker-control names the one-designated-branch limit and Startup verification checks it.
 ## Comments
@@ -146,6 +146,7 @@ class Scope(unittest.TestCase):
         self.assertIn("Nobody is available", p)
         self.assertIn("issues/30.md", p)
         self.assertNotRegex(p, r"(?i)scope|environment|worker-control|startup verification|refile")
+        self.assertIn("You may also write to other-project/issues/ (another project's tracker).", p)
         sc.build(self.out, "/x/checkout")
         self.assertIn("/x/checkout/plugins/dev-skills/skills/", self.read("PROMPT.md"))
 
@@ -179,9 +180,9 @@ class Scope(unittest.TestCase):
             (out / "other-project/issues/1.md").unlink()
             (out / "issues/54.md").write_text(sc.ISSUES[54].replace("State: open", "State: closed").replace("Labels: retro", "Labels: retro, wontfix")
                                               .replace("## Comments\nNone", "## Comments\nOne thread. Closed as wontfix."))
-            (out / "issues/55.md").write_text(TICKET.replace("worker-control's Harness reference and in Startup verification", "implement, implement-spec and release")
-                                              .replace("worker-control names", "each skill says").replace("Startup verification checks it", "it is stated")
-                                              .replace("Labels: enhancement, ready-for-agent, next-release", "Labels: enhancement, ready-for-agent"))
+            (out / "issues/55.md").write_text(
+                "# Tell threads to push only to their designated branch\nState: open\nLabels: enhancement, ready-for-agent\nCreated: 2026-11-08\n"
+                "Absorbs #51, #52.\nAdd a sentence to implement, implement-spec and release.\n## Done when\nEach skill says it.\n## Comments\nNone\n")
             (out / "issues/56.md").write_text(
                 "# Retro planning 2026-11-08\nState: closed\nLabels: retro-planning\nCreated: 2026-11-08\n## Verdicts\n"
                 "| push limit | #51, #52 | 2 | Ticket | #55 |\n| template | #53 | 2 | Ticket | none |\n| date | #54 | 1 | wontfix | one thread |\n")
@@ -204,11 +205,54 @@ class Scope(unittest.TestCase):
     def test_sentence_in_each_skill_fails(self):
         self.planted(lambda out: self.edit("issues/55.md", "Fix: the limit", "Add a warning line to each skill that starts work. Fix: the limit"), "sentence in each skill")
 
+    def test_add_a_sentence_to_named_skills_fails(self):
+        self.planted(lambda out: self.edit("issues/55.md", "Fix: the limit", "Add a sentence to implement, implement-spec and release. Fix: the limit"), "sentence in each skill")
+
+    def test_negated_sentence_in_each_skill_passes(self):
+        reference(self.out)
+        self.edit("issues/55.md", "Fix: the limit", "Do not add a sentence to implement, implement-spec and release; add it instead of a line in each skill. Fix: the limit")
+        ok, bad = passes(self.out)
+        self.assertTrue(ok, bad)
+
+    def test_harness_reference_wording_passes(self):
+        reference(self.out)
+        self.edit("issues/55.md", "worker-control", "the Harness reference")
+        ok, bad = passes(self.out)
+        self.assertTrue(ok, bad)
+
+    def test_two_ticket_run_passes(self):
+        reference(self.out)
+        (self.out / "issues/55.md").write_text(TICKET.replace("Absorbs #51, #52.", "Absorbs #51."))
+        (self.out / "issues/57.md").write_text(TICKET.replace("Absorbs #51, #52.", "Absorbs #52.").replace("Record the", "Also record the"))
+        self.edit("issues/52.md", "Absorbed by #55", "Absorbed by #57")
+        ok, bad = passes(self.out)
+        self.assertTrue(ok, bad)
+
+    def test_ticket_mentioning_53_without_absorbing_it_passes(self):
+        reference(self.out)
+        self.edit("issues/55.md", "Absorbs #51, #52.", "Absorbs #51, #52. Not absorbing #53 or #54.")
+        ok, bad = passes(self.out)
+        self.assertTrue(ok, bad)
+
+    def test_ticket_without_next_release_fails_among_two(self):
+        def m(out):
+            (out / "issues/57.md").write_text(TICKET.replace("Absorbs #51, #52.", "Absorbs #52.").replace("next-release", "bug"))
+        self.planted(m, "joins the next Release")
+
+    def test_scope_word_outside_snapshot_and_verdicts_is_ignored(self):
+        def m(out):
+            self.edit("issues/56.md", "| #51 | environment (given here: the sandbox refuses a push to any other branch) |", "| #51 | |")
+            self.edit("issues/56.md", "## Tickets filed", "## Notes\n| #51 | environment |\n\n## Tickets filed")
+        self.planted(m, "gives #51 the Scope")
+
     def test_ticket_without_the_harness_reference_fails(self):
-        self.planted(lambda out: self.edit("issues/55.md", "worker-control", "the docs"), "Harness reference")
+        def m(out):
+            p = out / "issues/55.md"
+            p.write_text(re.sub(r"worker-control|Harness reference", "the docs", p.read_text()))
+        self.planted(m, "Harness reference")
 
     def test_ticket_absorbing_the_skill_retro_fails(self):
-        self.planted(lambda out: self.edit("issues/55.md", "Absorbs #51, #52.", "Absorbs #51, #52, #53."), "not #53 or #54")
+        self.planted(lambda out: self.edit("issues/55.md", "Absorbs #51, #52.", "Absorbs #51, #52, #53."), "absorbs only #51 and #52")
 
     def test_misfiled_retro_left_in_place_fails(self):
         def m(out):

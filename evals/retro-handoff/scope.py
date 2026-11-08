@@ -122,7 +122,7 @@ None
 """,
 }
 
-PROMPT = """Release 3 has just ended. Run the Release-end retro-planning for this fixture repository; the release issue is issues/30.md. All issue state is in issues/, configured by docs/agents/issue-tracker.md, and the label strings are in docs/agents/triage-labels.md. The only other place you may write is another project's tracker, other-project/issues/, when a Retro belongs there. Use the skills in <checkout>/plugins/dev-skills/skills/ (load retro-planning from there; any other skill it names is in the same folder). Use only these local trackers; remote reads or writes are forbidden. Nobody is available to answer questions. Do not start `to-tickets`: file any Ticket yourself as the next unused issue file, labelled `ready-for-agent` (and `next-release` when it joins the next Release), naming the Retro issues it absorbs and its done condition, and comment `Absorbed by #<n>` on each issue it absorbs. Do not implement code.
+PROMPT = """Release 3 has just ended. Run the Release-end retro-planning for this fixture repository; the release issue is issues/30.md. All issue state is in issues/, configured by docs/agents/issue-tracker.md, and the label strings are in docs/agents/triage-labels.md. You may also write to other-project/issues/ (another project's tracker). Use the skills in <checkout>/plugins/dev-skills/skills/ (load retro-planning from there; any other skill it names is in the same folder). Use only these local trackers; remote reads or writes are forbidden. Nobody is available to answer questions. Do not start `to-tickets`: file any Ticket yourself as the next unused issue file, labelled `ready-for-agent` (and `next-release` when it joins the next Release), naming the Retro issues it absorbs and its done condition, and comment `Absorbed by #<n>` on each issue it absorbs. Do not implement code.
 """
 
 STATIC = {
@@ -188,6 +188,24 @@ def table_rows(text, n):
     return [l for l in text.splitlines() if l.startswith("|") and re.search(rf"#{n}\b", l)]
 
 
+def section(text, name):
+    m = re.search(rf"^## {name}\s*\n(.*?)(?=^## |\Z)", text, re.S | re.M)
+    return m.group(1) if m else ""
+
+
+def absorbed(text):
+    """Issue numbers a Ticket says it absorbs: the numbers on its absorbs / closes lines."""
+    kept = re.sub(r"(?i)\b(?:not|never|no)\b[^.;\n]*", "", text)
+    return {int(n) for m in re.finditer(r"(?i)\b(?:absorbs?|closes)\b([^.\n]*)", kept) for n in re.findall(r"#(\d+)", m.group(1))}
+
+
+def asks_sentence_in_skills(text):
+    """True when a Ticket asks for a sentence added to the skills, ignoring negated clauses."""
+    kept = re.sub(r"(?i)\b(?:not|rather than|instead of|never|no)\b[^.;\n]*", "", text)
+    return bool(re.search(r"(?i)\b(?:add|append|put|write)\b[^.\n]*\b(?:sentence|line|warning|reminder)\b[^.\n]*\b(?:each|every|all)\b[^.\n]*\bskills?\b", kept)
+                or re.search(r"(?i)\b(?:add|append|put|write)\b[^.\n]*\bimplement-spec\b", kept))
+
+
 def score(out):
     """Return a list of (name, ok, seen)."""
     out = pathlib.Path(out)
@@ -210,7 +228,7 @@ def score(out):
 
     # Scope in the record: each Retro has its own, #51 (no Scope line) included.
     for n, sc in SCOPES.items():
-        rows = [r for r in table_rows(text, n) if {int(m) for m in re.findall(r"#(\d+)", r)} & set(SCOPES) == {n}]
+        rows = [r for r in table_rows(section(text, "Snapshot") + "\n" + section(text, "Verdicts"), n) if {int(m) for m in re.findall(r"#(\d+)", r)} & set(SCOPES) == {n}]
         ok = any(re.search(rf"(?<![\w`]){re.escape(sc)}(?![\w`])|`{re.escape(sc)}`", r) for r in rows)
         wrong = [s for s in set(SCOPES.values()) - {sc} if any(re.search(rf"\b{re.escape(s)}\b", r) and not re.search(rf"\b{re.escape(sc)}\b", r) for r in rows)]
         check(f"the record gives #{n} the Scope {sc}", ok and not wrong, rows[:2])
@@ -221,25 +239,27 @@ def score(out):
     mixed = [l for l in verdict_rows if len({SCOPES[int(m)] for m in re.findall(r"#(\d+)", l) if int(m) in SCOPES}) > 1]
     check("no Verdicts row groups Retros of two Scopes", verdict_rows and not mixed, mixed[:1])
 
-    # The environment group: one Ticket aimed at the Harness reference.
-    check("exactly one new Ticket is filed, labelled ready-for-agent", len(tickets) == 1, f"{sorted(tickets)}")
-    tn, t = next(iter(tickets.items()), (None, None))
-    tt = t["text"] if t else ""
-    check("the Ticket absorbs #51 and #52 and not #53 or #54",
-          t and "#51" in tt and "#52" in tt and not re.search(r"#5[34]\b", tt))
-    check("the Ticket joins the next Release: labelled next-release", t and "next-release" in t["labels"], t and sorted(t["labels"]))
-    check("the Ticket aims the fix at the Harness reference (worker-control) and Startup verification",
-          t and re.search(r"worker-control", tt) and re.search(r"(?i)startup verification", tt))
-    check("the Ticket does not ask for a sentence in each skill",
-          t and not re.search(r"(?i)\b(?:add|append|put|write)\b[^.\n]*\b(?:sentence|line|warning|reminder)\b[^.\n]*\b(?:each|every|all)\b[^.\n]*\bskills?\b", tt))
+    # The environment group: one or more Tickets aimed at the Harness reference.
+    check("one or more new Tickets are filed, labelled ready-for-agent", len(tickets) >= 1, f"{sorted(tickets)}")
+    alltext = "\n".join(t["text"] for t in tickets.values())
+    check("every Ticket joins the next Release: labelled next-release", tickets and all("next-release" in t["labels"] for t in tickets.values()),
+          {n: sorted(t["labels"]) for n, t in tickets.items()})
+    ab = {n: absorbed(t["text"]) for n, t in tickets.items()}
+    check("every Ticket absorbs only #51 and #52, and together they absorb both",
+          tickets and all(v and v <= {51, 52} for v in ab.values()) and set().union(*ab.values()) == {51, 52}, ab)
+    check("the Tickets aim the fix at the Harness reference (worker-control) and Startup verification",
+          tickets and re.search(r"(?i)worker-control|harness reference", alltext) and re.search(r"(?i)startup verification", alltext))
+    check("no Ticket asks for a sentence in each skill", tickets and not any(asks_sentence_in_skills(t["text"]) for t in tickets.values()))
+    tns = sorted(tickets)
     for n in (51, 52):
         i = issues.get(n)
-        check(f"#{n} carries an Absorbed by comment naming the Ticket", i and tn and re.search(rf"Absorbed by #{tn}\b", i["comments"]))
+        check(f"#{n} carries an Absorbed by comment naming one of the Tickets",
+              i and any(re.search(rf"Absorbed by #{tn}\b", i["comments"]) for tn in tns))
 
-    # The skill group is a skill group, apart from the environment Ticket.
+    # The skill group is a skill group, apart from the environment Tickets.
     i53 = issues.get(53)
-    check("#53 (skill) is not closed as wontfix and not absorbed by the environment Ticket",
-          i53 and "wontfix" not in i53["labels"] and not (tn and re.search(rf"Absorbed by #{tn}\b", i53["comments"])))
+    check("#53 (skill) is not closed as wontfix and not absorbed by an environment Ticket",
+          i53 and "wontfix" not in i53["labels"] and not any(re.search(rf"Absorbed by #{tn}\b", i53["comments"]) for tn in tns))
 
     # The misfiled #54 goes to its own project's tracker.
     other = load(pathlib.Path(out) / "other-project/issues")
