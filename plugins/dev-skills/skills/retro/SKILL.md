@@ -23,7 +23,7 @@ The user has asked for a **retrospective**. You are suggesting improvements to t
 - **No-ops**: look for instructions in steering files that don't modify the agent's behavior. _Use when_ the steering files are large and unwieldy.
 - **Information access**: look for opportunities to increase the agent's access to information. Teeing dev server logs, readonly access to third-party services. _Use when_ a crucial piece of information was not available to the agent.
 
-5. File every candidate that is not a repeated Bug class as a Retro issue, or vote on an open one that covers it: [FILING.md](FILING.md).
+5. File every candidate that is not a repeated Bug class as a Retro issue, or vote on an open one that covers it: [FILING.md](FILING.md). Each carries a **Scope** line: `skill`, `environment` or `this repo`, with the reason in one clause answering "would this happen in a fresh repo using the skills, in the same environment?". A `this repo` Retro goes to this project's own tracker and proposes a fix in its own files; `skill` and `environment` go where the plugin's Retros go.
 
 6. Present these candidates to the user, in order of severity. Report repeated Bug classes as done, with the link to the retro's pull request. For each other candidate, give the issue it went to.
 

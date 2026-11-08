@@ -267,7 +267,7 @@ _Avoid_: repro, example
 ## Retros
 
 **Retro issue**:
-One suggestion from `retro` filed as a GitHub issue labelled `retro`, in the repo where its fix lands. It is never `needs-triage`; Retro planning decides what happens to it.
+One suggestion from `retro` filed as a GitHub issue labelled `retro`, in the repo its **Scope** sends it to. Its body opens with a Scope line: `skill` (a skill's behaviour, or a template, script or format the plugin ships) and `environment` (a limit of the coding agent or Harness the threads run in, true for any repo run there) are filed where the plugin's Retros go; `this repo` (true only of the repo the session ran in) is filed in that repo's own tracker. Retro planning sorts by Scope before root cause; an `environment` fix goes toward the Harness reference (`worker-control`) and Startup verification. It is never `needs-triage`; Retro planning decides what happens to it.
 _Avoid_: retro ticket, action item
 
 **Retro backlog**:

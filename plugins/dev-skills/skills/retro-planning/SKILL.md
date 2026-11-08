@@ -33,6 +33,7 @@ Done when there is exactly one open record and you know whether this planning is
 The snapshot is everything filed or commented before the record's creation time, and it is all this planning plans. An issue filed, or a `Seen again` comment made, after that time **arrived during this planning**: leave it for the next planning, and list it in the record at step 7. Other threads keep running meanwhile; nothing is held.
 
 - Every open issue labelled `retro` in the snapshot, with its body, comments and creation date.
+- Each issue's **Scope** (`skill`, `environment` or `this repo`), read from its `Scope:` line first. An issue with none (filed before the line existed) is given one now by `retro`'s question (would this happen in a fresh repo using the skills, in the same environment?), unless an earlier record or the issue's comments already assigned one: keep that. The snapshot table records it. A Retro that mixes scopes is split into one entry per Scope. A Retro whose Scope does not belong in this tracker (a `this repo` Retro of another repo, or a `skill` or `environment` Retro outside the plugin's repo) is not decided here: file its text where `retro`'s filing step sends it, close it with a link, and record that.
 - Every **closed** issue labelled `retro-planning` (the earlier records, format below), newest first. From them take: the groups the newest record held back by the cap, every Ticket in its "Tickets filed" and every Ticket in its `Filed #<ticket> (from spin-off ...)` comments, each with the Retro issues it absorbed, and each open issue's "plannings without a new vote" count from the newest record.
 
 Count each issue's **votes by distinct thread**: the thread its body names as the source, plus the thread of each `Seen again in <thread link>` comment in the snapshot. A thread counts once, however many comments it left. An issue has a **new vote** when it was filed, or got a `Seen again` comment, after the newest closed record was created; with no record yet, every issue has one.
@@ -59,7 +60,7 @@ Done when every closed Ticket in the earlier records is marked "holding", "came 
 
 ## 3. Group and propose verdicts
 
-Group the remaining backlog issues by root cause and merge duplicates. A group's vote count is the number of distinct threads across all its issues, so one thread that filed two duplicates counts once.
+Group the remaining backlog issues by Scope first, then by root cause within a Scope, and merge duplicates; a group never mixes Scopes. A `this repo` group's fix is in this repo's own files. A `skill` group's fix is in the skill, template, script or format. An `environment` group's fix goes toward the Harness reference (`worker-control`) and Startup verification, not a sentence in each skill. A group's vote count is the number of distinct threads across all its issues, so one thread that filed two duplicates counts once.
 
 Give each group the first verdict that fits:
 
@@ -108,7 +109,7 @@ Done when every group in the walk and every mechanical close has the user's call
 
 ## 6. Carry out a call
 
-- **Address the problem**: invoke the complete `to-tickets` workflow. Pass the intended outcome (for a one-sighting check, with the necessity check's evidence); source reports explicitly marked as issues to absorb; agreed constraints, failed-fix context and known dependencies; this one group's scope; and the remaining actual-ticket budget. Request one complete Ticket, with a return before publication if investigation requires several. Prefer a mechanical check or hook over a prose rule; pass that preference as a constraint, with a reason required when only prose can address the problem. Do this re-read (step 5) before each time the proposed Ticket is shown, a resumed handoff included. `to-tickets` owns context gathering, investigation, drafting, tier/dependency discussion, concrete-solution approval and verified publication. Include any existing publication identifiers, source mappings, approval and incomplete actions on resume.
+- **Address the problem**: invoke the complete `to-tickets` workflow. Pass the intended outcome (for a one-sighting check, with the necessity check's evidence); source reports explicitly marked as issues to absorb; agreed constraints, failed-fix context and known dependencies; this one group's scope; and the remaining actual-ticket budget. Pass the group's Scope and where its fix goes as a constraint. Request one complete Ticket, with a return before publication if investigation requires several. Prefer a mechanical check or hook over a prose rule; pass that preference as a constraint, with a reason required when only prose can address the problem. Do this re-read (step 5) before each time the proposed Ticket is shown, a resumed handoff included. `to-tickets` owns context gathering, investigation, drafting, tier/dependency discussion, concrete-solution approval and verified publication. Include any existing publication identifiers, source mappings, approval and incomplete actions on resume.
   - Reconcile its returned identifiers, source-to-ticket mappings and incomplete actions into the record. A real Ticket counts immediately even when a later label, link, comment or verification failed. Keep the handoff pending and resume its unfinished actions before showing another group; never recreate an existing Ticket.
   - If several Tickets are necessary, return to the user's spin-off decision before any publication. Keep the cap unchanged unless the user explicitly changes it; a larger budget alone does not turn this one-Ticket handoff into permission to publish several.
   - If the solution is declined, preserve both the problem approval and solution rejection, with the user's next call (revise, spin off, close or keep open). A decline creates no Ticket and consumes no slot. Once a solution has been approved and published, update the record without asking for solution approval again.
@@ -181,24 +182,24 @@ Snapshot time: <the record's creation time>
 
 ## Snapshot
 
-| Retro issue | Distinct threads | New vote | Status |
-|-------------|------------------|----------|--------|
-| #12 | 2 | yes | in the backlog |
-| #18 | 1 | no | waiting on #35 |
-| #19 | 1 | no | spun off, waiting |
+| Retro issue | Scope | Distinct threads | New vote | Status |
+|-------------|-------|------------------|----------|--------|
+| #12 | skill | 2 | yes | in the backlog |
+| #18 | this repo | 1 | no | waiting on #35 |
+| #19 | environment | 1 | no | spun off, waiting |
 
 ## Verdicts
 
-| Group | Retro issues | Distinct threads | Verdict | Reason or Ticket |
-|-------|--------------|------------------|---------|------------------|
-| <root cause> | #12, #15 | 3 | Ticket | #40 |
-| <root cause> | #21 | 1 | Ticket | #41; necessity check: confirmed (<evidence>) |
-| <root cause> | #22 | 1 | wontfix | necessity check: not confirmed (<why>) |
-| <root cause> | #13 | 1 | wontfix | <reason> |
-| <root cause> | #14 | 2 | held back by the cap | |
-| <root cause> | #20 | 2 | spun off | <thread link> |
-| <root cause> | #16 | 1 | kept open by the user | |
-| absorbed by a Ticket closed as completed | #11 | 2 | closed with its Ticket | #31 |
+| Group | Scope | Retro issues | Distinct threads | Verdict | Reason or Ticket |
+|-------|-------|--------------|------------------|---------|------------------|
+| <root cause> | skill | #12, #15 | 3 | Ticket | #40 |
+| <root cause> | skill | #21 | 1 | Ticket | #41; necessity check: confirmed (<evidence>) |
+| <root cause> | skill | #22 | 1 | wontfix | necessity check: not confirmed (<why>) |
+| <root cause> | skill | #13 | 1 | wontfix | <reason> |
+| <root cause> | skill | #14 | 2 | held back by the cap | |
+| <root cause> | environment | #20 | 2 | spun off | <thread link> |
+| <root cause> | this repo | #16 | 1 | kept open by the user | |
+| absorbed by a Ticket closed as completed | skill | #11 | 2 | closed with its Ticket | #31 |
 
 ## Incomplete actions
 
