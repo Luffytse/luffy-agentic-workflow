@@ -33,10 +33,12 @@ Run level: decision-level in a subagent. Tier: regular, one fresh subagent per r
 | redesigned | `unlanded` | 5/5 PASS (final text, `f81dd4b`) | not rerun |
 | redesigned | `landed` | 5/5 PASS (`f81dd4b`) | not rerun |
 | redesigned (notes say the chain landed and Ticket 32 has since changed `bye.sh`) | `later` | 5/5 PASS (`f81dd4b`) | 5/5 PASS: main's model also deletes |
+| redesigned (as the `later` row) | `later` | 5/5 PASS on the pre-fix text (`37fb7bb`): the model read part (a) leniently | not rerun |
 
 Case check: a fresh premium-tier subagent returned keep for both scenarios, with three fixes, applied: the README no longer says `unlanded` separates the branch from main, this entry records the runs, and the scorer accepts a `Next` that begins "Step 6.4 check failed; redo 6.3" (a passing variant is in the self-test).
+Case check of `later` (fresh premium tier): keep, with small fixes. It is valid and needed, the only case for "landed but the files differ now"; it is a regression guard because main's step 6.4 has no check, so main deletes by construction and a redesign cannot make main fail. Caveats: the prompt points at both step 6.4 and step 9 ("clearing the leftovers"), and both lead to a delete; the scorer's `Next` check for `later` is loose.
 Not exercised: a squash that landed with a differing file right after step 6.3 (the diff half of the check), main on the redesigned `landed`, a full build-flow run.
-Pass: yes, as a regression guard: the case fails no skill version, so it does not separate the branch from main. Lessons: the redesign (one, per the evals guide) did not make main fail, because main's step 1 "landed" definition and step 9 keep rule lead a careful model to the same answer (Retro #702). The real failure was an unchecked `&&` chain in a long thread, which a short fixture cannot reproduce; the rule still adds the explicit check.
+Pass: yes, as a regression guard: the case fails no skill version, so it does not separate the branch from main. Lessons: `later` passed on the pre-fix text (`37fb7bb`) too, so it is a guard, not a fail-before case: review found the step 3.1 and 9 flaw, not the eval. The redesign (one, per the evals guide) did not make main fail, because main's step 1 "landed" definition and step 9 keep rule lead a careful model to the same answer (Retro #702). The real failure was an unchecked `&&` chain in a long thread, which a short fixture cannot reproduce; the rule still adds the explicit check.
 
 ### 2026-11-04, main `9d1de32`, dev-skills 0.80.0 (no bump): #695 merge-authority and corrective-check cases, spec flow, through the `merging` load; closing case on main and its case check
 
