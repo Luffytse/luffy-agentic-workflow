@@ -25,7 +25,7 @@ Find, Verify, Rank, one comment. Sources (spec, standards, `REVIEW.md`, Boundary
 - **Rounds 2 and 3:** at any level, one Finder (standards and spec in one) and one Verifier.
 - **Nothing to verify:** a Round in which no Finder returned a candidate and no earlier Finding is open starts no Verifier and goes to Rank; its comment says no candidates went to a Verifier. Otherwise the Verifier stays a separate agent each Round (#583).
 
-Adversarial Finders get no Always check lines; the standards Finder gets only the lines for the file kinds the diff touches, and the smell baseline only when code changed. The review looks for risk, security, boundary crossings and whether the change carries tests for what it claims. A Finding quotes its line, and for code shows a run or failing test where it can; the Verifier keeps only what it confirmed. Every Finder and Verifier is a brand-new subagent each Round, given a brief, never the skill.
+Adversarial Finders get no Always check lines; the standards Finder gets only the lines for the files the diff touches, and the smell baseline only when code changed. The review looks for risk, security, boundary crossings and whether the change carries tests for what it claims. A Finding quotes its line, and for code shows a run or failing test where it can; the Verifier keeps only what it confirmed. Every Finder and Verifier is a brand-new subagent each Round, given a brief, never the skill.
 
 ## The loop
 

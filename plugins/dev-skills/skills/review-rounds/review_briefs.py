@@ -23,7 +23,7 @@ ticket is a Ticket check, one Quick Round (SKILL.md, Ticket checks): the round1 
 
 fixed is a review since a fixed point, Round 1 only: the round1 briefs for `git diff --merge-base <fixed point>` (the
 working tree counts, as agentic-review gives it) and `git log <fixed point>..HEAD`, with the untracked new files
-(`git ls-files --others --exclude-standard`) listed in the brief and counted for the kinds of file.
+(`git ls-files --others --exclude-standard`) listed in the brief and counted for the files' globs.
 
 later is Round 2 or 3: it writes finder-later.md, the one later-Round Finder doing the standards and spec Finders' work
 (FINDERS.md, Later-Round Finder): both Finders' inputs and both briefs (the spec brief only with --spec), the diff of
@@ -331,17 +331,20 @@ def review_md_parts(repo):
     lines = []
     for chunk in always:
         text = "\n".join(chunk)
-        m = re.search(r"\(files: ([^)]*)\)", text)
-        lines.append((text, re.findall(r"`([^`]+)`", m.group(1)) if m else []))
+        lines.append((text, re.findall(r"`([^`]+)`", files_scope(text))))
     return body("Important"), body("Skip"), lines
+
+
+def files_scope(text):
+    """The part of a line's `(files: ...)` group before the first `;` ("" when it has no group)."""
+    m = re.search(r"\(files: ([^)]*)\)", text)
+    return m.group(1).split(";")[0] if m else ""
 
 
 def unscoped(text):
     """True when an Always check line says neither globs nor `(files: all)`; it still applies to every diff."""
-    m = re.search(r"\(files: ([^)]*)\)", text)
-    if m and re.search(r"`[^`]+`", m.group(1)):
-        return False
-    return not (m and m.group(1).split(";")[0].strip() == "all")
+    scope = files_scope(text)
+    return not (re.search(r"`[^`]+`", scope) or scope.strip() == "all")
 
 
 def applies(globs, changed):

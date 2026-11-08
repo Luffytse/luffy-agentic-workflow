@@ -332,7 +332,7 @@ class AlwaysCheck(Base):
 def template_example():
     """The example Always-check line of the shipped setup-dev-skills REVIEW.md template."""
     text = (SKILLS / "setup-dev-skills/review.md").read_text()
-    lines = [l for l in text.split("## Always check", 1)[1].splitlines() if l.startswith("- **")]
+    lines = [l[2:] for l in text.split("## Always check", 1)[1].splitlines() if l.startswith("> - **")]
     assert lines, "the shipped template has no example Always-check line"
     return lines[0]
 
@@ -365,6 +365,23 @@ class AlwaysCheckForm(Base):
         git(s2.repo, "commit", "-q", "-m", "match")
         self.ok(s2.run("quick"))
         self.assertIn(marker, s2.brief("finder-standards.md"))
+
+    def test_the_shipped_template_as_is_has_no_live_always_check_line(self):
+        s = self.scratch(review=(SKILLS / "setup-dev-skills/review.md").read_text())
+        r = s.run("quick")
+        self.ok(r)
+        self.assertNotIn("api client", s.brief("finder-standards.md"))
+        self.assertNotIn("file scope", r.stderr)
+
+    def test_only_the_part_before_the_first_semicolon_is_the_scope(self):
+        for line, expect_in in (("- **x** (files: all; from `y`): PLANTED-SEMI check.", True),
+                                ("- **x** (files: `a.py`; from `d42ca69`): PLANTED-SEMI check.", False)):
+            with self.subTest(line=line):
+                s = self.scratch(review=review_with(line), change="docs")
+                r = s.run("quick")
+                self.ok(r)
+                self.assertEqual("PLANTED-SEMI" in s.brief("finder-standards.md"), expect_in)
+                self.assertNotIn("file scope", r.stderr)
 
     def test_files_all_applies_to_every_diff_with_no_warning(self):
         s = self.scratch(review=review_with("- **everywhere** (files: all; from #1): PLANTED-ALL check."), change="docs")
@@ -1273,7 +1290,7 @@ class FixedPoint(Base):
         self.ok(run_cmd(s, "fixed", "--level", "quick", "--base", "main", *inputs(s)))
         t = s.brief("finder-standards.md")
         self.assertIn("tools/run.sh", t)
-        self.assertIn("PLANTED-SH", t)  # an untracked file counts for the kinds of file
+        self.assertIn("PLANTED-SH", t)  # an untracked file counts for the globs
         diff_cmd = re.search(r"git -C \S+ diff [^\n]*", t).group(0)
         self.assertNotIn("...", diff_cmd)  # not a committed-only three-dot range
         out = subprocess.run(diff_cmd.split(), text=True, capture_output=True).stdout
