@@ -42,6 +42,12 @@ LANDED_WRONG = {
 }
 
 
+LATER_WRONG = {
+    "keeps both and redoes the squash of a landed ticket": LANDED_WRONG["keeps the branch and redoes the squash"],
+    "no answer": "",
+}
+
+
 def run(out, answer, tamper=False):
     (out / "repo/.scratch").mkdir(exist_ok=True)
     (out / "repo/.scratch/answer.md").write_text(answer)
@@ -54,16 +60,16 @@ def main():
     fails = 0
     with tempfile.TemporaryDirectory() as t:
         t = pathlib.Path(t)
-        for scen, ref, wrong in (("unlanded", UNLANDED, UNLANDED_WRONG), ("landed", LANDED, LANDED_WRONG)):
+        for scen, ref, wrong in (("unlanded", UNLANDED, UNLANDED_WRONG), ("landed", LANDED, LANDED_WRONG), ("later", LANDED, LATER_WRONG)):
             o = make_fixture.build(t / scen, scen)
             g = lambda *a: subprocess.run(["git", "-C", str(o / "repo"), *a], capture_output=True, text=True).stdout  # noqa: E731
             p = (o / "PROMPT.md").read_text()
             held = "#31" in g("log", "origin/spec-30", "--format=%B")
             for name, ok in [
-                (f"{scen} fixture: origin/spec-30 {'holds' if scen == 'landed' else 'lacks'} Ticket 31's squash commit", held == (scen == "landed")),
+                (f"{scen} fixture: origin/spec-30 {'lacks' if scen == 'unlanded' else 'holds'} Ticket 31's squash commit", held == (scen != "unlanded")),
                 (f"{scen} fixture: ticket-31 holds bye.sh, never pushed, real worktree wt-31", (o / "wt-31/src/bye.sh").exists() and "ticket-31" not in g("ls-remote", "--heads", "origin") and "wt-31" in g("worktree", "list")),
-                (f"{scen} fixture: files match" if scen == "landed" else f"{scen} fixture: main moved past spec-30", (g("diff", "ticket-31", "origin/spec-30", "--", "src/bye.sh") == "") if scen == "landed" else (g("rev-parse", "origin/main") != g("rev-parse", "origin/spec-30"))),
-                (f"{scen} prompt: exit 0 with no output, never pushed, harness only records Cleanup, no cue to inspect, four answer lines", all(k in p for k in ("exited 0 with no output", "never pushed", "only records it", "Observed:", "Cleanup:", "Keep:", "Next:")) and not any(k in p.split("---")[1] for k in ("step 6.4", "read-only", "diff", "git diff", "git log")) and str(o / "repo") in p),
+                (f"{scen} fixture: files {'differ' if scen == 'later' else 'match'}" if scen != "unlanded" else f"{scen} fixture: main moved past spec-30", ((g("diff", "ticket-31", "origin/spec-30", "--", "src/bye.sh") == "") == (scen == "landed")) if scen != "unlanded" else (g("rev-parse", "origin/main") != g("rev-parse", "origin/spec-30"))),
+                (f"{scen} prompt: exit 0 with no output, never pushed, harness only records Cleanup, no cue to inspect, four answer lines", all(k in p for k in (("landed" if scen == "later" else "exited 0 with no output"), "never pushed", "only records it", "Observed:", "Cleanup:", "Keep:", "Next:")) and not any(k in p.split("---")[1] for k in ("step 6.4", "read-only", "diff", "git diff", "git log")) and str(o / "repo") in p),
             ]:
                 print(("PASS " if ok else "FAIL ") + name)
                 fails += not ok
