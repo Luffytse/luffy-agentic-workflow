@@ -194,16 +194,17 @@ def section(text, name):
 
 
 def absorbed(text):
-    """Issue numbers a Ticket says it absorbs: the numbers on its absorbs / closes lines."""
-    kept = re.sub(r"(?i)\b(?:not|never|no)\b[^.;\n]*", "", text)
-    return {int(n) for m in re.finditer(r"(?i)\b(?:absorbs?|closes)\b([^.\n]*)", kept) for n in re.findall(r"#(\d+)", m.group(1))}
-
+    """Issue numbers a Ticket says it absorbs: the #n list right after an absorbs / closes verb, unless negated."""
+    out = set()
+    for m in re.finditer(r"(?i)(\b(?:not|never)\s+(?:\w+\s+)?)?\b(?:absorbs?|closes)\b:?\s*((?:#\d+(?:\s*\([^)\n]*\))?(?:\s*(?:,|\band\b|&)\s*)?)+)", text):
+        if not m.group(1):
+            out |= {int(n) for n in re.findall(r"#(\d+)", re.sub(r"\([^)\n]*\)", "", m.group(2)))}
+    return out
 
 def asks_sentence_in_skills(text):
-    """True when a Ticket asks for a sentence added to the skills, ignoring negated clauses."""
-    kept = re.sub(r"(?i)\b(?:not|rather than|instead of|never|no)\b[^.;\n]*", "", text)
+    kept = re.sub(r"(?i)\b(?:not|rather than|instead of|never|no|suggest\w*|propos\w*)\b[^.;\n]*", "", text)
     return bool(re.search(r"(?i)\b(?:add|append|put|write)\b[^.\n]*\b(?:sentence|line|warning|reminder)\b[^.\n]*\b(?:each|every|all)\b[^.\n]*\bskills?\b", kept)
-                or re.search(r"(?i)\b(?:add|append|put|write)\b[^.\n]*\bimplement-spec\b", kept))
+                or re.search(r"(?i)\b(?:add|append|put|write)\b[^.\n]*?\b(?:sentence|line|warning|reminder|note)s?\b[^.\n]*?\b(?:to|in|into)\s+(?:the\s+)?`?(?:implement|implement-spec|release)\b", kept))
 
 
 def score(out):

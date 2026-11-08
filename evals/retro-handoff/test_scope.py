@@ -220,6 +220,25 @@ class Scope(unittest.TestCase):
         ok, bad = passes(self.out)
         self.assertTrue(ok, bad)
 
+    def test_wordings_that_must_pass(self):
+        """Ticket wordings a right run may use: none asks for a sentence in the skills, none absorbs #53 or #54."""
+        wordings = {
+            "A": "Absorbs #51, #52.\nAdd a capability row to worker-control's Harness reference so implement, implement-spec and release threads read the limit from one place.",
+            "B": "Absorbs #51, #52.\n#51 suggested: add a sentence to implement, implement-spec and release. This Ticket puts it in worker-control instead.",
+            "C": "Absorbs #51, #52; #53 is a separate skill group and stays open.",
+            "D": "Absorbs #51 (filed with no Scope line) and #52.",
+            "F": "Absorbs #51 and #52 (Retro planning record #56).",
+        }
+        for k, w in wordings.items():
+            self.assertFalse(sc.asks_sentence_in_skills(w), k)
+            self.assertEqual(sc.absorbed(w) - {51, 52}, set(), k)
+        for k in "ABCDF":
+            self.assertEqual(sc.absorbed(wordings[k]), {51, 52}, k)
+            reference(self.out)
+            self.edit("issues/55.md", "Absorbs #51, #52.", wordings[k])
+            ok, bad = passes(self.out)
+            self.assertTrue(ok, (k, bad))
+
     def test_two_ticket_run_passes(self):
         reference(self.out)
         (self.out / "issues/55.md").write_text(TICKET.replace("Absorbs #51, #52.", "Absorbs #51."))
