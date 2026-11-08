@@ -1,0 +1,10 @@
+Use setup-project to draft project instructions. This is a bounded draft-stage check: exploration and grilling have finished, and the user has explicitly confirmed all facts below. Produce the full draft, then wait for approval. Write no files and send no messages.
+
+Project facts:
+- Project: Orchard, repo orchard-team/orchard, tracker GitHub Issues only, documented in docs/dev-skills/issue-tracker.md.
+- docs/dev-skills/index.md, CLAUDE.md and docs/dev-skills/boundaries.md exist. Use those relative paths as links; this is a fixture, so no real tracker/repo lookup is needed.
+- The project has an open Milestone agreement, found using the Boundary record's membership label form. Its sibling skills milestone and team-lead are available alongside setup-project for you to read.
+- You are a project thread, not the coordinator. You asked the coordinator to check its own skill list, and it answered: "My skill list holds only built-in skills; I cannot load team-lead, milestone, release or worker-control."
+- Boundary record: check-ins every 45 minutes, user approval for production deploys, membership label milestone-<n>.
+- Project-specific additions: at most two Build threads at once, backend before dashboard where both are eligible; user merges schema migrations. No custom tier-to-model map.
+- No existing project instructions.

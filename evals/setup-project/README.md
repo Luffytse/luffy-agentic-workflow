@@ -16,3 +16,17 @@ For `milestone-rerun.txt`, pass only when the full draft:
 For `no-milestone.txt`, pass only when the full draft keeps the existing full-instructions behavior: coordinator/thread kinds and their skills (the coordinator running `team-lead` for delivery of planned work), every brief field, Model tiers and model-start rule, project limits/merge rules and standing rules, docs/tracker pointers and tracker lookup for open work. It must not switch this project to the `milestone` workflow, add current-work state or claim approval/save/handover.
 
 These cases do not exercise exploration, an actual grilling exchange, the user's later approval or the coordinator's save operation. Check those unchanged steps by diff inspection; passing draft cases is not evidence that settings were saved. This is a local-source behavior check, not an installed-runtime discovery test.
+
+## Coordinator that cannot load the plugin
+
+`no-plugin.txt` (inside a Milestone) and `no-plugin-outside.txt` (no open Milestone agreement) give a project thread a coordinator that reports a skill list of built-ins only. Decision-level, regular tier; give each run the checkout's `setup-project` and its sibling `milestone` and `team-lead` skill folders (including `team-lead/DELIVERY-LOOP.md`), the case prompt only. Run on the branch and on main's skills (from a `git archive`); main's has no loop file, so it cannot carry one.
+
+For each, pass only when the full draft:
+
+- Carries the five steps of "The loop" in `team-lead/DELIVERY-LOOP.md` as that file gives them: a Startup verification thread before any Build thread, a Release thread to plan when no Release is current, Build threads only for the current Release's label, a Release thread to cut and plan the next when its issues have closed, and a report thread when every feature is merged or parked. The file's text appears verbatim or nearly so, judged on meaning.
+- Does not leave the coordinator told only to run `milestone` or `team-lead` itself (it cannot load them).
+- For `no-plugin.txt`, still keeps the owner pointers and project choices (two-thread limit, backend before dashboard, migration merge gate, Boundary record pointer) without copying the Boundary record's values.
+- For `no-plugin-outside.txt`, still keeps the full instructions (thread kinds and skills, every brief field, Model tiers and model-start rule, limits and merge rules, tracker lookup).
+- Holds no current-work state and claims no approval, save or handover.
+
+Both older prompts now state that the coordinator, asked to check its own skill list, answered that it can load `team-lead`, `milestone`, `release` and `worker-control`; their drafts must not gain the loop.

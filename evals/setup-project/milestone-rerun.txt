@@ -5,6 +5,7 @@ Project facts:
 - docs/dev-skills/index.md, CLAUDE.md and docs/dev-skills/boundaries.md exist. Use those relative paths as links; this is a fixture, so no real tracker/repo lookup is needed.
 - The project has an open Milestone agreement, found using the Boundary record's membership label form. The milestone skill owns the coordinator workflow; its current content is available alongside setup-project.
 - Boundary record: check-ins every 45 minutes, budget 100 credits, user approval for production deploys, membership label milestone-<n>.
+- You are a project thread; you asked the coordinator to check its own skill list, and it answered that it can load team-lead, milestone, release and worker-control.
 - Project-specific additions: at most two Build threads at once, backend before dashboard where both are eligible; user merges schema migrations; every worker sends an explicit completion callback to its coordinator; archive finished workers; pull main and reload changed skills after every merge. No custom tier-to-model map or other additions.
 
 Existing project instructions:
