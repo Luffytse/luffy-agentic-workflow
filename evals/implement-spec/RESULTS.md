@@ -24,12 +24,17 @@ Run level: decision-level in a subagent. Tier: regular.
 Setup: the [squash-check case](README.md#squash-check-check) (`squash-check/make_fixture.py <out-dir> unlanded|landed`), one fresh subagent per scenario per skill version (the branch's `implement-spec` folder, and a `git archive` of `origin/main` at `293bf5e`), each given the folder and `PROMPT.md` only, scored with `score.py`.
 Steps: step 6.4 after a chained step 6.3.
 Self-test: `python3 evals/implement-spec/squash-check/test_cases.py` passes (reference answers pass, planted wrong ones fail). Not a model run.
-PENDING: model run, branch, `unlanded` (expected to pass: nothing deleted, step 6.3 redone)
-PENDING: model run, branch, `landed` (expected to pass: worktree removed, `ticket-31` deleted)
-PENDING: model run, main, `unlanded` (expected to fail on the cleanup check: main's step 6.4 deletes with no check)
-PENDING: model run, main, `landed` (guard: expected to pass)
-Not exercised: a squash that landed with a differing file (the diff half of the check), a full build-flow run. The implementing session had no way to start a model subagent.
-Pass: PENDING. Lessons: PENDING.
+Run level: decision-level in a subagent, regular tier, one fresh subagent per run, single run each, made by the coordinator and scored with `score.py`.
+
+| Prompt | Scenario | Branch skill | Main skill (`293bf5e`) |
+| --- | --- | --- | --- |
+| original | `unlanded` | 5/5 PASS | 5/5 PASS |
+| original | `landed` | 5/5 PASS | 5/5 PASS |
+| redesigned (`7d75a47`: notes say step 6.3 exited 0 with no output, no cue to inspect) | `unlanded` | 5/5 PASS | 5/5 PASS: main's model inspected the repo, found no squash commit, kept both and redid 6.3 |
+
+Case check: a fresh premium-tier subagent returned keep for both scenarios, with three fixes, applied: the README no longer says `unlanded` separates the branch from main, this entry records the runs, and the scorer accepts a `Next` that begins "Step 6.4 check failed; redo 6.3" (a passing variant is in the self-test).
+Not exercised: a squash that landed with a differing file (the diff half of the check), a redesigned-prompt `landed` run, a full build-flow run.
+Pass: yes, as a regression guard: the case fails no skill version, so it does not separate the branch from main. Lessons: the redesign (one, per the evals guide) did not make main fail, because main's step 1 "landed" definition and step 9 keep rule lead a careful model to the same answer (Retro #702). The real failure was an unchecked `&&` chain in a long thread, which a short fixture cannot reproduce; the rule still adds the explicit check.
 
 ### 2026-11-04, main `9d1de32`, dev-skills 0.80.0 (no bump): #695 merge-authority and corrective-check cases, spec flow, through the `merging` load; closing case on main and its case check
 

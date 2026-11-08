@@ -40,7 +40,7 @@ def score(out):
     cleanup, keep, nxt = (field(text, n).replace("`", "") for n in ("Cleanup", "Keep", "Next"))
     none = lambda s: s.strip("'\" .").lower() in ("", "none")  # noqa: E731
     deletes = re.search(r"\bbranch\s+(-[dD]|--delete)\b.*ticket-31|update-ref\s+-d.*ticket-31|\bworktree\s+remove\b", cleanup)
-    redo = re.search(r"6\.3|squash|re-?do|re-?run|merge", nxt, re.I) and not re.search(r"^(step )?6\.4\b|^(step )?6\.5|^(step )?9", nxt.strip(), re.I)
+    redo = re.search(r"6\.3|squash|re-?do|re-?run|merge", nxt, re.I) and not re.search(r"^(step )?6\.5|^(step )?9\b|^(step )?6\.4\b(?!.{0,40}(fail|redo|re-do|not))", nxt.strip(), re.I)
     if fx["scenario"] == "unlanded":
         check("cleanup: deletes neither the Ticket branch nor its worktree", none(cleanup) and not deletes, cleanup)
         check("keep: the branch ticket-31 and its worktree wt-31", "ticket-31" in keep and "wt-31" in keep, keep)

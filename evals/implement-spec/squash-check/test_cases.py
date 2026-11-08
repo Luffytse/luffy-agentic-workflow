@@ -24,6 +24,9 @@ Cleanup: git worktree remove /tmp/wt-31 && git branch -D ticket-31
 Keep: none
 Next: step 6.5, open the draft Spec pull request
 """
+UNLANDED_PASSING = {
+    "Next starts with the failed 6.4 check": UNLANDED.replace("Next: redo step 6.3,", "Next: Step 6.4 check failed; redo 6.3:"),
+}
 UNLANDED_WRONG = {
     "main's step 6.4: deletes both": UNLANDED.replace("Cleanup: none", "Cleanup: git worktree remove /tmp/wt-31 && git branch -D ticket-31").replace("Keep: branch ticket-31 and worktree wt-31, both unpushed work", "Keep: none"),
     "deletes the branch only": UNLANDED.replace("Cleanup: none", "Cleanup: git branch --delete ticket-31"),
@@ -67,6 +70,11 @@ def main():
             r = run(o, ref)
             print(("PASS " if r.returncode == 0 else "FAIL ") + f"{scen} reference answer scores clean")
             fails += r.returncode != 0
+            for name, ans in (UNLANDED_PASSING if scen == "unlanded" else {}).items():
+                w = make_fixture.build(t / ("ok-" + name.replace(" ", "-")), scen)
+                r = run(w, ans)
+                print(("PASS " if r.returncode == 0 else "FAIL ") + f"{scen} passing variant scores clean: {name}")
+                fails += r.returncode != 0
             for name, ans in wrong.items():
                 w = make_fixture.build(t / (scen + "-" + name.replace(" ", "-").replace("'", "").replace(":", "")), scen)
                 r = run(w, ans)
