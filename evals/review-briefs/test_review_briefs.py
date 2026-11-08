@@ -639,6 +639,36 @@ class VerifierBrief(Base):
                 self.assertIn("standards", r.stderr)
                 self.assertIn("nothing found", r.stderr)
 
+    def test_nothing_found_line_may_carry_a_short_explanation_after_a_separator(self):
+        for text in ("nothing found\n",
+                     "Nothing found: no security or privacy Finding in this diff.\n\n## Notes\n\n- checked the parser\n",
+                     "Nothing found. Checked the parser and the cache.\n",
+                     "No issues found - the diff only renames a file.\n",
+                     "No findings found \u2013 clear.\n", "No candidates found \u2014 clear.\n",
+                     "...Nothing found: clear\n"):
+            with self.subTest(text=text):
+                s = self.scratch()
+                reports = self.all_clear()
+                reports["standards"] = text
+                r = self.verify(s, reports)
+                self.ok(r)
+                self.assertRegex(r.stdout.lower(), r"no verifier")
+
+    def test_a_report_without_a_finding_or_a_line_starting_with_nothing_found_is_still_refused(self):
+        for text in ("## Notes\n\n- checked the parser\n", "Reviewed the diff.\n\nAll fine.\n",
+                     "I found nothing found-like in this diff.\n", "Result: nothing found\n",
+                     "Nothing found-like in this diff.\n", "Nothing found here, the cache is wrong.\n",
+                     "Reviewed.\n\n## Notes\n\nNothing found: clear\n"):
+            with self.subTest(text=text):
+                s = self.scratch()
+                reports = self.all_clear()
+                reports["standards"] = text
+                r = self.verify(s, reports)
+                self.assertEqual(r.returncode, 3)
+                self.assertIn("standards", r.stderr)
+                self.assertIn("nothing found", r.stderr)
+                self.assertEqual(s.files(), [])
+
     def test_a_report_of_a_finder_the_arguments_leave_out_is_refused_and_named(self):
         s = self.scratch()
         reports = self.all_clear()
