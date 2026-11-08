@@ -18,6 +18,19 @@ Pass: yes | no. Lessons: <what to change in implement-spec, if anything>
 
 ## Runs
 
+### 2026-11-08, branch `claude/project-thread-l4rfwp`, base main `293bf5e`, dev-skills 1.0.1 (no bump): #14 squash-check case
+
+Run level: decision-level in a subagent. Tier: regular.
+Setup: the [squash-check case](README.md#squash-check-check) (`squash-check/make_fixture.py <out-dir> unlanded|landed`), one fresh subagent per scenario per skill version (the branch's `implement-spec` folder, and a `git archive` of `origin/main` at `293bf5e`), each given the folder and `PROMPT.md` only, scored with `score.py`.
+Steps: step 6.4 after a chained step 6.3.
+Self-test: `python3 evals/implement-spec/squash-check/test_cases.py` passes (reference answers pass, planted wrong ones fail). Not a model run.
+PENDING: model run, branch, `unlanded` (expected to pass: nothing deleted, step 6.3 redone)
+PENDING: model run, branch, `landed` (expected to pass: worktree removed, `ticket-31` deleted)
+PENDING: model run, main, `unlanded` (expected to fail on the cleanup check: main's step 6.4 deletes with no check)
+PENDING: model run, main, `landed` (guard: expected to pass)
+Not exercised: a squash that landed with a differing file (the diff half of the check), a full build-flow run. The implementing session had no way to start a model subagent.
+Pass: PENDING. Lessons: PENDING.
+
 ### 2026-11-04, main `9d1de32`, dev-skills 0.80.0 (no bump): #695 merge-authority and corrective-check cases, spec flow, through the `merging` load; closing case on main and its case check
 
 Run level: decision-level in a subagent (merge-authority); decision-level in a session (closing)
