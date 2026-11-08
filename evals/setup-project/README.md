@@ -23,10 +23,10 @@ These cases do not exercise exploration, an actual grilling exchange, the user's
 
 For each, pass only when the full draft:
 
-- Carries the five steps of "The loop" in `team-lead/DELIVERY-LOOP.md` as that file gives them: a Startup verification thread before any Build thread, a Release thread to plan when no Release is current, Build threads only for the current Release's label, a Release thread to cut and plan the next when its issues have closed, and a report thread when every feature is merged or parked. Meaning, not exact wording; the file's text should appear verbatim or nearly so.
+- Carries the five steps of "The loop" in `team-lead/DELIVERY-LOOP.md` as that file gives them: a Startup verification thread before any Build thread, a Release thread to plan when no Release is current, Build threads only for the current Release's label, a Release thread to cut and plan the next when its issues have closed, and a report thread when every feature is merged or parked. The file's text appears verbatim or nearly so, judged on meaning.
 - Does not leave the coordinator told only to run `milestone` or `team-lead` itself (it cannot load them).
 - For `no-plugin.txt`, still keeps the owner pointers and project choices (two-thread limit, backend before dashboard, migration merge gate, Boundary record pointer) without copying the Boundary record's values.
 - For `no-plugin-outside.txt`, still keeps the full instructions (thread kinds and skills, every brief field, Model tiers and model-start rule, limits and merge rules, tracker lookup).
 - Holds no current-work state and claims no approval, save or handover.
 
-Check by diff inspection that the existing `milestone-rerun.txt` and `no-milestone.txt` drafts (a coordinator that can load the plugin, or unstated) do not gain the loop.
+Both older prompts now state that the coordinator, asked to check its own skill list, answered that it can load `team-lead`, `milestone`, `release` and `worker-control`; their drafts must not gain the loop.
