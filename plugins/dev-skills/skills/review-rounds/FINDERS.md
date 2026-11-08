@@ -97,6 +97,6 @@ One Finder does the standards and spec Finders' work on the new commits: give it
 
 ## Report format
 
-A Finder's report is Markdown. It is either one or more Findings, each in the Finding format and starting with its `###` heading, or one line saying nothing found.
+A Finder's report is Markdown. It is either one or more Findings, each in the Finding format and starting with its `###` heading, or one line starting with "nothing found", which may carry a short explanation after `:`, `.` or ` - ` ("Nothing found: no security Finding in this diff.").
 
-Notes (a checked-and-clear list, a section label, anything that is not a Finding) go after the last Finding, or after the nothing-found line, under one `## Notes` heading. A report has no other heading: no `###` heading that is not a Finding, and no `##` heading but `## Notes`. The Verifier reads a report in this format; its notes are context, not Findings.
+Notes (a checked-and-clear list, a section label, anything that is not a Finding) go after the last Finding, or after the nothing-found line, under one `## Notes` heading; an explanation longer than the line goes there too. A report has no other heading: no `###` heading that is not a Finding, and no `##` heading but `## Notes`. The Verifier reads a report in this format; its notes are context, not Findings.

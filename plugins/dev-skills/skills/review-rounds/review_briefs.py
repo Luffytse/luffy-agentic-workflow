@@ -45,8 +45,9 @@ SKILL.md names it: standards, spec (only with --spec), adversarial (standard and
 later.md. It defaults to <out>/reports, so the thread passes it only for reports kept elsewhere. A Finder that could not
 write its file said so in its final message, and the thread saves that message there. First every report is checked
 against the Report format (FINDERS.md): it must hold one or more Findings in the Finding format (a heading and every
-field line of the format) or a line saying nothing found ("nothing found", "no issues found", "no findings found" or "no
-candidates found", any case, punctuation ignored), and any notes after the last Finding or the nothing-found line under
+field line of the format) or a line saying nothing found (its first words "nothing found", "no issues found", "no findings found" or "no
+candidates found", any case, optional leading punctuation, then the end of the line or ":", "." or " - " (also an en or
+em dash) and a short explanation), and any notes after the last Finding or the nothing-found line under
 one "## Notes" heading. Any other heading (a section label, "### (a) ...") is refused, as are a second "## Notes" and a
 Finding after "## Notes". Notes are not Findings: a report whose only content is nothing found plus notes counts as
 nothing found. A report of a Finder the arguments leave out (spec.md without --spec, adversarial.md at quick) stops the
@@ -546,7 +547,8 @@ FINDERS_ALL = ("standards", "spec", "adversarial", "security", "later")
 NOTES = re.compile(r"^## Notes\s*$")
 NOTES_RULE = ("the Report format (FINDERS.md): Findings only, each under its own Finding heading, and any notes after "
               "the last Finding under one '## Notes' heading, with no other heading")
-NOTHING = re.compile(r"^\W*(?:nothing|no\s+(?:findings|issues|candidates))\s+found\W*$", re.I)
+NOTHING = re.compile(r"^\W*(?:nothing|no\s+(?:findings|issues|candidates))\s+found\b(?:\W*$|\s*[:.].*|\s+[-\u2013\u2014]\s.*)",
+                     re.I)
 
 
 def has_findings(rules, text):
@@ -571,7 +573,7 @@ def report_problem(rules, text):
     if not found:
         if any(NOTHING.match(line) for line in lines[:notes[0] if notes else len(lines)]):
             return None
-        return "it has no Finding heading and has no line saying nothing found (\"nothing found\"); see %s" % NOTES_RULE
+        return "it has no Finding heading and has no line starting with \"nothing found\" (optionally followed by ':', '.' or ' - ' and a short explanation); see %s" % NOTES_RULE
     ends = sorted(i for i, _l, _line in hs)
     for i, line in found:
         block = lines[i + 1:next((j for j in ends if j > i), len(lines))]
