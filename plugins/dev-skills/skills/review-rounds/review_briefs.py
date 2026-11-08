@@ -60,7 +60,8 @@ answers, the earlier open Findings with their disputes (--earlier), the meaning 
 only the Always check lines whose name a candidate's Bug class matches (same words, ignoring case and punctuation, or
 one containing the other), with the review-record meaning. When every report is "nothing found" and --earlier is
 absent or empty, no Verifier runs: nothing is written, any old verifier.md is removed, and the output says so. The
-Verifier's tier (premium at Deep) is in the printed line.
+Verifier's tier (premium at Deep) is in the printed line. The brief names <out>/reports/verifier.md for the Verifier's
+report, as each Finder brief names its file.
 
 Inputs the thread passes, all files: --spec (the spec's text), --standards (a list of standards files, one path per
 line, relative to --repo), --earlier (the earlier open Findings with their disputes), --design (the design answers),
@@ -74,7 +75,9 @@ Every brief sentence is cut out of the skill's brief files (FINDERS.md, DEEP.md,
 docs-index skills beside this one) when the script runs; none is copied into it. A section it cannot find stops it
 with a message naming the section (exit 3) and nothing is written. --out must be outside the work tree; the script
 replaces the finder-*.md (verify and disputes: verifier.md) files already there, removes any <finder>.md report left in
-<out>/reports (it makes no such directory; a Finder makes it when it writes), and writes nothing else anywhere. It calls only `git`.
+<out>/reports (it makes no such directory; a Finder makes it when it writes), and writes nothing else anywhere.
+The verify and disputes briefs also name <out>/reports/verifier.md as the file the Verifier writes its report to (it also
+returns it); a verify or disputes run removes an old verifier.md report there. It calls only `git`.
 
 Exit 0 written, 2 usage error, 3 a section could not be found or a Finder report is missing, empty or off-format (verify). Prints one line per file: file, role, tier.
 """
@@ -222,6 +225,9 @@ class Rules:
             raise MissingSection("docs-index contract")
         verify = read_skill_file("review-rounds/VERIFY.md")
         self.verifier_brief = quoted(verify, "Brief", "Verifier brief")
+        self.verifier_report_file = quoted(verify, "Report file", "Verifier report file rule")
+        if "<report path>" not in self.verifier_report_file:
+            raise MissingSection("path place in the Verifier report file rule")
         m = re.search(r"on the (cheap|regular|premium) tier \((cheap|regular|premium) at Deep\)", verify)
         if not m:
             raise MissingSection("Verifier tier")
@@ -626,6 +632,14 @@ def raw_fence(text):
     return "%s\n%s%s%s" % (ticks, text, "" if text.endswith("\n") else "\n", ticks)
 
 
+def verifier_report_part(rules, out):
+    return "## Report file\n\n" + rules.verifier_report_file.replace("<report path>", str(out / "reports" / "verifier.md"))
+
+
+def drop_stale_verifier_report(out):
+    (out / "reports" / "verifier.md").unlink(missing_ok=True)  # an earlier Round's report must not pass for this one's
+
+
 def build_verify(rules, a):
     rv = RoundValues(rules, a)
     spec = read_text_file(a.spec, "spec") if a.spec else None
@@ -669,6 +683,7 @@ def build_verify(rules, a):
         "## Copy rule\n\n" + rules.copy_rule,
         rules.format,
         rules.report_format,
+        verifier_report_part(rules, rv.out),
         "## Candidates, tagged with their Finder",
     ]
     for f in finders:
@@ -689,6 +704,7 @@ def verify(args):
     out, text = build_verify(rules, args)
     out.mkdir(parents=True, exist_ok=True)
     (out / "verifier.md").unlink(missing_ok=True)
+    drop_stale_verifier_report(out)
     if text is None:
         print("no Verifier runs: every Finder reported nothing found and no earlier Finding is open; nothing written")
         return
@@ -714,9 +730,11 @@ def disputes(args):
         "Last Round's head: `%s`. Repository: `%s`." % (args.round, args.level.capitalize(), head, base, repo),
         important_part, skip_part,
         "## Copy rule\n\n" + rules.copy_rule,
+        verifier_report_part(rules, out),
         "## Disputed Findings and their disputes\n\n" + raw_fence(text),
     ]) + "\n"
     out.mkdir(parents=True, exist_ok=True)
+    drop_stale_verifier_report(out)
     (out / "verifier.md").write_text(body)
     print("%s\tVerifier\t%s tier" % (out / "verifier.md", rules.verifier_tiers[1 if args.level == "deep" else 0]))
 

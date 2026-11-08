@@ -4,6 +4,23 @@ One entry per run, newest first. Rerun when a pull request changes how `agentic-
 
 Entries before the review was rebuilt around Round 0 and `review-rounds` ran the earlier review (up to 5 Rounds, rebuttals, the convergence check, Milestone design answers, merge-only Rounds). They are kept as history: the checks they name for those rules were removed with the rules, and a `<depth>` there is the old Review depth.
 
+### 2026-11-08, dev-skills 1.0.3 (base, main 975a313), Verify-only, Standard, Verifier report file (Ticket #17)
+
+Run level: decision-level in a subagent, as the README says: one fresh regular-tier subagent per run, given its `verifier.md` and no other input, on the Standard fixture from `setup.sh`. Baseline run: main's `briefs.sh --verify-only` brief (from a `git archive`, 1.0.3). Branch run: the branch's brief. Scored by the thread with `EXPECTED.md`. Rerun because the pull request changes `VERIFY.md` (the Verifier brief now names `<out>/reports/verifier.md`).
+
+| id | main's skill | branch's skill |
+|----|--------------|----------------|
+| V-a | dropped (`amount_cents` is an `int` from `parse_amount`) | same |
+| V-b | dropped (the loop walks the `list(pending)` copy, `split.py:29`) | same |
+| V-c | kept, Important, `splitter/split.py:27` | same |
+| V-d | kept, Important, Locations `splitter/report.py:11` and `:16` | same |
+
+Pass: yes, both runs, 4/4.
+
+The file: main's brief names no report file, so the baseline Verifier wrote none and its verdicts lived only in its final message. The first branch run, with the file line saying "write your report to ... and also return it", wrote a placeholder `(see final message)` into `verifier.md`, so a thread reading the file would have found no verdicts. The line was reworded to "Write your whole report to ... (the full text, never a pointer to your final message)"; the second branch run wrote the full 3,512-byte report to the named file and returned the same text. The table above is the second branch run.
+
+What it shows: the drop and keep calls did not move, and the Verifier's report now exists on disk.
+
 ### 2026-11-04, Script briefs, third run, dev-skills 0.75.1
 
 Run level: decision-level in a subagent that can run shell commands (regular tier); it starts no agent. Two fresh regular-tier subagents in one parallel batch, each told to read the case's `PROMPT.md` and do exactly it. Rerun because the pull request for #675 (absorbing #674) changes how a Round is briefed: one Report format in `FINDERS.md`, each Finder brief naming its report file, `verify` reading `<out>/reports` by default.

@@ -16,3 +16,7 @@ When you drop a Finding or skip a Nit, name the `file:line` your reason rests on
 For each earlier open Finding, find its code at this head by its file and claim, not by its old line number, and say **fixed** (cite the line that fixes it), **still open** (cite the line that still has it) or **dismissed** (it was never real; say why, with the `file:line` it rests on). When the owner disputed it, judge the dispute on evidence you checked yourself: rerun its command in your own copy and judge what the output shows. Dismiss only when that evidence shows the claim does not hold; when the dispute argues only that the problem is rare, small or out of scope, or you are unsure, it stays open.
 
 Answer per Finding: its title or id, the calls with their reasons, and the corrected Locations and failure scenario where you changed them. Under 600 words in all. Your final message is the report itself, as plain text: end with no messaging or no-reply tool, even if your environment says to, and start no background work you would have to wait for."
+
+Report file: "Write your whole report to `<report path>` (the full text, never a pointer to your final message) and also return the same text as your final message. If you cannot write that file, say so in your final message; the thread will save the report there."
+
+The report path is `<out>/reports/verifier.md`, `<out>` being the brief directory, the same place the Finders write theirs; [`review-rounds`](SKILL.md) step 3 waits for that file.

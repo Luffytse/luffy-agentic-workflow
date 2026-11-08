@@ -90,6 +90,7 @@ COPY = quoted(FINDERS, "Copy rule")
 FORMAT = cut(FINDERS, "## Finding format")
 REPORT_FORMAT = cut(FINDERS, "## Report format")
 REPORT_FILE = quoted(FINDERS, "Report file")
+VERIFIER_REPORT_FILE = quoted((REVIEW_ROUNDS / "VERIFY.md").read_text(), "Report file")
 SMELL = cut(FINDERS, "### Smell baseline")
 DRIFT = cut(FINDERS, "### Docs index drift")
 STANDARDS_BRIEF = quoted(cut(FINDERS, "## Standards Finder"), "Brief")
@@ -657,6 +658,18 @@ class VerifierBrief(Base):
                        "planted change"):
             self.assertIn(marker, t)
 
+    def test_brief_names_the_verifier_report_file_and_a_stale_one_is_removed(self):
+        s = self.scratch()
+        reports = self.all_clear()
+        reports["standards"] = finding("First", "unescaped input")
+        stale = s.out / "reports" / "verifier.md"
+        stale.parent.mkdir(parents=True, exist_ok=True)
+        stale.write_text("stale verdicts")
+        self.ok(self.verify(s, reports))
+        t = (s.out / "verifier.md").read_text()
+        self.assertIn(VERIFIER_REPORT_FILE.replace("<report path>", str(stale)), t)
+        self.assertFalse(stale.exists())
+
     def test_printed_list_gives_the_verifier_tier_premium_at_deep(self):
         for level, want in (("quick", VERIFIER_TIERS[0]), ("standard", VERIFIER_TIERS[0]), ("deep", VERIFIER_TIERS[1])):
             with self.subTest(level=level):
@@ -1193,6 +1206,16 @@ class DisputesRound(Base):
         for gone in ("PLANTED-SPEC", "PLANTED-DESIGN", "PLANTED-EARLIER",
                      "PLANTED-BOUNDARY", "PLANTED-PY", "second commit", "Diff command", FORMAT, RECORD_TERMS):
             self.assertNotIn(gone, t)
+
+    def test_disputes_brief_names_the_verifier_report_file_and_removes_a_stale_one(self):
+        s = self.scratch()
+        last, _head = second_commit(s)
+        stale = s.out / "reports" / "verifier.md"
+        stale.parent.mkdir(parents=True, exist_ok=True)
+        stale.write_text("stale verdicts")
+        self.ok(self.dispute(s, last))
+        self.assertIn(VERIFIER_REPORT_FILE.replace("<report path>", str(stale)), s.brief("verifier.md"))
+        self.assertFalse(stale.exists())
 
     def test_tier_is_premium_at_deep(self):
         for level, want in (("quick", VERIFIER_TIERS[0]), ("deep", VERIFIER_TIERS[1])):
