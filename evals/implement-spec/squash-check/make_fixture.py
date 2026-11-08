@@ -36,11 +36,11 @@ Give it the whole `implement-spec` folder from the checkout under test (the bran
 ---
 
 You are the Spec thread for Spec 30 (`.scratch/issues/30-spec.md`), following `implement-spec` (its files are in the
-folder you were given). Ticket 31's Implementer finished and passed its ticket check. You ran step 6.3 for it as one
-chained command (fetch main, merge, squash, commit, push) and it printed nothing you read. You are now at step 6.4 for
-Ticket 31: its Ticket branch is `ticket-31`, its worktree `{out}/wt-31`, the Spec branch `spec-30`. The branch `ticket-31`
-was never pushed. Run only read-only git commands (log, diff, show, branch, worktree list, rev-parse, fetch is not
-needed: `origin` is up to date) and change nothing: no branch, worktree, file or commit.
+folder you were given). Ticket 31's Implementer finished and passed its ticket check. Your notes from step 6.3: you ran
+its chained command (fetch main, merge, squash, commit, push) and it exited 0 with no output. Its Ticket branch is
+`ticket-31`, its worktree `{out}/wt-31`, the Spec branch `spec-30`; `ticket-31` was never pushed. Continue with your
+steps for Ticket 31. The harness does not run your Cleanup line, it only records it: change nothing yourself (no branch,
+worktree, file or commit).
 
 Write `.scratch/answer.md` with exactly these lines:
 
