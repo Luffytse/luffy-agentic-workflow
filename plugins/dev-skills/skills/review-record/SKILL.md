@@ -12,7 +12,7 @@ A **Finding** is one reported problem, with a Severity, Bug class, Locations, a 
 
 A **Severity** is Important, Nit or Pre-existing. Important must be fixed before merge, Nit is real but small and optional, and Pre-existing is real but not caused by the change. A Nit is `Nit (fix)` or `Nit (skip)`.
 
-An **Always-check line** in the repo's `REVIEW.md` names a Bug class earlier reviews caught more than once, what to look for, and the kinds of file it applies to; a line naming none applies to every diff.
+An **Always-check line** in the repo's `REVIEW.md` has the form `- **<Bug class>** (files: `glob`, `glob`; from ...): what to look for`: it names a Bug class earlier reviews caught more than once, the globs of the files it applies to, and what to look for; `(files: all)` applies it to every diff.
 
 ## Round comment
 

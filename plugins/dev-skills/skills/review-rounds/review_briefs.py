@@ -23,7 +23,7 @@ ticket is a Ticket check, one Quick Round (SKILL.md, Ticket checks): the round1 
 
 fixed is a review since a fixed point, Round 1 only: the round1 briefs for `git diff --merge-base <fixed point>` (the
 working tree counts, as agentic-review gives it) and `git log <fixed point>..HEAD`, with the untracked new files
-(`git ls-files --others --exclude-standard`) listed in the brief and counted for the kinds of file.
+(`git ls-files --others --exclude-standard`) listed in the brief and counted for the files' globs.
 
 later is Round 2 or 3: it writes finder-later.md, the one later-Round Finder doing the standards and spec Finders' work
 (FINDERS.md, Later-Round Finder): both Finders' inputs and both briefs (the spec brief only with --spec), the diff of
@@ -66,7 +66,7 @@ Inputs the thread passes, all files: --spec (the spec's text), --standards (a li
 line, relative to --repo), --earlier (the earlier open Findings with their disputes), --design (the design answers),
 and --angle, a name from the adversarial angle list in FINDERS.md (default: the first, "Bugs and edge cases").
 Round values come from git: the diff command, commit list and head. From the repo it reads, when present, REVIEW.md
-(the meaning of Important, the Skip list, the Always check lines with the kinds of file they apply to),
+(the meaning of Important, the Skip list, the Always check lines, each `- **<Bug class>** (files: `glob`; from ...): ...`, `(files: all)` for every diff),
 docs/dev-skills/boundaries.md (the Boundary record) and docs/dev-skills/index.md (the docs index); each absent one
 falls back to the skill's default.
 
@@ -303,7 +303,11 @@ def read_text_file(path, what):
 
 
 def review_md_parts(repo):
-    """(important, skip, always lines as (text, globs)) from REVIEW.md; each None / empty when absent."""
+    """(important, skip, always lines as (text, globs)) from REVIEW.md; each None / empty when absent.
+
+    An Always check line is `- **<Bug class>** (files: `glob`, `glob`; from ...): what to look for`; `(files: all)`
+    says it applies to every diff (no globs). A line with no globs and not `all` still applies to every diff, and the
+    brief run warns about it (see unscoped)."""
     path = repo / "REVIEW.md"
     if not path.is_file():
         return None, None, []
@@ -327,9 +331,20 @@ def review_md_parts(repo):
     lines = []
     for chunk in always:
         text = "\n".join(chunk)
-        m = re.search(r"\(files: ([^)]*)\)", text)
-        lines.append((text, re.findall(r"`([^`]+)`", m.group(1)) if m else []))
+        lines.append((text, re.findall(r"`([^`]+)`", files_scope(text))))
     return body("Important"), body("Skip"), lines
+
+
+def files_scope(text):
+    """The part of a line's `(files: ...)` group before the first `;` ("" when it has no group)."""
+    m = re.search(r"\(files: ([^)]*)\)", text)
+    return m.group(1).split(";")[0] if m else ""
+
+
+def unscoped(text):
+    """True when an Always check line says neither globs nor `(files: all)`; it still applies to every diff."""
+    scope = files_scope(text)
+    return not (re.search(r"`[^`]+`", scope) or scope.strip() == "all")
 
 
 def applies(globs, changed):
@@ -397,6 +412,10 @@ class RoundValues:
             else:
                 self.label = "Round 1 of the review, level %s. Head: `%s`. Base: `%s`." % (level, head, base)
         self.important, self.skip, self.always = review_md_parts(repo)
+        for text, _globs in self.always:
+            if unscoped(text):
+                print("Always check line has no file scope; write (files: `glob`) or (files: all): %s"
+                      % text[:60].replace("\n", " "), file=sys.stderr)
         boundary_path = repo / "docs/dev-skills/boundaries.md"
         self.boundary = boundary_path.read_text().strip() if boundary_path.is_file() else None
         self.has_index = (repo / "docs/dev-skills/index.md").is_file()

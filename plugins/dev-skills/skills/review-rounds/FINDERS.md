@@ -23,7 +23,7 @@ The standards, spec and later-Round Finders also get the spec, the earlier Findi
 
 Add the standards files, and:
 
-- the `REVIEW.md` Always check lines for the kinds of file this diff touches (a line naming no kinds applies to every diff), with the Always-check meaning from `review-record` (load it by name); with none, drop (c);
+- the `REVIEW.md` Always check lines for the files this diff touches (each line's `(files: ...)` globs; `(files: all)` applies to every diff), with the Always-check meaning from `review-record` (load it by name); with none, drop (c);
 - the **smell baseline** below, only when the diff changes code; otherwise drop (b);
 - the **docs index drift** check, only when the repo has `docs/dev-skills/index.md`; otherwise drop (d).
 

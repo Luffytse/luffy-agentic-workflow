@@ -6,6 +6,7 @@ Each test builds a scratch repo with a planted change, writes the inputs to file
 back. What a brief must hold is read from the skill files the same way the script reads them (a section cut out, a
 quoted brief), never from a sentence of the skill's wording, so rewording a skill never fails a test. No agent runs.
 """
+import fnmatch
 import os
 import pathlib
 import re
@@ -37,7 +38,7 @@ Each line names the files it applies to.
 - **py line** (files: `*.py`; from #1): PLANTED-PY check for python files.
 - **sh line** (files: `*.sh`; from #2): PLANTED-SH check for shell scripts.
 - **docs line** (files: `docs/*`; from #3): PLANTED-DOCS check for docs.
-- **any line**: PLANTED-ANY check that names no kinds of file.
+- **any line** (files: all): PLANTED-ANY check that applies to every diff.
 """
 
 
@@ -318,7 +319,7 @@ class AlwaysCheck(Base):
         self.assertIn("PLANTED-PY", t)       # src/app.py changed
         self.assertIn("PLANTED-DOCS", t)     # docs/note.md changed
         self.assertNotIn("PLANTED-SH", t)    # no shell script changed
-        self.assertIn("PLANTED-ANY", t)      # a line naming no kinds is always included
+        self.assertIn("PLANTED-ANY", t)      # a (files: all) line is always included
 
     def test_a_line_matching_nothing_is_left_out_and_a_kindless_line_stays(self):
         s = self.scratch(change="docs")
@@ -326,6 +327,79 @@ class AlwaysCheck(Base):
         t = s.brief("finder-standards.md")
         self.assertNotIn("PLANTED-PY", t)
         self.assertIn("PLANTED-ANY", t)
+
+
+def template_example():
+    """The example Always-check line of the shipped setup-dev-skills REVIEW.md template."""
+    text = (SKILLS / "setup-dev-skills/review.md").read_text()
+    lines = [l[2:] for l in text.split("## Always check", 1)[1].splitlines() if l.startswith("> - **")]
+    assert lines, "the shipped template has no example Always-check line"
+    return lines[0]
+
+
+def review_with(line):
+    return REVIEW_MD.split("## Always check")[0] + "## Always check\n\n" + line + "\n"
+
+
+class AlwaysCheckForm(Base):
+    """The one Always-check line form: `- **<Bug class>** (files: `glob`, `glob`; from ...): what to look for`."""
+
+    def test_the_shipped_templates_example_line_is_read_back_by_name_and_by_globs(self):
+        line = template_example()
+        name = re.match(r"- \*\*(.+?)\*\*", line).group(1)
+        globs = re.findall(r"`([^`]+)`", re.search(r"\(files: ([^)]*)\)", line).group(1))
+        self.assertTrue(globs, "the example line names no globs")
+        marker = "PLANTED-TEMPLATE"
+        line = line + " " + marker
+        s = self.scratch(review=review_with(line), change="docs")
+        self.ok(s.run("quick"))
+        shipped_matches_docs = any(fnmatch.fnmatch("docs/note.md", g) or fnmatch.fnmatch("src/app.py", g) for g in globs)
+        # the globs scope it: included exactly when a changed file matches
+        self.assertEqual(marker in s.brief("finder-standards.md"), shipped_matches_docs)
+        # a changed file that matches a glob brings it in (plant one)
+        probe = next(g for g in globs if "*" in g)
+        rel = probe.replace("**", "x").replace("*", "probe")
+        s2 = self.scratch(review=review_with(line))
+        s2.write(rel, "changed\n")
+        git(s2.repo, "add", "-A")
+        git(s2.repo, "commit", "-q", "-m", "match")
+        self.ok(s2.run("quick"))
+        self.assertIn(marker, s2.brief("finder-standards.md"))
+
+    def test_the_shipped_template_as_is_has_no_live_always_check_line(self):
+        s = self.scratch(review=(SKILLS / "setup-dev-skills/review.md").read_text())
+        r = s.run("quick")
+        self.ok(r)
+        self.assertNotIn("api client", s.brief("finder-standards.md"))
+        self.assertNotIn("file scope", r.stderr)
+
+    def test_only_the_part_before_the_first_semicolon_is_the_scope(self):
+        for line, expect_in in (("- **x** (files: all; from `y`): PLANTED-SEMI check.", True),
+                                ("- **x** (files: `a.py`; from `d42ca69`): PLANTED-SEMI check.", False)):
+            with self.subTest(line=line):
+                s = self.scratch(review=review_with(line), change="docs")
+                r = s.run("quick")
+                self.ok(r)
+                self.assertEqual("PLANTED-SEMI" in s.brief("finder-standards.md"), expect_in)
+                self.assertNotIn("file scope", r.stderr)
+
+    def test_files_all_applies_to_every_diff_with_no_warning(self):
+        s = self.scratch(review=review_with("- **everywhere** (files: all; from #1): PLANTED-ALL check."), change="docs")
+        r = s.run("quick")
+        self.ok(r)
+        self.assertIn("PLANTED-ALL", s.brief("finder-standards.md"))
+        self.assertNotIn("file scope", r.stderr)
+
+    def test_a_line_with_no_scope_warns_on_stderr_and_is_still_included(self):
+        for line in ("- **unscoped one** (from #1): PLANTED-NOSCOPE check.",
+                     "- **unscoped one** (files: ; from #1): PLANTED-NOSCOPE check."):
+            with self.subTest(line=line):
+                s = self.scratch(review=review_with(line))
+                r = s.run("quick")
+                self.ok(r)
+                self.assertIn("PLANTED-NOSCOPE", s.brief("finder-standards.md"))
+                self.assertIn("Always check line has no file scope; write (files: `glob`) or (files: all): - **unscoped one**",
+                              r.stderr)
 
 
 class Conditionals(Base):
@@ -816,6 +890,15 @@ class VerifierBrief(Base):
         self.assertIn("PLANTED-EARLIER", t)
         self.assertIn("verifier.md", r.stdout)
 
+    def test_the_shipped_templates_example_line_is_named_by_a_candidates_bug_class(self):
+        line = template_example()
+        name = re.match(r"- \*\*(.+?)\*\*", line).group(1)
+        s = self.scratch(review=review_with(line + " PLANTED-TEMPLATE"))
+        reports = self.all_clear()
+        reports["standards"] = finding("A thing", name)
+        self.ok(self.verify(s, reports))
+        self.assertIn("PLANTED-TEMPLATE", (s.out / "verifier.md").read_text())
+
     def test_always_check_lines_only_for_the_bug_class_a_candidate_names(self):
         s = self.scratch()
         reports = self.all_clear()
@@ -1207,7 +1290,7 @@ class FixedPoint(Base):
         self.ok(run_cmd(s, "fixed", "--level", "quick", "--base", "main", *inputs(s)))
         t = s.brief("finder-standards.md")
         self.assertIn("tools/run.sh", t)
-        self.assertIn("PLANTED-SH", t)  # an untracked file counts for the kinds of file
+        self.assertIn("PLANTED-SH", t)  # an untracked file counts for the globs
         diff_cmd = re.search(r"git -C \S+ diff [^\n]*", t).group(0)
         self.assertNotIn("...", diff_cmd)  # not a committed-only three-dot range
         out = subprocess.run(diff_cmd.split(), text=True, capture_output=True).stdout
