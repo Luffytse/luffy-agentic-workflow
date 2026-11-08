@@ -13,6 +13,6 @@ Change: Ticket #31 (`setup-project` asks the coordinator about its skill access 
 - Main, `no-plugin.txt`: FAIL as expected. A short Milestone form telling the coordinator to run `milestone` and `team-lead`; it adds only an improvised "tell the user which skill is missing and wait"; none of the five loop steps.
 - Main, `no-plugin-outside.txt`: FAIL as expected. Full instructions plus an improvised "name the skill in each brief, don't load plugin skills"; no loop steps and no delivery path.
 - History, regression at fabdf36: `milestone-rerun.txt` and `no-milestone.txt` PASS, neither draft gained the loop.
-- Owed: the final wording change to `DELIVERY-LOOP.md` (the model the project's instructions map to the tier, else the worker tool's default) is rerun by the coordinator on the two no-plugin cases; the result is recorded here before merge. PENDING: both cases at the final commit.
+- Branch runs at a62e5f7 (the final text, with the loop's "or the worker tool's default model when they give none" sentence): `no-plugin.txt` and `no-plugin-outside.txt` PASS. Both drafts carried the gated loop verbatim, including that sentence, with the Build-thread kinds, no instruction to run `milestone`, `team-lead` or `release`, the project choices kept and no state or handover claim. Run by the coordinator, regular tier, decision-level, skills from a `git archive` of a62e5f7. Main baselines unchanged.
 
 No regression guard is needed: main fails both new cases. Not exercised: exploration, a real grilling exchange, approval or save.
