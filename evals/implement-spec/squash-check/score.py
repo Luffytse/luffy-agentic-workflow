@@ -5,7 +5,7 @@ Usage: score.py <out-dir>
 Prints one line per check (PASS, or FAIL with what it saw) and exits 1 when any fails. It reads the answer's decision,
 never the skill's text. `unlanded` (fixture.json): origin's spec-30 lacks Ticket 31's squash commit, so the run deletes
 neither the branch nor the worktree (Cleanup none, Keep names ticket-31 and wt-31) and goes back to step 6.3.
-`landed` and `later` (a later commit changed the file; still landed): the squash commit is there and the files match, so Cleanup removes the worktree and deletes ticket-31, and the
+`landed` and `later` (a later commit changed the file; still landed): the squash commit is there (the files match in `landed`, differ in `later`), so Cleanup removes the worktree and deletes ticket-31, and the
 run does not redo 6.3. Nothing in git may have changed.
 """
 import json

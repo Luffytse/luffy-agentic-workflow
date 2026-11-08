@@ -20,7 +20,7 @@ Pass: yes | no. Lessons: <what to change in implement-spec, if anything>
 
 ### 2026-11-08, branch `claude/project-thread-l4rfwp`, base main `293bf5e`, dev-skills 1.0.1 (no bump): #14 squash-check case
 
-Setup: the [squash-check case](README.md#squash-check-check) (`squash-check/make_fixture.py <out-dir> unlanded|landed`), one fresh subagent per scenario per skill version (the branch's `implement-spec` folder, and a `git archive` of `origin/main` at `293bf5e`), each given the folder and `PROMPT.md` only, scored with `score.py`.
+Setup: the [squash-check case](README.md#squash-check-check) (`squash-check/make_fixture.py <out-dir> unlanded|landed|later`), one fresh subagent per scenario per skill version (the branch's `implement-spec` folder, and a `git archive` of `origin/main` at `293bf5e`), each given the folder and `PROMPT.md` only, scored with `score.py`.
 Steps: step 6.4 after a chained step 6.3.
 Self-test: `python3 evals/implement-spec/squash-check/test_cases.py` passes (reference answers pass, planted wrong ones fail). Not a model run.
 Run level: decision-level in a subagent. Tier: regular, one fresh subagent per run, single run each, made by the coordinator and scored with `score.py`.
