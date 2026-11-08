@@ -50,3 +50,17 @@ Necessity subagent started: main no (not needed), branch no (no Agent tool). The
 The confirmed-path run (a Ticket for #41 with `necessity check: confirmed`) is therefore not recorded: it needs a top-level session that can start subagents, which the building thread could not make (a nested `claude -p` run was refused by the permission classifier). It is not claimed passed.
 
 Not exercised: the confirmed path above, the app-server install, `to-tickets` itself (the prompt has the run file the Ticket), a necessity check that does not confirm, and a group held back by the cap or decided at a Release end.
+
+## 2026-11-08 — #32 Retro scope
+
+Case `scope` (see the README): built by `scope.py`, self-tested by `test_scope.py` (28 tests: the rendered input says what the case means, a reference run passes, and planted wrong runs fail, among them main's behaviour). Regular tier, subagent runs, no dialogue or events kept; the branch's and main's skills are taken from checkouts.
+
+| Check | Result |
+| --- | --- |
+| Premium case check (fresh premium-tier subagent, whole skill folder and case files, before the runs) | Two rounds, both FIX, both applied. Round 1 (on `5ed6737`): the "no sentence in each skill" regex failed a correct negated wording; "exactly one Ticket" was stricter than the skill; the Harness wording and the absorb and Scope-row checks were too loose or too tight; one prompt sentence hinted the refile. Fixed in `37c7b71`. Round 2: five more correct wordings failed `absorbed()` and `asks_sentence_in_skills()`; fixed in `e8c0c45` (28 tests). Final scorer verdict: keep. |
+| Main's skill (`ed0e147`, plugin 1.1.0, from a `git archive` of main) | Red for the right reason, 1 run: 11 of 18 lines pass, 7 FAIL. No Scope in the record for #51, #52 and #53; the Ticket does not aim at the Harness reference; #54 is not refiled, not closed with a link and the record does not say it was refiled (main closed #54 as `wontfix`). |
+| This branch's skill | First run (branch skills at `5ed6737`, before the last wording fix, scored with an earlier scorer): 17 of 18. It refiled #54 but labelled it `needs-triage`, which Retros never carry. The fix was one sentence in `retro-planning` step 1 (`6f80247`: file it as `retro`'s filing step does, label `retro`, never `needs-triage`). After it, two fresh runs both scored 18 of 18, re-scored with the final scorer (`e8c0c45`). |
+
+After the Round 1 fix (`1b9f15a` skills) one more branch run, 18 of 18 with the final scorer.
+
+Tier regular (subagent runs). Not exercised: a Retro that mixes scopes (split), a re-run that finds a Scope already assigned in an earlier record, and a Scope assigned by an issue comment.
