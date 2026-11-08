@@ -1,0 +1,10 @@
+Use setup-project to draft project instructions. This is a bounded draft-stage check: exploration and grilling have finished, and the user has explicitly confirmed all facts below. Produce the full draft, then wait for approval. Write no files and send no messages.
+
+Project facts:
+- Project: Orchard, repo orchard-team/orchard, tracker GitHub Issues only, documented in docs/dev-skills/issue-tracker.md.
+- docs/dev-skills/index.md and CLAUDE.md exist. Use those relative paths as links; this is a fixture, so no real tracker/repo lookup is needed.
+- No existing project instructions. No open Milestone agreement, including if a past Milestone is closed.
+- You are a project thread, not the coordinator. You asked the coordinator to check its own skill list, and it answered: "My skill list holds only built-in skills; I cannot load the plugin's skills."
+- A coordinator starts planning threads with wayfinder, to-spec and to-tickets; Spec threads run implement-spec, lone Ticket threads run implement.
+- Every brief includes skill, Model tier, repo, Review level and the issue link. Start each thread on the model mapped to its brief's Model tier. No custom map; use model-tiers defaults.
+- At most two Build threads at once. User merges schema migrations; agents merge ordinary changes after clean Review and green CI.
