@@ -71,6 +71,18 @@ One at a time, in this order. Each feature is its own issue carrying `milestone-
                      "Acceptance with only its first line, Excluded: None.). Is this right?\n")
 
 
+def plan_setaside_run(repo, ask=True, excluded="- Translations (`31-translations.md`), set aside for a later Milestone.",
+                      label31=False):
+    actions, qs = plan_small_run(repo)
+    actions = actions.replace("- None.", excluded)
+    if label31:
+        actions += block(5, "Apply / remove labels", ".scratch/issues/31-translations.md", "Add: milestone-1\nRemove: none\n")
+    if ask:
+        qs = ("- Some work is set aside for a later Milestone: 31 Translations (next Milestone), French and Spanish "
+              "greetings. Does any of it join this one?\n") + qs
+    return actions, qs
+
+
 def add_run(repo, case, ticket12=True, ask_agreement=None, labels_first=False, keep_colour=False):
     excluded = None
     if case == "add-feature-excluded":
@@ -138,6 +150,17 @@ expect("plan-small with a Boundaries section fails", "plan-small",
 expect("plan-small asking for a budget fails", "plan-small",
        lambda r: (plan_small_run(r)[0], plan_small_run(r)[1] + "- Is there a budget for this Milestone?\n"),
        False, "no question on what a one-Release Milestone defaults")
+expect("plan-setaside reference passes", "plan-setaside", plan_setaside_run, True)
+expect("plan-setaside without the set-aside question fails", "plan-setaside",
+       lambda r: plan_setaside_run(r, ask=False), False, "asked which set-aside work joins")
+expect("plan-setaside with Excluded saying None fails", "plan-setaside",
+       lambda r: plan_setaside_run(r, excluded="- None."), False, "Excluded names the translations")
+expect("plan-setaside labelling the set-aside issue fails", "plan-setaside",
+       lambda r: plan_setaside_run(r, label31=True), False, "no label on 31-translations")
+expect("plan-setaside with only the draft question naming 31 fails", "plan-setaside",
+       lambda r: (plan_setaside_run(r, ask=False)[0], plan_setaside_run(r, ask=False)[1]
+                  + "- Here is the draft; Excluded names 31 Translations. Is this right?\n"),
+       False, "asked which set-aside work joins")
 for c in ("add-feature", "add-feature-excluded"):
     expect(f"{c} reference passes", c, lambda r, c=c: add_run(r, c), True)
     expect(f"{c} leaving touched Ticket 12 as it was fails", c, lambda r, c=c: add_run(r, c, ticket12=False),

@@ -2,6 +2,16 @@
 
 One entry per run of the `milestone` skill's dry run (the planning cases and the report cases; the delivery entries below are history, see the first entry), newest first ([README](README.md) says how to build, run and score it). Record the commit and the plugin version from `plugins/dev-skills/.claude-plugin/plugin.json`; an entry written inside an open pull request names the commit and version it ran on as its base. Each planning run also applies the shape to one real Milestone issue (`score.py --shape`) and names the migration it needs, if any; each `deliver` run also applies the loop, read-only, to one real Milestone and names the thread it would start next and the next Release it would plan.
 
+## 2026-11-09 — Ticket #55: milestone planning offers set-aside work first, `plan-setaside` case
+
+Runner: the Ticket thread. Case check by a fresh premium-tier subagent: first verdict fix (the user's script named issue 31 and gave away the rule; the scorer counted the draft question), both fixed, then the self-test passes. Runs: one fresh premium-tier subagent each, `<checkout>` the branch's working tree or a `git archive` of main (`28f99ba`, plugin 1.2.0, unbumped), scored with the branch's `score.py`. Run level: decision-level in a subagent.
+
+| Case | Branch | Main | Main's failures |
+| --- | --- | --- | --- |
+| `plan-setaside` | 6/6 | 4/6 | never asked whether the set-aside issue 31 joins; Excluded reads `- None.` |
+
+Not exercised: the Retro, Spec-split, decision-ticket and relay sentences (wording-only rules, no case); a real tracker.
+
 ## 2026-11-04 — Ticket #638: model runs at `aeb9b39`, branch and main
 
 Runner: the coordinator. Each case got a fresh premium-tier subagent with only the text of its `PROMPT.md`, and `<checkout>` was set to a `git archive` copy (with `evals/` removed) of the branch (`aeb9b39`, plugin 0.61.0, unbumped) or of main (`c29d3b1`, 0.61.0). The add cases were rebuilt with `aeb9b39`'s `make-fixture.sh`. The plan cases are the runs from the entry below; their fixtures did not change in `aeb9b39`. All were scored with `aeb9b39`'s `score.py`. Run level: decision-level in a subagent. Evidence: [`evidence/638/`](evidence/638/), one folder per `<branch|main>-<case>` holding the prompt, `proposed-actions.md`, `questions.md`, `report.md` and `score.txt`. `main-plan-small` wrote no actions file.
