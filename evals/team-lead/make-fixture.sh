@@ -35,7 +35,7 @@ The coordinator follows these two. `docs/dev-skills/release.md` has the bump rul
 - Skill-changing pull requests merge one at a time. While a number is out (main's `VERSION` has not reached it and its pull request is open), give none: record the request as `Waiting` the same way and tell the thread to wait.
 - While the user's pause is in effect, give no number: record the request as waiting and tell the thread to wait; a number already out stays out and its merge may finish.
 
-**Ticket re-read after a skill merge.** Right after a pull request that changed a file under `skills/` merges, before any further thread starts, re-read the open issues of the Milestone that no running thread is building and whose body names the changed skill or a changed file, against main's new text of the skill: update an issue the change makes wrong or incomplete (the whole body written back with only that change and a one-line note naming the merge); close one it makes obsolete; otherwise comment that it was re-read and still fits.
+**Ticket re-read after a skill merge.** Right after a pull request that changed a file under `skills/` merges, before any further thread starts, re-read the open issues of the Milestone that no running thread is building and whose body names the changed skill or a changed file, against main's new text of the skill: update an issue the change makes wrong or incomplete (the whole body written back with only that change and a one-line note naming the merge); close one it makes obsolete as completed, with a note naming the merge; otherwise comment that it was re-read and still fits.
 MD
 
 cat > "$r/docs/dev-skills/index.md" <<'MD'

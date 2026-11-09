@@ -34,7 +34,7 @@ Skills tell a thread to follow the merge-time steps the repo's own docs give. Th
 
 **Ticket re-read after a skill merge.** Right after a pull request that changed a file under `plugins/dev-skills/skills/` merges, and before any further thread starts, the coordinator re-reads the open issues that no running thread is building and whose body names the changed skill or a changed file (inside a Milestone, only those carrying its membership label). Each is read against main's new text of the skill, with one of three outcomes:
 - the change makes it wrong or incomplete: update the issue (read the whole body, write it whole back with only that change and a one-line note naming the merge, read it back); a change that would alter a Milestone's agreement (goal, acceptance or exclusions) goes to the user as one question and that feature waits for the answer;
-- the change makes it obsolete: close it with a note naming the merge;
+- the change makes it obsolete: close it as completed, with a note naming the merge;
 - otherwise: comment that it was re-read after the merge and still fits.
 
 Then it reads the blockers again and takes the next start from what they now say. A running thread keeps the skill version it started with until its Ticket or Spec is done. The coordinator may hand the re-read to a `triage` thread, briefed with the merge, the changed skill, main's version and the issues, and start nothing further until it reports.
