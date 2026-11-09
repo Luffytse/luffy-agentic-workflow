@@ -76,9 +76,9 @@ Run it: take main's skills from a `git archive` (`git archive main plugins/dev-s
 
 Does the Ticket thread, when the environment refuses an action the rules allow (the merge itself, a push of a CI workflow file), hand the action once to the user or the coordinator with the exact change, record that it waits on it, and neither retry, work around the refusal nor stall silently? It covers the one sentence in `implement` step 2, `implement-spec` step 2 and `merging`'s "The merge".
 
-Files in [`env-refusal/`](env-refusal/): `PROMPT.md` (the decision prompt: a refused squash-merge the Boundary record allows, and a refused workflow-file push), `EXPECTED.md` (keep it away from the session under test) and `test.sh` (checks the files exist; it never greps skill text; `scripts/run-tests.sh` runs it).
+Files in [`env-refusal/`](env-refusal/): `PROMPT.md` (the decision prompt: scenario A, a refused squash-merge the Boundary record allows; scenario B, a refused workflow-file push in another Ticket), `EXPECTED.md` (keep it away from the session under test) and `test.sh` (checks the files exist; it never greps skill text; `scripts/run-tests.sh` runs it).
 
-**Run level and tier:** decision-level in a subagent (the prompt asks what the thread does and writes), regular tier. Run it: give a fresh subagent the text between the lines of `PROMPT.md` and the skills folder, once on the branch's skills and once on main's (`git archive`). Expected: the branch's run hands both actions over once, with the exact change, and records the wait; main's run fails at least one of those. Model-run results: see [RESULTS.md](RESULTS.md).
+**Run level and tier:** decision-level in a subagent (the prompt asks what the thread does and writes), regular tier. Run it: give a fresh subagent the text between the lines of `PROMPT.md` and the skills folder, once on the branch's skills and once on main's (`git archive`). Expected: the branch's run hands both actions over once, with the exact change, and records the wait; main's run fails at least one of those. Not covered by this case: the "coordinator (for a fresh thread)" path (a refused new branch off main) and `implement`'s designated-branch line. Model-run results: see [RESULTS.md](RESULTS.md).
 
 ## Main-check check
 
