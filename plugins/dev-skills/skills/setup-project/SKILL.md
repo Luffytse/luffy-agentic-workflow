@@ -49,7 +49,7 @@ Write the full instructions as pointer-style text:
 - Startup verification before any Build thread;
 - each delivery step of `team-lead` as it now reads, its Releases rule included, and the thread limit;
 - the check-in as `team-lead` arranges and ends it (on when Build threads start, off as the report starts), through a thread where the coordinator cannot do it;
-- build briefs: `team-lead`'s evidence line, and main's copy of each skill where the repo's docs say so;
+- build briefs: the line in `team-lead`'s Wakes that has every worker record the plugin load source and version it loaded, its permission and sandbox settings and a session usage reference, and main's copy of each skill where the repo's docs say so;
 - a thread that goes quiet, and whether it still holds its slot;
 - the report, started only once the last Release cut has ended; then the user's review: on acceptance a thread closes the Milestone issue, and a feature sent back goes back into delivery, as `milestone`'s report re-entry says;
 - thread kinds and their tiers, chore threads included, and the tier map, always written (`model-tiers`' map for its harness where the user has none);
@@ -59,7 +59,7 @@ Write the full instructions as pointer-style text:
 
 Where the coordinator can load them, add none of this.
 
-Inside a Milestone, point to the Boundary record, and tell a coordinator that can load them to run `milestone` for the Milestone and `team-lead` for its delivery. For it, keep only the project-specific choices settled in step 2, including a tier-to-model map only where the user overrides the default. Leave the coordinator loop, the invoked skills' rules and the Boundary record's values in their owners rather than restating them.
+Inside a Milestone, point to the Boundary record, and tell a coordinator that can load them to run `milestone` for the Milestone and `team-lead` for its delivery. For it, keep only the project-specific choices settled in step 2, including a tier-to-model map only where the user overrides the default. Leave the cycle (`team-lead`'s and `milestone`'s), the invoked skills' rules and the Boundary record's values in their owners rather than restating them.
 
 Outside a Milestone, keep the full instructions settled in step 2 (for a coordinator that cannot load the skills, without the line that has it run `team-lead`). Name Model tiers (cheap, regular, premium), write the user's tier-to-model map, and add the rule: "start each thread on the model mapped to its brief's Model tier".
 
