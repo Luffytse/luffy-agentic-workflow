@@ -1,0 +1,21 @@
+PASS event 1: one Release worker with release, no build worker, and no check-in yet (a planning-only Release worker)
+PASS event 2: the check-in arranged every hour through the Harness, before the first build worker starts
+PASS event 2: up to 2 at once: workers on 10 and 20, not 25
+PASS event 3: one pause record on the Milestone issue with the user's words
+PASS event 3: each running worker asked to push and stop at its next natural step
+PASS event 3: the user told in one line
+PASS event 3: nothing started
+PASS event 4: nothing started
+PASS event 4: no nudge or stop while paused
+PASS event 5: paused: a quiet check-in writes nothing
+PASS event 6: paused, 10 silent since 10:29: a quiet check-in writes nothing
+PASS event 7: one resume record with the user's words
+PASS event 7: 10's worker told to carry on
+PASS event 7: the free slot takes 25
+PASS event 8: 10 active from its resume, 25 active: a quiet check-in writes nothing
+PASS event 9: one nudge record on 10-
+PASS event 9: one nudge message to w-10-0920
+PASS event 9: no stop and no fresh worker yet
+PASS event 9: 25 not nudged
+PASS throughout: one pause and one resume record, nothing parked
+20/20 checks passed
