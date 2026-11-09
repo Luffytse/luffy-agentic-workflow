@@ -17,8 +17,11 @@ def readback(out):
 
 
 def has(t, terms):
-    """True when the ticket text (title, body or criteria, any line) carries one of the item's terms: its code name or a plain-words alternative."""
-    return any(k in t["text"] for k in terms)
+    """True when the ticket carries the item: its code name (first term) anywhere in the text, or a plain-words alternative
+    on the title line or a checkbox (acceptance criterion) line. Free prose does not count: it may only mention another item."""
+    lines = t["text"].splitlines()
+    named = [l for l in lines if l.startswith("#") or l.lstrip().startswith("- [")]
+    return terms[0] in t["text"] or any(k in l for k in terms[1:] for l in named)
 
 
 def reach(got, a, b):

@@ -74,10 +74,15 @@ expect("hidden: cycle fails", run("hidden", [("01", ("03",), B1), ("02", ("01",)
 # Reworded but correct tickets (criteria in plain words, not on checkbox lines, no code name) still carry each item.
 R1 = "Adds a shout option: a greeting can be shouted in capitals."
 R2 = "Records each greeting in a history file, appending a line per greeting."
-R3 = "Logs every shouted greeting to a loud log."
+R3 = "- [ ] Every shouted greeting is logged to a loud log."
 expect("reworded: hidden set in plain words passes", run("hidden", [("01", (), R1), ("02", ("01",), R3), ("03", ("01",), R2)]), False)
 expect("reworded: hidden set lacking the history item fails", run("hidden", [("01", (), R1), ("02", ("01",), R3)]), True)
 expect("reworded: one Ticket lacking the history item fails", run("shared", [("01", (), R1)]), True)
+
+# A prose mention of another item's words does not make a ticket carry that item.
+expect("prose: 02 mentioning the shout option, unblocked, fails", run("hidden", [("01", (), R1), ("02", (), R3 + "\nUses the shout option from the other ticket."), ("03", ("01",), R2)]), True)
+expect("prose: one shout Ticket mentioning the history fails", run("shared", [("01", (), "Adds shout option; update Greeting entry. Not the history.")]), True)
+expect("prose: 'history is item 03' in 02 does not count for 03", run("hidden", [("01", (), R1), ("02", ("01",), R3 + "\n\nThe greeting history is item 03, not this Ticket.")]), True)
 
 
 # Rendered input: what the agent reads must say what each case means.
