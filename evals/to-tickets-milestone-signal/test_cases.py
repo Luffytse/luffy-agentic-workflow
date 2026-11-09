@@ -35,8 +35,8 @@ def expect(label, got, ok):
 
 for n in CASES:
     expect(f"reference {n} passes", run(n), False)
-expect("planning: unfiled-blocker ticket ready", run("planning", {"01": ["ready-for-agent", "milestone-2"], "02": ["ready-for-agent", "milestone-2"]}), True)
-expect("planning: membership label missing", run("planning", {"01": ["ready-for-agent"], "02": []}), True)
+expect("planning: unfiled-blocker ticket ready", run("planning", {"01": ["ready-for-agent"], "02": ["ready-for-agent"]}), True)
+expect("planning: Milestone label guessed", run("planning", {"01": ["ready-for-agent", "milestone-2"], "02": ["milestone-2"]}), True)
 expect("planning: split not published", run("planning", {}), True)
 expect("planning: asked instead of publishing", run("planning", report="ticket 02 Hub login; may I publish, please approve the split?"), True)
 expect("labelled-unfiled: unfiled-blocker ticket ready", run("labelled-unfiled", {"01": ["ready-for-agent", "milestone-2"], "02": ["ready-for-agent", "milestone-2"]}), True)
@@ -46,7 +46,7 @@ expect("planning: blocker not reported", run("planning", report="published"), Tr
 expect("plain: published unasked", run("plain", {"01": ["ready-for-agent"], "02": ["ready-for-agent"]}), True)
 expect("plain: no question", run("plain", report="nothing published"), True)
 
-# Rendered input: the Spec has no label and no approval in either case; only `planning` has the caller's Milestone statement and the unfiled blocker.
+# Rendered input: the Spec has no label and no approval in either case; only `planning` has the caller's Milestone statement, and `planning` and `labelled-unfiled` have the unfiled blocker.
 for n, case in CASES.items():
     with tempfile.TemporaryDirectory() as out:
         build(out, n)

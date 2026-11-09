@@ -14,9 +14,9 @@ CHILDREN = {
 CASES = {
     "planning": {
         "milestone_statement": True, "unfiled_blocker": True,
-        "expect": {"01": [READY, "milestone-2"], "02": ["milestone-2"]},
+        "expect": {"01": [READY], "02": []},
         "report": {"02": ["hub login"]},
-        "meaning": "caller names Milestone 2 (no issue yet): split published unasked, Tickets get milestone-2; 02 waits on an unfiled blocker so it is not ready-for-agent and the report names that blocker",
+        "meaning": "caller names Milestone 2 (no issue yet): split published unasked, no Milestone label from to-tickets; 02 waits on an unfiled blocker so it is not ready-for-agent and the report names that blocker",
     },
     "labelled-unfiled": {
         "milestone_statement": False, "unfiled_blocker": True, "spec_labels": ["milestone-2"],
