@@ -13,9 +13,9 @@ def build(out, name):
       "A source Spec is `.scratch/greeter/SPEC.md` with its own `**Labels:**` line. Blocking: a `**Blocked by:**` line of ticket numbers; a blocker that is not filed yet is named in the ticket's text. No forge; no network.\n")
     w("docs/dev-skills/triage-labels.md", "# Triage labels\n\n| Role | Label |\n| --- | --- |\n| `ready-for-agent` | `ready-for-agent` |\n| `bug` | `bug` |\n| `enhancement` | `enhancement` |\n")
     w("docs/dev-skills/release.md", "# Release\n\nRelease labels start with `release-`.\n")
-    w("docs/dev-skills/boundaries.md", "# Boundaries\n\nNothing needs the user's approval. Milestone label form: `milestone-<n>`.\n")
+    w("docs/dev-skills/boundaries.md", "# Boundaries\n\nMilestone label form: `milestone-<n>`.\n")
     w("docs/dev-skills/index.md", "# Docs index\n\n- issue-tracker.md, triage-labels.md, release.md, boundaries.md\n")
-    spec = ["# Spec: greeter", "", "**Labels:**", "", "A plain-text greeting formatter and a greeting for logged-in users.", "", "## Proposed breakdown (not yet approved)", ""]
+    spec = ["# Spec: greeter", "", f"**Labels:** {', '.join(case.get('spec_labels', []))}".rstrip(), "", "A plain-text greeting formatter and a greeting for logged-in users.", "", "## Proposed breakdown (not yet approved)", ""]
     for cid, c in CHILDREN.items():
         blocked = f"the {UNFILED} feature (planned, not filed yet)" if (cid == "02" and case["unfiled_blocker"]) else ("01" if cid == "02" else "")
         spec.append(f"{cid}. {c['title']} (regular tier)" + (f", blocked by {blocked}" if blocked else ""))

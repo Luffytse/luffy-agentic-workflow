@@ -26,10 +26,16 @@ def score(out, name):
         if cid not in case["expect"]:
             fails.append(f"ticket {cid} must not be published")
     rep = open(os.path.join(out, "REPORT.txt")).read().lower()
-    if case.get("ask") and "?" not in rep:
-        fails.append("the run did not ask the user a question")
-    if not case.get("ask") and "?" in rep:
-        fails.append("the run asked a question where the split needed no approval")
+    asks = bool(re.search(r"(please|do you|can you|would you|may i|confirm)[^.]*approv|approv[^.]*\?", rep))
+    if case.get("ask") and "approv" not in rep:
+        fails.append("the run did not ask the user to approve the breakdown")
+    if not case.get("ask") and asks:
+        fails.append("the run asked for approval where the split needed none")
+    for cid in case["expect"]:
+        if case["unfiled_blocker"] and cid == "02" and cid in got:
+            body = open(glob.glob(os.path.join(out, f".scratch/greeter/issues/{cid}-*.md"))[0]).read().lower()
+            if "hub login" not in body:
+                fails.append(f"ticket {cid} body does not name the unfiled blocker")
     for cid, words in case["report"].items():
         if cid not in rep and CHILDREN[cid]["title"].lower() not in rep:
             fails.append(f"report does not name ticket {cid}")

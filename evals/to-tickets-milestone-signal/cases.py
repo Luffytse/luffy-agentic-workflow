@@ -18,6 +18,12 @@ CASES = {
         "report": {"02": ["hub login"]},
         "meaning": "caller names Milestone 2 (no issue yet): split published unasked, Tickets get milestone-2; 02 waits on an unfiled blocker so it is not ready-for-agent and the report names that blocker",
     },
+    "labelled-unfiled": {
+        "milestone_statement": False, "unfiled_blocker": True, "spec_labels": ["milestone-2"],
+        "expect": {"01": [READY, "milestone-2"], "02": ["milestone-2"]},
+        "report": {"02": ["hub login"]},
+        "meaning": "the Spec carries milestone-2 and the caller says nothing: split published unasked (the existing rule); 02 waits on an unfiled blocker, so it is not ready-for-agent and the report names that blocker",
+    },
     "plain": {
         "milestone_statement": False, "unfiled_blocker": False,
         "expect": {}, "ask": True,
