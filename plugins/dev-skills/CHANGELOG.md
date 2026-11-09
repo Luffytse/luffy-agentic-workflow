@@ -2,6 +2,14 @@
 
 What each version of `dev-skills` brought, newest first. Each pull request that changes a skill bumps the version, and each Release adds one entry here covering everything since the last Release: its goal, the versions it delivered, the issues it shipped, and what a project using the plugin must do when something breaks. Entries up to 0.25.0 are one per version, when only a Release bumped it.
 
+## Milestone 3 · Release 2 (2026-11-09)
+
+A skill-loading coordinator closes the Milestone issue once the user accepts the Milestone, so Milestone 3's own end runs the cycle cleanly without Lufei stepping in.
+
+Versions: 1.10.0. Commits: 69de11a..ae30934.
+
+- `milestone` closes the Milestone issue once the user accepts it (#78)
+
 ## Milestone 3 · Release 1 (2026-11-08)
 
 Deliver all nine Milestone 3 features in one Release, so the agentic cycle runs cleanly end to end, with this project's coordinator instructions rebuilt from the skills at the end.
