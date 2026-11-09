@@ -25,4 +25,4 @@ Each case: full run in a top-level session or a fresh regular-tier subagent, wor
 
 ## Run record
 
-None yet: the runs are owed to the Ticket #56 thread.
+See [RESULTS.md](RESULTS.md).
