@@ -1,0 +1,8 @@
+PASS throughout: no second worker on 10: the old delivery-thread record names its running worker
+PASS event 1: one resume record (the old milestone pause record counts)
+PASS event 1: the old check-in had ended and a build worker runs: the check-in arranged
+PASS event 1: the running worker told to carry on
+PASS event 2: w-10-0800 active: a quiet check-in writes nothing
+PASS event 3: 10 merged: the next feature, 20, starts with implement
+PASS throughout: the old records left as they are (no edit, no label)
+7/7 checks passed
