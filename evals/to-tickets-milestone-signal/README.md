@@ -1,0 +1,28 @@
+# to-tickets Milestone-signal and unfiled-blocker check
+
+Does `to-tickets` treat a Spec as in a Milestone when its caller says it is planning a feature of a named Milestone whose issue is not written yet (publish the split without asking, and leave the Milestone label to `milestone`), and does it leave `ready-for-agent` off a Ticket whose blocker is planned but not filed, naming that blocker in its report? Bounded publication check for Ticket #56 (absorbs #20 and #28). Local files only; no real issue or network call. The Boundary record holds only the label form `milestone-<n>`.
+
+## Files
+
+- [`cases.py`](cases.py): the three cases and their expected labels (below), shared by the other scripts.
+- [`make_fixture.py`](make_fixture.py): `python3 make_fixture.py <out-dir> <case>` builds a scratch repo (local-files tracker doc, triage-labels, release and Boundary docs, `.scratch/greeter/SPEC.md` with an unapproved breakdown, `PROMPT.md`).
+- [`score.py`](score.py): `python3 score.py <out-dir> <case>` reads the labels back from `.scratch/greeter/issues/*.md` and checks `REPORT.txt`, the run's final reply saved by hand.
+- [`test_cases.py`](test_cases.py): the scorer's self-test (a reference run per case passes, planted wrong runs fail) and checks that the rendered Spec, prompt and Boundary record say what each case means. It reads no skill or doc text. Run `python3 evals/to-tickets-milestone-signal/test_cases.py`; it prints `ok`.
+
+## Cases
+
+Fixture Spec "greeter" has a proposed breakdown nobody has approved and no label: 01 format a greeting, 02 greet a logged-in user.
+
+| Case | Caller says | 02 blocked by | Expected |
+| --- | --- | --- | --- |
+| `planning` | it is planning a feature of Milestone 2, issue not written yet | the Hub login feature, planned and not filed | published with no question; 01 `ready-for-agent`; 02 no label; no ticket gets `milestone-2` (`milestone` labels them when it writes the Milestone issue); report names 02 and Hub login |
+| `labelled-unfiled` | nothing; the Spec carries `milestone-2` | the Hub login feature, planned and not filed | published with no question; 01 `ready-for-agent` and `milestone-2`; 02 `milestone-2` only; report names 02 and Hub login (the existing label rule lets the split through, so this tests the unfiled-blocker rule alone) |
+| `plain` (control) | nothing | 01 | nothing published; one question asking for approval |
+
+## Run level
+
+Each case: full run in a top-level session or a fresh regular-tier subagent, working directory `<out-dir>`, given only the text of `PROMPT.md`, loading `to-tickets` from the checkout under test (`plugins/dev-skills/skills/to-tickets/SKILL.md`) and the skills it names from the same checkout. Keep this README, `cases.py` and `score.py` away from it. Save its final reply to `<out-dir>/REPORT.txt`, then `python3 score.py <out-dir> <case>`. Run each case on the branch's skill and on main's (`git archive <main sha> plugins | tar -x -C <dir>`). `labelled-unfiled` discriminates the unfiled-blocker rule and `planning` the caller-signal rule together with it (main does not publish both tickets as expected in either); `plain` is a regression guard. `score.py` also checks that 02's file names the Hub login blocker, and tells asking from not asking by approval wording in the report.
+
+## Run record
+
+See [RESULTS.md](RESULTS.md).
