@@ -22,7 +22,7 @@ def put(out, num, slug, title, body, blocked=()):
     open(os.path.join(d, f"{num}-{slug}.md"), "w").write("\n".join(lines + ["", body, ""]))
 
 
-def run(name, published):
+def run(name, published, titles=None):
     """published: list of (num, blocked_by tuple, body). Replaces whatever the fixture put in the issues folder."""
     with tempfile.TemporaryDirectory() as out:
         build(out, name)
@@ -31,7 +31,8 @@ def run(name, published):
             for f in os.listdir(d):
                 os.remove(os.path.join(d, f))
         for num, blocked, body in published:
-            put(out, num, ITEMS[num]["slug"] if num in ITEMS else "merged", ITEMS.get(num, {}).get("title", "merged"), body, blocked)
+            item = dict(ITEMS[num], **CASES[name]["overrides"].get(num, {})) if num in ITEMS else {}
+            put(out, num, item.get("slug", "merged"), (titles or {}).get(num) or item.get("title", "merged"), body, blocked)
         return score(out, name)
 
 
@@ -56,7 +57,7 @@ expect("resume: 02 blocked by 01 passes", run("resume", [("01", (), B1), ("02", 
 expect("resume: 02 unblocked fails", run("resume", [("01", (), B1), ("02", (), B2)]), True)
 expect("resume: 01 gained a blocker fails", run("resume", [("01", ("02",), B1), ("02", ("01",), B2)]), True)
 expect("resume: only 01 fails", run("resume", [("01", (), B1)]), True)
-expect("resume: 02 without the history item fails", run("resume", [("01", (), B1), ("02", ("01",), "- [ ] something else")]), True)
+expect("resume: 02 without the history item fails", run("resume", [("01", (), B1), ("02", ("01",), "- [ ] something else")], titles={"02": "Something else"}), True)
 # hidden: items are 01 shout, 02 loud log (needs 01), 03 history (shares Greeting with 01)
 expect("hidden: 02 and 03 each blocked by 01 passes", run("hidden", [("01", (), B1), ("02", ("01",), B3), ("03", ("01",), B2)]), False)
 expect("hidden: 03 behind 02 behind 01 passes (path)", run("hidden", [("01", (), B1), ("02", ("01",), B3), ("03", ("02",), B2)]), False)
@@ -68,6 +69,15 @@ expect("hidden: no edges fails", run("hidden", [("01", (), B1), ("02", (), B3), 
 expect("hidden: 02 free of 01 fails", run("hidden", [("01", (), B1), ("02", (), B3), ("03", ("01",), B2)]), True)
 expect("hidden: item dropped fails", run("hidden", [("01", (), B1), ("02", ("01",), B3)]), True)
 expect("hidden: cycle fails", run("hidden", [("01", ("03",), B1), ("02", ("01",), B3), ("03", ("01",), B2)]), True)
+
+
+# Reworded but correct tickets (criteria in plain words, not on checkbox lines, no code name) still carry each item.
+R1 = "Adds a shout option: a greeting can be shouted in capitals."
+R2 = "Records each greeting in a history file, appending a line per greeting."
+R3 = "Logs every shouted greeting to a loud log."
+expect("reworded: hidden set in plain words passes", run("hidden", [("01", (), R1), ("02", ("01",), R3), ("03", ("01",), R2)]), False)
+expect("reworded: hidden set lacking the history item fails", run("hidden", [("01", (), R1), ("02", ("01",), R3)]), True)
+expect("reworded: one Ticket lacking the history item fails", run("shared", [("01", (), R1)]), True)
 
 
 # Rendered input: what the agent reads must say what each case means.
