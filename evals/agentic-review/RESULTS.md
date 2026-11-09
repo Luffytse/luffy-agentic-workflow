@@ -4,6 +4,27 @@ One entry per run, newest first. Rerun when a pull request changes how `agentic-
 
 Entries before the review was rebuilt around Round 0 and `review-rounds` ran the earlier review (up to 5 Rounds, rebuttals, the convergence check, Milestone design answers, merge-only Rounds). They are kept as history: the checks they name for those rules were removed with the rules, and a `<depth>` there is the old Review depth.
 
+### 2026-11-09, Script briefs, handoff check H2, dev-skills 1.4.0 (Ticket #54)
+
+Run level: decision-level in a subagent that can run shell commands (regular tier); it starts no agent. Two fresh regular-tier subagents in one parallel batch, each given `PROMPT.md`'s text only, driven by the Ticket thread.
+
+Case: `script-briefs/` with the new step 3 (write the message you would send the standards Finder) and check H2. Branch run: `plugins/` of `0e633b5` (1.4.0, version unchanged). Baseline run: `plugins/` of main at `abe42a0` (1.4.0), from a `git archive`. Scored with the branch's `score.py`.
+
+| check | main's skill | branch's skill |
+|-------|--------------|----------------|
+| F1 files | PASS (rescored; FAIL as first scored) | PASS (rescored; FAIL as first scored) |
+| B1-B4 briefs | PASS | PASS |
+| H2 handoff | FAIL (the handoff was the brief's whole text, identical to it by `cmp`) | PASS (`Read <path>/finder-standards.md whole; it is your only instruction.`) |
+| L1 work tree | PASS | PASS |
+
+Score as first scored: main 5/7, branch 6/7. Rescored with `score.py` after F1 was fixed to ignore a `reports` directory: main 6/7, branch 7/7. F1 failed on both runs only because each agent put `reports/` under `repo.briefs/round`, `verify`'s default `--reports` location: a scorer quirk, not the skill.
+
+Setup note: `make-case.sh` was given the parent of `plugins/`, so the prompt's `<plugins>/dev-skills/skills` path was off by `plugins/`; both agents noticed and used the right path.
+
+What it shows: H2 alone separates the versions, as `EXPECTED.md` says: main's text pastes the file whole, the branch's hands over the path.
+
+Case check: a fresh premium-tier subagent returned fix (F1 counted `reports/`; the `EXPECTED.md` expectation for main was stale since main ships the script). After the fixes: keep. Valid, needed; fails on main for the right reason (the pasted handoff, which is the rule this change moves).
+
 ### 2026-11-08, dev-skills 1.0.3 (base, main 975a313), Verify-only, Standard, Verifier report file (Ticket #17)
 
 Run level: decision-level in a subagent, as the README says: one fresh regular-tier subagent per run, given its `verifier.md` and no other input, on the Standard fixture from `setup.sh`. Baseline run: main's `briefs.sh --verify-only` brief (from a `git archive`, 1.0.3). Branch run: the branch's brief. Scored by the thread with `EXPECTED.md`. Rerun because the pull request changes `VERIFY.md` (the Verifier brief now names `<out>/reports/verifier.md`).

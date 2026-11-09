@@ -5,7 +5,7 @@ Usage: score.py <case-dir> [--script <review_briefs.py>]
 <case-dir> is what make-case.sh built, after the subagent ran. The scorer builds the briefs the script gives for the
 same inputs (the branch's script by default, even when the run was made on main's skill, so main's hand-built briefs
 are compared with the script's) and compares them byte for byte with the files the run left in <case-dir>/repo.briefs/round/.
-Checks: F1 exactly the four files; B1-B3 the three Finder briefs identical to the script's; B4 the Verifier brief
+Checks: F1 exactly the four files (a `reports` directory there is `verify`'s default reports location and is ignored); B1-B3 the three Finder briefs identical to the script's; B4 the Verifier brief
 identical to the script's, which holds the three canned messages byte for byte (a Finder brief's report path is compared
 with the run's own directory in its place); H2 the handoff message to the standards Finder (<case-dir>/handoff-standards.txt) names the brief file's
 path and is far shorter than the brief, which it does not paste; L1 nothing written inside the
@@ -47,7 +47,7 @@ def score(case: pathlib.Path, script: pathlib.Path) -> list:
     got_dir = case / "repo.briefs" / "round"
     with tempfile.TemporaryDirectory() as t:
         want = expected(case, script, pathlib.Path(t), got_dir)
-    found = sorted(p.name for p in got_dir.iterdir()) if got_dir.is_dir() else []
+    found = sorted(p.name for p in got_dir.iterdir() if p.name != "reports") if got_dir.is_dir() else []
     rows = [("F1", found == sorted(FILES), f"files left: {found or 'none'}")]
     for i, f in enumerate(FILES, 1):
         p = got_dir / f

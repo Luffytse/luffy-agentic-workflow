@@ -84,6 +84,12 @@ class CaseTest(unittest.TestCase):
         self.assertFalse(r["B2"])
         self.assertTrue(r["B1"] and r["B3"] and r["B4"])
 
+    def test_reports_directory_is_ignored_by_f1(self):
+        self.scripted_run()
+        (self.briefs / "reports").mkdir()
+        (self.briefs / "reports" / "standards.md").write_text("x")
+        self.assertTrue(self.result()["F1"])
+
     def test_missing_and_extra_files_fail(self):
         self.scripted_run()
         (self.briefs / "finder-adversarial.md").unlink()

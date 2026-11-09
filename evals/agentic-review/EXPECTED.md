@@ -87,4 +87,4 @@ What a Round briefed from the script leaves. The run is a fresh regular-tier sub
 
 B1-B3 compare against the script run with exactly `--base main --head planted`, so a run that passes `--base <sha>` instead of `main` fails them too.
 
-Expected: on the branch's skill every check passes, H2 included. On main's skill, which says to paste each file whole, H2 fails (the handoff holds the brief) unless the run's handoff is short for another reason. On main's skill, which has no script, a hand-built set cannot be byte-identical, so B1-B4 fail while F1 and L1 may pass: that shows the change moved the briefs from hand-made to the script's. A run that passes B1-B4 on main's skill means the checks are too loose.
+Expected: on the branch's skill every check passes. Main already ships `review_briefs.py`, so on main's skill B1-B4, F1 and L1 pass and H2 alone separates the versions: main says to paste each file whole, so its handoff holds the brief. A main run that passes H2 is recorded as a regression guard (`docs/dev-skills/evals.md`).
