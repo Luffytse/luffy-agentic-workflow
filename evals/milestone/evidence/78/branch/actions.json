@@ -1,0 +1,17 @@
+[
+  {
+    "operation": "comment",
+    "target": "M1",
+    "body": "## Milestone review: accepted by the user\nThe user accepted Milestone 1 at 2026-11-02T13:00Z (chat://coordinator/u9): \"I read the report. Looks good, I accept Milestone 1.\" The acceptance covers the existing report comment (<!-- milestone report -->, posted 2026-11-02T12:05Z), whose review state has not changed: F10 (P7) and F20 (P8) merged, R1 cut, no feature sent back, no park lifted. The acceptance is the user's; agents make no proof-pass claim. Still open: maintenance issue B30 (colour polish, left open with its recorded reason) and build-20's writer (idle, stop not confirmed, session unreadable). Both are listed in the report's Next Milestone proposals for the next planning. Closing this Milestone issue as completed."
+  },
+  {
+    "operation": "close",
+    "target": "M1",
+    "body": "state_reason: completed. The user accepted it at chat://coordinator/u9."
+  },
+  {
+    "operation": "message-user",
+    "target": "chat://coordinator/u9",
+    "body": "Milestone 1 is accepted. I recorded your acceptance on the Milestone issue (M1) and closed it as completed. No delivery runs until you plan the next Milestone. That planning will start with the report's proposals: the registry permission for quiet, usage measurement for sessions we could not read, and B30 (colour polish). One thing to check: build-20's writer is idle and its stop was never confirmed, so a session may still be running."
+  }
+]
