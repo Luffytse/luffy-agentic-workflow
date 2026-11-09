@@ -5,11 +5,11 @@
 # <scratch-repo> is the directory setup.sh built. The briefs go to <scratch-repo>.briefs/<level>/ (or
 # <level>-verify-only/), a sibling of the scratch repo, so no agent working in the scratch repo can find them.
 # quick writes finder-standards.md and finder-spec.md; standard adds finder-adversarial.md; deep adds
-# finder-security.md too. Each file is complete: paste it whole into one fresh subagent. The Verifier brief does not
+# finder-security.md too. Each file is complete: hand its path to one fresh subagent to read whole (paste it only into an agent that cannot read files). The Verifier brief does not
 # exist yet: after the Finders have run (each writes its report to the <out>/reports/<finder>.md its brief names), run
 # `review_briefs.py verify` (see README.md).
 # --verify-only writes just verifier.md: VERIFY-ONLY.md split into one report file per Finder (a Finder with no
-# candidate there reports "nothing found"), checked and pasted whole by `review_briefs.py verify`. The Finders never
+# candidate there reports "nothing found"), checked and carried whole by `review_briefs.py verify`. The Finders never
 # get this. Its reports are kept in <level>-verify-only.reports/ for inspection.
 # The adversarial angle defaults to the script's default; pass another angle name from FINDERS.md.
 set -eu
