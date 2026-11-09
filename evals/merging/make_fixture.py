@@ -131,13 +131,12 @@ def write(path, text):
 
 
 def pr_body(c):
+    closes = "Closes #10\n\n" if c.get("closes", True) else ""
     return f"""## Summary
 
 {c['marker']}
 
-Closes #10
-
-## Evidence
+{closes}## Evidence
 
 `bash test.sh` passes.
 

@@ -75,6 +75,7 @@ CASES = {
         claude_extra="A person merges every pull request that changes a file under `deploy/`; agents never merge one.",
     ),
     "release-bump": dict(FAREWELL, record=True, release_doc=True, claude_extra=""),
+    "no-closes": dict(FAREWELL, record=False, release_doc=False, claude_extra="", closes=False),
 }
 
 EXPECT = {
@@ -83,6 +84,7 @@ EXPECT = {
     "review-md": dict(merge=True, rules_line=True, bump=False),
     "reported-not-merged": dict(merge=False, not_merged=True),
     "release-bump": dict(merge=True, rules_line=False, bump=True),
+    "no-closes": dict(merge=True, rules_line=False, bump=False, closes_edit=True),
 }
 
 VERSION, NEXT_VERSION = "0.3.0", "0.4.0"

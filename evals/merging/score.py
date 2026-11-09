@@ -87,6 +87,11 @@ def score(out, case):
             check("the report names REVIEW.md", "review.md" in low)
         else:
             check("no `Agent-merged rules:` line (no rules file, no design answer)", not rules and not (merges and "Agent-merged rules:" in blocks[merges[0]]["message"]))
+        if exp.get("closes_edit"):
+            has = lambda b: re.search(r"^\W*Closes #10\b", b["body"], re.M)  # noqa: E731
+            ce = [i for i in edits if has(blocks[i])]
+            check("the body gets a `Closes #10` line, by a body edit before the merge", bool(ce) and bool(merges) and ce[0] < merges[0])
+            check("the squash message carries the edited body's `Closes #10` line", bool(merges) and bool(re.search(r"^\W*Closes #10\b", blocks[merges[0]]["message"], re.M)))
         version_commits = [i for i, b in enumerate(blocks) if b["op"] == "commit to a branch" and "VERSION" in b["files"]]
         asks = [i for i, b in enumerate(blocks) if b["op"] == "ask the coordinator" and "version" in (b["question"] + b["raw"]).lower()]
         if exp["bump"]:
