@@ -8,11 +8,11 @@ Runner: the Ticket thread. Case check by a fresh premium-tier subagent: verdict 
 
 | Case | Branch | Main |
 | --- | --- | --- |
-| `accepted` (final fixture) | 3/3 (`branch`: comment and close, wording "close the Milestone issue yourself") | 3/3 (`main`: comment and close) |
+| `accepted` (final fixture) | 3/3 (`branch`: comment and close, wording "close the Milestone issue yourself, with the Close operation") | 3/3 (`main`: comment and close) |
 
 Earlier branch run, same fixture, first wording ("close the Milestone issue only once the user accepts it"): did not close (`branch-earlier-wording`); the sentence was reworded to an instruction. On the first fixture main also closed in one run and, with a stub prior report and an uncut Release, did not close in another (the Release-cut confound the case check named).
 
-Result: **regression guard**, not a failing-on-main case. A capable model closes the issue on acceptance from its own reading even though main's `reporting.md` says to stop rather than close, and each branch run said the skill gave no step, so the text change is a clarity fix rather than a measured behaviour change. The runs are single samples; they show the case scores a correct close and a missing one, not a rate. Not exercised: a real tracker or a `team-lead` session.
+Result: **regression guard**, not a failing-on-main case. A capable model closes the issue on acceptance from its own reading even though main's `reporting.md` says to stop rather than close, and each main run said the skill gave no step, so the text change is a clarity fix rather than a measured behaviour change. The runs are single samples; they show the case scores a correct close and a missing one, not a rate. After Round 1 the sentence lost "yourself" (to agree with `setup-project`'s "a thread closes the Milestone issue") and `team-lead`'s End of delivery gained "unless the user has accepted it"; neither was rerun. Not exercised: a real tracker or a `team-lead` session (a `team-lead` eval case for the acceptance wake is the stated gap: its fixtures start at delivery, not at a report waiting).
 
 ## 2026-11-09 — Ticket #55: milestone planning offers set-aside work first, `plan-setaside` case
 
