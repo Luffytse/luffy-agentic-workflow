@@ -4,6 +4,8 @@ One entry per run of the `milestone` skill's Startup verification, newest first.
 
 Startup verification is `worker-control`'s check plus the loaded-skill-version probe (#530). Record the check's runs, in every Harness, in `evals/worker-control/RESULTS.md` (its unknown-Harness fallback case is the negative case there), and only the loaded-skill-version probe here. The entries below, and the scripted check-in probe, predate that change: they ran the earlier four probes of "Startup verification" and stay as history.
 
+A Worker control row may be **reused** from the last Startup verification result on an earlier Milestone issue instead of re-run: the row passed, the Harness and every Runtime-line field match, `worker-control`'s reference for the Harness is unchanged on main since the result was posted, the result is under 30 days old and no failure of that capability was recorded since. The loaded-skill-version probe always re-runs, so an entry here is still written for every run. The reuse cases are in [README.md](README.md); their runs are recorded in the entries below.
+
 The loaded-skill-version probe is followed by one **planted failure**: the probe told to compare against a main version that differs from the loaded one (a stale cache). It passes as an eval when the probe reports `fail` with "loaded `<version>`, main `<version>`" and the Verdict names Loaded skill version. The earlier planted failures (a marker token no worker is asked to write; a check-in that reaches the runner instead of the target) belong to the probes now replaced by `worker-control`'s check and stay as recorded history.
 
 ### 2026-11-02, commit 0c0cd6494bc37f484a6e5a0472872395cfe3da60 (base), dev-skills 0.41.0 (base): Codex #499 check-in rerun and stop corroboration
@@ -54,6 +56,25 @@ Pass: yes | no. Lessons: <what to change in the skill, if anything>
 ```
 
 ## Runs
+
+### 2026-11-09, branch `claude/startup-verification-reuse` (skill text as of `28cc78f`, unchanged at `4b2eb43`), base main `552119f`, dev-skills 1.4.0 (unbumped): reuse rule of Ticket #62, six cases, branch and main
+
+Run level: decision-level in a subagent (regular tier)
+Runner: the Ticket thread. 12 fresh regular-tier subagents in one parallel batch, one per case per skill version, each given only the checkout's skill text (the branch: a `git archive` of `28cc78f`, whose skill text is identical at `4b2eb43` because only `score.py` and `test_score.py` changed after it; main: a `git archive` of `origin/main` at `552119f`) and the case's `PROMPT.md`. Case check: a premium-tier subagent that did not write the cases, before any run (its verdicts are in the pull request body).
+Ran: `test_score.py` passing, then `score.py` at `4b2eb43` on each run.
+
+| Case | Branch | Main | Main's failures |
+| --- | --- | --- | --- |
+| `same` | 17/17 | 4 pass, 7 fail | re-ran every row, no row reused |
+| `runtime` | 11/11 | 10 pass, 1 fail | the run-now clause check only |
+| `reference` | 11/11 | 10 pass, 1 fail | the run-now clause check only |
+| `old` | 11/11 | 10 pass, 1 fail | the run-now clause check only |
+| `failure` | 16/16 | 7 pass, 4 fail | reused none, re-ran all |
+| `failedrow` | 16/16 | 5 pass, 6 fail | re-ran all |
+
+Regression guards: `runtime`, `reference` and `old` are regression guards on the changed condition: main re-runs every row, which is the right answer there, and fails them only at the run-now clause check because main's Run line names no rows. All three main runs behaved as predicted.
+
+Pass: yes. Not exercised: real probes (no worker starts, no tracker call), so whether a reused row's earlier evidence still holds in a real Harness; the checks of the Evidence text beyond `reused from <link>`; the 30-day and reference conditions are read from supplied records, not from a real tracker or `git log`. Lessons: the first scoring (scorer at `28cc78f`) failed the branch `same` run on a correct comment, because the word "reused" inside a parenthesis discarded the run-now clause. The scorer was fixed in `4b2eb43` (parentheticals and a trailing "the others are reused" remark are cut before the clause is read) and all 12 outputs were rescored with it, the outputs unchanged.
 
 ### 2026-11-02, commit 5d4e9bb (branch `ticket-495`; base 4d0a751), dev-skills 0.40.0 (base): Claude Code cloud project, check-in probe into the coordinator, real run and planted failure
 
