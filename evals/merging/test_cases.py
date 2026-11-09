@@ -54,6 +54,9 @@ def reference(name):
         return [], ("Pull request 1 is not merged: the tracker still shows it open, so I closed nothing. "
                     "Tell me once it is merged and I will close #10.")
     blocks, k = [], 1
+    if e.get("closes_edit"):
+        body = body.replace("\n## Evidence", "\nCloses #10\n\n## Evidence", 1)
+        blocks.append(block(k, "Edit a pull request body", pull="1", body=body)); k += 1
     if e["rules_line"]:
         body = body + "\nAgent-merged rules: REVIEW.md\n"
         blocks.append(block(k, "Edit a pull request body", pull="1", body=body)); k += 1
@@ -81,6 +84,9 @@ def planted(name):
         wrong.append(("closed before the merge", [close(0)] + ref, report))
         wrong.append(("never closed", [b for b in ref if "Close" not in b.splitlines()[0]], report))
         wrong.append(("squash message is not the body", [b.replace(c["marker"], "Squashed commits.") for b in ref], report))
+    if e.get("closes_edit"):
+        wrong.append(("merged with the body lacking the Closes line", [merge(1, c, body), close(2)], report))
+        wrong.append(("Closes line added only after the merge", ref[1:] + [ref[0]], report))
     if e.get("rules_line") is True:
         wrong.append(("merged with no Agent-merged rules: line", [merge(1, c, body), close(2)], "Merged pull request 1."))
     if e.get("rules_line") is False and e["merge"]:
@@ -126,7 +132,7 @@ def rendered_input(out, name):
     pull = (repo / ".scratch/pulls/1.md").read_text()
     if "State: open" not in pull:
         bad.append("pull request 1 is not open")
-    if name == "no-record":
+    if name in ("no-record", "no-closes"):
         if not (repo / "VERSION").exists() or (repo / "VERSION").read_text().strip() != "0.3.0":
             bad.append("no VERSION file reading 0.3.0")
         index_names_record = (docs / "index.md").exists() and "boundaries.md" in (docs / "index.md").read_text()
@@ -147,6 +153,10 @@ def rendered_input(out, name):
     if name == "reported-not-merged":
         if "deploy/" not in claude or "deploy/config.sh" not in changed:
             bad.append("CLAUDE.md's deploy/ rule or the deploy/config.sh change is missing")
+    if name == "no-closes" and "Closes #" in pull:
+        bad.append("pull request 1's body already has a closing line")
+    elif name != "no-closes" and "Closes #10" not in pull:
+        bad.append("pull request 1's body lacks its closing line")
     if name == "release-bump":
         if not release.exists() or "coordinator" not in release.read_text() or not any(f.startswith("src/") for f in changed):
             bad.append("the release doc's coordinator bump or the src/ change is missing")

@@ -3,7 +3,7 @@
 # workflow step that calls it is in place (that line is committed by hand).
 # A new test joins by its file name alone: no list to edit. A test is a regular file named test*
 # anywhere under evals/ or scripts/, except below a folder named tests/ (fixture code a review eval
-# plants, not a test of this repo). A .sh test runs with bash and a .py test with python3, each from the
+# plants, not a test of this repo), or in a __pycache__ folder (compiled files Python leaves, not tests). A .sh test runs with bash and a .py test with python3, each from the
 # repo root, and passes by exiting 0. Nothing is skipped silently: a test* file with any other extension
 # (it cannot be run) fails and is named, and finding no test at all fails.
 # Usage: scripts/run-tests.sh [root]   (root defaults to the repo root; the self-test passes a disposable tree)
@@ -11,7 +11,7 @@ set -u
 root=${1:-$(cd "$(dirname "$0")/.." && pwd)}
 cd "$root" || exit 2
 list=$(mktemp); trap 'rm -f "$list"' EXIT
-find evals scripts -type f -name 'test*' -not -path '*/tests/*' -print0 > "$list" || { echo "FAIL: find could not read evals/ and scripts/"; exit 2; }
+find evals scripts -type f -name 'test*' -not -path '*/tests/*' -not -path '*/__pycache__/*' -print0 > "$list" || { echo "FAIL: find could not read evals/ and scripts/"; exit 2; }
 failed=()
 count=0
 while IFS= read -r -d '' t; do

@@ -16,6 +16,14 @@ Pass: yes | no. Lessons: <what to change in merging or its callers, if anything>
 
 ## Runs
 
+### 2026-11-09, commit 6010e31 (branch claude/project-thread-vcuew8), dev-skills 1.2.0 (no bump yet), branch's skills and main's: #53 `no-closes` case
+
+Run level: decision-level in a session
+Setup: case `no-closes`, fixtures built by `make_fixture.py`; one fresh premium-tier subagent per side, given only the prompt. The branch's skills were the checkout at `6010e31`; main's were a `git archive` of `origin/main` at `28f99ba`. Main's subagent could not write `.scratch/report.md`, so the thread wrote its returned report text there before scoring ([evals guide](../../docs/dev-skills/evals.md#making-model-runs)). Case check: a fresh premium-tier subagent that did not write the case returned `no-closes` keep.
+Score: branch 13/13 PASS, main 13/13 PASS: both runs edited the body to add `Closes #10` before the squash, the squash message carried it, and #10 was closed after the merge. Self-test: `python3 evals/merging/test_cases.py`: OK, 6 cases, 48 scored runs.
+Not exercised: a full build-flow in a top-level session; the `release` and `implement-spec` callers.
+Pass: yes. `no-closes` is a **regression guard** (a rule main's text already passes): main's `implement` step 5 and `pr` already tell the thread the body closes the issue, so main's run re-adds the line, and no other reason for main to pass is left to remove from the fixture. The guard protects `merging`'s new step 3 from being lost. Lessons: none.
+
 ### 2026-11-04, main `9d1de32`, dev-skills 0.80.0 (no bump), main's skills: #695 case check of the cases and `approval` rerun
 
 Run level: decision-level in a session (the run); no model session (the self-test)

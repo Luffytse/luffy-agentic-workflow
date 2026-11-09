@@ -9,7 +9,7 @@ Behaviour checks for the review: `agentic-review` (Round 0) and `review-rounds` 
 - **Loop, `empty-round`:** does a Round 2 in which the Finder returns no candidate and no Finding is open start no Verifier, go to Rank, and say in its comment that no candidates went to a Verifier?
 - **Loop, `after-round3`:** after a Round 3 that is not clean, does the open Important become a bug Ticket, the Nit get dropped, and the pull request become ready to merge, with no Round 4 and no question to the user?
 - **Loop, `after-round3-labels`:** the same sort in a repo whose triage-labels doc has a Repo labels table (`backend` for the server code under `app/`, `frontend` for the UI under `ui/`): does the bug Ticket carry `backend` and not `frontend`? The plain `after-round3` case, which has no table, also checks that the bug Ticket carries no label beyond `bug` and `ready-for-agent`.
-- **Script briefs:** does a fresh top-level-style session, following `review-rounds`, write a Round's Finder and Verifier briefs by running the plugin's brief script, so the files are the script's own? Rerun when `review-rounds` or `review_briefs.py` changes how a Round is briefed.
+- **Script briefs:** does a fresh top-level-style session, following `review-rounds`, write a Round's Finder and Verifier briefs by running the plugin's brief script, so the files are the script's own? Also: does it hand a Finder its brief file's path, not the pasted text (H2)? Rerun when `review-rounds` or `review_briefs.py` changes how a Round is briefed.
 
 Every case's builder has a test that builds it and checks it holds what the case needs; run them after changing a builder or a skill file they read. None of them starts an agent:
 
@@ -69,7 +69,7 @@ The fixture's own tests pass (`python3 -m unittest` in the scratch repo): the pl
 
 ## Script briefs
 
-A Round whose briefs come from the plugin's brief script. Scoring: [`script-briefs/score.py`](script-briefs/score.py) and `EXPECTED.md`. A fresh subagent that can run shell commands gets the skill text under test and the fixture, and is asked to write Round 1 (Standard) briefs for the Finders and then, given the Finders' canned final messages, the Verifier's brief. It starts no agent.
+A Round whose briefs come from the plugin's brief script. Scoring: [`script-briefs/score.py`](script-briefs/score.py) and `EXPECTED.md`. A fresh subagent that can run shell commands gets the skill text under test and the fixture, and is asked to write Round 1 (Standard) briefs for the Finders and then, given the Finders' canned final messages, the Verifier's brief, and last to write the message it would send the standards Finder (scored by H2). It starts no agent.
 
 1. `bash evals/agentic-review/script-briefs/make-case.sh <new-out-dir> <plugins-copy>` builds `<out-dir>/repo` (the planted fixture), `<out-dir>/messages/` and `<out-dir>/PROMPT.md`. `<plugins-copy>` is a copy of the `plugins/` folder under test, outside this checkout: the branch's, or main's (`git archive main plugins | tar -x -C <dir>`). One case per skill version.
 2. Give a fresh regular-tier subagent the text of `PROMPT.md`, nothing else, and keep this checkout away from it.

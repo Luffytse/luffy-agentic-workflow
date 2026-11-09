@@ -60,6 +60,6 @@ This repo's rule, not a skill's. The coordinator (or a `triage` thread it briefs
 - **Which issues.** The open issues that no running thread is building and whose body names the changed skill or a file the merge changed; inside a Milestone, only those carrying its membership label. A running thread keeps the skill version it started with until its Ticket or Spec is done.
 - **Read each against main's new text of the skill, then one of three outcomes:**
   - the change makes it wrong or incomplete: update it. Read the whole body, write it whole back with only that change and a one-line note naming the merge, and read it back. A change that would alter a Milestone's agreement (goal, acceptance or exclusions) goes to the user as one question, and that feature waits for the answer;
-  - the change makes it obsolete: close it, with a note naming the merge;
+  - the change makes it obsolete: close it as completed, with a note naming the merge;
   - otherwise: comment that it was re-read after the merge and still fits.
 - **Then** read the blockers again and take the next start from what they now say.
