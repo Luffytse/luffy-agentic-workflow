@@ -78,7 +78,7 @@ Does the Ticket thread, when the environment refuses an action the rules allow (
 
 Files in [`env-refusal/`](env-refusal/): `PROMPT.md` (the decision prompt: scenario A, a refused squash-merge the Boundary record allows; scenario B, a refused workflow-file push in another Ticket), `EXPECTED.md` (keep it away from the session under test) and `test.sh` (checks the files exist; it never greps skill text; `scripts/run-tests.sh` runs it).
 
-**Run level and tier:** decision-level in a subagent (the prompt asks what the thread does and writes), regular tier. Run it: give a fresh subagent the text between the lines of `PROMPT.md` and the skills folder, once on the branch's skills and once on main's (`git archive`). Expected: the branch's run hands both actions over once, with the exact change, and records the wait; main's run fails at least one of those. Not covered by this case: the "coordinator (for a fresh thread)" path (a refused new branch off main) and `implement`'s designated-branch line. Model-run results: see [RESULTS.md](RESULTS.md).
+**Run level and tier:** decision-level in a subagent (the prompt asks what the thread does and writes), regular tier. Run it: give a fresh subagent the text of `PROMPT.md` and the skills folder, once on the branch's skills and once on main's (`git archive`). Expected: the branch's run hands both actions over once, with the exact change, and records the wait; main's run fails at least one of those. Not covered by this case: the "coordinator (for a fresh thread)" path (a refused new branch off main) and `implement`'s designated-branch line. Model-run results: see [RESULTS.md](RESULTS.md).
 
 ## Main-check check
 
