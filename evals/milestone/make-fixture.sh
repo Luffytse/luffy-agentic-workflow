@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# Builds one fixture for the milestone skill's dry run of its planning phase (plan, plan-small, add-feature,
-# add-feature-excluded). The delivery cases moved to evals/team-lead/ with the team-lead skill.
-# Usage: make-fixture.sh <out-dir> <plan|plan-small|add-feature|add-feature-excluded>
+# Builds one fixture for the milestone skill's dry run of its planning phase (plan, plan-small, plan-setaside,
+# add-feature, add-feature-excluded). The delivery cases moved to evals/team-lead/ with the team-lead skill.
+# Usage: make-fixture.sh <out-dir> <plan|plan-small|plan-setaside|add-feature|add-feature-excluded>
 # Makes <out-dir>/repo (a git repo, one commit on main, with a dry-run local tracker) and <out-dir>/PROMPT.md
 # (the scripted prompt for a fresh coordinator session). See evals/milestone/README.md.
 set -eu
 out="$1"; case_="$2"
-case "$case_" in plan|plan-small|add-feature|add-feature-excluded) ;; *) echo "unknown case: $case_" >&2; exit 2 ;; esac
+case "$case_" in plan|plan-small|plan-setaside|add-feature|add-feature-excluded) ;; *) echo "unknown case: $case_" >&2; exit 2 ;; esac
 [ -e "$out" ] && { echo "$out exists" >&2; exit 2; }
 mkdir -p "$out"
 out="$(cd "$out" && pwd)"
@@ -213,6 +213,19 @@ Blocked by: none
 
 Someone asked for coloured greetings. Not looked at yet.
 MD
+# Work set aside for a later Milestone (plan-setaside): nobody has planned it for this one.
+if [ "$case_" = plan-setaside ]; then
+  cat > "$r/.scratch/issues/31-translations.md" <<'MD'
+Title: Translations (next Milestone)
+Type: ticket
+Labels: enhancement
+Status: open
+Parent: none
+Blocked by: none
+
+Greetings in French and Spanish. Set aside by the user for a later Milestone.
+MD
+fi
 printf 'enhancement\nneeds-triage\nbug\n' > "$r/.scratch/labels.md"
 
 # The open Milestone 1 (add-feature cases), with its Startup verification passed. $1 is the order rule;
@@ -341,7 +354,7 @@ The user's answers:
 
 Stop when the skill would hand over to its next phase.
 TXT
-  elif [ "$case_" = plan-small ]; then
+  elif [ "$case_" = plan-small ] || [ "$case_" = plan-setaside ]; then
     cat <<'TXT'
 
 The user's message: "Let's plan a small Release: just the quiet flag (issue 20). I planned it already; its acceptance
@@ -350,6 +363,11 @@ criteria are in the issue."
 The user's answers:
 - Goal: "Scripts can run the greeter silently."
 - Any feature an agent proposes: "No."
+TXT
+    [ "$case_" = plan-setaside ] && cat <<'TXT'
+- Any question about other open issues joining this Milestone: "None of them join this one."
+TXT
+    cat <<'TXT'
 - The draft Milestone issue: "Yes, that's it. Write it."
 - Startup verification: "It has not run in this environment yet."
 

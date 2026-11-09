@@ -5,7 +5,7 @@ The delivery cases moved to evals/team-lead/score.py with the team-lead skill.
 
 Usage:
   score.py <out-dir> <case>               score <out-dir>/repo/.scratch/proposed-actions.md (and questions.md) for
-                                          that case: plan, plan-small, add-feature or add-feature-excluded
+                                          that case: plan, plan-small, plan-setaside, add-feature or add-feature-excluded
   score.py --shape <body-file>            check a Milestone issue body (for example a real one) against the shape
 
 Prints one line per check (PASS or FAIL with what it saw) and exits 1 when any check fails.
@@ -16,7 +16,7 @@ import sys
 
 LABEL = "milestone-1"
 HEADINGS = ["## Goal", "## Features, in build order", "## Acceptance", "## Excluded"]
-CASES = ("plan", "plan-small", "add-feature", "add-feature-excluded")
+CASES = ("plan", "plan-small", "plan-setaside", "add-feature", "add-feature-excluded")
 # A question about the Milestone's agreement: its goal, its own acceptance or its exclusions (not a feature's criteria).
 AGREEMENT = re.compile(r"\bgoal\b|exclu|Milestone(?:'s| 1's)? acceptance|acceptance of the Milestone|## Acceptance", re.I)
 # A question about what a Milestone issue no longer holds, or what a one-Release Milestone takes as a default.
@@ -179,6 +179,26 @@ def score_plan_small(blocks, qs):
     check("no thread started (delivery has not started)", not started, f"{len(started)} threads")
 
 
+def score_plan_setaside(blocks, qs):
+    creates = [b for b in blocks if b["op"] == "Create an issue" and LABEL in b["f"].get("Labels", "")
+               and b["f"].get("Title", "").startswith("Milestone 1:")]
+    check("one Milestone issue created, titled 'Milestone 1: ...', labelled " + LABEL, len(creates) == 1,
+          f"{len(creates)} found")
+    asked = [q for q in qs if re.search(r"\b31\b|translation|set aside", q, re.I) and not re.search(r"\bdraft\b", q, re.I)]
+    check("asked which set-aside work joins (naming issue 31 or translations)", bool(asked), " | ".join(qs))
+    check("no label on 31-translations", not labels_added(blocks, "31-translations"))
+    if not creates:
+        return
+    m = creates[0]
+    exc = section(m["body"], "## Excluded")
+    check("Excluded names the translations work left set aside", bool(re.search(r"\b31\b|ranslation", exc)),
+          exc.strip()[:80])
+    hit = labels_added(blocks, "20-quiet")
+    check("20-quiet labelled after the Milestone issue is created", bool(hit) and hit[0]["n"] > m["n"])
+    started = [b for b in blocks if b["op"] == "Start a thread"]
+    check("no thread started (delivery has not started)", not started, f"{len(started)} threads")
+
+
 def score_add(blocks, original, qs, case):
     edits = [b for b in blocks if b["op"] == "Edit an issue body" and "00-milestone" in b["issue"]]
     check("Milestone issue body edited", bool(edits), "none found")
@@ -272,6 +292,8 @@ def main():
             score_plan(blocks)
         elif case == "plan-small":
             score_plan_small(blocks, qs)
+        elif case == "plan-setaside":
+            score_plan_setaside(blocks, qs)
         else:
             original = open(f"{out}/repo/.scratch/issues/00-milestone.md").read()
             score_add(blocks, original, qs, case)
