@@ -21,7 +21,7 @@ Post one comment with the tracker doc's **Comment on an issue** operation. First
 4. **Time and tokens:** per-thread records, totals, skill-loading usage by thread kind, estimates and gaps.
 5. **Versions and Startup verification:** the per-thread versions/load sources, probe results and permission/sandbox settings.
 6. **Agent decisions:** design answers, rules-file merges and other material decisions with their source links.
-7. **Next Milestone:** suggestions from outcomes, blockers and maintenance records. These are proposals, not added scope.
+7. **Next Milestone:** suggestions from outcomes, blockers and maintenance records. These are proposals, not added scope; the next Milestone's planning step 3 lists them first.
 
 End with `Ready for the user's Milestone review; acceptance pending.`, explicitly leaving the Milestone open. Read the comment back before telling the user its link and stopping delivery. If the write/read-back fails, report the failure and retry from the tracker at the next wake; a proposed or failed write is no posted report.
 
