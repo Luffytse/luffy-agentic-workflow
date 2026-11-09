@@ -40,15 +40,20 @@ class CaseTest(unittest.TestCase):
             shutil.copy(self.case / "messages" / name, reports / f"{finder}.md")
         run_script(self.case, "round1", "--level", "standard", "--out", str(self.briefs))
         run_script(self.case, "verify", "--level", "standard", "--reports", str(reports), "--out", str(self.briefs))
+        self.handoff(f"Read {(self.briefs / 'finder-standards.md').resolve()} whole; it is your only instruction.")
+
+    def handoff(self, text):
+        (self.case / "handoff-standards.txt").write_text(text)
 
     def result(self):
         return {cid: ok for cid, ok, _ in score.score(self.case, SCRIPT)}
 
     def test_prompt_is_rendered_for_this_case(self):
         text = (self.case / "PROMPT.md").read_text()
-        for placeholder in ("<plugins>", "<repo>", "<messages>", "<briefs>"):
+        for placeholder in ("<plugins>", "<repo>", "<messages>", "<briefs>", "<handoff>"):
             self.assertNotIn(placeholder, text)
         self.assertIn(str(ROOT / "plugins"), text)
+        self.assertIn(f"{self.case}/handoff-standards.txt", text)
         self.assertIn(f"{self.case}/repo.briefs/round", text)
         self.assertTrue((self.case / "repo/.scratch/SPEC.md").is_file())
         for name in score.REPORTS.values():
@@ -79,6 +84,12 @@ class CaseTest(unittest.TestCase):
         self.assertFalse(r["B2"])
         self.assertTrue(r["B1"] and r["B3"] and r["B4"])
 
+    def test_reports_directory_is_ignored_by_f1(self):
+        self.scripted_run()
+        (self.briefs / "reports").mkdir()
+        (self.briefs / "reports" / "standards.md").write_text("x")
+        self.assertTrue(self.result()["F1"])
+
     def test_missing_and_extra_files_fail(self):
         self.scripted_run()
         (self.briefs / "finder-adversarial.md").unlink()
@@ -92,6 +103,17 @@ class CaseTest(unittest.TestCase):
         p = self.briefs / "verifier.md"
         p.write_text(p.read_text().replace("settle never pays the last creditor", "settle pays nobody"))
         self.assertFalse(self.result()["B4"])
+
+    def test_pasted_or_missing_handoff_fails_only_h2(self):
+        self.scripted_run()
+        self.handoff((self.briefs / "finder-standards.md").read_text())
+        r = self.result()
+        self.assertFalse(r["H2"])
+        self.assertTrue(r["B1"] and r["F1"] and r["L1"])
+        self.handoff("Please review the branch.")
+        self.assertFalse(self.result()["H2"])
+        (self.case / "handoff-standards.txt").unlink()
+        self.assertFalse(self.result()["H2"])
 
     def test_file_written_in_the_repository_fails(self):
         self.scripted_run()

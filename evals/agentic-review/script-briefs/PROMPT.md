@@ -4,5 +4,6 @@ The review skills are under `<plugins>/dev-skills/skills`. Load `review-rounds` 
 
 1. Write the brief for each Finder this Round starts into the directory `<briefs>` (create it; it is outside the repository on purpose).
 2. Then suppose the Finders have all reported. Their final messages are in `<messages>`: `standards-finder.txt`, `spec-finder.txt` and `adversarial-finder.txt`, one per Finder of that name. Write the Verifier's brief into the same directory.
+3. Last, write into the file `<handoff>` the exact message you would send, as the prompt, to the brand-new subagent you would start for the standards Finder (you cannot start it, so only write the message).
 
 Reply with the files you wrote, the tier of the agent each is for, and the exact commands you ran to make them.
