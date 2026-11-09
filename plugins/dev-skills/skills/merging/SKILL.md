@@ -49,9 +49,10 @@ Name what stops the merge, so the user can decide quickly: the boundary (the act
 
 1. Run the caller's own pre-merge step, if it named one.
 2. **Follow the repo's merge-time steps.** Read the repo's own docs for steps to take just before a merge (its `CLAUDE.md` or `AGENTS.md`, and the release doc, `docs/dev-skills/release.md`) and take each one, in the order they give. A step that waits for something, such as a number, waits for it; a commit a step asks for is made by the committer the caller named. Take only the steps those docs give: where they give none, there is none.
-3. **Sync with main.** Fetch main. If the branch lacks commits from main, the committer merges main in (a merge, never a rebase) and pushes. If main was merged since the last Round's recorded head and that merge had conflicts, its resolutions are reviewed as `review-rounds` says under "Merges from main" (the next Round, or after Round 3 its one resolutions check, whose open Importants become bug Tickets); a merge without conflicts needs only the checks.
-4. Rerun the checks on the branch's head, in the committer's worktree where it has one, and wait for CI (if the repo has any).
-5. If main moves again before the merge, repeat this part from 1. What a repeat keeps or redoes of a merge-time step's commit is the repo's docs' to say.
+3. **Check the closing lines.** The pull request's body carries a `Closes #<n>` line for each issue the caller names as built by it, and for each source it absorbs (as `issue-absorption` says); add any missing one by editing the body, before the merge.
+4. **Sync with main.** Fetch main. If the branch lacks commits from main, the committer merges main in (a merge, never a rebase) and pushes. If main was merged since the last Round's recorded head and that merge had conflicts, its resolutions are reviewed as `review-rounds` says under "Merges from main" (the next Round, or after Round 3 its one resolutions check, whose open Importants become bug Tickets); a merge without conflicts needs only the checks.
+5. Rerun the checks on the branch's head, in the committer's worktree where it has one, and wait for CI (if the repo has any).
+6. If main moves again before the merge, repeat this part from 1. What a repeat keeps or redoes of a merge-time step's commit is the repo's docs' to say.
 
 ## The merge
 
