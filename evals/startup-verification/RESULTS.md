@@ -57,24 +57,24 @@ Pass: yes | no. Lessons: <what to change in the skill, if anything>
 
 ## Runs
 
-### PENDING: <date>, commit PENDING: <branch sha> (base `abe42a0`), dev-skills 1.3.0 (unbumped): reuse rule of Ticket #62, six cases, branch and main
+### 2026-11-09, branch `claude/startup-verification-reuse` (skill text as of `28cc78f`, unchanged at `4b2eb43`), base main `552119f`, dev-skills 1.4.0 (unbumped): reuse rule of Ticket #62, six cases, branch and main
 
 Run level: decision-level in a subagent (regular tier)
-Runner: PENDING: <the Ticket thread; one fresh regular-tier subagent per case per skill version, `<checkout>` the branch's working tree or a `git archive` of main at `abe42a0`, each given only its PROMPT.md>. Case check: PENDING: <premium-tier subagent's keep, fix or drop for each case>.
-Ran: `score.py` on each run, with `test_score.py` passing first.
+Runner: the Ticket thread. 12 fresh regular-tier subagents in one parallel batch, one per case per skill version, each given only the checkout's skill text (the branch: a `git archive` of `28cc78f`, whose skill text is identical at `4b2eb43` because only `score.py` and `test_score.py` changed after it; main: a `git archive` of `origin/main` at `552119f`) and the case's `PROMPT.md`. Case check: a premium-tier subagent that did not write the cases, before any run (its verdicts are in the pull request body).
+Ran: `test_score.py` passing, then `score.py` at `4b2eb43` on each run.
 
 | Case | Branch | Main | Main's failures |
 | --- | --- | --- | --- |
-| `same` | PENDING | PENDING | PENDING |
-| `runtime` | PENDING | PENDING | PENDING |
-| `reference` | PENDING | PENDING | PENDING |
-| `old` | PENDING | PENDING | PENDING |
-| `failure` | PENDING | PENDING | PENDING |
-| `failedrow` | PENDING | PENDING | PENDING |
+| `same` | 17/17 | 4 pass, 7 fail | re-ran every row, no row reused |
+| `runtime` | 11/11 | 10 pass, 1 fail | the run-now clause check only |
+| `reference` | 11/11 | 10 pass, 1 fail | the run-now clause check only |
+| `old` | 11/11 | 10 pass, 1 fail | the run-now clause check only |
+| `failure` | 16/16 | 7 pass, 4 fail | reused none, re-ran all |
+| `failedrow` | 16/16 | 5 pass, 6 fail | re-ran all |
 
-Regression guards: `runtime`, `reference` and `old` are expected regression guards on the changed condition: main re-runs every row, which is the right answer there, and fails them only at the Run line (the check that a run-now clause names the rows). PENDING: <confirm from the runs; if main fails any of the three at a row's Evidence instead, say so>.
+Regression guards: `runtime`, `reference` and `old` are regression guards on the changed condition: main re-runs every row, which is the right answer there, and fails them only at the run-now clause check because main's Run line names no rows. All three main runs behaved as predicted.
 
-Pass: PENDING. Not exercised: real probes (no worker starts, no tracker call), so whether a reused row's earlier evidence still holds in a real Harness; the checks of the Evidence text beyond `reused from <link>`; the 30-day and reference conditions are read from supplied records, not from a real tracker or `git log`. Lessons: PENDING.
+Pass: yes. Not exercised: real probes (no worker starts, no tracker call), so whether a reused row's earlier evidence still holds in a real Harness; the checks of the Evidence text beyond `reused from <link>`; the 30-day and reference conditions are read from supplied records, not from a real tracker or `git log`. Lessons: the first scoring (scorer at `28cc78f`) failed the branch `same` run on a correct comment, because the word "reused" inside a parenthesis discarded the run-now clause. The scorer was fixed in `4b2eb43` (parentheticals and a trailing "the others are reused" remark are cut before the clause is read) and all 12 outputs were rescored with it, the outputs unchanged.
 
 ### 2026-11-02, commit 5d4e9bb (branch `ticket-495`; base 4d0a751), dev-skills 0.40.0 (base): Claude Code cloud project, check-in probe into the coordinator, real run and planted failure
 
