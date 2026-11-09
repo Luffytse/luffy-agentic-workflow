@@ -16,9 +16,12 @@ def readback(out):
     return found
 
 
-def has(t, key):
-    """True when a checkbox (acceptance criterion) line of the ticket text carries the item's key."""
-    return any(l.lstrip().startswith("- [") and key in l for l in t["text"].splitlines())
+def has(t, terms):
+    """True when the ticket carries the item: its code name (first term) anywhere in the text, or a plain-words alternative
+    on the title line or a checkbox (acceptance criterion) line. Free prose does not count: it may only mention another item."""
+    lines = t["text"].splitlines()
+    named = [l for l in lines if l.startswith("#") or l.lstrip().startswith("- [")]
+    return terms[0] in t["text"] or any(k in l for k in terms[1:] for l in named)
 
 
 def reach(got, a, b):
@@ -39,7 +42,10 @@ def score(out, name):
     got = readback(out)
     shape = case["shape"]
     nums = sorted(got)
-    keys = {c: dict(ITEMS[c], **case["overrides"].get(c, {}))["key"] for c in case["items"]}
+    keys = {}
+    for c in case["items"]:
+        item = dict(ITEMS[c], **case["overrides"].get(c, {}))
+        keys[c] = [item["key"].lower()] + [a.lower() for a in item.get("alts", [])]
     if shape == "grouped":
         if len(got) == 1:
             if not all(has(got[nums[0]], k) for k in keys.values()):
