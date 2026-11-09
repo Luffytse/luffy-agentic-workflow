@@ -8,7 +8,7 @@ Runner: the Ticket thread. Case check by a fresh premium-tier subagent: first ve
 
 | Case | Branch | Main | Main's failures |
 | --- | --- | --- | --- |
-| `plan-setaside` | 6/6 | 4/6 | never asked whether the set-aside issue 31 joins; Excluded reads `- None.` |
+| `plan-setaside` | 7/7 | 5/7 | never asked whether the set-aside issue 31 joins; Excluded reads `- None.` |
 
 Not exercised: the Retro, Spec-split, decision-ticket and relay sentences (wording-only rules, no case); a real tracker.
 

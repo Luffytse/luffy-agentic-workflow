@@ -20,7 +20,7 @@ The coordinator runs it with the user, when the user asks for a Milestone or a s
 
 **The features are the user's.** A feature is a Spec with its Tickets, a lone Ticket with the issues it absorbs, or a few related issues the user agrees to treat as one. Agents may **propose** a feature: an open issue that serves the goal, or a gap between the goal and the features listed. Ask about each proposal as one question, saying why it might belong. Only the user adds a feature: a proposal the user does not take stays out, and nothing is listed or labelled for it.
 
-**A one-Release Milestone.** When the user asks for a small Release or for one Release's worth of work, rather than for a Milestone, plan a Milestone with one Release: steps 4 and 5 ask nothing and write their defaults into the draft instead: one at a time, in the order the user named the features; Acceptance holds only its first line; Excluded reads `- None.` (plus any set-aside work the user left out in step 3). The user sees them in step 6 and may change any of them there; a default the user changes is planned like any other field.
+**A one-Release Milestone.** When the user asks for a small Release or for one Release's worth of work, rather than for a Milestone, plan a Milestone with one Release: steps 4 and 5 ask nothing and write their defaults into the draft instead: one at a time, in the order the user named the features; Acceptance holds only its first line; Excluded names the set-aside work left out in step 3, or reads `- None.` when there is none. The user sees them in step 6 and may change any of them there; a default the user changes is planned like any other field.
 
 ### Steps
 

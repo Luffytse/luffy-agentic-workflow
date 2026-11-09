@@ -39,7 +39,7 @@ The **dry run** lives in the fixture's tracker doc (`docs/dev-skills/issue-track
 4. To check a real Milestone issue against the shape (the second case of each planning run), save its body to a file and run `python3 evals/milestone/score.py --shape <file>`. A miss prints each failed check with what it saw; the migration that issue needs is written by hand in RESULTS.md.
 5. Record the run in [RESULTS.md](RESULTS.md) with its template, with the commit and plugin version of the checkout under test.
 
-After changing `score.py` or `make-fixture.sh`, run `python3 evals/milestone/test_score.py`: it builds each of `plan-small`, `add-feature` and `add-feature-excluded`, scores a hand-written reference run (which must pass) and planted wrong runs (a Boundaries section, a budget question, a touched Ticket left as it was, labelling before listing, an agreement question too many or too few, colour left in Excluded), each of which must fail the check it plants.
+After changing `score.py` or `make-fixture.sh`, run `python3 evals/milestone/test_score.py`: it builds each of `plan-small`, `plan-setaside`, `add-feature` and `add-feature-excluded`, scores a hand-written reference run (which must pass) and planted wrong runs (a Boundaries section, a budget question, a touched Ticket left as it was, labelling before listing, an agreement question too many or too few, colour left in Excluded), each of which must fail the check it plants.
 
 The `plan` case stops before delivery; the team-lead cases start where planning and Startup verification have ended.
 

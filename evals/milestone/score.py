@@ -195,6 +195,8 @@ def score_plan_setaside(blocks, qs):
           exc.strip()[:80])
     hit = labels_added(blocks, "20-quiet")
     check("20-quiet labelled after the Milestone issue is created", bool(hit) and hit[0]["n"] > m["n"])
+    started = [b for b in blocks if b["op"] == "Start a thread"]
+    check("no thread started (delivery has not started)", not started, f"{len(started)} threads")
 
 
 def score_add(blocks, original, qs, case):
