@@ -2,6 +2,26 @@
 
 What each version of `dev-skills` brought, newest first. Each pull request that changes a skill bumps the version, and each Release adds one entry here covering everything since the last Release: its goal, the versions it delivered, the issues it shipped, and what a project using the plugin must do when something breaks. Entries up to 0.25.0 are one per version, when only a Release bumped it.
 
+## Milestone 3 · Release 1 (2026-11-08)
+
+Deliver all nine Milestone 3 features in one Release, so the agentic cycle runs cleanly end to end, with this project's coordinator instructions rebuilt from the skills at the end.
+
+Versions: 1.3.0, 1.4.0, 1.5.0, 1.6.0, 1.7.0, 1.8.0, 1.9.0. Commits: ec8e87e..69de11a.
+
+- Repo fixes: test runner cache files, eval scorer rewording, re-read close form (#52)
+- `merging` checks the Closes line before the merge (#53)
+- `review-rounds` briefs review agents by file path (#54)
+- `milestone` planning offers set-aside work and fits features planned in parallel (#55)
+- `to-tickets` fixes for features planned in parallel (#56)
+- Build skills hand over actions the cloud environment refuses (#57)
+- Spec: assemble the whole Milestone cycle for coordinators that cannot load skills (#58), with its Tickets: `team-lead` starts `release` to cut or plan, and names `setup-project` for skill-less coordinators (#75); `setup-project` assembles the whole Milestone cycle for coordinators that cannot load skills (#76)
+- Re-run `setup-project` for this project's coordinator (#59)
+- Startup verification reuses an earlier passing Harness check (#62)
+
+### What to do
+
+- A project whose coordinator cannot load the plugin's skills: run `setup-project` again. `team-lead/DELIVERY-LOOP.md`, which its instructions copied, is gone; `setup-project` now assembles the whole Milestone cycle from `team-lead` and `milestone`, with a source stamp and a stale check (#58).
+
 ## Milestone 2 · Release 1 (2026-11-08)
 
 Ship the review-script and `implement-spec` fixes found by other projects that use the plugin, then the `setup-project` delivery loop and the Retro scope line, so the whole of Milestone 2 lands in one Release.
