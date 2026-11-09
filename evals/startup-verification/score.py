@@ -2,6 +2,9 @@
 """Score a dry run of the reuse rule in the milestone skill's Startup verification.
 
 Usage: score.py <out-dir> <case>   (same, runtime, reference, old, failure or failedrow)
+
+The row names that say which rows run now may sit in the Run line or in a line of their own, and `all`, `every row` or
+`all seven` stands for every row when every row is expected.
 Reads <out-dir>/.scratch/result.md, the comment the coordinator would post. Prints one line per check (PASS or FAIL with
 what it saw) and exits 1 when any fails. See evals/startup-verification/README.md.
 """
@@ -23,18 +26,30 @@ RERUN = {
 }
 
 
+# Rows whose re-run is optional in a case: a Confirmed stop re-run needs a probe worker, so the rows that start and read
+# one may be marked either way.
+OPTIONAL = {"failure": {"Start a worker", "Worker state"}}
+RUN_NOW = re.compile(r"\b(?:run|ran)\s+now\b|\brows?\s+(?:run|ran)\b|\bre-?run", re.I)
+
+
 def parse(text):
-    """Return (run_line, {row name: (result, evidence)}, has_heading, verdict_line)."""
-    rows, run_line, verdict = {}, "", ""
+    """Return (run_clauses, {row name: (result, evidence)}, has_heading, verdict_line).
+
+    A run clause is a part of a non-table line (split at `;`, `.` and `·`) that says rows run now: it matches RUN_NOW and
+    does not belong to a `reused` list. It may be its own line or follow the Harness line."""
+    rows, clauses, verdict = {}, [], ""
     for line in text.splitlines():
-        if re.search(r"\bRun:", line):
-            run_line = line
         if line.startswith("Verdict:"):
             verdict = line
         cells = [c.strip() for c in line.strip().strip("|").split("|")]
-        if line.startswith("|") and len(cells) >= 5 and cells[0] in ROWS:
-            rows[cells[0]] = (cells[3], cells[4])
-    return run_line, rows, bool(re.search(r"^## Startup verification\s*$", text, re.M)), verdict
+        if line.startswith("|"):
+            if len(cells) >= 5 and cells[0] in ROWS:
+                rows[cells[0]] = (cells[3], cells[4])
+            continue
+        for clause in re.split(r"[;.\u00b7]", line):
+            if RUN_NOW.search(clause) and "reused" not in clause.lower():
+                clauses.append(clause)
+    return clauses, rows, bool(re.search(r"^## Startup verification\s*$", text, re.M)), verdict
 
 
 def score(text, case):
@@ -44,24 +59,30 @@ def score(text, case):
         results.append(ok)
         print(("PASS " if ok else "FAIL ") + name + ("" if ok or not seen else f": {seen}"))
 
-    run_line, rows, heading, verdict = parse(text)
-    rerun = RERUN[case]
+    clauses, rows, heading, verdict = parse(text)
+    rerun, optional = RERUN[case], OPTIONAL.get(case, set())
     check("headed ## Startup verification", heading)
     check("all seven rows present", set(rows) == set(ROWS), f"saw {sorted(rows)}")
     check("a Verdict line", bool(verdict), "none")
     for name in ROWS:
         if name not in rows:
             continue
-        evidence = rows[name][1]
+        result, evidence = rows[name]
         reused = "reused from" in evidence.lower()
-        if name in rerun:
+        if name in optional:
+            check(f"{name} is re-run or reused from the earlier result",
+                  bool(evidence) and (not reused or LINK in evidence), f"Evidence reads {evidence!r}")
+        elif name in rerun:
             check(f"{name} is re-run", not reused and bool(evidence), f"Evidence reads {evidence!r}")
         else:
             check(f"{name} is reused from the earlier result", reused and LINK in evidence, f"Evidence reads {evidence!r}")
-    ran_named = {n for n in ROWS if n.lower() in run_line.lower()}
-    says_all = rerun == set(ROWS) and "all rows" in run_line.lower()
-    check("Run line names exactly the rows run now", ran_named == rerun or says_all,
-          f"Run line {run_line!r} names {sorted(ran_named)}")
+        if reused:
+            check(f"{name} reused row keeps Result pass", result.lower() == "pass", f"Result reads {result!r}")
+    joined = " ".join(clauses)
+    named = {n for n in ROWS if n.lower() in joined.lower()}
+    says_all = bool(re.search(r"\ball\b|every row", joined, re.I))
+    ok = (rerun <= named <= rerun | optional) or (rerun == set(ROWS) and says_all)
+    check("a run-now clause names exactly the rows run now", ok, f"clauses {clauses!r} name {sorted(named)}")
     return all(results), results
 
 

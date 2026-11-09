@@ -12,13 +12,13 @@ out="$(cd "$out" && pwd)"
 rec="$out/records"
 
 posted="2026-10-20"; perm_then="default"; perm_now="default"
-ref_changed="2026-09-30"; cc_row="pass"; failure="None recorded."
+ref_changed="2026-09-30"; cc_essential="yes"; cc_row="pass"; cc_evidence="arrival 10:35, ended 10:38"; failure="None recorded."
 case "$case_" in
   runtime) perm_now="bypass permissions" ;;
   reference) ref_changed="2026-10-28" ;;
   old) posted="2026-09-25"; ref_changed="2026-09-01" ;;
   failure) failure="Retro #77 (2026-11-01): Confirmed stop failed in Milestone 2's delivery; a stopped worker still read as running after 10 minutes." ;;
-  failedrow) cc_row="not relied on" ;;
+  failedrow) cc_essential="not relied on"; cc_row="fail"; cc_evidence="no arrival by 11:05" ;;
 esac
 
 cat > "$rec/earlier-result.md" <<MD
@@ -36,7 +36,7 @@ Runtime: claude.ai project; permission mode: $perm_then; sandbox: on (read from 
 | Pause and resume | yes | message; reference | pass | paused 09:10, resumed 09:14 | none |
 | Confirmed stop | yes | archive; reference | pass | running 09:20, archived 09:22 | none |
 | End or failure notice | yes | done reply; reference | pass | wake at 09:30, state done | failure not provoked |
-| Scheduled check-in | no | check-in method; reference | $cc_row | arrival 10:35, ended 10:38 | none |
+| Scheduled check-in | $cc_essential | check-in method; reference | $cc_row | $cc_evidence | none |
 | Loaded skill version | yes | model-tiers load path | pass | installed 1.1.0, main 1.1.0 | none |
 
 Verdict: ready

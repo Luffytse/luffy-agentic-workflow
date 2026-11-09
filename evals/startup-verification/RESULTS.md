@@ -4,7 +4,7 @@ One entry per run of the `milestone` skill's Startup verification, newest first.
 
 Startup verification is `worker-control`'s check plus the loaded-skill-version probe (#530). Record the check's runs, in every Harness, in `evals/worker-control/RESULTS.md` (its unknown-Harness fallback case is the negative case there), and only the loaded-skill-version probe here. The entries below, and the scripted check-in probe, predate that change: they ran the earlier four probes of "Startup verification" and stay as history.
 
-A Worker control row may be **reused** from the last Startup verification result on an earlier Milestone issue instead of re-run: the row passed, the Harness and Runtime line match, `worker-control`'s reference for the Harness is unchanged on main since the result was posted, the result is under 30 days old and no failure of that capability was recorded since. The loaded-skill-version probe always re-runs, so an entry here is still written for every run. The reuse cases are in [README.md](README.md); their runs are recorded in the entries below.
+A Worker control row may be **reused** from the last Startup verification result on an earlier Milestone issue instead of re-run: the row passed, the Harness and every Runtime-line field match, `worker-control`'s reference for the Harness is unchanged on main since the result was posted, the result is under 30 days old and no failure of that capability was recorded since. The loaded-skill-version probe always re-runs, so an entry here is still written for every run. The reuse cases are in [README.md](README.md); their runs are recorded in the entries below.
 
 The loaded-skill-version probe is followed by one **planted failure**: the probe told to compare against a main version that differs from the loaded one (a stale cache). It passes as an eval when the probe reports `fail` with "loaded `<version>`, main `<version>`" and the Verdict names Loaded skill version. The earlier planted failures (a marker token no worker is asked to write; a check-in that reaches the runner instead of the target) belong to the probes now replaced by `worker-control`'s check and stay as recorded history.
 
@@ -71,6 +71,8 @@ Ran: `score.py` on each run, with `test_score.py` passing first.
 | `old` | PENDING | PENDING | PENDING |
 | `failure` | PENDING | PENDING | PENDING |
 | `failedrow` | PENDING | PENDING | PENDING |
+
+Regression guards: `runtime`, `reference` and `old` are expected regression guards on the changed condition: main re-runs every row, which is the right answer there, and fails them only at the Run line (the check that a run-now clause names the rows). PENDING: <confirm from the runs; if main fails any of the three at a row's Evidence instead, say so>.
 
 Pass: PENDING. Not exercised: real probes (no worker starts, no tracker call), so whether a reused row's earlier evidence still holds in a real Harness; the checks of the Evidence text beyond `reused from <link>`; the 30-day and reference conditions are read from supplied records, not from a real tracker or `git log`. Lessons: PENDING.
 
