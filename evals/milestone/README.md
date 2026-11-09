@@ -11,7 +11,7 @@ Delivery is the `team-lead` skill's now (ADR 0010): its cases (`deliver`, `deliv
 | Case | Run level |
 | --- | --- |
 | `plan`, `plan-small`, `plan-setaside`, `add-feature`, `add-feature-excluded` | decision-level in a subagent: every write, thread start and message is a block in `.scratch/proposed-actions.md`, so no real worker starts |
-| report cases (`ready`, `incomplete`, `final-cut`, `reentry`) | decision-level in a subagent: the coordinator reads supplied records and writes `actions.json`; no real scheduler or tracker |
+| report cases (`ready`, `incomplete`, `final-cut`, `reentry`, `accepted`) | decision-level in a subagent: the coordinator reads supplied records and writes `actions.json`; no real scheduler or tracker |
 
 (Judged from the fixtures, which record starts as blocks; no case here needs a top-level session. The loaded-skill-version probe and the Harness check are real-environment checks: see `../startup-verification/RESULTS.md` and `../worker-control/README.md`.)
 
@@ -74,5 +74,7 @@ records and actions into a fresh directory, set `checkins.running` false and add
 those actions to `existing_tracker_and_scheduler_actions` in records.json; save
 `actions.json` as `before-actions.json`. A fresh coordinator runs the same prompt.
 `score.py <out-dir> reentry` requires the action list to remain unchanged.
+
+The `accepted` case (premium tier, decision-level, like the others): `report/make-fixture.py <out-dir> accepted` builds a Milestone whose features are merged, whose Release is cut, whose check-in has ended and whose report is already posted (in `existing_tracker_and_scheduler_actions`), with the user's acceptance in words as the new message (`user_message_now`). `score.py <out-dir> accepted` requires exactly one new `close` of the Milestone issue, a comment on it (in the close body or beside it) naming where (`chat://coordinator/u9`) and when (13:00Z) the user accepted, and no new report, schedule ending or thread start; a `message-user` is allowed. The prompt names no `close` operation, so a run on main that closes anyway shows the model closes from its own reading.
 
 Run `python3 evals/milestone/report/test-score-durations.py` for the scorer regression: both recorded ready reports must pass, while swapping only coordinator/build-10 elapsed values between their rows, or contradicting either row's known session end time while keeping its elapsed figure, must fail.

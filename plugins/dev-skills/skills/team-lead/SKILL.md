@@ -92,4 +92,4 @@ A pause is in effect from the latest pause record until a resume record follows 
 
 ## End of delivery
 
-At every wake, apply `milestone`'s "Milestone review" gate. Once it holds and any final Release cut has reported, start nothing further; if a report for this state already waits, do nothing more. Otherwise end the check-in through `worker-control`, read back that it no longer runs and record it, then follow `milestone`'s report and stop for the user's review. A one-Release Milestone ends the same way.
+At every wake, apply `milestone`'s "Milestone review" gate. Once it holds and any final Release cut has reported, start nothing further; if a report for this state already waits, do nothing more, unless the user has accepted it (`milestone`'s reporting reference closes the Milestone issue then). Otherwise end the check-in through `worker-control`, read back that it no longer runs and record it, then follow `milestone`'s report and stop for the user's review. A one-Release Milestone ends the same way.

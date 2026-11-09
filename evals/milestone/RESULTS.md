@@ -2,6 +2,18 @@
 
 One entry per run of the `milestone` skill's dry run (the planning cases and the report cases; the delivery entries below are history, see the first entry), newest first ([README](README.md) says how to build, run and score it). Record the commit and the plugin version from `plugins/dev-skills/.claude-plugin/plugin.json`; an entry written inside an open pull request names the commit and version it ran on as its base. Each planning run also applies the shape to one real Milestone issue (`score.py --shape`) and names the migration it needs, if any; each `deliver` run also applies the loop, read-only, to one real Milestone and names the thread it would start next and the next Release it would plan.
 
+## 2026-11-09 — Ticket #78: closing the accepted Milestone issue, `accepted` report case
+
+Runner: the Ticket thread. Case check by a fresh premium-tier subagent: verdict fix (a release-cut confound, a stub prior report, a clock behind the message, a scorer too narrow on where and too loose on other actions, and a missing README entry and self-test); all fixed. One redesign of the fixture removed the prompt's `close` operation hint. Runs: one fresh premium-tier subagent each, `<checkout>` a `git archive` of the branch or of main (`065d1d7`, plugin 1.9.0, unbumped). Run level: decision-level in a subagent. Evidence: [`evidence/78/`](evidence/78/).
+
+| Case | Branch | Main |
+| --- | --- | --- |
+| `accepted` (final fixture) | 3/3 (`branch`: comment and close, wording "close the Milestone issue yourself, with the Close operation") | 3/3 (`main`: comment and close) |
+
+Earlier branch run, same fixture, first wording ("close the Milestone issue only once the user accepts it"): did not close (`branch-earlier-wording`); the sentence was reworded to an instruction. On the first fixture main also closed in one run and, with a stub prior report and an uncut Release, did not close in another (the Release-cut confound the case check named).
+
+Result: **regression guard**, not a failing-on-main case. A capable model closes the issue on acceptance from its own reading even though main's `reporting.md` says to stop rather than close, so the text change is a clarity fix rather than a measured behaviour change. The runs are single samples; they show the case scores a correct close and a missing one, not a rate. After Round 1 the sentence lost "yourself" (to agree with `setup-project`'s "a thread closes the Milestone issue") and `team-lead`'s End of delivery gained "unless the user has accepted it"; neither was rerun. Not exercised: a real tracker or a `team-lead` session (a `team-lead` eval case for the acceptance wake is the stated gap: its fixtures start at delivery, not at a report waiting).
+
 ## 2026-11-09 — Ticket #55: milestone planning offers set-aside work first, `plan-setaside` case
 
 Runner: the Ticket thread. Case check by a fresh premium-tier subagent: first verdict fix (the user's script named issue 31 and gave away the rule; the scorer counted the draft question), both fixed, then the self-test passes. Runs: one fresh premium-tier subagent each, `<checkout>` the branch's working tree or a `git archive` of main (`28f99ba`, plugin 1.2.0, unbumped), scored with the branch's `score.py`. Run level: decision-level in a subagent.

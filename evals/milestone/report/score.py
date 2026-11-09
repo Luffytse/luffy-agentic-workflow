@@ -2,13 +2,21 @@
 """Score actual proposed coordinator actions against independent fixture facts."""
 import argparse,json,re
 from pathlib import Path
-p=argparse.ArgumentParser(); p.add_argument("out",type=Path); p.add_argument("case",choices=["ready","incomplete","final-cut","reentry"]); a=p.parse_args()
+p=argparse.ArgumentParser(); p.add_argument("out",type=Path); p.add_argument("case",choices=["ready","incomplete","final-cut","reentry","accepted"]); a=p.parse_args()
 actions=json.loads((a.out/"actions.json").read_text()); checks=[]
 def check(name,condition):
  checks.append(condition); print(("PASS " if condition else "FAIL ")+name)
 reports=[x for x in actions if x["operation"]=="comment" and "<!-- milestone report -->" in x.get("body","")]
 if a.case=="reentry":
  check("unchanged review state takes no duplicate action",actions==json.loads((a.out/"before-actions.json").read_text()))
+elif a.case=="accepted":
+ old=json.loads((a.out/"records.json").read_text())["existing_tracker_and_scheduler_actions"]
+ new=[x for x in actions if x not in old]
+ closes=[x for x in new if x["operation"]=="close"]
+ check("closes the Milestone issue once",len(closes)==1 and closes[0]["target"]=="M1")
+ b=json.dumps([x for x in new if x["target"]=="M1" and x["operation"] in ["close","comment"]])
+ check("a comment on M1 names the acceptance, where and when",bool(re.search(r"u9|chat://coordinator|coordinator chat",b)) and "13:00" in b)
+ check("no new report, schedule ending or thread start",all(x["operation"] not in ["end-checkins","start-thread"] and not (x["operation"]=="comment" and x.get("body","").lstrip().startswith("<!-- milestone report -->")) for x in new))
 elif a.case=="final-cut":
  check("final Release cut starts before report",any(x["operation"]=="start-thread" and re.search(r"release",x.get("body",""),re.I) and x["target"]=="R1" for x in actions))
  check("await final cut without report or ending checkins",not reports and not any(x["operation"]=="end-checkins" for x in actions))

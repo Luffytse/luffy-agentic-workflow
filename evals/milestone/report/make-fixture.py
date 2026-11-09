@@ -2,7 +2,7 @@
 """Build coordinator-facing report inputs; never contacts a tracker or runtime."""
 import argparse, json
 from pathlib import Path
-p=argparse.ArgumentParser(); p.add_argument("out",type=Path); p.add_argument("case",choices=["ready","incomplete","final-cut"]); a=p.parse_args()
+p=argparse.ArgumentParser(); p.add_argument("out",type=Path); p.add_argument("case",choices=["ready","incomplete","final-cut","accepted"]); a=p.parse_args()
 a.out.mkdir(parents=True,exist_ok=False)
 records={
  "milestone":{"id":"M1","state":"open","goal":"quiet farewell","delivery_start":"2026-11-02T10:00:00Z","now":"2026-11-02T12:00:00Z","features":["F10","F20"],"acceptance":"farewell works and quiet suppresses output","excluded":"colour"},
@@ -19,5 +19,13 @@ if a.case=="final-cut":
  records["features"][1].update(state="closed",state_reason="completed",parked=False,blockers=[],pull_request={"id":"P8","merged":True,"evidence":"tracker://P8/tests"},evidence={"quiet suppresses output":"tracker://P8/test-quiet"})
  records["releases"][0].update(label="release-m1-r1",issues=[{"id":"F10","state":"closed","labels":["release-m1-r1"]},{"id":"F20","state":"closed","labels":["release-m1-r1"]}],cut_started=False,cut_done=False)
  records["threads"][2]["end"]="2026-11-02T11:50:00Z"
+if a.case=="accepted":
+ records["features"][1].update(parked=False,blockers=[],state="closed",state_reason="completed",pull_request={"id":"P8","merged":True,"evidence":"tracker://P8/tests"},evidence={"quiet suppresses output":"tracker://P8/test-quiet"})
+ records["releases"][0].update(state="closed",label="release-m1-r1",issues=[{"id":"F10","state":"closed","labels":["release-m1-r1"]},{"id":"F20","state":"closed","labels":["release-m1-r1"]}],cut_started=True,cut_done=True)
+ records["threads"][2]["end"]="2026-11-02T11:50:00Z"
+ records["checkins"]["running"]=False
+ records["milestone"]["now"]="2026-11-02T13:05:00Z"
+ records["existing_tracker_and_scheduler_actions"]=[{"operation":"end-checkins","target":"sched-01","body":"disabled; no future firing"},{"operation":"comment","target":"M1","body":"<!-- milestone report -->\n## Milestone report — ready for user review\nFull report as posted 2026-11-02T12:05Z: outcomes, parked and maintenance, user messages, time and tokens, versions, agent decisions, next Milestone. Nothing has changed since: both features merged, R1 cut, no feature sent back, no park lifted.\nReady for the user's Milestone review; acceptance pending."}]
+ records["user_message_now"]={"id":"chat://coordinator/u9","time":"2026-11-02T13:00Z","text":"I read the report. Looks good, I accept Milestone 1."}
 (a.out/"records.json").write_text(json.dumps(records,indent=2)+"\n")
-(a.out/"PROMPT.md").write_text("Read <checkout>/plugins/dev-skills/skills/milestone/SKILL.md and its reporting reference if reached. Continue the coordinator at the current wake from records.json, which is the fixture tracker/runtime read surface. Its links are evidence identifiers. Tracker writes and external actions are dry-run only: write actions.json as a JSON list of objects with operation, target, and body. Use operation comment for tracker comments, end-checkins for schedule ending, message-user for user reporting, and start-thread for any thread start. Do not change records.json. Produce the actions called for by the skill, then stop. Treat actions.json from an earlier wake, when present, as tracker/scheduler writes already read back; rerun the same wake without duplicating them. No actual external operation is authorized.\n")
+(a.out/"PROMPT.md").write_text("Read <checkout>/plugins/dev-skills/skills/milestone/SKILL.md and its reporting reference if reached. Continue the coordinator at the current wake from records.json, which is the fixture tracker/runtime read surface. Its links are evidence identifiers. Tracker writes and external actions are dry-run only: write actions.json as a JSON list of objects with operation, target, and body. Use operation comment for tracker comments, end-checkins for schedule ending, message-user for user reporting, and start-thread for any thread start, and any other tracker write by its own name (for example label or edit). Do not change records.json. Produce the actions called for by the skill, then stop. Treat actions.json from an earlier wake, when present, as tracker/scheduler writes already read back; rerun the same wake without duplicating them. No actual external operation is authorized.\n")
