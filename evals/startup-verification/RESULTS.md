@@ -4,6 +4,8 @@ One entry per run of the `milestone` skill's Startup verification, newest first.
 
 Startup verification is `worker-control`'s check plus the loaded-skill-version probe (#530). Record the check's runs, in every Harness, in `evals/worker-control/RESULTS.md` (its unknown-Harness fallback case is the negative case there), and only the loaded-skill-version probe here. The entries below, and the scripted check-in probe, predate that change: they ran the earlier four probes of "Startup verification" and stay as history.
 
+A Worker control row may be **reused** from the last Startup verification result on an earlier Milestone issue instead of re-run: the row passed, the Harness and Runtime line match, `worker-control`'s reference for the Harness is unchanged on main since the result was posted, the result is under 30 days old and no failure of that capability was recorded since. The loaded-skill-version probe always re-runs, so an entry here is still written for every run. The reuse cases are in [README.md](README.md); their runs are recorded in the entries below.
+
 The loaded-skill-version probe is followed by one **planted failure**: the probe told to compare against a main version that differs from the loaded one (a stale cache). It passes as an eval when the probe reports `fail` with "loaded `<version>`, main `<version>`" and the Verdict names Loaded skill version. The earlier planted failures (a marker token no worker is asked to write; a check-in that reaches the runner instead of the target) belong to the probes now replaced by `worker-control`'s check and stay as recorded history.
 
 ### 2026-11-02, commit 0c0cd6494bc37f484a6e5a0472872395cfe3da60 (base), dev-skills 0.41.0 (base): Codex #499 check-in rerun and stop corroboration
@@ -54,6 +56,23 @@ Pass: yes | no. Lessons: <what to change in the skill, if anything>
 ```
 
 ## Runs
+
+### PENDING: <date>, commit PENDING: <branch sha> (base `abe42a0`), dev-skills 1.3.0 (unbumped): reuse rule of Ticket #62, six cases, branch and main
+
+Run level: decision-level in a subagent (regular tier)
+Runner: PENDING: <the Ticket thread; one fresh regular-tier subagent per case per skill version, `<checkout>` the branch's working tree or a `git archive` of main at `abe42a0`, each given only its PROMPT.md>. Case check: PENDING: <premium-tier subagent's keep, fix or drop for each case>.
+Ran: `score.py` on each run, with `test_score.py` passing first.
+
+| Case | Branch | Main | Main's failures |
+| --- | --- | --- | --- |
+| `same` | PENDING | PENDING | PENDING |
+| `runtime` | PENDING | PENDING | PENDING |
+| `reference` | PENDING | PENDING | PENDING |
+| `old` | PENDING | PENDING | PENDING |
+| `failure` | PENDING | PENDING | PENDING |
+| `failedrow` | PENDING | PENDING | PENDING |
+
+Pass: PENDING. Not exercised: real probes (no worker starts, no tracker call), so whether a reused row's earlier evidence still holds in a real Harness; the checks of the Evidence text beyond `reused from <link>`; the 30-day and reference conditions are read from supplied records, not from a real tracker or `git log`. Lessons: PENDING.
 
 ### 2026-11-02, commit 5d4e9bb (branch `ticket-495`; base 4d0a751), dev-skills 0.40.0 (base): Claude Code cloud project, check-in probe into the coordinator, real run and planted failure
 
