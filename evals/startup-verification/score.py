@@ -35,8 +35,8 @@ RUN_NOW = re.compile(r"\b(?:run|ran)\s+now\b|\brows?\s+(?:run|ran)\b|\bre-?run",
 def parse(text):
     """Return (run_clauses, {row name: (result, evidence)}, has_heading, verdict_line).
 
-    A run clause is a part of a non-table line (split at `;`, `.` and `·`) that says rows run now: it matches RUN_NOW and
-    does not belong to a `reused` list. It may be its own line or follow the Harness line."""
+    A run clause is a part of a non-table line (split at `;`, `.` and `·`, parentheticals removed and a trailing `reused` remark cut off) that says rows run
+    now: it matches RUN_NOW and is not itself a `reused` list. It may be its own line or follow the Harness line."""
     rows, clauses, verdict = {}, [], ""
     for line in text.splitlines():
         if line.startswith("Verdict:"):
@@ -46,8 +46,18 @@ def parse(text):
             if len(cells) >= 5 and cells[0] in ROWS:
                 rows[cells[0]] = (cells[3], cells[4])
             continue
+        line = re.sub(r"\([^)]*\)", " ", line)  # a parenthetical (for example "(the six rows are reused)") is not a clause
         for clause in re.split(r"[;.\u00b7]", line):
-            if RUN_NOW.search(clause) and "reused" not in clause.lower():
+            # A trailing ", the others are reused" or " - the rest reused" is cut off; what is left must not itself be
+            # a reused list.
+            parts = re.split(r"(?:,|\s[\u2014\u2013-]\s)", clause)
+            kept = []
+            for part in parts:
+                if "reused" in part.lower():
+                    break
+                kept.append(part)
+            clause = ", ".join(kept)
+            if RUN_NOW.search(clause):
                 clauses.append(clause)
     return clauses, rows, bool(re.search(r"^## Startup verification\s*$", text, re.M)), verdict
 

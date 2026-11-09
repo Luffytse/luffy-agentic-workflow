@@ -87,6 +87,37 @@ def expect(name, got, want):
         failures.append(f"{name}: scored {'pass' if got else 'fail'}, expected {'pass' if want else 'fail'}")
 
 
+SAMPLE = """## Startup verification
+
+Harness: claude.ai project threads (claude-code-project-threads) \u00b7 Role: coordinator \u00b7 Runner: the coordinator \u00b7 Run: 2026-11-09 UTC; rows run now: Loaded skill version (the six Harness rows are reused)
+Runtime: claude.ai project; permission mode: default; sandbox: on (read from settings); tools held: start_thread
+"""
+
+
+def sample_result(harness_tail, rerun=frozenset({score.LOADED})):
+    """A same-case result whose run-now remark is `harness_tail` (written after the Run line's times)."""
+    text = result(set(rerun), style="none")
+    return text.replace("UTC", "UTC; " + harness_tail, 1)
+
+
+for name, tail, want in [
+    ("parenthetical reused mention (the recorded branch-same run)",
+     "rows run now: Loaded skill version (the six Harness rows are reused)", True),
+    ("trailing ', the others are reused'", "rows run now: Loaded skill version, the others are reused", True),
+    ("trailing ' - the rest reused'", "rows run now: Loaded skill version - the rest reused", True),
+    ("run-now clause that is itself a reused list", "Reused: Start a worker, Worker state, Pause and resume, Confirmed stop, "
+     "End or failure notice, Scheduled check-in", False),
+    ("a reused list that says not re-run", "Not re-run, reused: Start a worker, Worker state, Pause and resume", False),
+    ("wrong row named in a parenthesis-tailed clause", "rows run now: Confirmed stop (the rest are reused)", False),
+]:
+    expect(f"same sample: {name}", run("same", sample_result(tail)), want)
+text = SAMPLE + "\n| Capability | Essential | Method and source | Result | Evidence | Limits |\n|---|---|---|---|---|---|\n"
+for n in ROWS:
+    ev = "ran now (simulated)" if n == score.LOADED else f"reused from {score.LINK}"
+    text += f"| {n} | yes | m | pass | {ev} | none |\n"
+expect("same sample: the recorded branch-same comment", run("same", text + "\nVerdict: ready"), True)
+
+
 for case, rerun in score.RERUN.items():
     with tempfile.TemporaryDirectory() as tmp:
         out = os.path.join(tmp, case)
