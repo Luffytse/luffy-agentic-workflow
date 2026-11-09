@@ -26,6 +26,14 @@ The coordinator relies on these and does not rebuild them in tracker records:
 
 The coordinator itself holds no tool to set a timer or to stop a thread (no `send_later`, `create_trigger`, `archive_session` or `interrupt_session`; runtime-reported). Its threads hold them, so the check-in and the stop below go through threads.
 
+## What the environment refuses a thread
+
+A thread hands any of these over once, as the build and merge skills say; none is a rule violation by the thread. All three are runtime-reported (no doc page lists them):
+
+- **One designated branch, no force push.** A cloud thread has one designated branch, and a force push is refused, so it cannot restart that branch from main. After its pull request is squash-merged it cannot make a new branch off main for a post-merge bug Ticket or the retro's check, so a fresh thread builds those.
+- **Auto mode may refuse a self-merge the Boundary record allows.** The merge call is denied as "Merge Without Review" until the user says to merge it.
+- **No pushes under `.github/workflows/`.** A cloud thread holds no `workflow` scope: `git push` says "without `workflow` scope" and the GitHub tools say "Insufficient scope". The user pushes such a file.
+
 ## Methods the coordinator adds
 
 ### Start a worker

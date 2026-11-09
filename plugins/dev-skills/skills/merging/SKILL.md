@@ -56,7 +56,7 @@ Name what stops the merge, so the user can decide quickly: the boundary (the act
 
 ## The merge
 
-Merge into main with the tracker doc's **Merge a PR** operation, with the caller's method and title. For a squash, the commit message is the pull request's body, as it stands then, rather than the branch's commit messages joined together. For a merge commit, the title replaces the tracker's default one. A tracker doc with no such operation was written before it: merge as the tracker's own docs say, and tell the user to re-run `setup-dev-skills`.
+Merge into main with the tracker doc's **Merge a PR** operation, with the caller's method and title. For a squash, the commit message is the pull request's body, as it stands then, rather than the branch's commit messages joined together. For a merge commit, the title replaces the tracker's default one. A tracker doc with no such operation was written before it: merge as the tracker's own docs say, and tell the user to re-run `setup-dev-skills`. When the environment refuses an action the rules allow (a new branch off main, the merge itself, pushing a CI workflow file), the thread does not stall or work around it: it hands the action once, with the exact change, to the coordinator (for a fresh thread) or to the user, and records that it waits on it.
 
 ## After the merge
 
