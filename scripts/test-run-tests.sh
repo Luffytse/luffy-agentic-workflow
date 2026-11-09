@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Tests scripts/run-tests.sh through its exit code over disposable trees: a clean tree passes,
 # a planted failing .sh or .py test* file, or one in a path with spaces, exits non-zero and is named, a test* file
-# it cannot run and a tree with no tests also fail, and a file not named test* is ignored.
+# it cannot run and a tree with no tests also fail, and a file not named test* is ignored, and a test* file in a __pycache__ folder (a compiled .pyc) is skipped.
 set -u
 here=$(cd "$(dirname "$0")" && pwd)
 runner="$here/run-tests.sh"
@@ -39,6 +39,12 @@ out=$("$runner" "$tmp" 2>&1); rc=$?
 [ $rc != 0 ] || { echo "FAIL: a test* file with another extension exited 0"; fail=1; }
 case "$out" in *evals/a/test-notes.txt*) ;; *) echo "FAIL: output does not name the unrunnable file: $out"; fail=1;; esac
 rm "$tmp/evals/a/test-notes.txt"
+
+mkdir -p "$tmp/evals/a/__pycache__"
+printf 'x\n' > "$tmp/evals/a/__pycache__/test_x.cpython-311.pyc"   # a compiled test: skipped, not an unrunnable test*
+out=$("$runner" "$tmp" 2>&1); rc=$?
+[ $rc = 0 ] || { echo "FAIL: a __pycache__ test*.pyc made a passing tree exit $rc: $out"; fail=1; }
+rm -r "$tmp/evals/a/__pycache__"
 
 empty=$(mktemp -d); mkdir -p "$empty/evals" "$empty/scripts"
 out=$("$runner" "$empty" 2>&1); rc=$?

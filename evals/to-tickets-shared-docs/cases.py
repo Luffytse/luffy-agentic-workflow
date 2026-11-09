@@ -1,17 +1,18 @@
 """Cases for the to-tickets shared-doc-lines check. Shared by make_fixture.py, score.py and test_cases.py."""
 
 # The fixture Spec's two work items. They touch different files and functions (`code`), so the only thing they can collide on is a glossary entry.
+# `key` is the item's code name; `alts` are plain-words phrases that also count (a ticket may be worded without the code name).
 # Each names the glossary entry its docs update rewrites; a case may override an item's `entry` and `doc`.
-SHOUT = {"slug": "shout-option", "title": "Add a shout option", "key": "format_greeting",
+SHOUT = {"slug": "shout-option", "title": "Add a shout option", "key": "format_greeting", "alts": ["shout option", "shout=true"],
          "code": "greet.py, function format_greeting",
          "criteria": ["format_greeting('Ada', shout=True) returns 'HELLO ADA'"],
          "entry": "Greeting", "doc": "a Greeting can be shouted"}
-HISTORY = {"slug": "greeting-history", "title": "Record greetings in a history", "key": "record_greeting",
+HISTORY = {"slug": "greeting-history", "title": "Record greetings in a history", "key": "record_greeting", "alts": ["history"],
            "code": "history.py, function record_greeting",
            "criteria": ["record_greeting('Ada') appends the line 'Hello Ada' to history.txt"],
            "entry": "Greeting", "doc": "each Greeting is recorded in the history"}
 # Needs item 01's shout option in code (it logs shouted greetings), but rewrites a different glossary entry.
-LOUD = {"slug": "loud-log", "title": "Log shouted greetings", "key": "record_shout",
+LOUD = {"slug": "loud-log", "title": "Log shouted greetings", "key": "record_shout", "alts": ["loud log"],
         "code": "loudlog.py, function record_shout", "needs": "01",
         "criteria": ["record_shout('Ada') appends the line 'HELLO ADA' to loud.log"],
         "entry": "Loud log", "doc": "the Loud log lists every shouted Greeting"}
