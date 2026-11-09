@@ -18,6 +18,14 @@ Pass: yes | no. Lessons: <what to change in implement, if anything>
 
 ## Runs
 
+### PENDING: date, branch `claude/project-thread-5ol4so` on main `2c8fe38`, dev-skills 1.6.0 (no bump yet): #57 env-refusal case
+
+Run level: decision-level in a subagent
+Setup: PENDING: one fresh regular-tier subagent for the `env-refusal` case on the branch's skills, one on main's (`git archive` of `origin/main`), in one parallel batch; the prompt text only.
+Steps: PENDING: <what each run wrote for (1) to (4)>
+Not exercised: a real refusal by a Harness; everything after the decision.
+Pass: PENDING: the branch hands both actions over once and records the wait; main's run is expected to fail at least one (or is recorded as a regression guard).
+
 ### 2026-11-04, main `9d1de32`, dev-skills 0.80.0 (no bump): #695 merge-authority and corrective-check cases, ticket flow, through the `merging` load
 
 Run level: decision-level in a subagent

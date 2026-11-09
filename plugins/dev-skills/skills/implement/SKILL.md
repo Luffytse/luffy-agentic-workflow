@@ -32,7 +32,7 @@ Done when you have stated the title, every blocker is cleared under the tracker 
 
 ## 2. Make the Ticket branch
 
-Give the Implementer its own git worktree on the Ticket branch, so nothing you do to read a branch can move the checkout its commits land in. Fetch main (the repo's default branch), then make the worktree yourself, outside your checkout: `git worktree add <path> -b <ticket-branch> origin/<default-branch>`, and push the branch from it (`git -C <path> push -u origin <ticket-branch>`). Your own checkout stays where it is. Done when the branch exists on the remote and the worktree is on it.
+Give the Implementer its own git worktree on the Ticket branch, so nothing you do to read a branch can move the checkout its commits land in. Fetch main (the repo's default branch), then make the worktree yourself, outside your checkout: `git worktree add <path> -b <ticket-branch> origin/<default-branch>`, and push the branch from it (`git -C <path> push -u origin <ticket-branch>`). Your own checkout stays where it is. If the harness allows a thread only one designated branch, that branch is the Ticket branch and the worktree is made on it (`git worktree add <path> <ticket-branch>`), so you still write no code. When the environment refuses an action the rules allow (a new branch off main, the merge itself, pushing a CI workflow file), the thread does not stall or work around it: it hands the action once, with the exact change, to the coordinator (for a fresh thread) or to the user, and records that it waits on it. Done when the branch exists on the remote and the worktree is on it.
 
 ## 3. Start one Implementer
 
