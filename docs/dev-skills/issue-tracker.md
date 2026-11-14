@@ -2,7 +2,7 @@
 
 Issues and specs for this repo live as GitHub issues in [`Luffytse/luffy-agentic-workflow`](https://github.com/Luffytse/luffy-agentic-workflow). Use the `gh` CLI for all operations. A session without `gh` (some cloud sessions) does the same operations with the GitHub tools it has, and needs no route from the second file.
 
-Some cloud sessions have `gh` but no GraphQL: `gh repo view`, `gh issue view`, `gh issue list`, the other `gh issue` and `gh pr` subcommands and `gh label list` fail with "GraphQL is not available". Where `gh` fails that way, or is older than 2.94 and lacks `--parent` and `--blocked-by`, open [issue-tracker-rest.md](./issue-tracker-rest.md), which gives each operation's `gh api` route; every operation below that has such a route names it.
+Some cloud sessions have `gh` but no GraphQL: `gh repo view`, `gh issue view`, `gh issue list`, the other `gh issue` and `gh pr` subcommands and `gh label list` fail with "GraphQL is not available". Where `gh` fails that way, or is older than 2.94 and lacks `--parent` and `--blocked-by`, open [issue-tracker-rest.md](./issue-tracker-rest.md), which gives each operation's `gh api` route.
 
 ## Conventions
 
