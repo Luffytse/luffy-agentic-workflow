@@ -1,6 +1,6 @@
 # Changelog
 
-What each version of `dev-skills` brought, newest first. Each pull request that changes a skill bumps the version, and each Release adds one entry here covering everything since the last Release: its goal, the versions it delivered, the issues it shipped, and what a project using the plugin must do when something breaks. Entries up to 0.25.0 are one per version, when only a Release bumped it.
+What each version of `dev-skills` brought, newest first. Each Release adds one entry here covering everything since the last Release: its goal, the version it delivered (older entries list the versions delivered one per skill pull request), the issues it shipped, and what a project using the plugin must do when something breaks. Entries up to 0.25.0 are one per version, when only a Release bumped it.
 
 ## Milestone 3 · Release 2 (2026-11-09)
 

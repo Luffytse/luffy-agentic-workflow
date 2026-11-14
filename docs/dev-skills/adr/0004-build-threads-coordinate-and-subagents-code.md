@@ -30,7 +30,7 @@ A review never stops for a reason the Boundary record does not list (amended 202
 
 A repo's own rules may add cases; the skills name only the general ones.
 
-Where each pull request bumps the version ([ADR 0008](0008-each-skill-change-bumps-the-plugin-version.md)), the bump merged with it is not a published release, and it does not make the pull request a one-way door on its own: a bad change is walked back by a revert that takes the next number. A Release that publishes a version, where Releases bump, still is one.
+Where each pull request bumps the version (a project's own choice; [ADR 0008](0008-each-skill-change-bumps-the-plugin-version.md), superseded for this repo by [ADR 0016](0016-releases-bump-the-plugin-version-once.md)), the bump merged with it is not a published release, and it does not make the pull request a one-way door on its own: a bad change is walked back by a revert. A Release that publishes a version, where Releases bump, is the same: in this repo a merged version bump is no one-way door (ADR 0016).
 
 A thread that brings a pull request to the user names what stops the merge (the boundary and where it is listed, or the rule and its file), so the user can decide quickly. The user then merges, or tells the thread to. This follows the Claude Code team's practice of setting human review by the risk of the change, not by who wrote it.
 
