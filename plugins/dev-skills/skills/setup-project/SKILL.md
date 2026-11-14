@@ -3,73 +3,64 @@ name: setup-project
 description: "Drafts a project's coordinator instructions: how its threads work, never the state of its work. Use when the user wants to write or update them, or a new repo, thread kind or standing rule makes them stale."
 ---
 
-Draft the **project instructions**: the short text a project's coordinator reads before it starts a thread. It points to thread workflows and docs, and carries the project's own choices. It never holds the state of the work (the map, open specs, plannings or tickets): those change faster than the instructions, so it tells the coordinator where to look them up. The draft lives in the conversation until the coordinator saves it; this thread writes no file (repo `CLAUDE.md` included) and changes no project setting.
+Draft the **project instructions**: the short text a project's coordinator reads before it starts a thread. It points to thread workflows and docs and carries the project's own choices. It never holds the state of the work (the map, open specs, plannings or tickets), which changes faster than the instructions; it says where to look that up. The draft lives in the conversation until the coordinator saves it; this thread writes no file (repo `CLAUDE.md` included) and changes no project setting.
 
 ## 1. Explore
 
 Facts are your job. Gather:
 
-- The existing project instructions. If your context does not show them, ask the user (or the coordinator) for the current text; a re-run starts from it and proposes the full new text with a diff.
+- The existing project instructions. If your context does not show them, ask the user (or the coordinator) for the current text; a re-run starts from it.
 - Each repo's `CLAUDE.md` / `AGENTS.md` and `docs/dev-skills/index.md`.
-- Which tracker the project uses (`docs/dev-skills/issue-tracker.md` names it; if absent, ask the user where it is). Do not gather the map, open specs or tickets: they are state, and the coordinator looks them up.
-- Whether the project is inside a Milestone. Load `milestone` by name and apply its **No Milestone** test: read the Boundary record for its label form and look up only the open Milestone agreement, not its work list. With no Boundary record, no label form or no open Milestone agreement, keep the full draft below.
-- Whether the coordinator can load the plugin's skills. If you are the coordinator, read your own skill list; otherwise ask the coordinator to check its own and report whether `team-lead`, `milestone`, `release` and `worker-control` are in it, and never guess from your own list. Record "can", "cannot" or "unknown" (unknown counts as "cannot").
+- Which tracker the project uses (`docs/dev-skills/issue-tracker.md` names it; if absent, ask the user). Gather no map, spec or ticket: they are state.
+- Whether the coordinator can load the plugin's skills. If you are the coordinator, read your own skill list; otherwise ask the coordinator whether `team-lead`, `milestone`, `release` and `worker-control` are in its own, and never guess from yours. Record "can", "cannot" or "unknown" (unknown counts as "cannot").
+- The size limit of the instructions. It belongs to the tool the coordinator runs in, not to the project: read it from `worker-control`'s reference for that tool where the reference states one, otherwise ask the user. Record the limit and its unit, or "none known".
 
-Record "none yet" for anything that does not exist, and carry on with the links you have. Done when each of the above is a link, a text, or "none yet".
+Record "none yet" for anything that does not exist. Done when each item is a link, a text, or "none yet".
 
 ## 2. Grill
 
-Run `grilling` to settle how this project's threads work. On a re-run the existing text already answers what it covers: grill only the change the user wants and what depends on it. Keep its end gate: drafting starts once the user confirms you share an understanding.
-
-Inside a Milestone, settle only the project-specific choices: repos, any thread limit, extra merge gates, any tier-to-model override and other additions not already held by `milestone`, `team-lead`, the skills it invokes or the Boundary record. Read those owners to distinguish an addition from a shared default; leave their procedures with them.
-
-Outside a Milestone, settle each of these, skipping what exploration already answered:
-
-- **Phases**: the coordinator's project threads, the Build threads (Spec threads run `implement-spec`, Ticket threads run `implement`), and planning threads if the project has them.
-- **Skill per thread kind**: which skill each runs (`wayfinder`, `to-spec`, `to-tickets`, `implement-spec`, `implement`); the coordinator itself runs `team-lead` to deliver planned work (a Release, or a Milestone with `milestone`).
-- **Brief contents**: what every brief carries. Default: skill, Model tier, repo(s), Review level, link to the ticket or spec.
-- **Tier-to-model map**: ask the user which model each Model tier (cheap, regular, premium, top) maps to in their harness. Vendor model names go only into the user's drafted instructions, never into skill text (the `model-tiers` skill holds the plugin default; the user's map overrides it). If the user has no map yet, record "not needed" and draft the rule without the map.
-- **Standing rules**: how many questions a thread asks the user at once, review Rounds, who merges, how many Build threads run at once, and any rule of the user's own.
-
-Done when every item has an answer or a recorded "not needed".
+Run `grilling` to settle the project's own choices: repos, any thread limit, extra merge gates, any tier-to-model override, and other rules of the user's own that `milestone`, `team-lead`, the skills they invoke and the Boundary record do not already hold. Read those owners to tell an addition from a shared default, and leave their procedures with them. Vendor model names go only into the drafted instructions, never into skill text. On a re-run, grill only the change the user wants and what depends on it. Keep the end gate of `grilling`: drafting starts once the user confirms you share an understanding.
 
 ## 3. Draft
 
 Write the full instructions as pointer-style text:
 
-- Link `docs/dev-skills/index.md` (Build threads start there; if it is "none yet", say the index is still to be created), and leave its contents in that page.
-- Tell the coordinator to find open specs, plannings and tickets on the tracker when it needs them: name the tracker (and the repo, if the project has several) and say `docs/dev-skills/issue-tracker.md` is where it is documented, so the coordinator is not sent to a file that may be absent or unreadable. Link no map, spec or ticket as state.
+- Link `docs/dev-skills/index.md`, where Build threads start (if it is "none yet", say it is still to be created).
+- Name the tracker (and the repo, if the project has several) and `docs/dev-skills/issue-tracker.md` as where it is documented, for the coordinator to look up open specs, plannings and tickets; link none of them as state.
+- Point to the Boundary record, and keep only the choices settled in step 2, a tier-to-model map only where the user overrides the default.
 - Keep it short enough to read in one minute (the assembled cycle below is exempt), and cut what the skills already do by default.
 
-**A coordinator that cannot load the plugin's skills** (recorded "cannot" or "unknown"), inside a Milestone or not, cannot read the cycle it runs, so the draft carries it. Read `team-lead`, and `milestone`'s Planning, Plugin version check and Delivery parts and its `reporting.md`, from the plugin you run from, or, when its version is behind main's on the source repository its manifest names, from that main (read from the remote), so the text matches the stamp below. From them and the project's facts, write what this coordinator does at each point, from the user's ask to plan to the user's acceptance. It starts a thread for each step that needs a skill or a write it cannot make, so never tell it to run `milestone`, `team-lead` or `release` itself. Before showing the draft, check that it covers each item below, and name to the user any you could not fill:
+A coordinator that can load the skills is told to run `milestone` for the Milestone and `team-lead` for its delivery, and gets nothing more.
 
-- how planning starts, as `milestone`'s Planning gives it (set-aside work offered first, the features named and their dependency graph agreed, the Milestone issue written last, after every feature is planned);
-- feature planning briefs, as `milestone`'s Planning step 5 gives them: one feature planning thread per feature, started on the planning thread's request in the order of its dependency graph; each brief carrying the Milestone number and the planning thread's link, the goal, the graph, what earlier threads settled that the feature builds on, the skills it runs (the project's own, or `milestone`'s where it names none) and the `top` tier; each thread reporting its Spec and Ticket numbers, each Ticket's blockers and any change to the goal, acceptance, exclusions or another feature to the planning thread;
-- a feature the user asks for once planning has settled, which waits, unlabelled and titled for the next Milestone, for that Milestone's planning (`milestone`'s Planning), and a bug the user raises during the Milestone (a `triage` thread files it);
-- the Plugin version check before any Build thread: delivery starts once the Plugin version check holds, or the user's word to go on is recorded;
-- each delivery step of `team-lead` as it now reads: its Releases rule, its start rule (every Order entry with no open blocker starts, within the project's thread limit only where the project gives one), its guiding threads, its bug Ticket rule, its pause and its End of delivery gate;
-- the check-in as `team-lead` arranges and ends it (on when Build threads start, off as the report starts), through a thread where the coordinator cannot do it;
-- build briefs, as `team-lead`'s Brief gives them, and main's copy of each skill where the repo's docs say so;
-- a thread that goes quiet, one that ends without its result (asked once to carry on, then replaced once, then parked) and one that waits on the user's action;
-- the report, started only once the last Release cut has ended; then the user's review: on acceptance a thread closes the Milestone issue, and a feature sent back goes back into delivery, as `milestone`'s report re-entry says;
-- thread kinds and their tiers, chore threads included, always written (feature planning threads on `top`; Release threads and the Milestone planning thread on premium, a Release thread asking `top` for advice only for a dependency graph or another special planning case), and the tier map (`model-tiers`' map for its harness where the user has none);
-- each term the steps use that only the skills define (parked, waits with, setup Ticket, Order, report re-entry), with its meaning;
-- a source stamp, the commit on the source repository's main that last changed `team-lead` or `milestone` (read from the remote), and a line in the brief of the thread that makes the Plugin version check: that thread compares the stamp with main's and reports it, and when it moved the coordinator tells the user once to re-run `setup-project` and goes on unless the user says to wait.
+**A coordinator that cannot load the plugin's skills** ("cannot" or "unknown") gets the cycle in the draft. Read `team-lead`, `milestone`'s Planning, Plugin version check and Delivery parts with its `reporting.md`, and the tier each thread's skill names, from the plugin you run from or, when its version is behind main's on the source repository its manifest names, from that main, so the text matches the stamp. Write what this coordinator does at each point, from the user's ask to plan to the user's acceptance. It starts a thread for each step that needs a skill or a write it cannot make, so never tell it to run `milestone`, `team-lead` or `release` itself. Before showing the draft, check that it covers each point below as the skills give it, and name to the user any you could not fill:
 
-Where the coordinator can load them, add none of this.
+- planning, a feature asked for once it has settled, and a bug the user raises (a `triage` thread files it);
+- the check before delivery starts;
+- delivery: each step of `team-lead`, with its records and briefs, and main's copy of each skill where the repo's docs ask for it;
+- the check-in, through a thread where the coordinator cannot arrange it;
+- the report;
+- the user's review;
+- thread kinds and their tiers, a chore thread for each record or Harness action the coordinator cannot take, and the tier map (`model-tiers`' map for its harness where the user has none);
+- each term the steps use that only the skills define, with its meaning;
+- a source stamp, the commit on the source repository's main that last changed `team-lead` or `milestone` (read from the remote), and a line in the brief of the thread making the check before delivery: it compares the stamp with main's and reports both; when it moved, the coordinator tells the user once to re-run `setup-project` and goes on unless told to wait.
 
-Inside a Milestone, point to the Boundary record, and tell a coordinator that can load them to run `milestone` for the Milestone and `team-lead` for its delivery. For it, keep only the project-specific choices settled in step 2, including a tier-to-model map only where the user overrides the default. Leave the cycle (`team-lead`'s and `milestone`'s), the invoked skills' rules and the Boundary record's values in their owners rather than restating them.
+**Size.** With a limit known, count the draft in the limit's unit before showing it, leaving about a tenth of the limit for the user's own edits. Over that, shorten in this order, each step only as far as needed:
 
-Outside a Milestone, keep the full instructions settled in step 2 (for a coordinator that cannot load the skills, without the line that has it run `team-lead`). Name Model tiers (cheap, regular, premium, top), write the user's tier-to-model map, and add the rule: "start each thread on the model mapped to its brief's Model tier".
+1. Reasons, examples and sentences that repeat another.
+2. Repeated forms: terms gathered into one line of meanings, short sections merged.
+3. Detail a started thread reads in its own skill (what a planning, Release or report thread does inside it), keeping what the coordinator decides and what the brief carries.
+4. The wording of the coordinator's own steps, thinned and never dropped.
 
-On a re-run, the draft is the full new text; show it with the diff against the existing text. A re-run also removes any state lines the existing text holds (open specs, plannings, the map), and, inside a Milestone, shared rules now reached through the owner pointers. It also drops the assembled cycle where the coordinator can now load the plugin's skills, adds it where it can no longer, and otherwise rebuilds it, with a new stamp, from the skills as they now read.
+No point is dropped without telling the user. Beside the draft (on a re-run, beside the diff too), give the count, the limit and what each step shortened. A draft that cannot fit with every point goes to the user as that, naming the points that do not fit, and is never sent over the limit. With no limit known, give the draft's size and say it could not be checked.
+
+**On a re-run** the draft is the full new text, shown with its diff against the existing text. It removes state lines and shared rules now reached through the owner pointers. It drops the assembled cycle where the coordinator can now load the skills, adds it where it no longer can, and otherwise rebuilds it, with a new stamp, from the skills as they now read.
 
 ## 4. Approve
 
-Show the draft (on a re-run, the diff and the full new text) and let the user edit it. Approval is the user's own message saying so; a relayed or agent-written yes does not count. If the user edits after approving, show the new full text and ask again. Approval is of the full text, and that full text is what step 5 sends. Done when the user has approved it.
+Show the draft (on a re-run, the diff and the full new text) and let the user edit it. Approval is the user's own message saying so; a relayed or agent-written yes does not count. If the user edits after approving, show the new full text, counted again, and ask again. Done when the user has approved the full text, which is what step 5 sends.
 
 ## 5. Hand over
 
-Send exactly the approved text to the project coordinator through whatever channel this thread has to it, and say it is the new project instructions to save. Then tell the user it was sent and is waiting for the coordinator to save it; say "saved" only once the coordinator confirms.
+Send exactly the approved text to the project coordinator through whatever channel this thread has to it, as the new project instructions to save. Tell the user it was sent and waits to be saved; say "saved" only once the coordinator confirms.
 
 If the session is not a project thread with a coordinator, give the user the text, say it is not saved yet, and tell them to paste it into the project's instructions setting.
