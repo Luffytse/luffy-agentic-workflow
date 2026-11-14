@@ -6,7 +6,7 @@ What the user has agreed agents may do on their own in this repo, which actions 
 - **Actions that need the user's approval**: none.
 - **Budget**: none (no paid or limited resource is used).
 - **Check-in interval**: 1 hour.
-- **Skill file size**: a change that pushes any skill file (a `SKILL.md` or a reference file under a skill) past 5,000 words brings the user into planning, to decide on a split or a redesign. It is enforced by the `skill-file-size` check in `scripts/check-plugin.sh`, which CI runs on the pull request; a Round does not weigh it, and the pull request does not merge until the user has decided.
+- **Skill file size**: a change that pushes any skill file (a `SKILL.md` or a reference file under a skill) past 4,000 words brings the user into planning, to decide on a split or a redesign. It is enforced by the `skill-file-size` check in `scripts/check-plugin.sh`, which CI runs on the pull request; a Round does not weigh it, and the pull request does not merge until the user has decided.
 - **Milestone label form**: `milestone-<n>` (for example `milestone-1`). An issue belongs to a Milestone when it carries that Milestone's label, and the Milestone issue carries the same label.
 
 ## Milestone issues

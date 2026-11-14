@@ -1,5 +1,7 @@
 # Skill changes are tested by CI, evals and review, each with its own job
 
+**Replaced by [ADR 0015](0015-model-evals-are-retired-and-skill-changes-merge-on-ci-review-and-acceptance-lines.md)** (2026-11-13, Spec #147): model evals are retired, and a skill change merges on CI, the review and its issue's acceptance lines shown as met. The evals guide and the eval folder this ADR names are deleted; the text below is history.
+
 A change to skill text is tested in three layers. **CI** answers questions with one right answer from the files, by a script with no model, on every pull request. An **Eval** shows what a skill makes an agent do: a fresh agent runs the skill on a fixture, scored by scripts first and a judge only for what scripts cannot see, run when a pull request changes how a skill behaves, against main's skill as the baseline. **Review** is judgement on the text. The method lives in this repo's [evals guide](../evals.md); the plugin carries only a short rule. Settled with the user on 2026-11-03 in the planning thread "Plan CI, evals and review for skills" (Spec #626, answering #615).
 
 ## Why

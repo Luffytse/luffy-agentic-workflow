@@ -1,2 +1,0 @@
-- Issue 30 (colour output) is open and untriaged. What should it do, when is it accepted, and is it one lone Ticket or a bigger feature (a Spec with Tickets)?
-- Where does it go in Milestone 1's build order (currently 1. farewell command, 2. --quiet flag)?

@@ -1,5 +1,0 @@
-- How should colour output (issue 30, `30-colour.md`) behave, how will you accept it, and is it one lone Ticket or a Spec with Tickets?
-- Should the colour Ticket wait for the farewell usage-line Ticket (`12-bye-usage.md`) to merge first, since its usage line names `bye` and replaces the exact line that Ticket's test checks? (unanswered)
-- Colour output is listed under Milestone 1's Excluded; may it come out of Excluded so it can be added as a feature?
-- Where does colour output go in Milestone 1's build order?
-- Should colour output join the open Release 0.4.0, or wait for the next Release planning?

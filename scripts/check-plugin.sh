@@ -29,7 +29,7 @@
 #   worker-reference-sources     each worker-control reference has methods, each method a Source: line with a doc link, each Detect and harness fact bullet a doc link
 #   team-lead-no-harness-detail  team-lead text names no harness tool (no mcp__ name, no `name` a worker-control reference puts in backticks); it calls worker-control
 #   milestone-no-delivery-detail the milestone skill plans and reports and hands delivery to team-lead: it names team-lead, and its text names no harness tool and no delivery record kind
-#   skill-file-size              no skill file (a SKILL.md or a reference .md under a skill) is over 5,000 words, except the known files, which may not grow
+#   skill-file-size              no skill file (a SKILL.md or a reference .md under a skill) is over 4,000 words, except the known files, which may not grow
 #
 # `claude plugin validate .` is not run here: CI runs it as its own step; the README says to run it before pushing.
 #
@@ -358,16 +358,19 @@ then
   bad "milestone-no-delivery-detail failed (see above; requires python3): delivery is team-lead's, worker lifecycle is worker-control's"
 fi
 
-# skill-file-size: a skill file (every .md under skills/) over 5,000 words is a split-or-redesign question for the user
+# skill-file-size: a skill file (every .md under skills/) over 4,000 words is a split-or-redesign question for the user
 # (Boundary record). Words are whitespace-separated tokens. A file over the limit when this check landed is listed in
-# known_over with its word count then: it may not grow, and it comes off the list once it is back to 5,000 or fewer.
+# known_over with its word count then: it may not grow, and it comes off the list once it is back to 4,000 or fewer.
 # Any other file over the limit fails.
 if [ -d "$skills" ] && ! python3 - "$skills" <<'PYCODE'
 import pathlib
 import sys
 
-LIMIT = 5000
-known_over = {  # path under skills/ -> words when this check landed; empty since release/SKILL.md came back under
+LIMIT = 4000
+known_over = {  # path under skills/ -> words when the limit went to 4,000
+    "retro-planning/SKILL.md": 4589,
+    "implement-spec/SKILL.md": 4423,
+    "release/SKILL.md": 4347,
 }
 skills = pathlib.Path(sys.argv[1])
 failed = False

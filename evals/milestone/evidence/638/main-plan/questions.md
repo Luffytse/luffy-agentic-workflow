@@ -1,7 +1,0 @@
-- What outcome do you want by the end of this Milestone? Please give it as one paragraph in your own words.
-- Which features deliver that goal, and is each one already planned with its acceptance criteria in its own issue?
-- In what order should the features be built, and one at a time or several at once (how many)?
-- How will you accept the Milestone at its review, beyond every feature being merged and its issue closed?
-- What is excluded from this Milestone, and where does it go instead, if anywhere?
-- What budget should this Milestone work within: the Boundary record's (none), or a tighter one for this Milestone? (unanswered)
-- Are there any boundaries beyond the Boundary record for this Milestone, such as an action its issues may also take or one that needs your approval? "None beyond the Boundary record" is a fine answer. (unanswered)

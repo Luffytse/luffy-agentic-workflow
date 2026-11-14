@@ -1,1 +1,0 @@
-80 independent worker packages share schema v1 field total. Target v2 amount. Readers and writers coexist during deployments.

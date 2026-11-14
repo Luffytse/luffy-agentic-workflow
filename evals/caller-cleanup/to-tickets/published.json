@@ -1,5 +1,0 @@
-{
-  "title": "Build a plain-text greeting formatter",
-  "body": "## What to build\n\nAccept a name and return a plain-text greeting consisting of Hello followed by a space and that name. The formatter input/output is the test seam. No UI or storage is in scope.\n\n**Model tier:** regular\n\n## Acceptance criteria\n\n- [ ] Given the name Ada, the formatter returns exactly Hello Ada.\n- [ ] The returned greeting uses the supplied name.\n- [ ] Automated tests verify the behavior through formatter input/output.\n- [ ] The formatter requires no UI or storage.",
-  "labels": ["robot-queue"]
-}

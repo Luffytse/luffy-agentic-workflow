@@ -32,12 +32,14 @@ class SkillLoadingPackaging(unittest.TestCase):
             '  short_description: "Interpret fixture records"\npolicy:\n' + policy
         )
 
-    def check(self, expected):
+    def check(self, expected, message=None):
         result = subprocess.run(
             ["bash", str(self.repo / "scripts/check-plugin.sh")],
             cwd=self.repo, text=True, capture_output=True,
         )
         self.assertEqual(result.returncode, expected, result.stdout + result.stderr)
+        if message:
+            self.assertIn(message, result.stdout + result.stderr)
 
     def test_hidden_reference_remains_model_loadable(self):
         self.check(0)
@@ -74,24 +76,31 @@ class SkillLoadingPackaging(unittest.TestCase):
         self.plant("docs/dev-skills/glossary.md", "Ask Lu" + "fei.\n")
         self.check(1)
 
-    def test_skill_file_over_5000_words_fails_and_under_passes(self):
-        self.plant("plugins/dev-skills/skills/implement/SKILL.md", "word " * 5000)
+    def test_unlisted_skill_file_over_4000_words_fails(self):
+        (self.skill / "big.md").write_text("word " * 4001)
+        self.check(1)
+
+    def test_skill_file_of_exactly_4000_words_passes(self):
+        (self.skill / "big.md").write_text("word " * 4000)
+        self.check(0)
+
+    def test_unlisted_existing_skill_over_4000_words_fails_and_under_passes(self):
+        self.plant("plugins/dev-skills/skills/implement/SKILL.md", "word " * 4000)
         self.check(1)
         shutil.copy(pathlib.Path(__file__).resolve().parents[1] / "plugins/dev-skills/skills/implement/SKILL.md",
                     self.repo / "plugins/dev-skills/skills/implement/SKILL.md")
         self.plant("plugins/dev-skills/skills/implement/SKILL.md", "word " * 100)
         self.check(0)
 
-    def test_new_reference_file_over_5000_words_fails(self):
-        (self.skill / "big.md").write_text("word " * 5001)
-        self.check(1)
-        (self.skill / "big.md").write_text("word " * 4999)
-        self.check(0)
+    def test_listed_skill_file_that_grew_fails(self):
+        # release/SKILL.md is on known_over: it may not grow past its recorded count.
+        self.plant("plugins/dev-skills/skills/release/SKILL.md", "word")
+        self.check(1, "grown past its recorded")
 
-    def test_release_skill_is_held_to_the_limit(self):
-        # release/SKILL.md left known_over once it came back under 5,000 words: it now fails like any other file.
-        self.plant("plugins/dev-skills/skills/release/SKILL.md", "word " * 5000)
-        self.check(1)
+    def test_listed_skill_file_at_or_under_4000_words_must_leave_the_list(self):
+        (self.repo / "plugins/dev-skills/skills/release/SKILL.md").write_text(
+            "---\nname: release\ndescription: Use when cutting a Release.\n---\n\n" + "word " * 3900)
+        self.check(1, "remove it from known_over")
 
     def plant(self, rel, text="Run it on Son" + "net.\n"):
         with open(self.repo / rel, "a") as f:

@@ -1,1 +1,0 @@
-Resume retro-planning for this fixture repository. All issue state is in issues/, configured by docs/agents/issue-tracker.md. Use only this local tracker; remote reads or writes are forbidden. Walk me through the selected problem. Do not implement code.

@@ -176,17 +176,10 @@ _Avoid_: section, module
 
 ## Testing skills
 
-A change to skill text is tested in three layers, **CI**, **Eval** and **Review**, sorted by one rule: if a script can catch it, it is CI; if you must watch an agent use the skill, it is an eval; if it needs reading for meaning, it is review. A Bug class that keeps coming back moves to the cheapest layer that can catch it (ADR 0013, `docs/dev-skills/evals.md`).
+A change to skill text is tested in two layers, **CI** and **Review**, sorted by one rule: if a script can catch it, it is CI; otherwise it is review, and real use shows the rest through Retro issues. A Bug class that keeps coming back moves to CI when a script can catch it. No model eval is run in this repo (ADR 0015, replacing ADR 0013; the eval sentence `tdd` and the Implementer briefs still carry asks for nothing here): a skill change merges on CI green, the review, and each acceptance line of its issue shown as met in the pull request body (`CLAUDE.md`).
 
 **CI**:
-The layer for questions with one right answer from the files: a script with no model, on every pull request (the plugin checker and `claude plugin validate`; `scripts/run-tests.sh` runs the deterministic tests; its workflow step is committed by hand and until it is there they run by hand with that script). It tests structure and banned names, never that a skill holds a given sentence, so rewording a skill fails it only if it adds a banned name.
-
-**Eval**:
-The layer that shows what a skill makes an agent do: a fresh agent runs the skill on a fixture, and its output is scored by scripts first, a judge only for what scripts cannot see. Its cases live in `evals/<skill>/`. A pull request that changes how a skill behaves runs that skill's cases on its own skill and on main's (the baseline) and links the results; a wording-only, docs, ADR or eval-only change skips the run and says which kind it is. Nothing is left owed: the one allowed gap is a run that cannot be made, stated with its reason. The Implementer of such a change plans an eval, not a grep for a sentence, and chooses its seam without the user; its evidence is the eval run or the stated gap (the rule in `tdd` and the Implementer briefs). The third layer is the **Review**.
-_Avoid_: test (for a model run), benchmark
-
-**Case check**:
-The check of a new eval case, or a changed expected result, before any model run: a fresh premium-tier subagent reads the whole skill and its workflow and returns keep, fix or drop (valid, fails on main for the right reason, needed; a regression guard, a rule main already passes after one fixture redesign, is kept without the second); the verdict goes in the pull request body.
+The layer for questions with one right answer from the files: a script with no model, on every pull request (the plugin checker and `claude plugin validate`; `scripts/run-tests.sh` runs every script test under `scripts/`, the tests of this repo's tooling and of the scripts the plugin ships; its workflow step is committed by hand and until it is there they run by hand with that script). It tests structure, banned names and what a script does, never that a skill holds a given sentence, so rewording a skill fails it only if it adds a banned name. The second layer is the **Review**.
 
 ## Code review
 
@@ -222,15 +215,15 @@ One batch of questions a skill (`grilling`, `triage`) puts to the user at once. 
 _Avoid_: Round (for a batch of questions)
 
 **REVIEW.md**:
-A short file at a repo's root telling reviewers what Important means there, what to skip, what to always check (the **Always check** lines: each a Bug class earlier reviews caught, as `- **<Bug class>** (files: `glob`; from ...): what to look for`, `(files: all)` for every diff; a line that checks the text for completeness, not for what an agent will do, adds an eval case for a real gap it finds), and optionally its own Review levels.
+A short file at a repo's root telling reviewers what Important means there, what to skip, what to always check (the **Always check** lines: each a Bug class earlier reviews caught, as `- **<Bug class>** (files: `glob`; from ...): what to look for`, `(files: all)` for every diff), and optionally its own Review levels.
 
 **Finder**:
 A reviewer agent that looks for problems and reports candidate Findings, as a Markdown report in the Report format (Findings, then any notes under one `## Notes` heading), written to the file its brief names and returned as its final message. The **standards Finder** and **spec Finder** come from Upstream; at Standard and Deep one **adversarial Finder** takes the angle that fits the change best ("what the change is missing" is one); at Deep a premium **security Finder** is added. Rounds 2 and 3 run one **later-Round Finder**, standards and spec in one.
 _Avoid_: reviewer (too broad), scanner
 
 **Brief script**:
-`review_briefs.py`, in the `review-rounds` folder: writes each Round's Finder and Verifier briefs, one complete Markdown file per agent, by cutting the text out of the skill's brief files and filling in the Round's values from git and the repo's files. The thread hands each file's path to one fresh subagent to read whole as its only instruction (pasting the file whole only for an agent that cannot read files), and builds the briefs by hand from the brief files when the script cannot run. Each Finder brief names the file its Finder writes its report to, `<out>/reports/<finder>.md`, and the script's `verify` reads those files, checking each against the **Report format** (Findings, or a line saying nothing found, and any notes under one `## Notes` heading, written once in `FINDERS.md` and shared by the Finder briefs and the Verifier brief). The agentic-review eval builds its briefs with the same script.
-_Avoid_: brief builder (the eval's `briefs.sh` only calls it)
+`review_briefs.py`, in the `review-rounds` folder: writes each Round's Finder and Verifier briefs, one complete Markdown file per agent, by cutting the text out of the skill's brief files and filling in the Round's values from git and the repo's files. The thread hands each file's path to one fresh subagent to read whole as its only instruction (pasting the file whole only for an agent that cannot read files), and builds the briefs by hand from the brief files when the script cannot run. Each Finder brief names the file its Finder writes its report to, `<out>/reports/<finder>.md`, and the script's `verify` reads those files, checking each against the **Report format** (Findings, or a line saying nothing found, and any notes under one `## Notes` heading, written once in `FINDERS.md` and shared by the Finder briefs and the Verifier brief).
+_Avoid_: brief builder
 
 **Verifier**:
 The one agent per Round (none when the Round has no candidates and no open Finding) that checks each candidate Finding, and each open Finding with any dispute of it, against the code, keeps only what it confirmed and makes the final call on it. Premium tier at Deep, regular otherwise.
@@ -249,7 +242,7 @@ How hard a change is to walk back. A **one-way door** is a change that reverting
 _Avoid_: risk level
 
 **Boundary record**:
-A repo's agent doc, `docs/dev-skills/boundaries.md`, written with the user by `setup-dev-skills`: which irreversible actions agents may take, which actions need the user's approval (the list may be empty), the resource budget, the check-in interval (default one hour) and the form of a Milestone's membership label (for example `milestone-<n>`). `merging` (see **Merging**) reads it for every merge, which `implement`, `implement-spec` and `release` load at their merge step, inside a Milestone or not, instead of a fixed list, to decide whether a pull request crosses a boundary and so goes to the user; with no record they read an empty one (nothing allowed, nothing needing approval; ADR 0004). A repo may add its own limits to its record; this repo's is the skill file size limit (5,000 words, a split-or-redesign decision for the user, enforced by the `skill-file-size` check). It is the only record of boundaries: a Milestone issue holds none of its own (ADR 0004, Spec #633).
+A repo's agent doc, `docs/dev-skills/boundaries.md`, written with the user by `setup-dev-skills`: which irreversible actions agents may take, which actions need the user's approval (the list may be empty), the resource budget, the check-in interval (default one hour) and the form of a Milestone's membership label (for example `milestone-<n>`). `merging` (see **Merging**) reads it for every merge, which `implement`, `implement-spec` and `release` load at their merge step, inside a Milestone or not, instead of a fixed list, to decide whether a pull request crosses a boundary and so goes to the user; with no record they read an empty one (nothing allowed, nothing needing approval; ADR 0004). A repo may add its own limits to its record; this repo's is the skill file size limit (4,000 words, a split-or-redesign decision for the user, enforced by the `skill-file-size` check). It is the only record of boundaries: a Milestone issue holds none of its own (ADR 0004, Spec #633).
 _Avoid_: permissions file, policy
 
 **Merging**:

@@ -47,7 +47,7 @@ def seed(root):
     src.commit("chore: drop plugin\n", remove=[PLUGIN], author=MAC, committer="GitHub <noreply@github.com>")
     src.commit("docs: evidence\n\nPlanned in [the thread](" + PROJECT_LINK + ").\nTrigger " + helpers.TRIG_ID
                + ".\n\n" + CO_AUTHOR + "\n",
-               {"evals/r.md": "Run in " + helpers.HOME_PATH + "\n" + helpers.SESSION_LINK + "\n"
+               {"notes/r.md": "Run in " + helpers.HOME_PATH + "\n" + helpers.SESSION_LINK + "\n"
                 + "_Made by [Claude Code](" + helpers.SESSION_LINK + ")_ in session `" + SESSION_ID + "`.\n"
                 + "Code session `" + helpers.CSE_ID + "`, trigger " + helpers.TRIG_ID + ".\n"},
                author=helpers.OWNER, committer="GitHub <noreply@github.com>")
@@ -91,7 +91,7 @@ class RewritePublicHistory(unittest.TestCase):
         self.assertIn("PASS", out)
         self.assertIn("commits on main: 4 before, 3 after", out)
         self.assertIn("DRY RUN", out)
-        self.assertIn("files at the tip that the rewrite changed: 2\n  README.md\n  evals/r.md\n", out)
+        self.assertIn("files at the tip that the rewrite changed: 2\n  README.md\n  notes/r.md\n", out)
         self.assertEqual(git(self.src.path, "for-each-ref"), before, "the source is untouched")
         self.assertEqual(git(self.remote, "for-each-ref"), "", "nothing was pushed")
         self.assertEqual(git(self.work, "for-each-ref", "--format=%(refname)"), "refs/heads/main")
@@ -109,7 +109,7 @@ class RewritePublicHistory(unittest.TestCase):
                                   "Luffytse <" + OWNER_EMAIL + ">"})
         self.assertEqual(git(self.work, "show", "main:README.md"),
                          "Hi, the `example_db` schema. Mail " + OWNER_EMAIL)
-        self.assertEqual(git(self.work, "show", "main:evals/r.md"),
+        self.assertEqual(git(self.work, "show", "main:notes/r.md"),
                          "Run in ~/work/notes.md\n_Made by [Claude Code](https://claude.ai/code)_ in session "
                          "`session_REMOVED`.\nCode session `cse_REMOVED`, trigger trig_REMOVED.")
         self.assertNotIn(PLUGIN, git(self.work, "log", "--name-only", "--format=", "main"))

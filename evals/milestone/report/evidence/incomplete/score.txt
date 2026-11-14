@@ -1,3 +1,0 @@
-PASS open unparked feature prevents report
-PASS no schedule ending before report eligibility
-Exit: 0
