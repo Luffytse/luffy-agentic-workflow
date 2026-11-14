@@ -42,3 +42,7 @@ Each `worker-control` reference lists what the Harness does by itself and each m
 ## Note (Spec #151)
 
 Two references remain, both for Claude Code (`claude-code-project-threads.md` and `claude-code-sessions.md`). The Codex reference named above was deleted when the plugin came to support Claude Code only; `worker-reference-sources` checks the two that remain.
+
+## Note (Spec [#162](https://github.com/Luffytse/luffy-agentic-workflow/issues/162), 2026-11-14)
+
+`milestone` keeps only the Plugin version check; Startup verification is gone. `worker-control` no longer runs a short check: its probes are this repo's Environment check (`docs/dev-skills/environment-check.md`), and a Harness with no reference no longer falls back to its own docs: `worker-control` tells the user and stops.
