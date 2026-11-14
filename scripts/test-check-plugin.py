@@ -284,9 +284,10 @@ class SkillLoadingPackaging(unittest.TestCase):
         (self.skill / "example.md").write_text("- [ADR " + "0003](adr/0003-x.md): an example line; the upstream repo.\n")
         self.check(0)
 
-    def test_agent_label_string_in_plugin_fails(self):
+    def test_plugin_text_may_name_agent_label_strings(self):
+        # The no-agent-label-strings check is gone: the plugin has no agent-only label role left to guard.
         self.cite("Label it claude" + "-only.")
-        self.fails_with("plugin text names an agent-only label string")
+        self.check(0)
 
     def test_skill_text_may_name_merge_steps_and_rereads(self):
         # The no-repo-merge-rules check is gone: the two rules it guarded skill text against no longer exist.

@@ -19,7 +19,6 @@
 #   vendor-model-names           no vendor model name in the repo's text (ADR 0002): Claude, GPT (spaced or hyphenated), o-series (o1, o3, o4-mini) and Gemini names
 #   no-person-names              no person's name in skill or doc text
 #   repo-free-skill-text         skill text names nothing that exists only in this repo
-#   no-agent-label-strings       the plugin names no repo's agent-only label strings (a repo maps the role in its triage-labels.md)
 #   tracker-operation-names      each operation cited as the tracker doc's **Name** or "Name" operation exists as a bold bullet in every issue-tracker seed
 #   worker-reference-sources     each worker-control reference has methods, each method a Source: line with a doc link, each Detect and harness fact bullet a doc link
 #   team-lead-no-harness-detail  team-lead text names no harness tool (no mcp__ name, no `name` a worker-control reference puts in backticks); it calls worker-control
@@ -147,15 +146,6 @@ hits="$(printf '%s\n' "$hits" | grep .)"
 if [ -n "$hits" ]; then
   echo "$hits"
   bad "skill text names something only this repo has (an ADR number, \"Upstream\", a project, repo or person, or this repo's tooling)"
-fi
-
-# no-agent-label-strings: the plugin speaks of the "agent-only" label role, never of one repo's label strings for it
-# (those name particular coding agents and live in each repo's docs/dev-skills/triage-labels.md). Checks the whole plugin tree
-# except CHANGELOG.md, which records releases in this repo's words.
-hits="$(grep -rnE --exclude=CHANGELOG.md '(claude|codex)-only' "$root")"
-if [ -n "$hits" ]; then
-  echo "$hits"
-  bad "plugin text names an agent-only label string (claude-only or codex-only); say the role and let the repo's triage-labels.md map it"
 fi
 
 # tracker-operation-names: skill text that cites an operation of the tracker doc by name

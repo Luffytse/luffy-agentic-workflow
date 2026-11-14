@@ -39,9 +39,6 @@ The branch one Ticket is built on. A Spec's Ticket branches start from the Spec 
 **Ticket check**:
 One Quick Round over a Spec's Ticket branch, against the Spec branch, before the Ticket joins it, recorded on the Spec pull request. Its open Findings carry into the Spec pull request's Round 1. Not one of the Spec pull request's Rounds.
 
-**Continuation**:
-The build of a Spec's Ticket that carries another agent's Agent label, by that agent, off the pushed Spec branch, while the Spec thread keeps the Spec pull request. Also the continuation Spec pull request that brings a closed Spec's remaining Tickets to main. Owned by `implement-spec` (`continuation.md`).
-
 **Merging**:
 The `merging` Base skill, hidden from the menu: the finish of one pull request that is ready to merge. It decides who merges from the **Boundary record** alone (none means an empty one), runs the repo's merge-time steps, syncs with main, merges, confirms the merge on the tracker and closes the issues. `implement`, `implement-spec` and `release` load it at their merge step, and `review-rounds` defines a boundary crossing by it.
 _Avoid_: merge step (a caller's step that loads it), auto-merge
