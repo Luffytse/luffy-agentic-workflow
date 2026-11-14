@@ -41,7 +41,7 @@ Five **state** roles:
 
 One **mark** role, `next-release`, says an issue must join the next Release; Release planning takes it and removes the mark. It is neither a category nor a state role. Set it only when the user asks. Triage applies no release label.
 
-An **agent-found enhancement** (an audit, investigation or retro finding: an enhancement an agent filed, or whose body says an agent found it) waits for the user at `ready-for-human`: the user decides every new feature, and only the user moves it on or closes it. An agent never ranks, closes, expires or marks one.
+An **agent-found enhancement** (an audit, investigation or retro finding: an enhancement an agent filed, or whose body says an agent found it) waits for the user at `ready-for-human`: the user decides every new feature, and only the user moves it on or closes it. An agent never ranks, closes, expires or marks one. A Retro issue that Retro planning handed over is not one: the Triage batch's rule for it decides it.
 
 For a PR, the same states read against the attached code: `ready-for-agent` means a brief is attached and an agent should take the next step on the diff; `ready-for-human` means it's ready for a human to merge.
 
@@ -70,7 +70,7 @@ Query the issue tracker and present three buckets, oldest first:
 
 When PRs are in scope, include external PRs in these buckets and tag each line `[PR]` or `[issue]`. Discovery surfaces only *external* PRs (the tracker config defines who counts as external), so a collaborator's in-flight PR is not triage work. This filter is discovery-only; an explicitly named PR is always triaged regardless of author.
 
-Skip issues labelled `retro`, here and when one is named: they are Retro issues, planned in batches, not untriaged work (a Retro the user takes into a Milestone is absorbed by its feature's Ticket, as `issue-absorption` says, not triaged).
+Skip a `retro` issue that carries no state role, here and when one is named: Retro planning has not handed it over, so it is not untriaged work (a Retro the user takes into a Milestone is absorbed by its feature's Ticket, as `issue-absorption` says, not triaged). Retro planning hands one over with `needs-triage`; from then on it is triaged like any other issue.
 
 Show counts and a one-line summary per item. Let the maintainer pick.
 

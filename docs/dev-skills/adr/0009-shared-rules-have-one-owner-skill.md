@@ -13,7 +13,7 @@ The `docs-index` Base skill owns index format and update requirements; its write
 
 ## Workflow handoff
 
-The `retro-planning` handoff migrated in #369 moves earlier: it selects one problem with the user, then `to-tickets` prepares, discusses and publishes the concrete Ticket. Retro planning keeps the snapshot, order, cap, closes, spin-offs and record, and updates that record before moving on.
+The `retro-planning` handoff migrated in #369 moves earlier: it selects one problem with the user, then `to-tickets` prepares, discusses and publishes the concrete Ticket. Retro planning keeps the snapshot, order, cap, closes, spin-offs and record, and updates that record before moving on. (Amended 2026-11-14, Ticket #160: Retro planning no longer hands over to `to-tickets`; it hands a repeated problem to triage, and this section is history.)
 
 The ordinary handoff aims for one complete Ticket. If several are needed, it returns to planning before publication so the larger effort can be spun off, rather than forcing an oversized Ticket or silently raising the cap. Partial publication is reconciled on resume instead of duplicated. The absorption contract and this handoff land separately.
 
@@ -34,8 +34,8 @@ This narrows ADR 0006's rejected separate index skill: the trigger stays with ea
 | --- | --- | --- |
 | `docs-index` | Document writers (`domain-modeling`, `grill-with-docs`, `improve-codebase-architecture`, `research`, `retro`, `setup-dev-skills`, `triage`, including their supporting-file branches) at index updates; `review-rounds/FINDERS.md` standards branch when checking the index | #364 |
 | `review-record` | `review-rounds` before reading/writing comments and briefing Finders (`agentic-review` writes Round 0's one-line None record inline, in the shape `review-record` gives); the standards Finder, `retro` (step 3 loads it by name) and the `retro/BUG-CLASSES.md` reader apply its record meaning | #365, Spec #555 |
-| `issue-absorption` | `to-tickets` before source-based drafting/publication; `retro-planning` before lifecycle classification and absorption; `pr` when selecting closing lines; builders when maintaining lines or completing absorbed sources | #368 |
-| `to-tickets` complete workflow | `retro-planning` after problem approval, including publication repair on resume; planning retains budget, order and record ownership | #369 |
+| `issue-absorption` | `to-tickets` before source-based drafting/publication; `retro-planning` to read whether an open Ticket absorbs a Retro issue (it writes no absorption record since Ticket #160); `pr` when selecting closing lines; builders when maintaining lines or completing absorbed sources | #368 |
+| `to-tickets` complete workflow | none since Ticket #160 (was `retro-planning` after problem approval, including publication repair on resume) | #369, Ticket #160 |
 | `agentic-review` complete workflow | `implement` and `implement-spec` at review with worktree, branch, base and prior-check context; Round 0 loads `review-rounds` when a Round will run; builders retain fixes, integration and a corrective check's Retro origin (the merge is `merging`'s, below) | #366, Spec #555 |
 | `merging` | `implement` (step 7 and the retro check), `implement-spec` (step 8) and `release` (the changelog pull request) at their merge step; `review-rounds` "When a person is needed" defines a boundary crossing by it; callers keep their method, title, committer, readiness and pre-merge step | Spec #641 (#642, #643, #644) |
 | `worker-control` | `milestone` Startup verification, running its check as the first part of the result (the loaded skill version is `milestone`'s own probe); `team-lead` for every worker start, state check, end, stop, pause, resume and check-in | #527, #529, #530 |

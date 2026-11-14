@@ -27,10 +27,10 @@ _Avoid_: release triage
 What a repo's release doc says the cut runs once the changelog entry is written, in order: what its versioning policy adds, anything else the repo must change or run, and optionally a step between Releases for a fix that cannot wait. A cut step wins over `release`'s own text where they differ, so the skill names no version policy.
 
 **Triage batch**:
-The run of `triage` that the Release thread makes at each Release end, naming the release issue just closed: agents decide every open `needs-triage` issue against the Milestone without asking the user per issue, make the **Backlog sweep** and post one `## Triage batch` summary on the release issue. Its procedure lives in its own file in the `triage` folder, `TRIAGE-BATCH.md`, which a session triaging with the user does not read; only the batch sets `next-release` by rule. Owned by `triage`.
+The run of `triage` that the Release thread makes at each Release end, naming the release issue just closed: agents decide every open `needs-triage` issue, a **Handed-over Retro issue** included, against the Milestone without asking the user per issue, make the **Backlog sweep** and post one `## Triage batch` summary on the release issue. Its procedure lives in its own file in the `triage` folder, `TRIAGE-BATCH.md`, which a session triaging with the user does not read; only the batch sets `next-release` by rule. Owned by `triage`.
 
 **Backlog sweep**:
 The second part of the **Triage batch**: a pass over every open `ready-for-agent` issue at a Release end, so that the **Ranked list** ranks a true backlog. It moves, closes, marks or **expires** each issue as `triage` says.
 
 **Release thread**:
-A project thread that runs `release`: it cuts the current Release (the changelog entry, the **Cut steps**, the merge, the **Triage batch** and the Release-end Retro planning), then plans the next. One started with nothing before it to cut only plans. When one starts is the **Team lead**'s; whether it cuts or plans is `release`'s "Find where you are".
+A project thread that runs `release`: it cuts the current Release (the changelog entry, the **Cut steps**, the merge, Retro planning and then the **Triage batch**), then plans the next. One started with nothing before it to cut only plans. When one starts is the **Team lead**'s; whether it cuts or plans is `release`'s "Find where you are".

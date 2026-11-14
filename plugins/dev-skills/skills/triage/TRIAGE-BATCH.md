@@ -1,13 +1,13 @@
 # Triage batch
 
-The Release thread runs the batch from `triage` at a Release end, naming the Release just closed or its release issue. Agents decide: the user is asked nothing per issue, except as "Goes to the user" says. Before the first issue, read the release issue, the Milestone issue it names (goal, features, acceptance criteria, exclusions) and the Boundary record (`docs/dev-skills/boundaries.md`), and fetch main. Every comment triage posts here starts with the disclaimer in [SKILL.md](SKILL.md), and each one on an issue names the Release, so a rerun can tell what this batch already did. Skip `retro` issues throughout.
+The Release thread runs the batch from `triage` at a Release end, naming the Release just closed or its release issue. Agents decide: the user is asked nothing per issue, except as "Goes to the user" says. Before the first issue, read the release issue, the Milestone issue it names (goal, features, acceptance criteria, exclusions) and the Boundary record (`docs/dev-skills/boundaries.md`), and fetch main. Every comment triage posts here starts with the disclaimer in [SKILL.md](SKILL.md), and each one on an issue names the Release, so a rerun can tell what this batch already did. Skip throughout a `retro` issue that carries no state role, as [SKILL.md](SKILL.md) says; one Retro planning handed over is decided as "A handed-over Retro issue" says.
 
 ### 1. Triage the new issues
 
 For every open `needs-triage` issue:
 
 1. Gather context and verify the claim (steps 1 and 3 of "Triage a specific issue or PR" in [SKILL.md](SKILL.md)). Where the issue needs fleshing out (step 4), settle it by reading the code, docs, ADRs, the Milestone issue and the issue's comments; ask nobody.
-2. Decide the category and the state, with the agent-found enhancement rule in Roles, the `next-release` rule in part 2, and the triage-labels doc's rule for repo labels. When "Goes to the user" applies to the issue, apply nothing (no brief, no label change) and leave it `needs-triage`. Otherwise apply the outcome as step 5 of "Triage a specific issue or PR" says: an agent brief for `ready-for-agent`, a brief for `ready-for-human`, triage notes for `needs-info`, a close as completed for an already-implemented one, a reasoned close for `wontfix`.
+2. Decide the category and the state, with the agent-found enhancement rule in Roles (for a handed-over Retro issue, "A handed-over Retro issue" instead), the `next-release` rule in part 2, and the triage-labels doc's rule for repo labels. When "Goes to the user" applies to the issue, apply nothing (no brief, no label change) and leave it `needs-triage`. Otherwise apply the outcome as step 5 of "Triage a specific issue or PR" says: an agent brief for `ready-for-agent`, a brief for `ready-for-human`, triage notes for `needs-info`, a close as completed for an already-implemented one, a reasoned close for `wontfix`.
 3. Record the decision on the issue in a comment: category, state, any mark, any repo label added or removed and the reason (a removed repo label's one-line reason can be this comment).
 
 Done when no open issue but those waiting on the user is at `needs-triage`.
@@ -29,6 +29,14 @@ For every open `ready-for-agent` issue (those part 1 just moved there included),
 A planned feature, or a Ticket of a planned Spec, that reads as a duplicate or obsolete is not closed: closing it would change the Milestone's agreement, so it goes to the user. Any other issue stays as it is.
 
 Done when every open `ready-for-agent` issue has been through the tests.
+
+### A handed-over Retro issue
+
+A `retro` issue at `needs-triage` was handed over by Retro planning because its problem repeated or is severe. Triage it in part 1 like any other issue; it is the Ticket, so its brief goes on it and no second issue is filed. Its state:
+
+1. Agents build its fix: `ready-for-agent`, with an agent brief.
+2. A fix that needs a Spec waits for the user's next Milestone planning: `ready-for-human`, with a comment saying so.
+3. A fix that crosses the Boundary record or changes the Milestone's agreement goes to the user, as "Goes to the user" says.
 
 ### Goes to the user
 

@@ -54,8 +54,8 @@ Read this first, then open only the docs whose line fits your work. Specs and ti
 
 ## Retros
 
-- [Retros glossary](glossary/retros.md): Retro issue, Retro backlog, Retro planning, Necessity check and Spin-off. Read when working on `retro` or `retro-planning`.
-- [ADR 0007](adr/0007-retro-issues-pile-up-per-repo-and-are-planned-in-batches.md): how `retro` only files Retro issues by Scope, repeated Bug classes included, and how `retro-planning` works through the backlog. Read when working on `retro`, `retro-planning`, or the end of `implement` and `implement-spec`.
+- [Retros glossary](glossary/retros.md): Retro issue, Retro backlog, Retro planning and Handed-over Retro issue. Read when working on `retro` or `retro-planning`.
+- [ADR 0007](adr/0007-retro-issues-pile-up-per-repo-and-are-planned-in-batches.md): how `retro` only files Retro issues by Scope, repeated Bug classes included, and how `retro-planning` sorts the backlog, handing repeated problems to triage. Read when working on `retro`, `retro-planning`, or the end of `implement` and `implement-spec`.
 
 ## Out of scope
 

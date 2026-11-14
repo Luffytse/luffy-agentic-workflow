@@ -74,9 +74,9 @@ Done when the release issue is closed with its notes.
 
 ## 4. Run the end-of-Release pass
 
-Load `triage` and run its Triage batch (`TRIAGE-BATCH.md`) for the Release just closed, naming its release issue; then load `retro-planning` by name and run its Release-end Retro planning for the same Release. Both run before the planning, so it sees what they closed and marked `next-release`.
+Load `retro-planning` by name and run its Retro planning for the Release just closed; then load `triage` and run its Triage batch (`TRIAGE-BATCH.md`), naming the release issue. Both run before the planning, so it sees what they changed.
 
-After each one, comment on the closed release issue, first line `<!-- release end-of-Release pass -->`, second line `triage ran for this Release.` (or `retro-planning ran ...`). If one cannot run (it fails, or the thread cannot start it), write `<skill> could not run: <why>.` instead and go on: the planning ranks what the tracker shows, and your report names the pass that did not run. A rerun skips each skill that already has its record.
+After each one, comment on the closed release issue, first line `<!-- release end-of-Release pass -->`, second line `retro-planning ran for this Release: <its record's link>.` (or `triage ran for this Release.`). If one cannot run, write `<skill> could not run: <why>.` instead and go on: the planning ranks what the tracker shows, and your report names the pass that did not run. A rerun skips each skill that already has its record.
 
 Done when the closed release issue holds a record for `triage` and one for `retro-planning`.
 
@@ -88,7 +88,7 @@ With no open Milestone, plan nothing: tell the user the next Release needs a Mil
 
 ### Check against main
 
-Before ranking, check every open issue that carries no release label, does not read parked and does not belong to a later Milestone (one the Milestone issue leaves to the next Milestone) against freshly fetched main: its code and docs, and the changes merged since the issue was written. Records and backlogs that other steps or skills keep are not checked: the Milestone issue, release issues, issues labelled `retro` or `retro-planning` (Retro issues are planned in batches) and wayfinder maps. Give each issue one verdict:
+Before ranking, check every open issue that carries no release label, does not read parked and does not belong to a later Milestone (one the Milestone issue leaves to the next Milestone) against freshly fetched main: its code and docs, and the changes merged since the issue was written. Records and backlogs that other steps or skills keep are not checked: the Milestone issue, release issues, `retro-planning` records, `retro` issues not at `ready-for-agent` (their own skills keep them) and wayfinder maps. Give each issue one verdict:
 
 - **still valid**: main still has the problem, or does not yet do what the issue asks;
 - **already fixed** or **obsolete**: main no longer has the problem or already does what the issue asks, or what the issue is about is gone from main; this is the Obsolete test of `triage`'s sweep (test 3), and you confirm it as that test says;
@@ -111,10 +111,10 @@ Every open issue that survived the check against main (not closed by it, not wai
 - a **severe** issue (a security hole, lost data, or delivery stopped: nothing can merge or ship), at `ready-for-agent` or marked `next-release`;
 - an issue marked `next-release`;
 - a **planned feature**: one the Milestone issue lists (including any added since the last Release), together with its open blockers (the tracker doc's **Count open blockers** operation); a Ticket of a listed Spec belongs to its Spec;
-- a `ready-for-agent` bug;
+- a `ready-for-agent` bug or `retro` issue;
 - every issue still open that is listed under `## Carried over` in the release issue of the Release just cut (the closed release issue cut most recently, in any run); read that section, not the issue's other text.
 
-A parked issue is left out, waiting on the user to lift its park. An **unplanned feature** (an enhancement, or any other feature-sized issue, that the Milestone issue does not list) is never ranked, whatever its label or whoever suggested it: propose each one to the user in one line, saying the Milestone issue does not list it; the user plans it with `milestone` or not. Any other issue that was not carried over, such as one at `needs-triage`, `needs-info`, `ready-for-human` or `wontfix`, is not a candidate.
+A parked issue is left out, waiting on the user to lift its park. An **unplanned feature** (an enhancement, or any other feature-sized issue, that the Milestone issue does not list; never a `retro` issue) is never ranked, whatever its label or whoever suggested it: propose each one to the user in one line, saying the Milestone issue does not list it; the user plans it with `milestone` or not. Any other issue that was not carried over, such as one at `needs-triage`, `needs-info`, `ready-for-human` or `wontfix`, is not a candidate.
 
 A **carried-over** candidate gets one place, the first of these that fits:
 
@@ -129,7 +129,7 @@ Sort every candidate into one list, in descending priority:
 
 1. **Group 1**: severe issues, then issues marked `next-release`; within each, oldest first.
 2. **Group 2**: the planned features, in the order you set this planning (below), each preceded by its open blockers in the order they must land. A blocker already placed higher stays where it is. A feature with a blocker an agent cannot take (parked, not at `ready-for-agent`, or closed without the work done: as not planned, duplicate or `wontfix`, which never clears) is left out, naming that blocker. A blocker closed as completed, the check against main's closes included, is cleared.
-3. **Group 3**: the carried-over issues it takes, oldest first, then the other `ready-for-agent` bugs, oldest first: the user chose to keep the carried-over ones going, and an earlier planning already took them.
+3. **Group 3**: the carried-over issues it takes, oldest first, then the other `ready-for-agent` bugs and `retro` issues, oldest first: the user chose to keep the carried-over ones going, and an earlier planning already took them.
 
 An issue that meets several conditions goes in its highest group, and first within it: a severe issue also marked `next-release` comes before the other severe issues; a bug that blocks a planned feature goes before that feature in group 2, not in group 3. Each issue appears once. A Spec is one entry, standing for its Tickets.
 
