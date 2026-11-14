@@ -26,5 +26,7 @@ The `release` skill knows no version policy and names no tracker command. It che
 ## Consequences
 
 - `release/SKILL.md` is back under 5,000 words and off `known_over` in `scripts/check-plugin.sh`.
-- ADR 0008's version rule for this repo stands; its "How a Release works" is amended by this ADR. This repo's version hand-out and Ticket re-read stay in `CLAUDE.md` and `docs/dev-skills/release.md`.
+- ADR 0008's version rule for this repo stood when this ADR was written; its "How a Release works" is amended by this ADR. This repo's version hand-out and Ticket re-read stayed in `CLAUDE.md` and `docs/dev-skills/release.md`.
 - Existing repos rerun `setup-dev-skills` to gain the release doc's new fields (versioning policy, Release size, cut steps) and the `next-release` label.
+
+*Amendment note, 2026-11-14, Ticket #150.* [ADR 0016](0016-releases-bump-the-plugin-version-once.md) replaced ADR 0008's version rule: this repo's versioning policy is now Releases bump, and its cut steps raise the version once in the changelog pull request and name the one new version on the `Versions:` line. The version hand-out and the Ticket re-read are gone. The decisions above (a version-free, command-free `release` that runs the cut steps the repo's release doc lists) are unchanged.

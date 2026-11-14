@@ -1,5 +1,7 @@
 # Each skill change bumps the plugin version
 
+> **Superseded by [ADR 0016](0016-releases-bump-the-plugin-version-once.md)** (2026-11-14, Ticket #150, absorbing #99): a pull request no longer bumps the version; the Release's changelog pull request raises it once, and the version hand-out and the Ticket re-read are dropped. This ADR keeps its text below as history; the semver meanings of X.Y.Z and the 1.0 declaration carried over to ADR 0016.
+
 Every pull request that changes a skill bumps the `dev-skills` version when it merges, so a merged skill change governs the next session straight from main and a retro can name the version that went wrong. A **Release** no longer marks a version: it is a named step inside a Milestone, with its own name, and it writes the changelog for the versions it delivered. Settled with the user on 2026-11-01 in [Define safe adoption of each evolving skill revision](https://github.com/Luffytse/luffy-dev-skills/issues/384#issuecomment-6556373083) and item 7 of [Reconcile delivery approvals with Milestone authority](https://github.com/Luffytse/luffy-dev-skills/issues/385#issuecomment-6556848716).
 
 ## History

@@ -299,15 +299,11 @@ class SkillLoadingPackaging(unittest.TestCase):
         self.cite("Label it claude" + "-only.")
         self.fails_with("plugin text names an agent-only label string")
 
-    def test_repo_merge_rule_names_in_skill_text_fail(self):
-        for text in ("Ask for the version hand" + "-out.\n", "Then run the Ticket re" + "-read.\n",
-                     "Ask for the version hand" + " out.\n", "The Tickets re" + "-read follows.\n"):
-            self.cite(text)
-            self.fails_with("skill text names a merge-time rule that only fits this repo")
-
-    def test_generic_rereads_and_merges_in_skill_text_pass(self):
-        # Prose a generic skill may hold: the check bans the rule names, not sentences around them.
+    def test_skill_text_may_name_merge_steps_and_rereads(self):
+        # The no-repo-merge-rules check is gone: the two rules it guarded skill text against no longer exist.
         self.cite("After a skill merge, re-read the open issues and hand out the next version number.")
+        self.check(0)
+        self.cite("Ask for the version hand" + "-out, then the Ticket re" + "-read.")
         self.check(0)
 
 
