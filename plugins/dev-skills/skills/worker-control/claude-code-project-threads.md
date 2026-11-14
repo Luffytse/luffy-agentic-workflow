@@ -1,6 +1,6 @@
 # Claude Code project threads
 
-Workers run as **threads** of a claude.ai Claude Code project, this reference's **Harness**: the coordinator is the project conversation, and each thread is a separate cloud session (or a session on the user's machine through Remote Control) with its own branch. Docs read 2026-11-03; the cloud-environment section 2026-11-14. A line marked **runtime-reported** names a fact no doc page states but the runtime's own tools showed; it is a fact seen in use, not one the docs promise.
+Workers run as **threads** of a claude.ai Claude Code project, this reference's **Harness**: the coordinator is the project conversation, and each thread is a separate cloud session (or a session on the user's machine through Remote Control) with its own branch. Docs read 2026-11-03; the cloud-environment section and the instructions' size 2026-11-14. A line marked **runtime-reported** names a fact no doc page states but the runtime's own tools showed; it is a fact seen in use, not one the docs promise.
 
 ## Detect
 
@@ -33,6 +33,10 @@ A thread hands any of these over once, as the build and merge skills say; none i
 - **One designated branch, no force push.** A cloud thread has one designated branch, and a force push is refused, so it cannot restart that branch from main. After its pull request is squash-merged it cannot make a new branch off main for a post-merge bug Ticket or the retro's check, so a fresh thread builds those.
 - **Auto mode may refuse a self-merge the Boundary record allows.** The merge call is denied as "Merge Without Review" until the user says to merge it.
 - **No pushes under `.github/workflows/`.** A cloud thread holds no `workflow` scope: `git push` says "without `workflow` scope" and the GitHub tools say "Insufficient scope". The user pushes such a file.
+
+## The coordinator's instructions
+
+- **Size limit.** The project instructions are sent to each new thread and to the coordinator, up to 16,000 characters. Source: [give a project standing context](https://code.claude.com/docs/en/claude-projects#give-a-project-standing-context)
 
 ## Keeping the plugin current in a cloud environment
 
