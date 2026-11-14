@@ -74,7 +74,7 @@ Done when the release issue is closed with its notes.
 
 ## 4. Run the end-of-Release pass
 
-Load `triage` by name and run its Triage batch for the Release just closed, naming its release issue; then load `retro-planning` by name and run its Release-end Retro planning for the same Release. Both run before the planning, so it sees what they closed and marked `next-release`.
+Load `triage` and run its Triage batch (`TRIAGE-BATCH.md`) for the Release just closed, naming its release issue; then load `retro-planning` by name and run its Release-end Retro planning for the same Release. Both run before the planning, so it sees what they closed and marked `next-release`.
 
 After each one, comment on the closed release issue, first line `<!-- release end-of-Release pass -->`, second line `triage ran for this Release.` (or `retro-planning ran ...`). If one cannot run (it fails, or the thread cannot start it), write `<skill> could not run: <why>.` instead and go on: the planning ranks what the tracker shows, and your report names the pass that did not run. A rerun skips each skill that already has its record.
 
