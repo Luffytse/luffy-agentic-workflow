@@ -40,6 +40,7 @@ This narrows ADR 0006's rejected separate index skill: the trigger stays with ea
 | `merging` | `implement` (step 7 and the retro check), `implement-spec` (step 8) and `release` (the changelog pull request) at their merge step; `review-rounds` "When a person is needed" defines a boundary crossing by it; callers keep their method, title, committer, readiness and pre-merge step | Spec #641 (#642, #643, #644) |
 | `worker-control` | `milestone`'s Plugin version check, to start its one cheap worker where the runner is not a fresh session; `team-lead` for every worker start, state check, end, stop, pause, resume and check-in | #527, #529, #530 |
 | Project tracker and triage docs | Builders read blocker/closure operations; `to-spec` and `to-tickets` read publication operations and role mappings | #366 |
+| Triage-labels doc's Repo labels rule | `triage`, `to-spec`, `to-tickets` and `review-rounds` read it there; `triage` no longer holds it | #156 |
 
 ## Remaining references and consistency
 

@@ -70,7 +70,7 @@ A last commit that changes only a version field and its changelog entry needs no
 
 Start one brand-new premium-tier agent with the open Importants whose Note names no bug Ticket yet, the spec and the Boundary record. For each it chooses one, and you carry it out, one row at a time, editing that row's Note on the Round 3 comment as soon as it is done, so a rerun files no Ticket twice:
 
-- **Bug Ticket:** create an issue with the tracker's "Create an issue" operation, holding the Finding's claim, `file:line`, failure scenario and a link to the pull request, with the `bug` category and `ready-for-agent` state labels the repo's triage-labels doc maps, and the repo labels that fit the Finding by the rule in `triage`'s Roles section (load `triage` by name); the row's Note becomes `bug Ticket: <link>`. Your caller works it straight away, as its own Ticket.
+- **Bug Ticket:** create an issue with the tracker's "Create an issue" operation, holding the Finding's claim, `file:line`, failure scenario and a link to the pull request, with the `bug` category and `ready-for-agent` state labels the repo's triage-labels doc maps, and the repo labels that fit the Finding, as the triage-labels doc says; the row's Note becomes `bug Ticket: <link>`. Your caller works it straight away, as its own Ticket.
 - **Dismiss:** with a one-line reason; the row becomes `dismissed`, `dismissed after Round 3: <reason>`.
 
 Open Nits are dropped. Last, edit the Round 3 comment's Result to the sorted one. The pull request is then ready to merge.
