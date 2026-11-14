@@ -46,11 +46,11 @@ _Avoid_: Round (for a batch of questions)
 A short file at a repo's root telling reviewers what Important means there, what to skip, what to always check (the **Always check** lines, each a Bug class earlier reviews caught) and optionally its own Review levels. The line form is `review-record`'s.
 
 **Finder**:
-A reviewer agent that looks for problems and reports candidate Findings, as a Markdown report in the **Report format** (Findings, then any notes under one `## Notes` heading), written to the file its brief names. Its kinds are the **standards Finder** and **spec Finder** (from Upstream), the **adversarial Finder**, the premium **security Finder** and the **later-Round Finder**; which run at each level and Round is `review-rounds`'.
+A reviewer agent that looks for problems and reports candidate Findings, as a Markdown report in the **Report format** (Findings, then any notes under one `## Notes` heading), written to the file its brief names; a report off that format goes to the Verifier with a note, and the Finder is asked again only when its report is missing or empty. Its kinds are the **standards Finder** and **spec Finder** (from Upstream), the **adversarial Finder**, the premium **security Finder** and the **later-Round Finder**; which run at each level and Round is `review-rounds`'.
 _Avoid_: reviewer (too broad), scanner
 
 **Brief script**:
-`review_briefs.py`, in the `review-rounds` folder: it writes each Round's Finder and Verifier briefs, one complete Markdown file per agent, cut from the skill's brief files, and its `verify` checks each Finder's report against the **Report format**. How the briefs are handed out, or built by hand when it cannot run, is `review-rounds`'.
+`review_briefs.py`, in the `review-rounds` folder: it writes each Round's Finder and Verifier briefs, one complete Markdown file per agent, cut from the skill's brief files, and its `verify` checks each Finder's report against the **Report format**, passing an off-format report to the Verifier as written with a note and a warning, and stopping only for a missing or empty one. How the briefs are handed out, or built by hand when it cannot run, is `review-rounds`'.
 _Avoid_: brief builder
 
 **Verifier**:
