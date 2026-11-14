@@ -162,7 +162,7 @@ Check, and report each failure to the user. Never change a setting, and never cr
 
 | Check | How | A failure means |
 | --- | --- | --- |
-| Sub-issues and dependencies | (**Read repo settings**) Any issue's sub-issue and dependency summaries are present; report "not checked" when the repo has no issue to probe. Note whether the installed command-line tool has the native parent and blocked-by options, or only the routes in the seed | `to-tickets` and `wayfinder` fall back to `Part of #<n>` and `Blocked by:` lines |
+| Sub-issues and dependencies | (**Read repo settings**) Any issue's sub-issue and dependency summaries are present; report "not checked" when the repo has no issue to probe. Note whether the installed command-line tool has the native parent and blocked-by options, or only the routes in `rest-routes.md` | `to-tickets` and `wayfinder` fall back to `Part of #<n>` and `Blocked by:` lines |
 | Draft PRs | The repo is public, which allows drafts. A private repo needs a paid plan: the "Upgrade to GitHub Pro" message from the branch protection read means a free plan, so fail; if the plan cannot be told, report "not checked" | `implement-spec` cannot open the Spec pull request as a draft |
 | Merge methods | The merge method each build skill will use is allowed: the one the repo's own rules name, else squash merging for `implement` and merge commits for `implement-spec` | that build skill cannot merge |
 | Default branch | The default branch is `main` | the build skills assume `main` |
