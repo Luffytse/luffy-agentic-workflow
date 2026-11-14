@@ -61,7 +61,7 @@ Done when every closed Ticket in the earlier records is marked "holding", "came 
 
 ## 3. Group and propose verdicts
 
-Group the remaining backlog issues by Scope first, then by root cause within a Scope, and merge duplicates; a group never mixes Scopes. A `this repo` group's fix is in this repo's own files. A `skill` group's fix is in the skill, template, script or format. An `environment` group's fix goes toward the Harness reference (`worker-control`) and Startup verification, not a sentence in each skill. A group's vote count is the number of distinct threads across all its issues, so one thread that filed two duplicates counts once.
+Group the remaining backlog issues by Scope first, then by root cause within a Scope, and merge duplicates; a group never mixes Scopes. A `this repo` group's fix is in this repo's own files. A `skill` group's fix is in the skill, template, script or format. An `environment` group's fix goes toward the Harness reference (`worker-control`), not a sentence in each skill. A group's vote count is the number of distinct threads across all its issues, so one thread that filed two duplicates counts once.
 
 Give each group the first verdict that fits:
 

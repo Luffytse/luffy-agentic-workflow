@@ -37,7 +37,7 @@ Read this first, then open only the docs whose line fits your work. Specs and ti
 
 ## Building
 
-- [Delivery glossary](glossary/delivery.md): Milestone, project threads, Startup verification, Harness, Worker control, Team lead, Takeover, Parked and Pause. Read when working on `milestone`, `team-lead` or `worker-control`.
+- [Delivery glossary](glossary/delivery.md): Milestone, project threads, Plugin version check, Harness, Worker control, Team lead, Takeover, Parked and Pause. Read when working on `milestone`, `team-lead` or `worker-control`.
 - [Releases glossary](glossary/releases.md): Release, Release size, Main check, Ranked list, Cut steps, Triage batch and Release thread. Read when working on `release` or the Triage batch.
 - [Build glossary](glossary/building.md): Spec, Ticket, build threads, branches, Build check, Implementer and Merging. Read when working on `implement`, `implement-spec` or `merging`.
 - [ADR 0004](adr/0004-build-threads-coordinate-and-subagents-code.md): build threads coordinate and Implementer subagents code; a pull request goes to the user only at a boundary crossing; a build thread reads its issue against main first. Read when working on `implement`, `implement-spec`, `to-tickets` or `setup-project`.

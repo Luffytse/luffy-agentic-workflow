@@ -67,7 +67,7 @@ One line per skill under `skills/`; each skill's own `SKILL.md` has the rest.
 - `improve-codebase-architecture`: scans a codebase for refactors that deepen shallow modules.
 - `issue-absorption`: records and reads the issues a Ticket absorbs (a Base skill).
 - `merging`: finishes a pull request: who merges, merge-time steps, the merge, closing issues (a hidden Base skill).
-- `milestone`: plans a Milestone, checks startup and reports at its end.
+- `milestone`: plans a Milestone, checks the plugin version and reports at its end.
 - `model-tiers`: maps a Model tier to the models of each coding agent (a Base skill).
 - `pr`: writes a pull request title and body.
 - `prototype`: builds a throwaway prototype to answer a design question.
