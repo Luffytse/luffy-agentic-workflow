@@ -23,7 +23,7 @@ When the Spec says a note is on another issue ("a note is on #24") or that anoth
 
 ### 2. Explore the codebase (optional)
 
-If you have not already explored the codebase, do so to understand the current state of the code. Start at `docs/dev-skills/index.md` and open only the docs that fit (with no index, fall back to `docs/dev-skills/glossary.md` and `docs/dev-skills/adr/`). When the source Spec was filed in an earlier session, do this even if you explored before, and also open every ADR or glossary entry newer than the Spec: other threads may have decided since, and the slices follow the newer entry where it differs from the Spec (say so in the breakdown). Ticket titles and descriptions should use the project's domain glossary vocabulary, and respect ADRs in the area you're touching.
+If you have not already explored the codebase, do so to understand the current state of the code. When the source Spec was filed in an earlier session, do this even if you explored before, and also open every ADR or glossary entry newer than the Spec: other threads may have decided since, and the slices follow the newer entry where it differs from the Spec (say so in the breakdown). Ticket titles and descriptions should use the project's domain glossary vocabulary, and respect ADRs in the area you're touching.
 
 Look for opportunities to prefactor the code to make the implementation easier. "Make the change easy, then make the easy change."
 

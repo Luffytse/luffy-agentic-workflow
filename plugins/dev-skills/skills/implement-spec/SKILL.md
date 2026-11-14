@@ -23,8 +23,6 @@ Fetch the spec and every ticket under it from the issue tracker and state the sp
 - On every entry, re-entry included, fetch the Spec branch if it exists and read the tracker before starting anything: each ticket's state and comments, and the Spec pull request with its ticket-check comments.
 - **Owner record.** The Spec thread that owns a Spec leaves an **owner record**: a comment on the Spec naming its thread or session, how to reach it, and the record it replaces (if any). The record **in force** is, among records replacing the same record, the earliest; a record that a later in-force record replaces is out. After that read, act on the one in force. None, or your own: you own the Spec. Another thread's: ask your coordinator (the user, when none runs) whether that thread is still running. Running: stop, build and start nothing, and tell the coordinator (or the user) the Spec is owned. Ended or unreachable, once the coordinator says so: you own it. The coordinator cannot say: ask the user and wait, building nothing, and treat the thread as ended only on the answer. Once you own it, post your owner record before step 2, then read the Spec's comments again once: if the record in force is another thread's, you stop as above. A thread re-entering as the one in force posts no second.
 
-Start at `docs/dev-skills/index.md` and open only the docs that fit (with no index, fall back to `docs/dev-skills/glossary.md` and `docs/dev-skills/adr/`).
-
 Optionally, start an **exploration subagent** for what the tickets need explored (codebase files, external docs). It saves its notes as Markdown in a directory outside the repo, so every later subagent can read them and Implementers can focus on building.
 
 ### Check against main

@@ -131,7 +131,7 @@ If an `## Agent skills` block already exists in the chosen file, update it in pl
 ```markdown
 ## Agent skills
 
-Start at `docs/dev-skills/index.md`; it says which doc to read for what.
+Start at `docs/dev-skills/index.md` and open only the docs whose line fits your work.
 
 ### Issue tracker
 

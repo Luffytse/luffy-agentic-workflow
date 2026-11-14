@@ -24,10 +24,6 @@ In a multi-context repo, per-context glossaries and per-context ADR folders also
 
 Not listed: `CLAUDE.md` and `AGENTS.md` files, `SKILL.md` files, code, and specs, tickets and review comments that live on the issue tracker. Research findings on a throwaway branch that is never merged get no line; a note committed to a branch that merges does. Test fixtures (data an eval or test runs against) are not listed either, even when they are Markdown files: the doc that describes a fixture gets a line, the fixture's own files get none.
 
-## How agents read it
-
-Read `CLAUDE.md` (or `AGENTS.md`) and `docs/dev-skills/index.md`, then open only the docs whose line fits the work. If the repo has no `docs/dev-skills/index.md`, fall back to `docs/dev-skills/glossary.md` and `docs/dev-skills/adr/`.
-
 ## Update rule
 
 Any skill that creates or edits a doc updates `docs/dev-skills/index.md` in the same commit:

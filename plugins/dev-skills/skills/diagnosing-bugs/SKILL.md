@@ -7,7 +7,7 @@ description: Diagnosis loop for hard bugs and performance regressions. Use when 
 
 A discipline for hard bugs. Skip phases only when explicitly justified.
 
-When exploring the codebase, start at `docs/dev-skills/index.md` and open only the docs that fit, to get a clear mental model of the relevant modules and the ADRs in the area you're touching (with no index, fall back to `docs/dev-skills/glossary.md` and `docs/dev-skills/adr/`).
+When exploring the codebase, get a clear mental model of the relevant modules and the ADRs in the area you're touching.
 
 ## Redact
 
