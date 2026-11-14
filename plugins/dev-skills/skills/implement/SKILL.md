@@ -13,7 +13,7 @@ Fetch the ticket from the issue tracker and state its title. If the reference is
 
 - If it is a Spec, stop and use `implement-spec` instead, carrying the Spec. If it is a Ticket under a Spec, say so to whoever handed it to you and stop: a Spec's Tickets are built by its Spec thread.
 - Use the tracker doc's **Count open blockers** operation and its completion rules. If any blocker remains uncleared, stop and tell the user (or the coordinator) which.
-- Read whether the ticket is parked with the tracker doc's **Park** operation. If it is, stop and tell the user (or the coordinator): it waits on the user, and the user lifts the park.
+- Read whether the ticket is parked with the tracker doc's **Park** operation. If it is, stop and tell the user (or the coordinator): it waits on the user, and the user lifts the park. A ticket labelled with the `ready-for-human` role: stop and tell the same; it waits on the person.
 
 ### Check against main
 
