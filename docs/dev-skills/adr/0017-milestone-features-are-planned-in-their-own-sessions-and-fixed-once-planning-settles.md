@@ -15,3 +15,7 @@ Milestone planning names the features first, sorts them into a dependency graph 
 - `release` and `setup-project` send a feature the Milestone does not list to the next Milestone's planning.
 - The question "one at a time or several at once" and the line of the Milestone issue that records it stay until [#88](https://github.com/Luffytse/luffy-agentic-workflow/issues/88) decides the limit.
 - This replaces ADR 0010's "add a feature mid-Milestone" and ADR 0012's sentence that a feature planned while a Milestone runs joins it.
+
+## Note (Ticket [#176](https://github.com/Luffytse/luffy-agentic-workflow/issues/176), 2026-11-14)
+
+[#88](https://github.com/Luffytse/luffy-agentic-workflow/issues/88) decided the limit: the plugin holds none. The question "one at a time or several at once" and its line in the Milestone issue are gone; the team lead starts every entry whose blockers have closed, within a thread limit only where a project's instructions give one (ADR 0010's note of the same date).

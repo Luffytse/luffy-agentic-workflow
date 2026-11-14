@@ -4,7 +4,7 @@
 Run: python3 scripts/test_snapshot.py (scripts/run-tests.sh runs it too). Run it after changing snapshot.py.
 Each test builds a disposable git repo with dated commits and a tracker (a local Markdown tracker, or a stub `gh`
 that answers like GitHub's REST API), runs plugins/dev-skills/skills/team-lead/snapshot.py as a command and reads
-its printed rows: each verdict, a lost report found by the branch, the `reported` and `resumed` fields, and the
+its printed rows: each verdict, a lost report found by the branch, the `reported`, `resumed` and `waiting` fields, and the
 hand-read fallback (exit 3, `read by hand`).
 """
 import os
@@ -193,6 +193,30 @@ class MarkdownTracker(unittest.TestCase):
         self.assertEqual(rows(self.f.snapshot(spec).stdout)["w25"]["Verdict"], "active")
         later = self.f.snapshot(spec, now="2026-11-03T15:40:00Z")
         self.assertEqual(rows(later.stdout)["w25"]["Verdict"], "silent since 2026-11-03T14:30:00Z")
+
+    def test_a_worker_waiting_on_the_user_is_neither_silent_nor_nudged(self):
+        self.f.commit("t25", "2026-11-03T11:40:00Z", "readme: hello")
+        self.f.issue("25-hello-doc.md", [
+            ("2026-11-03T11:45:00Z", "worker", "Waiting on the user: add the API key to the environment."),
+            ("2026-11-03T11:50:00Z", "coordinator", "<!-- team-lead wait -->\nw25 waits on the user."),
+            ("2026-11-03T13:00:00Z", "coordinator", "<!-- team-lead nudge -->\nNudged w25."),
+        ])
+        spec = "id=w25;issue=25;branch=t25;started=2026-11-03T11:10:00Z;waiting=2026-11-03T11:50:00Z"
+        out = self.f.snapshot(spec)
+        self.assertEqual(out.returncode, 0, out.stdout + out.stderr)
+        self.assertEqual(rows(out.stdout)["w25"]["Verdict"], "waiting on the user since 2026-11-03T11:50:00Z")
+
+    def test_a_comment_after_the_wait_ends_it(self):
+        self.f.commit("t25", "2026-11-03T11:40:00Z", "readme: hello")
+        self.f.issue("25-hello-doc.md", [("2026-11-03T13:30:00Z", "worker", "The key is in; carrying on.")])
+        spec = "id=w25;issue=25;branch=t25;started=2026-11-03T11:10:00Z;waiting=2026-11-03T11:50:00Z"
+        self.assertEqual(rows(self.f.snapshot(spec).stdout)["w25"]["Verdict"], "silent since 2026-11-03T13:30:00Z")
+
+    def test_a_push_after_the_wait_ends_it(self):
+        self.f.commit("t25", "2026-11-03T14:40:00Z", "readme: key wired")
+        self.f.issue("25-hello-doc.md")
+        spec = "id=w25;issue=25;branch=t25;started=2026-11-03T11:10:00Z;waiting=2026-11-03T11:50:00Z"
+        self.assertEqual(rows(self.f.snapshot(spec).stdout)["w25"]["Verdict"], "active")
 
     def test_an_earlier_milestone_nudge_record_counts_and_is_not_activity(self):
         self.f.commit("t25", "2026-11-03T12:40:00Z", "readme: hello")

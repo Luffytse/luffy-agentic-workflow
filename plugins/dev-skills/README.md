@@ -80,7 +80,7 @@ One line per skill under `skills/`; each skill's own `SKILL.md` has the rest.
 - `setup-dev-skills`: configures a GitHub repo for the plugin.
 - `setup-project`: drafts a project's coordinator instructions.
 - `tdd`: test-driven development, red-green-refactor.
-- `team-lead`: runs a Milestone's delivery as the coordinator: workers, check-ins, pause and resume.
+- `team-lead`: runs a Milestone's delivery as the coordinator: starts every unblocked entry, check-ins, pause and resume, and the stop for the Milestone review.
 - `to-spec`: turns the current conversation into a published spec.
 - `to-tickets`: splits a plan or spec into tracer-bullet tickets.
 - `triage`: moves issues and external pull requests through triage roles.

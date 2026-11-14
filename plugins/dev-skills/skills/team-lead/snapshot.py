@@ -2,13 +2,14 @@
 """Print one row per running worker for a team lead's check-in: last commit, last comment, pull request, verdict.
 
 Usage:
-  snapshot.py --worker 'id=<worker>;issue=<n>;branch=<branch>[;pr=<n>][;started=<UTC>][;reported=<UTC>][;resumed=<UTC>][;state=<text>]' ...
+  snapshot.py --worker 'id=<worker>;issue=<n>;branch=<branch>[;pr=<n>][;started=<UTC>][;reported=<UTC>][;resumed=<UTC>][;waiting=<UTC>][;state=<text>]' ...
               [--repo <dir>] [--tracker-doc <file>] [--now <UTC>] [--silent-after <minutes>] [--no-fetch]
 
 A worker's fields: its id, the issue it works on, the branch it pushes, its pull request if any (left out, it is looked
 up by the branch: GitHub's pulls?head= route, or a pull request file's Branch: line), when it started,
 when it last reported to the team lead, when the team lead last resumed it after a pause (activity, so a nudge
-before it is void and the worker gets a full window), and its state as the harness reports it (printed as given). Times are UTC,
+before it is void and the worker gets a full window), when the team lead recorded it as waiting on the user's action (its
+`wait` record), and its state as the harness reports it (printed as given). Times are UTC,
 as 2026-11-03T14:40:00Z.
 
 The tracker is read the way the tracker doc (default <repo>/docs/dev-skills/issue-tracker.md) says it is kept:
@@ -24,7 +25,8 @@ Verdicts: "pull request ready but not reported" (ready or merged after the later
 its start, so a replacement is not flagged for its predecessor's pull request; a ready pull request still open
 counts only while the worker has made no comment or push (or been resumed) since marking it ready, because a Spec thread marks its pull request
 ready before its review and the review's comments and pushes are the worker at work); "active" (activity within the
-silent-after window); "nudged at <T>, waiting"; "still silent after its nudge at <T>" (a window, less a 10-minute grace
+silent-after window); "waiting on the user since <T>" (a wait given, with no push, comment or pull request change after
+it: such a worker is neither silent nor due a nudge until it comments or pushes again); "nudged at <T>, waiting"; "still silent after its nudge at <T>" (a window, less a 10-minute grace
 for a nudge recorded minutes after its check-in, has passed since the nudge with no activity); "silent since <T>". Activity is a pushed commit, a comment
 on the issue or the pull request, a pull request change, the worker's start, its last report or its resume. Comments
 whose first line starts "<!-- team-lead" or, from the earlier milestone loop, "<!-- milestone " are the team lead's own
@@ -80,7 +82,7 @@ def parse_worker(spec):
     for need in ("id", "issue", "branch"):
         if not fields.get(need):
             raise ValueError(f"worker needs id=, issue= and branch= (missing {need}=): {spec!r}")
-    for k in ("started", "reported", "resumed"):
+    for k in ("started", "reported", "resumed", "waiting"):
         fields[k] = parse_time(fields[k]) if fields.get(k) else None
     return fields
 
@@ -230,7 +232,8 @@ def row_for(w, repo, tracker, now, window):
     cell = {"Worker": w["id"], "Issue": w["issue"], "Harness state": w.get("state") or "not given"}
     when, subject = last_commit(repo, w["branch"])
     cell["Last commit"] = f"{show(when)} {subject}" if when else "none pushed"
-    activity = [t for t in (w["started"], w["reported"], w["resumed"], when) if t]
+    # The worker's own moves (pushes, comments, pull request changes); activity adds its start, report and resume.
+    moves = [when] if when else []
     ready_at = None
     try:
         if tracker is None:
@@ -245,7 +248,7 @@ def row_for(w, repo, tracker, now, window):
         return cell, False
     if pr:
         comments = comments + pr["comments"]
-        activity += [t for t in (pr["opened"], pr["ready"], pr["merged"], pr["closed"]) if t]
+        moves += [t for t in (pr["opened"], pr["ready"], pr["merged"], pr["closed"]) if t]
         if pr["state"] == "merged":
             ready_at = pr["merged"] or pr["ready"] or pr["opened"]
             cell["Pull request"] = f"#{w['pr']} merged {show(ready_at)}"
@@ -260,7 +263,8 @@ def row_for(w, repo, tracker, now, window):
         cell["Pull request"] = "none"
     theirs = [c for c in comments if c[0] and not c[2].startswith(OWN)]
     nudges = [c[0] for c in comments if c[0] and c[2].startswith(NUDGE)]
-    activity += [c[0] for c in theirs]
+    moves += [c[0] for c in theirs]
+    activity = moves + [t for t in (w["started"], w["reported"], w["resumed"]) if t]
     latest = max(theirs, key=lambda c: c[0]) if theirs else None
     cell["Last comment"] = f"{show(latest[0])} {latest[1]}: {latest[2][:60]}" if latest else "none"
     last = max(activity) if activity else None
@@ -271,6 +275,8 @@ def row_for(w, repo, tracker, now, window):
     working = ready_at and pr["state"] == "open" and any(t > ready_at for t in activity)
     if ready_at and (seen is None or seen < ready_at) and not working:
         verdict = "pull request ready but not reported"
+    elif w["waiting"] and not any(t > w["waiting"] for t in moves):
+        verdict = f"waiting on the user since {show(w['waiting'])}"
     elif last and now - last < window:
         verdict = "active"
     elif nudge and (last is None or nudge > last):
