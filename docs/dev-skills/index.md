@@ -4,7 +4,7 @@ Read this first, then open only the docs whose line fits your work. Specs and ti
 
 ## Whole repo
 
-- [docs/dev-skills/glossary.md](glossary.md): the words used here (Plugin, Model tier, Spec, Ticket, Release, Finder, Verifier and more). Read when writing or reviewing any skill text.
+- [docs/dev-skills/glossary.md](glossary.md): the glossary's map, one page per Area of the words used here (Plugin, Model tier, Spec, Ticket, Release, Finder, Verifier and more). Read when writing or reviewing any skill text, to find the page.
 - [ADR 0013](adr/0013-skill-changes-are-tested-by-ci-evals-and-review.md): the earlier three layers (CI, model evals, review), kept as history. Read when asking how skill changes were tested before ADR 0015.
 - [ADR 0015](adr/0015-model-evals-are-retired-and-skill-changes-merge-on-ci-review-and-acceptance-lines.md): why model evals were retired and a skill change now merges on CI, review and shown acceptance lines. Read when changing how a skill change is tested or shown ready to merge.
 
@@ -15,6 +15,7 @@ Read this first, then open only the docs whose line fits your work. Specs and ti
 - [docs/dev-skills/domain.md](domain.md): the single-context doc layout and how skills read the glossary and ADRs. Read when a skill looks for domain docs or flags an ADR conflict.
 - [docs/dev-skills/release.md](release.md): the release doc: version sources, versioning policy, Release size, change sizes, cut steps, naming and the whole-Release check. Read when running the `release` skill, raising the version at a cut or giving an issue a release label.
 - [docs/dev-skills/boundaries.md](boundaries.md): this repo's Boundary record: approvals, budget, skill file size limit, check-in interval and Milestone label form. Read when a skill or thread decides whether an action needs the user, or when giving an issue a Milestone label.
+- [Agent setup glossary](glossary/agent-setup.md): Agent and Repo labels, `next-release`, Boundary record and Door. Read when a skill labels an issue or decides who merges.
 - [docs/dev-skills/upstream-watch.md](upstream-watch.md): the prompt of the Upstream watch, run by hand every 2 weeks, and how its reminder issue works. Read when running or changing the watch.
 
 ## Packaging
@@ -31,10 +32,14 @@ Read this first, then open only the docs whose line fits your work. Specs and ti
 - [scripts/check-plugin.sh](../../scripts/check-plugin.sh): this repo's own checker for the plugin layout and repo-wide rules, each check named in its header, among them `index-line-length` (no index bullet over 60 words). Read when adding or changing a check, or before pushing a plugin change.
 - [ADR 0001](adr/0001-dev-skills-is-one-plugin-forked-from-matt-pocock.md): why `dev-skills` is one plugin that began as Matt Pocock's skills, and which skills it keeps. Read when adding or dropping a skill, or when the Upstream watch finds an idea.
 - [ADR 0002](adr/0002-skills-name-model-tiers-not-models.md): skills name cheap, regular or premium tiers, never models; the `model-tiers` skill holds the default map. Read when a skill picks a model or the map changes.
+- [Packaging glossary](glossary/packaging.md): Marketplace, Plugin, Skill, Upstream, Model tier, Shared rule and Base skill. Read when writing skill text or sharing a rule.
 - [ADR 0009](adr/0009-shared-rules-have-one-owner-skill.md): shared rules have one owner skill, with workflow reuse and consumer inventory. Read when sharing a rule, composing skills or adding a Base skill.
 
 ## Building
 
+- [Delivery glossary](glossary/delivery.md): Milestone, project threads, Startup verification, Harness, Worker control, Team lead, Takeover, Parked and Pause. Read when working on `milestone`, `team-lead` or `worker-control`.
+- [Releases glossary](glossary/releases.md): Release, Release size, Main check, Ranked list, Cut steps, Triage batch and Release thread. Read when working on `release` or the Triage batch.
+- [Build glossary](glossary/building.md): Spec, Ticket, build threads, branches, Build check, Implementer and Merging. Read when working on `implement`, `implement-spec` or `merging`.
 - [ADR 0004](adr/0004-build-threads-coordinate-and-subagents-code.md): build threads coordinate and Implementer subagents code; a pull request goes to the user only at a boundary crossing; a build thread reads its issue against main first. Read when working on `implement`, `implement-spec`, `to-tickets` or `setup-project`.
 - [ADR 0005](adr/0005-a-spec-is-one-long-lived-branch.md): the spec branch model, ticket worktrees and merges. Read when working on `implement-spec` or anything about branches.
 - [ADR 0010](adr/0010-delivery-is-split-into-planning-a-team-lead-and-harness-references.md): delivery is split into `milestone` (plans and reports), `team-lead` (runs delivery) and `worker-control` (Harness references). Read when working on those skills or their callers.
@@ -43,11 +48,13 @@ Read this first, then open only the docs whose line fits your work. Specs and ti
 
 ## Code review
 
+- [Code review glossary](glossary/code-review.md): CI, Review, Round, Review level, Finder, Verifier, Finding and Severity. Read when working on the review skills or how skill changes are tested.
 - [REVIEW.md](../../REVIEW.md): this repo's review rules: what Important means, what to skip, the Always check lines and the Review levels. Read when reviewing a change or adding an Always check line.
 - [ADR 0003](adr/0003-code-review-runs-find-verify-rank-in-rounds.md): Round 0, Review levels, Find, Verify and Rank in at most 3 Rounds, and the review stopping for a person only at a boundary crossing. Read when working on `agentic-review`, `review-rounds`, `review-record`, `retro` or `pr`.
 
 ## Retros
 
+- [Retros glossary](glossary/retros.md): Retro issue, Retro backlog, Retro planning, Necessity check and Spin-off. Read when working on `retro` or `retro-planning`.
 - [ADR 0007](adr/0007-retro-issues-pile-up-per-repo-and-are-planned-in-batches.md): how `retro` files Retro issues by Scope and how `retro-planning` works through the backlog. Read when working on `retro`, `retro-planning`, or the end of `implement` and `implement-spec`.
 
 ## Out of scope
@@ -56,6 +63,7 @@ Read this first, then open only the docs whose line fits your work. Specs and ti
 
 ## Docs
 
+- [Docs glossary](glossary/docs.md): Skill docs folder, Docs index and Area. Read when a skill writes or reads docs.
 - [ADR 0006](adr/0006-docs-are-found-through-one-index.md): this index and the glossary pages per area, and which skills keep the index up to date; its layout part is replaced by ADR 0011. Read when a skill writes or reads docs.
 - [ADR 0011](adr/0011-skill-files-live-in-docs-dev-skills.md): every file the skills require lives at a fixed path in `docs/dev-skills/`. Read when a skill names a path to a doc it writes or reads, or when setting up a repo.
 - [ADR 0012](adr/0012-release-is-version-free-and-command-free.md): `release` is version-free and command-free; every plan is a Milestone, and the next Release is picked from one ranked list (amended by ADR 0016). Read when changing `release`, the Triage batch, the release doc seed or how the next Release is chosen.
