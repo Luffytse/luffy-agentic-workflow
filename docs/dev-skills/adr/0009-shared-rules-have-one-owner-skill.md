@@ -32,7 +32,7 @@ This narrows ADR 0006's rejected separate index skill: the trigger stays with ea
 
 | Owner | Consumers and load point | Migration |
 | --- | --- | --- |
-| `docs-index` | Document writers (`domain-modeling`, `grill-with-docs`, `improve-codebase-architecture`, `research`, `retro`, `setup-dev-skills`, `triage`, including their supporting-file branches) at index updates; `review-rounds/FINDERS.md` standards branch when checking the index | #364 |
+| `docs-index` | Document writers (`domain-modeling`, `grill-with-docs`, `improve-codebase-architecture`, `research`, `setup-dev-skills`, `triage`, including their supporting-file branches) at index updates; `review-rounds/FINDERS.md` standards branch when checking the index | #364 |
 | `review-record` | `review-rounds` before reading/writing comments and briefing Finders (`agentic-review` writes Round 0's one-line None record inline, in the shape `review-record` gives); the standards Finder, `retro` (step 3 loads it by name) and the `retro/BUG-CLASSES.md` reader apply its record meaning | #365, Spec #555 |
 | `issue-absorption` | `to-tickets` before source-based drafting/publication; `retro-planning` to read whether an open Ticket absorbs a Retro issue (it writes no absorption record since Ticket #160); `pr` when selecting closing lines; builders when maintaining lines or completing absorbed sources | #368 |
 | `to-tickets` complete workflow | none since Ticket #160 (was `retro-planning` after problem approval, including publication repair on resume) | #369, Ticket #160 |

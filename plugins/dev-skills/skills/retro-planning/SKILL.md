@@ -22,7 +22,7 @@ Read every open issue labelled `retro`, with its body and comments. Load `issue-
 - carries a state role: it was handed over already. An open issue with `wontfix` is the exception: `retro` reopened an old close, so remove that label and sort it.
 - has a latest `Absorbed by #<ticket>` comment naming a Ticket that is open, as `issue-absorption` reads it. It is neither closed, merged nor handed over; it closes with that Ticket.
 
-List them in the record under "Left as it is". This is the only place this skill reads an absorption comment; it writes none.
+List them in the record under "Left as it is". These are the only places this skill reads an absorption comment; it writes none.
 
 Give each remaining issue its **Scope** (`skill`, `environment` or `this repo`) from its `Scope:` line; with none, decide it by `retro`'s question (would this happen in a fresh repo using the skills, in the same environment?). A Retro whose Scope does not belong in this tracker (a `this repo` Retro of another repo, or a `skill` or `environment` Retro outside the plugin's repo) is refiled: for `skill` or `environment`, in the repo the plugin manifest's `repository` field names, as `retro`'s filing step does; for `this repo`, in the tracker of the project its source thread names. File it there with the label `retro` and no state role, then close it here with the link. If you cannot write there, leave it open and record it as `misplaced, not refiled`.
 

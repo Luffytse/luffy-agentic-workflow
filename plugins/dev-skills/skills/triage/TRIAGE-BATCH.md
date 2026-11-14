@@ -20,7 +20,7 @@ The **`next-release` mark** goes on a `ready-for-agent` issue that is **severe**
 
 For every open `ready-for-agent` issue (those part 1 just moved there included), take the first test that fits:
 
-1. **Agent-found enhancement**: move it to `ready-for-human`, with a comment saying why. Nothing else in the sweep touches it.
+1. **Agent-found enhancement** (not a handed-over Retro issue): move it to `ready-for-human`, with a comment saying why. Nothing else in the sweep touches it.
 2. **Duplicate**: it reports the same problem or asks for the same change as another open issue. Keep the one with the fuller brief (the older when they are even), close the other as a duplicate (as not planned where the tracker has no duplicate outcome) with a comment linking the kept issue, and comment on the kept issue anything only the closed one said.
 3. **Obsolete**: main's current code no longer has the problem or already does what the issue asks; reproduce it or read the code to confirm. Close it as completed, since main already has the work and nothing is left to do, with the reason: where on main it is fixed or done, and the commit or pull request when you find it. A planned feature it blocks is then unblocked, as a close as completed counts as done.
 4. **Needs the mark**: it is severe or blocks a planned feature and lacks `next-release`: set it, with a comment giving the reason.

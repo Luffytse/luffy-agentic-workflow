@@ -111,7 +111,7 @@ Every open issue that survived the check against main (not closed by it, not wai
 - a **severe** issue (a security hole, lost data, or delivery stopped: nothing can merge or ship), at `ready-for-agent` or marked `next-release`;
 - an issue marked `next-release`;
 - a **planned feature**: one the Milestone issue lists (including any added since the last Release), together with its open blockers (the tracker doc's **Count open blockers** operation); a Ticket of a listed Spec belongs to its Spec;
-- a `ready-for-agent` bug or `retro` issue;
+- a `ready-for-agent` bug or `retro` issue at `ready-for-agent`;
 - every issue still open that is listed under `## Carried over` in the release issue of the Release just cut (the closed release issue cut most recently, in any run); read that section, not the issue's other text.
 
 A parked issue is left out, waiting on the user to lift its park. An **unplanned feature** (an enhancement, or any other feature-sized issue, that the Milestone issue does not list; never a `retro` issue) is never ranked, whatever its label or whoever suggested it: propose each one to the user in one line, saying the Milestone issue does not list it; the user plans it with `milestone` or not. Any other issue that was not carried over, such as one at `needs-triage`, `needs-info`, `ready-for-human` or `wontfix`, is not a candidate.
@@ -129,7 +129,7 @@ Sort every candidate into one list, in descending priority:
 
 1. **Group 1**: severe issues, then issues marked `next-release`; within each, oldest first.
 2. **Group 2**: the planned features, in the order you set this planning (below), each preceded by its open blockers in the order they must land. A blocker already placed higher stays where it is. A feature with a blocker an agent cannot take (parked, not at `ready-for-agent`, or closed without the work done: as not planned, duplicate or `wontfix`, which never clears) is left out, naming that blocker. A blocker closed as completed, the check against main's closes included, is cleared.
-3. **Group 3**: the carried-over issues it takes, oldest first, then the other `ready-for-agent` bugs and `retro` issues, oldest first: the user chose to keep the carried-over ones going, and an earlier planning already took them.
+3. **Group 3**: the carried-over issues it takes, oldest first, then the other `ready-for-agent` bugs and `ready-for-agent` `retro` issues, oldest first: the user kept the carried-over ones going, and an earlier planning took them.
 
 An issue that meets several conditions goes in its highest group, and first within it: a severe issue also marked `next-release` comes before the other severe issues; a bug that blocks a planned feature goes before that feature in group 2, not in group 3. Each issue appears once. A Spec is one entry, standing for its Tickets.
 
