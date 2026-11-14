@@ -92,7 +92,7 @@ Load `merging` by name and follow it to its end. Give it the Spec pull request a
 
 ## 9. Clean up and report
 
-Once the Spec pull request has merged, remove what is left (`git worktree list`, `git worktree remove`, `git worktree prune`) and delete the local Ticket branches. Until then delete nothing, apart from a dropped Ticket's branch: while you wait on the user every branch is kept.
+Once the Spec pull request has merged, remove what is left (`git worktree list`, `git worktree remove`, `git worktree prune`) and delete the local Ticket branches. Until then delete nothing, a dropped Ticket's branch included: while you wait on the user every branch is kept.
 
 Tell the user (or the coordinator) the pull request link and the outcome as `merging` hands it back: merged with its merge commit, or with the user and what stops it, with each bug Ticket the review filed and each Ticket still waiting. A report of waiting is not your end: stay open and re-enter at step 1 on the answer, the lifted park or the closed setup Ticket. If the pull request is with the user, once they merge it or tell you it is merged, run `merging`'s "After the merge", then clean up and go to step 10; if they close it unmerged, ask whether they want a retro.
 
