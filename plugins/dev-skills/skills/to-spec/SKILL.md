@@ -15,7 +15,7 @@ Read the configured project issue-tracker and triage-label docs before publicati
 
 Check with the user that these seams match their expectations.
 
-3. Write the spec using the template below, then publish it to the project issue tracker. Apply the label mapped to the `ready-for-agent` role - no need for additional triage. Also apply the repo labels by the rule in `triage`'s Roles section (load `triage` by name), judged on the Spec as a whole: a label that fits only part of the Spec is not applied, so an end-to-end Spec gets neither of two labels that each fit only part of it.
+3. Write the spec using the template below, then publish it to the project issue tracker. Apply the label mapped to the `ready-for-agent` role - no need for additional triage. Also apply the repo labels as the triage-labels doc says, judged on the Spec as a whole: a label that fits only part of the Spec is not applied, so an end-to-end Spec gets neither of two labels that each fit only part of it.
 
 <spec-template>
 

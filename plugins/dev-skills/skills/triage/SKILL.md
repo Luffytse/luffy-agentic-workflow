@@ -37,7 +37,7 @@ Five **state** roles:
 - `ready-for-human`: needs human implementation
 - `wontfix`: will not be actioned
 
-**Repo labels** are the labels the repo records for its own kinds of work, in the **Repo labels** table of its triage-labels doc: each a label string with one line saying when it applies. They are not roles, and the labelling rule is written here once; `to-spec`, `to-tickets` and `review-rounds` point to this paragraph. Read the table, and apply each label whose line fits the issue, by your judgement. A label the user named for the issue (in the request, or while planning it) goes on whatever you judge. Never apply a label that is not in the table unless the user named it. Remove a repo label only when you judge it no longer fits the issue, with a one-line comment on the issue saying why, and never remove one the user named. A repo with no table, or an empty one, has no repo labels: apply none, and leave any such label already on an issue as it is.
+**Repo labels** are the labels the repo records for its own kinds of work; apply them as the **Repo labels** section of its triage-labels doc says.
 
 One **mark** role, `next-release`, says an issue must join the next Release; Release planning takes it and removes the mark. It is neither a category nor a state role. Set it on a `ready-for-agent` issue that is **severe** (a security hole, lost data, or delivery stopped: nothing can merge or ship) or that blocks a **planned feature** (one the Milestone issue lists: the open issue carrying a label in the Boundary record's Milestone label form, or for a batch the one its release issue names). Triage applies no release label.
 
@@ -129,7 +129,7 @@ The Release thread runs the batch at a Release end, naming the Release just clos
 For every open `needs-triage` issue:
 
 1. Gather context and verify the claim (steps 1 and 3 of "Triage a specific issue or PR"). Where the issue needs fleshing out (step 4), settle it by reading the code, docs, ADRs, the Milestone issue and the issue's comments; ask nobody.
-2. Decide the category and the state, with the Roles rules for `next-release`, agent-found enhancements and repo labels. When "Goes to the user" applies to the issue, apply nothing (no brief, no label change) and leave it `needs-triage`. Otherwise apply the outcome as step 5 says: an agent brief for `ready-for-agent`, a brief for `ready-for-human`, triage notes for `needs-info`, a close as completed for an already-implemented one, a reasoned close for `wontfix`.
+2. Decide the category and the state, with the Roles rules for `next-release` and agent-found enhancements, and the triage-labels doc's rule for repo labels. When "Goes to the user" applies to the issue, apply nothing (no brief, no label change) and leave it `needs-triage`. Otherwise apply the outcome as step 5 says: an agent brief for `ready-for-agent`, a brief for `ready-for-human`, triage notes for `needs-info`, a close as completed for an already-implemented one, a reasoned close for `wontfix`.
 3. Record the decision on the issue in a comment: category, state, any mark, any repo label added or removed and the reason (a removed repo label's one-line reason can be this comment).
 
 Done when no open issue but those waiting on the user is at `needs-triage`.

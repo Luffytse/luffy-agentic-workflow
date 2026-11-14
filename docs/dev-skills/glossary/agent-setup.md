@@ -5,7 +5,7 @@ The labels and records a repo keeps so the skills can work in it, and the Door c
 ## Language
 
 **Repo label**:
-A label the repo records in the **Repo labels** table of its `docs/dev-skills/triage-labels.md`, with a one-line "when it applies" (this repo's table is empty). It is not a triage role; builders read none and it routes no work. `triage` owns the rule that applies it, which `to-spec`, `to-tickets` and `review-rounds` follow; `setup-dev-skills` records the table.
+A label the repo records in the **Repo labels** table of its `docs/dev-skills/triage-labels.md`, with a one-line "when it applies" (this repo's table is empty). It is not a triage role; builders read none and it routes no work. The doc's **Repo labels** section holds the rule that applies it, which `triage`, `to-spec`, `to-tickets` and `review-rounds` follow; `setup-dev-skills` records the table.
 _Avoid_: custom role
 
 **`next-release`**:

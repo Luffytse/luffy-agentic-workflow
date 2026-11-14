@@ -22,7 +22,7 @@ When a skill mentions a role (e.g. "apply the AFK-ready triage label"), use the 
 
 ## Repo labels
 
-Labels this repo records for its own kinds of work, each with one line saying when it applies. They are not triage roles. `triage`, `to-spec`, `to-tickets` and `review-rounds` apply them, by the rule `triage` holds: a label whose line fits the issue, and any label the user names; builders read none. An empty table means the repo has none.
+Labels this repo records for its own kinds of work, each with one line saying when it applies. They are not triage roles; builders read none. `triage`, `to-spec`, `to-tickets` and `review-rounds` apply them by this rule: apply each label whose line fits the issue, by your judgement. Always apply a label the user named for the issue (in the request, or while planning it). Never apply a label that is not in the table unless the user named it. Remove one only when you judge it no longer fits, with a one-line comment on the issue saying why, and never one the user named. An empty or missing table means the repo has no repo labels: apply none, and a label already on an issue stays.
 
 | Label in our tracker | When it applies |
 | -------------------- | --------------- |
