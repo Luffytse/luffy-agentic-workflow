@@ -1,5 +1,0 @@
-interface:
-  display_name: "Worker Control"
-  short_description: "Start, check and stop workers in this tool"
-policy:
-  allow_implicit_invocation: true

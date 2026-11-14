@@ -24,17 +24,7 @@ user-invocable: false
 ---
 ```
 
-For Codex, supply `agents/openai.yaml` alongside it:
-
-```yaml
-interface:
-  display_name: "Example Contract"
-  short_description: "Interpret example records"
-policy:
-  allow_implicit_invocation: true
-```
-
-The display name should read like the folder name. The Codex policy preserves implicit invocation; it is not a menu-hiding setting. Check each supported host rather than assuming Claude Code's visibility flag has the same effect elsewhere. See the [Claude Code invocation reference](https://code.claude.com/docs/en/skills#control-who-invokes-a-skill) and [Codex metadata reference](https://developers.openai.com/codex/skills/#optional-metadata) for host-specific behavior. Metadata validation does not replace the fresh-runtime dependency check described in `SKILL.md`.
+See the [Claude Code invocation reference](https://code.claude.com/docs/en/skills#control-who-invokes-a-skill) for how the visibility flag behaves. Metadata validation does not replace the fresh-runtime dependency check described in `SKILL.md`.
 
 ## Splitting by invocation
 

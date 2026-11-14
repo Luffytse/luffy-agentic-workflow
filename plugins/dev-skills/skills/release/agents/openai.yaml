@@ -1,5 +1,0 @@
-interface:
-  display_name: "Release"
-  short_description: "Cut a Release and plan the next one"
-policy:
-  allow_implicit_invocation: true

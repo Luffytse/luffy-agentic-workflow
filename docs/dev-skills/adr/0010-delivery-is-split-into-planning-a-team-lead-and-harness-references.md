@@ -38,3 +38,7 @@ Each `worker-control` reference lists what the Harness does by itself and each m
 - `milestone`'s planning, adding a feature, Startup verification and report stay there (slimmed by #530); its delivery dry runs move to `evals/team-lead/`, rebuilt on Harness events, and cases for records that no longer exist are cut.
 - Milestone issues opened under the earlier loop keep reading correctly: each earlier `<!-- milestone ... -->` record counts as its team-lead counterpart (a `delivery thread` record as a `start` naming its worker, `delivery thread ended` as that worker's end, `nudge`, `stall`, `parked`, `park lifted`, `pause` and `resume` as theirs, `check-in`, `check-in ended` and `stand-up` as `check-in`), and a worker such a record names is read through `worker-control` like any other, so a running one keeps its slot and no second worker starts beside it (the `deliver-earlier` case, Milestone 1's own #523).
 - ADR 0008's "the Milestone loop lives in the `milestone` skill" now reads: delivery lives in the `team-lead` skill.
+
+## Note (Spec #151)
+
+Two references remain, both for Claude Code (`claude-code-project-threads.md` and `claude-code-sessions.md`). The Codex reference named above was deleted when the plugin came to support Claude Code only; `worker-reference-sources` checks the two that remain.

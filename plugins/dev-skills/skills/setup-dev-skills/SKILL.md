@@ -8,7 +8,7 @@ description: "Configure a GitHub repo for the dev-skills plugin: tracker, label,
 Derived from Matt Pocock's setup skill; the seed files in this folder are mostly his text (MIT, see `LICENSE-mattpocock-skills` in the plugin folder). Scaffold the per-repo configuration the other skills read. Every file it writes lives in `docs/dev-skills/`, the one folder only the skills use, so it never mixes with the repo's own docs; only `REVIEW.md` and the `## Agent skills` block in `CLAUDE.md` or `AGENTS.md` go at the repo root, where reviewers and coding agents expect them:
 
 - **Issue tracker**: GitHub Issues, in `docs/dev-skills/issue-tracker.md`.
-- **Labels**: the 5 state roles and 2 category roles that `triage` uses, the `next-release` role, the optional agent-only role (one label per coding agent) when the user wants it, the repo's own labels, if it has any, each with a line saying when it applies (the **Repo labels** table, which `triage`, `to-spec`, `to-tickets` and `review-rounds` apply), the `wayfinder:*` labels and the `parked` label (the tracker doc's **Park** operation uses it), in `docs/dev-skills/triage-labels.md` and on the repo.
+- **Labels**: the 5 state roles and 2 category roles that `triage` uses, the `next-release` role, the repo's own labels, if it has any, each with a line saying when it applies (the **Repo labels** table, which `triage`, `to-spec`, `to-tickets` and `review-rounds` apply), the `wayfinder:*` labels and the `parked` label (the tracker doc's **Park** operation uses it), in `docs/dev-skills/triage-labels.md` and on the repo.
 - **Domain docs**: where the glossary (`docs/dev-skills/glossary.md`) and ADRs (`docs/dev-skills/adr/`) live and how skills read them, in `docs/dev-skills/domain.md`, plus the `docs/dev-skills/index.md` that lists the docs.
 - **Review rules**: a starter `REVIEW.md` at the repo root, where the repo's own review rules go.
 - **Releases**: the versioning policy (none, pull requests bump or Releases bump, with that policy's text), the Release name form, the Release size, the changelog path, the release label prefix, the cut steps and the whole-Release check, that `release` reads, in `docs/dev-skills/release.md`, for a repo that cuts Releases, versioned or not.
@@ -52,17 +52,11 @@ The defaults are the 5 state roles, `needs-triage`, `needs-info`, `ready-for-age
 
 Then ask one more question:
 
-> Do you want labels that mark an issue for one coding agent only, so that the other agent leaves it alone? (recommended: **yes** when `docs/dev-skills/triage-labels.md` already has agent rows or more than one coding agent works the repo, else **no**)
-
-On **no**, the seed's agent-only section is left out of `docs/dev-skills/triage-labels.md`. On **yes**, ask the user for each agent's label string (suggest `<agent>-only`), and fill the seed's agent-only table with one row per agent. Never guess agent names.
-
-Then ask a third question:
-
 > Does this repo have labels of its own, such as one per area of the code or kind of work? (recommended: **no**, **yes** when `docs/dev-skills/triage-labels.md` already has Repo labels rows)
 
 On **no**, add no row: the seed's **Repo labels** table stays empty (a row an earlier run recorded stays until the user drops it), and the run goes on as if the question did not exist. On **yes**:
 
-1. Take the tracker's labels from exploration (step 1). Offer as candidates those that no role, no agent label, no `wayfinder:` label, not `parked`, `retro` or `retro-planning`, no release label (the release doc's label prefix, else `release-`), no Milestone membership label (the form in the Boundary record, else `milestone-<n>`) and no existing Repo labels row covers. Say which labels you left out and why. The user picks the ones to record.
+1. Take the tracker's labels from exploration (step 1). Offer as candidates those that no role, no `wayfinder:` label, not `parked`, `retro` or `retro-planning`, no release label (the release doc's label prefix, else `release-`), no Milestone membership label (the form in the Boundary record, else `milestone-<n>`) and no existing Repo labels row covers. Say which labels you left out and why. The user picks the ones to record.
 2. For each picked label, draft its one-line "when it applies" from its name and the issues that carry it (the tracker doc's **List issues** with that label filter), and show it for the user to confirm or correct. Never record a line the user has not confirmed.
 3. Ask whether to add labels the tracker does not have yet; for each, take its string and its line from the user. Step 4 creates them.
 
@@ -145,7 +139,7 @@ Start at `docs/dev-skills/index.md`; it says which doc to read for what.
 
 ### Triage labels
 
-[one-line summary of the label vocabulary, for example "5 state roles + 2 category roles: ...", plus the `next-release` role, the agent-only labels and the Repo labels table when the repo has them]. See `docs/dev-skills/triage-labels.md`.
+[one-line summary of the label vocabulary, for example "5 state roles + 2 category roles: ...", plus the `next-release` role and the Repo labels table when the repo has them]. See `docs/dev-skills/triage-labels.md`.
 
 ### Domain docs
 
@@ -168,7 +162,7 @@ Add a `### Boundaries` part to the block, after `### Domain docs` and before `##
 
 Then write the approved files, and `docs/dev-skills/index.md` last.
 
-**Create the labels.** Create every label the skills use that the repo lacks, whether or not `triage` is installed: the label string of each of the 5 state roles, `bug` and `enhancement`, `next-release`, each agent-only label from the table (only when Section B was **yes**), each Repo labels row's label the repo lacks (a label the user added, or one a re-run's row names but the tracker lost), and `wayfinder:map`, `wayfinder:research`, `wayfinder:prototype`, `wayfinder:grilling`, `wayfinder:task` and `parked`. Use the tracker doc's **Create a label** operation for each. Never delete a label. Leave `retro`, `retro-planning` and the release labels alone: `retro`, `retro-planning` and `release` create them when first needed.
+**Create the labels.** Create every label the skills use that the repo lacks, whether or not `triage` is installed: the label string of each of the 5 state roles, `bug` and `enhancement`, `next-release`, each Repo labels row's label the repo lacks (a label the user added, or one a re-run's row names but the tracker lost), and `wayfinder:map`, `wayfinder:research`, `wayfinder:prototype`, `wayfinder:grilling`, `wayfinder:task` and `parked`. Use the tracker doc's **Create a label** operation for each. Never delete a label. Leave `retro`, `retro-planning` and the release labels alone: `retro`, `retro-planning` and `release` create them when first needed.
 
 ### 5. Check GitHub settings and report
 

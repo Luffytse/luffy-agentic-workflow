@@ -52,3 +52,5 @@ While the plugin was below 1.0.0, a breaking change bumped the minor part instea
 - The plugin's `release` and `setup-dev-skills` text is not changed here; #143 removes versioning policy text from the plugin later, and the Codex manifest goes with #123, so the cut still names both manifests.
 - The project's coordinator instructions describe the hand-out and the re-read until `setup-project` is re-run at the end of Milestone 4.
 - Past changelog entries, which record versions delivered one per pull request, stay as written.
+
+*Amendment note, 2026-11-14, Spec #151.* Removing the Codex packaging is a breaking change: a project that installed the plugin in Codex must do something, because that install stops updating (ADR 0001). The Release that carries Spec #151 is therefore cut as a major version (2.0.0), whatever else it holds. The Codex manifest is gone, so the cut names one manifest, `.claude-plugin/plugin.json`, and the drift check against a synchronized copy, with the `codex-packaging` check, is gone with it.

@@ -5,7 +5,7 @@ The words used in luffy-agentic-workflow, a plugin marketplace: the skills codin
 ## Contexts
 
 - [Packaging](./glossary/packaging.md): the marketplace, plugin, skills, Upstream, Model tier, Shared rule and Base skill
-- [Agent setup](./glossary/agent-setup.md): Agent and Repo labels, `next-release`, the Boundary record and the Door
+- [Agent setup](./glossary/agent-setup.md): Repo labels, `next-release`, the Boundary record and the Door
 - [Building: Milestones and delivery](./glossary/delivery.md): project threads, Milestone, Startup verification, Harness, Worker control, Team lead and what it does when a worker stalls
 - [Building: Releases](./glossary/releases.md): Release, its size, planning, Main check, Ranked list, cut, Triage batch and Release thread
 - [Building: Specs, Tickets and build threads](./glossary/building.md): Spec, Ticket, the build threads and branches, Build check, Implementer and Merging

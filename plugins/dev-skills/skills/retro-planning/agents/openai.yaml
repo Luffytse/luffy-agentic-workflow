@@ -1,5 +1,0 @@
-interface:
-  display_name: "Retro Planning"
-  short_description: "Work through a repository's Retro backlog"
-policy:
-  allow_implicit_invocation: true

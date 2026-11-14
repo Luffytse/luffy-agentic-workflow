@@ -1,5 +1,0 @@
-interface:
-  display_name: "Milestone"
-  short_description: "Plan a Milestone, verify the environment and report"
-policy:
-  allow_implicit_invocation: true

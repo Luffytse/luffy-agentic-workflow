@@ -11,16 +11,16 @@ Read this first, then open only the docs whose line fits your work. Specs and ti
 ## Agent setup
 
 - [docs/dev-skills/issue-tracker.md](issue-tracker.md): this repo's issues live on GitHub, and the commands for each tracker operation the skills use. Read when a skill creates, reads, edits, labels, parks or closes an issue, or merges a pull request.
-- [docs/dev-skills/triage-labels.md](triage-labels.md): the label string for each triage role, the `next-release` and agent-only roles, the Repo labels table and the other labels. Read when applying or filtering triage labels, or before working an issue that carries an agent label.
+- [docs/dev-skills/triage-labels.md](triage-labels.md): the label string for each triage role, the `next-release` role, the Repo labels table and the other labels. Read when applying or filtering triage labels.
 - [docs/dev-skills/domain.md](domain.md): the single-context doc layout and how skills read the glossary and ADRs. Read when a skill looks for domain docs or flags an ADR conflict.
 - [docs/dev-skills/release.md](release.md): the release doc: version sources, versioning policy, Release size, change sizes, cut steps, naming and the whole-Release check. Read when running the `release` skill, raising the version at a cut or giving an issue a release label.
 - [docs/dev-skills/boundaries.md](boundaries.md): this repo's Boundary record: approvals, budget, skill file size limit, check-in interval and Milestone label form. Read when a skill or thread decides whether an action needs the user, or when giving an issue a Milestone label.
-- [Agent setup glossary](glossary/agent-setup.md): Agent and Repo labels, `next-release`, Boundary record and Door. Read when a skill labels an issue or decides who merges.
+- [Agent setup glossary](glossary/agent-setup.md): Repo labels, `next-release`, Boundary record and Door. Read when a skill labels an issue or decides who merges.
 - [docs/dev-skills/upstream-watch.md](upstream-watch.md): the prompt of the Upstream watch, run by hand every 2 weeks, and how its reminder issue works. Read when running or changing the watch.
 
 ## Packaging
 
-- [README.md](../../README.md): Claude Code and Codex marketplace install, update and local-development steps. Read when changing install steps.
+- [README.md](../../README.md): Claude Code marketplace install, update and local-development steps. Read when changing install steps.
 - [LICENSE](../../LICENSE): the MIT license for our own work. Read when asking what the repo's license covers.
 - [dev-skills README](../../plugins/dev-skills/README.md): the plugin's install, update and development steps, folder layout, one line per skill and the last Upstream commit looked at. Read when installing the plugin or adding a skill of our own.
 - [scripts/run-tests.sh](../../scripts/run-tests.sh): the test runner CI runs; it runs every `test*` file under `scripts/` and names each failure ([scripts/test-run-tests.sh](../../scripts/test-run-tests.sh) tests it). Read when pushing a change under `scripts/`.

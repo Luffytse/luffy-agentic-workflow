@@ -37,8 +37,6 @@ Five **state** roles:
 - `ready-for-human`: needs human implementation
 - `wontfix`: will not be actioned
 
-One optional **agent-only** role marks an issue for one coding agent only (the repo's triage-labels doc maps it to one label per agent, and says which agents it has). It is neither a category nor a state role and is not needed for triage to be complete. Apply it when the issue only makes sense for one agent, for example a bug that happens in only one agent; leave it off otherwise, since an issue without it can be taken by any agent. Never apply it when the repo's triage-labels doc has no agent label, and never remove one already there without asking. An agent that sees another agent's label does not work the issue.
-
 **Repo labels** are the labels the repo records for its own kinds of work, in the **Repo labels** table of its triage-labels doc: each a label string with one line saying when it applies. They are not roles, and the labelling rule is written here once; `to-spec`, `to-tickets` and `review-rounds` point to this paragraph. Read the table, and apply each label whose line fits the issue, by your judgement. A label the user named for the issue (in the request, or while planning it) goes on whatever you judge. Never apply a label that is not in the table unless the user named it. Remove a repo label only when you judge it no longer fits the issue, with a one-line comment on the issue saying why, and never remove one the user named. A repo with no table, or an empty one, has no repo labels: apply none, and leave any such label already on an issue as it is.
 
 One **mark** role, `next-release`, says an issue must join the next Release; Release planning takes it and removes the mark. It is neither a category nor a state role. Set it on a `ready-for-agent` issue that is **severe** (a security hole, lost data, or delivery stopped: nothing can merge or ship) or that blocks a **planned feature** (one the Milestone issue lists: the open issue carrying a label in the Boundary record's Milestone label form, or for a batch the one its release issue names). Triage applies no release label.
@@ -47,7 +45,7 @@ An **agent-found enhancement** (an audit, investigation or retro finding: an enh
 
 For a PR, the same states read against the attached code: `ready-for-agent` means a brief is attached and an agent should take the next step on the diff; `ready-for-human` means it's ready for a human to merge.
 
-Every triaged issue should carry exactly one category role and one state role (the agent-only role and the repo labels, when used, come on top of those). If state roles conflict, flag it and ask the maintainer before doing anything else.
+Every triaged issue should carry exactly one category role and one state role (the repo labels, when used, come on top of those). If state roles conflict, flag it and ask the maintainer before doing anything else.
 
 These are canonical role names. The actual label strings used in the issue tracker may differ. The mapping should have been provided to you. If not, tell the user to run `setup-dev-skills`.
 

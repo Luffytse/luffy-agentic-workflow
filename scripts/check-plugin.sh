@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Structural checks of the dev-skills plugin. This repo's own tooling: it lives at the repo root,
 # not in the plugin, so it does not ship in every project's plugin cache.
-# Run from anywhere: scripts/check-plugin.sh (or a symlink to it). Requires python3 for JSON checks.
+# Run from anywhere: scripts/check-plugin.sh (or a symlink to it). Requires python3 for its Python checks.
 #
 # Each check has a short name (the `# name:` comment above its code) and no number, so a new check
 # takes no counter that parallel pull requests could collide on. A check tests structure or a
@@ -12,18 +12,13 @@
 #   skill-layout                 skills/ holds only skill folders, each with a SKILL.md
 #   model-invoked                every skill remains model-loadable; user-menu hiding is allowed
 #   skill-name-matches-folder    each SKILL.md frontmatter name equals its folder name
-#   skill-links                  each relative .md or .yaml link in a SKILL.md points at a file that exists
+#   skill-links                  each relative .md link in a SKILL.md points at a file that exists
 #   plugin-manifest              plugin.json, README.md, CHANGELOG.md and the licence file exist; plugin.json names its repository
-#   codex-packaging              Codex marketplace exposes only dev-skills, with matching manifest identity and shared skills path
 #   release-files                the release skill, its release doc seed and this repo's release doc exist
 #   boundary-files               the Boundary record seed and this repo's Boundary record exist
-#   openai-metadata-present      every skill folder has agents/openai.yaml
-#   codex-implicit-invocation    no agents/openai.yaml turns implicit invocation off
-#   openai-display-name          each agents/openai.yaml display_name reads like its skill's folder name
 #   vendor-model-names           no vendor model name in the repo's text (ADR 0002): Claude, GPT (spaced or hyphenated), o-series (o1, o3, o4-mini) and Gemini names
 #   no-person-names              no person's name in skill or doc text
 #   repo-free-skill-text         skill text names nothing that exists only in this repo
-#   no-agent-label-strings       the plugin names no repo's agent-only label strings (a repo maps the role in its triage-labels.md)
 #   tracker-operation-names      each operation cited as the tracker doc's **Name** or "Name" operation exists as a bold bullet in every issue-tracker seed
 #   worker-reference-sources     each worker-control reference has methods, each method a Source: line with a doc link, each Detect and harness fact bullet a doc link
 #   team-lead-no-harness-detail  team-lead text names no harness tool (no mcp__ name, no `name` a worker-control reference puts in backticks); it calls worker-control
@@ -78,7 +73,7 @@ for d in "$skills"/*/; do
   [ "$fm_name" = "$folder" ] || bad "skill $folder: SKILL.md frontmatter name \"$fm_name\" differs from its folder name"
 done
 
-# skill-links: a relative link in a SKILL.md to a .md or .yaml file points at a file that exists (a skill's
+# skill-links: a relative link in a SKILL.md to a .md file points at a file that exists (a skill's
 # reference files and seeds). Anchors are ignored. Other files' links are examples for the reader, not checked.
 for sm in "$skills"/*/SKILL.md; do
   [ -f "$sm" ] || continue
@@ -87,7 +82,7 @@ for sm in "$skills"/*/SKILL.md; do
     t="${t%%#*}"
     case "$t" in ""|http:*|https:*|mailto:*) continue ;; esac
     [ -e "$dir/$t" ] || bad "$(basename "$dir")/SKILL.md links $t, which does not exist"
-  done < <(grep -oE '\]\([^) ]+\.(md|yaml)(#[^) ]*)?\)' "$sm" | sed -E 's/^\]\(//; s/\)$//')
+  done < <(grep -oE '\]\([^) ]+\.md(#[^) ]*)?\)' "$sm" | sed -E 's/^\]\(//; s/\)$//')
 done
 
 # plugin-manifest: the manifest, README, changelog and licence exist, and the manifest names the repo
@@ -96,46 +91,6 @@ done
 [ -f "$root/README.md" ] || bad "missing README.md"
 [ -f "$root/CHANGELOG.md" ] || bad "missing CHANGELOG.md"
 grep -qE '"repository"[[:space:]]*:[[:space:]]*"https://github.com/[^"/]+/[^"/]+"' "$root/.claude-plugin/plugin.json" 2>/dev/null || bad "plugin.json has no repository field with a GitHub URL"
-
-# codex-packaging: Codex publishes only dev-skills and shares Claude's identity and skill tree.
-# Parse JSON rather than grepping formatting; missing or malformed packaging fails too.
-if ! python3 - "$repo" <<'PYCODE'
-import json
-import pathlib
-import sys
-
-repo = pathlib.Path(sys.argv[1])
-root = repo / "plugins/dev-skills"
-try:
-    def require(condition, message):
-        if not condition:
-            raise ValueError(message)
-
-    claude = json.loads((root / ".claude-plugin/plugin.json").read_text())
-    codex = json.loads((root / ".codex-plugin/plugin.json").read_text())
-    marketplace = json.loads((repo / ".agents/plugins/marketplace.json").read_text())
-    require(codex.get("name") == claude["name"], "Codex manifest name differs from Claude manifest")
-    require(codex.get("version") == claude["version"], "Codex manifest version differs from Claude manifest")
-    def skill_paths(manifest):
-        paths = manifest.get("skills")
-        if isinstance(paths, str):
-            paths = [paths]
-        require(isinstance(paths, list) and paths and all(isinstance(path, str) for path in paths), "manifest skills must name directories")
-        return [path.rstrip("/") for path in paths]
-    require(skill_paths(codex) == skill_paths(claude) == ["./skills"], "Codex and Claude manifests must use the shared ./skills tree")
-    require((root / "skills").is_dir(), "shared skills directory is missing")
-    entries = marketplace["plugins"]
-    require(marketplace["name"] == "luffy-agentic-workflow", "Codex marketplace name differs from luffy-agentic-workflow")
-    require(len(entries) == 1 and entries[0]["name"] == claude["name"], "Codex marketplace must offer only dev-skills")
-    source = entries[0]["source"]
-    require(source == {"source": "local", "path": "./plugins/dev-skills"}, "Codex marketplace must use the shared dev-skills plugin")
-except (AttributeError, KeyError, TypeError, ValueError, OSError) as error:
-    print(f"FAIL: codex-packaging: {error}")
-    sys.exit(1)
-PYCODE
-then
-  bad "codex-packaging failed (see above; requires python3)"
-fi
 
 # release-files: the release skill and the release docs it reads exist (presence only; the skill's text is
 # covered by repo-free-skill-text)
@@ -146,29 +101,6 @@ done
 # boundary-files: the Boundary record seed that setup-dev-skills writes from, and this repo's own record (presence only)
 for f in "$skills/setup-dev-skills/boundaries.md" "$repo/docs/dev-skills/boundaries.md"; do
   [ -f "$f" ] || bad "missing ${f#"$repo"/}"
-done
-
-# openai-metadata-present: every skill folder carries Codex/OpenAI metadata
-for d in "$skills"/*/; do
-  [ -d "$d" ] || continue
-  [ -f "${d}agents/openai.yaml" ] || bad "skill $(basename "$d"): missing agents/openai.yaml"
-done
-
-# codex-implicit-invocation: every skill is implicitly invocable in the Codex/OpenAI metadata too
-if [ -d "$skills" ] && grep -rn --include=openai.yaml 'allow_implicit_invocation: false' "$skills"; then
-  bad "a skill's agents/openai.yaml sets allow_implicit_invocation: false"
-fi
-
-# openai-display-name: a skill's display_name in agents/openai.yaml names the skill. The display_name, lowercased with
-# each run of other characters turned into one hyphen, equals the skill's folder name ("Grill with Docs" is
-# grill-with-docs, "PR" is pr). So a display_name that is another skill's or a built-in skill's name fails.
-for y in "$skills"/*/agents/openai.yaml; do
-  [ -f "$y" ] || continue
-  folder="$(basename "$(dirname "$(dirname "$y")")")"
-  dn="$(sed -n 's/^[[:space:]]*display_name:[[:space:]]*//p' "$y" | head -n 1 | sed -E 's/^["'"'"']//; s/["'"'"'][[:space:]]*$//')"
-  norm="$(printf '%s' "$dn" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g; s/^-//; s/-$//')"
-  [ -n "$dn" ] || bad "skill $folder: agents/openai.yaml has no display_name"
-  [ -z "$dn" ] || [ "$norm" = "$folder" ] || bad "skill $folder: display_name \"$dn\" does not match the skill name (it should read like \"$folder\")"
 done
 
 # vendor-model-names: no vendor model names (Claude, GPT with an optional space or hyphen before its number, o-series such as o1 or o4-mini, Gemini) in the repo's text (ADR 0002): skills name cheap, regular or
@@ -203,26 +135,17 @@ if [ -n "$name_hits" ]; then
 fi
 
 # repo-free-skill-text: skill text leans on nothing that exists only in this repo, because every project that loads
-# the plugin reads it. Under skills/ (*.md and *.yaml): no "ADR NNNN" (this repo's ADR numbers mean another decision,
+# the plugin reads it. Under skills/ (*.md): no "ADR NNNN" (this repo's ADR numbers mean another decision,
 # or nothing, elsewhere), no "Upstream" (this repo's glossary word for Matt Pocock's repo; lowercase "upstream", a
 # fork's parent repo, is fine), no project, repo or maintainer name, and no path of this repo's own tooling or of
 # another plugin. An example docs index line that links its own ADR file ("[ADR 0003](adr/0003-...") is fine.
-hits="$(grep -rnE --include='*.md' --include='*.yaml' 'ADR [0-9]{4}|\bUpstream\b' "$skills" | grep -vE '\[ADR [0-9]{4}\]\(adr/')"
+hits="$(grep -rnE --include='*.md' 'ADR [0-9]{4}|\bUpstream\b' "$skills" | grep -vE '\[ADR [0-9]{4}\]\(adr/')"
 hits="$hits
-$(grep -rniE --include='*.md' --include='*.yaml' 'luffydev|luffytse|luffy-dev|luffy-agentic-workflow|lufei|check-plugin|dai-portal' "$skills")"
+$(grep -rniE --include='*.md' 'luffydev|luffytse|luffy-dev|luffy-agentic-workflow|lufei|check-plugin|dai-portal' "$skills")"
 hits="$(printf '%s\n' "$hits" | grep .)"
 if [ -n "$hits" ]; then
   echo "$hits"
   bad "skill text names something only this repo has (an ADR number, \"Upstream\", a project, repo or person, or this repo's tooling)"
-fi
-
-# no-agent-label-strings: the plugin speaks of the "agent-only" label role, never of one repo's label strings for it
-# (those name particular coding agents and live in each repo's docs/dev-skills/triage-labels.md). Checks the whole plugin tree
-# except CHANGELOG.md, which records releases in this repo's words.
-hits="$(grep -rnE --exclude=CHANGELOG.md '(claude|codex)-only' "$root")"
-if [ -n "$hits" ]; then
-  echo "$hits"
-  bad "plugin text names an agent-only label string (claude-only or codex-only); say the role and let the repo's triage-labels.md map it"
 fi
 
 # tracker-operation-names: skill text that cites an operation of the tracker doc by name

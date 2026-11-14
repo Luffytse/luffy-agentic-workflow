@@ -8,6 +8,8 @@ Amended 2026-11-03 (Spec #555): a section here described restarting a spec on a 
 
 Amended 2026-11-03 (#513): a Ticket that carries another coding agent's agent-only label is built by that agent on the same spec branch, not by the spec thread and not through a pull request to main. The spec thread hands it off with a comment on the Ticket and keeps the spec pull request, its review and its merge; the other agent builds the Ticket off the pushed spec branch, runs its ticket check, squash-merges it into the spec branch and pushes, and the spec thread reads that check instead of repeating it. The spec pull request does not merge until that Ticket has landed or the user drops it. If the spec closed with such a Ticket still open, the spec is reopened and the remaining Tickets reach main through a continuation spec pull request on a spec branch of the same name, recreated from main.
 
+*Amendment note, 2026-11-14, Ticket #154 (Spec #151).* The amendment of 2026-11-03 (#513) above no longer applies: the plugin is Claude Code only for now (ADR 0001), the agent-only label role is gone, and `implement-spec` has no continuation path. Every Ticket of a Spec is built by its Spec thread on the spec branch, and a thread handed one Ticket under a Spec says so and stops.
+
 ## Why
 
 - A live test in a cloud thread (2026-10-29) showed two subagents can each work in their own worktree off a spec branch, commit, and be squash-merged back, in parallel.
