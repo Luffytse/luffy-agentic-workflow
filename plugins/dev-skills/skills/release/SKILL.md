@@ -11,7 +11,7 @@ The user plans the Milestone and its features with `milestone`; everything in th
 
 ## Before you start
 
-Read the repo's **release doc**, `docs/dev-skills/release.md`: its Release name (the name, label and release issue title forms), Release size, changelog path, **cut steps** (with what its versioning policy section adds to them) and whole-Release check. With no release doc, or one missing the name forms or the Release size, tell the user to run `setup-dev-skills`, which writes them, and stop. Read the triage label doc for the label of each role (`ready-for-agent`, `bug`, `enhancement`, `next-release`), and the tracker doc (`docs/dev-skills/issue-tracker.md`) for its traps and its named operations. Work the tracker and pull requests with the tools you already use.
+Read the repo's **release doc**, `docs/dev-skills/release.md`: its Release name (the name, label and release issue title forms), Release size, changelog path, **cut steps** and whole-Release check. With no release doc, or one missing the name forms or the Release size, tell the user to run `setup-dev-skills`, which writes them, and stop. Read the triage label doc for the label of each role (`ready-for-agent`, `bug`, `enhancement`, `next-release`), and the tracker doc (`docs/dev-skills/issue-tracker.md`) for its traps and its named operations. Work the tracker and pull requests with the tools you already use.
 
 The **Milestone** is the one the last release issue's `**Milestone:**` line names, or else the open Milestone issue (the issue `milestone` wrote, carrying a label in the Boundary record's Milestone label form).
 
