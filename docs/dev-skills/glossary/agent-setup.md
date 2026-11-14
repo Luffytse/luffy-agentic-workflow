@@ -16,5 +16,5 @@ A repo's `docs/dev-skills/boundaries.md`, written with the user by `setup-dev-sk
 _Avoid_: permissions file, policy
 
 **Door**:
-How hard a change is to walk back. A **one-way door** is a change that reverting its commits would not fully undo, anything outside git included; a **two-way door** is one a revert does undo. The `pr` skill owns the test and records the call as `**Door:**`; whether a one-way door is an agent merge is the Boundary record's alone, applied by `merging` (ADR 0004; this repo's version bump: ADR 0016).
+How hard a change is to walk back. A **one-way door** is a change that reverting its commits would not fully undo, anything outside git included; a **two-way door** is one a revert does undo. The `pr` skill records the call as `**Door:**`; whether a one-way door is an agent merge is the Boundary record's alone, applied by `merging` (ADR 0004).
 _Avoid_: risk level
