@@ -11,15 +11,23 @@ Usage:
                    [--head <ref>] [--repo <dir>] [--spec <file>] [--standards <file>] [--earlier <file>] [--design <file>]
   review_briefs.py verify [--for round1|later|ticket|fixed] [--round 2|3] [--level ...] --base <ref> --out <dir>
                    [--reports <dir>] [--head <ref>] [--repo <dir>] [--spec <file>] [--earlier <file>] [--design <file>]
+                   [--standards <file>] [--angle <name>] [--fixes-confirmed]
   review_briefs.py disputes --level quick|standard|deep --round 2|3 --base <last Round's head> --out <dir>
-                   --disputes <file> [--head <ref>] [--repo <dir>]
+                   --disputes <file> [--head <ref>] [--repo <dir>] [--spec <file>] [--standards <file>]
+                   [--earlier <file>] [--design <file>] [--angle <name>]
+
+verify and disputes take every option the Round's own kind takes, so the thread passes the Round's arguments again
+unchanged; an option they do not use is accepted and ignored (disputes uses --level, --round, --base, --head, --repo,
+--out and --disputes; verify ignores --standards and --angle).
 
 One subcommand per kind of Round; --base is the ref the Round's diff starts from. round1 writes the briefs for Round 1
 of a review at the level Round 0 picked: the standards and spec Finders at quick; plus the adversarial Finder at
 standard; plus the security Finder at deep (the table in SKILL.md). Without --spec there is no spec Finder.
 
-ticket is a Ticket check, one Quick Round (SKILL.md, Ticket checks): the round1 briefs at quick for the Ticket branch
-(--head) diffed against the Spec branch (--base); the briefs say Ticket check.
+ticket is a Ticket check, one Quick Round (SKILL.md, Ticket checks): it writes finder-ticket.md, the one Ticket-check
+Finder built as later builds its Finder (both the standards and spec Finders' inputs and briefs), for the Ticket branch
+(--head) diffed against the Spec branch (--base); the brief says Ticket check, and its tier is the one in the SKILL.md
+table's Ticket check row. --angle is checked and not used.
 
 fixed is a review since a fixed point, Round 1 only: the round1 briefs for `git diff --merge-base <fixed point>` (the
 working tree counts, as agentic-review gives it) and `git log <fixed point>..HEAD`, with the untracked new files
@@ -29,7 +37,9 @@ later is Round 2 or 3: it writes finder-later.md, the one later-Round Finder doi
 (FINDERS.md, Later-Round Finder): both Finders' inputs and both briefs (the spec brief only with --spec), the diff of
 the pull request's new commits since the last Round's head (the command in SKILL.md's pin step, --base standing for
 <last-head>), the commits first-parent only, and the new-commits sentence from FINDERS.md. At deep it also holds the
-security brief and the spec (DEEP.md). Its tier is the one in the SKILL.md table (premium at deep).
+security brief and the spec (DEEP.md). Its tier is the one in the SKILL.md table (premium at deep). With a non-empty
+--earlier, the later and ticket briefs also carry the request to report each earlier open Finding as fixed or still
+open (FINDERS.md, Later-Round Finder).
 
 disputes is a Round that is the Verifier alone on disputes (VERIFY.md): it writes verifier.md holding the Verifier
 brief, the copy rule, the head, the meaning of Important and the Skip list (from REVIEW.md, as for verify), and the
@@ -42,24 +52,32 @@ the Round is named in the brief). Each Finder brief names the file its Finder wr
 (the Finder also returns the report as its final message; the Finder briefs and the file rule are in FINDERS.md).
 --reports is the directory holding one file per Finder of the Round, named <finder>.md with the Finder as the table in
 SKILL.md names it: standards, spec (only with --spec), adversarial (standard and deep), security (deep); for later, one
-later.md. It defaults to <out>/reports, so the thread passes it only for reports kept elsewhere. A Finder that could not
-write its file said so in its final message, and the thread saves that message there. First every report is checked
+later.md; for ticket, one ticket.md. It defaults to <out>/reports, so the thread passes it only for reports kept elsewhere. A Finder that could not
+write its file said so in its final message, and the thread saves that message there. Then every report is checked
 against the Report format (FINDERS.md): it must hold one or more Findings in the Finding format (a heading and every
 field line of the format) or a line saying nothing found (its first words "nothing found", "no issues found", "no findings found" or "no
 candidates found", any case, optional leading punctuation, then the end of the line or ":", "." or " - " (also an en or
 em dash) and a short explanation), and any notes after the last Finding or the nothing-found line under
-one "## Notes" heading. Any other heading (a section label, "### (a) ...") is refused, as are a second "## Notes" and a
+one "## Notes" heading. Any other heading (a section label, "### (a) ...") is off the format, as are a second "## Notes" and a
 Finding after "## Notes". Notes are not Findings: a report whose only content is nothing found plus notes counts as
 nothing found. A report of a Finder the arguments leave out (spec.md without --spec, adversarial.md at quick) stops the
-script with exit 2 naming it: verify takes the Round's own --level and --spec (and --round, --for). A missing, empty or
-off-format report stops the script (exit 3) with every such Finder named and the rule, and nothing is written; the thread
-asks that Finder again. A passing report goes into the brief byte for byte, in a code fence under a heading naming its
+script with exit 2 naming it: verify takes the Round's own --level and --spec (and --round, --for). Only a missing or
+empty report stops the script (exit 3), with every such Finder named and nothing written; the thread asks that Finder
+again. An off-format report does not stop it: every problem of every such report is collected, the report goes into the
+Verifier's brief as written, a note at the top of the brief names each such Finder and what is off in its report
+(VERIFY.md, Noted reports), and the same warning is printed on stderr. An off-format report counts as a candidate source,
+so a Round whose only report is off-format still writes a brief. Every report goes into the brief byte for byte, in a code fence under a heading naming its
 Finder. The brief also holds the
 Verifier brief, copy rule and Report format (VERIFY.md, FINDERS.md), the Finding format, the Round values, the spec, the design
 answers, the earlier open Findings with their disputes (--earlier), the meaning of Important and the Skip list, and
 only the Always check lines whose name a candidate's Bug class matches (same words, ignoring case and punctuation, or
 one containing the other), with the review-record meaning. When every report is "nothing found" and --earlier is
-absent or empty, no Verifier runs: nothing is written, any old verifier.md is removed, and the output says so. The
+absent or empty, no Verifier runs: nothing is written, any old verifier.md is removed, and the output says so. For
+later and ticket, --fixes-confirmed says the Finder's report gives every earlier open Finding as fixed and none is
+disputed: then a Round whose report raises nothing new (no Finding, not off-format) also writes no brief, though
+--earlier is given. Without it, a non-empty --earlier still sends the Round to a Verifier; with a new candidate the
+brief holds every earlier open Finding from --earlier either way. --fixes-confirmed with round1 or fixed is a usage
+error (exit 2): in Round 1 every earlier open Finding goes to a Verifier. The
 Verifier's tier (premium at Deep) is in the printed line. The brief names <out>/reports/verifier.md for the Verifier's
 report, as each Finder brief names its file.
 
@@ -79,7 +97,7 @@ replaces the finder-*.md (verify and disputes: verifier.md) files already there,
 The verify and disputes briefs also name <out>/reports/verifier.md as the file the Verifier writes its report to (it also
 returns it); a verify or disputes run removes an old verifier.md report there. It calls only `git`.
 
-Exit 0 written, 2 usage error, 3 a section could not be found or a Finder report is missing, empty or off-format (verify). Prints one line per file: file, role, tier.
+Exit 0 written, 2 usage error, 3 a section could not be found or a Finder report is missing or empty (verify; an off-format report exits 0 with a warning). Prints one line per file: file, role, tier.
 """
 import argparse
 import fnmatch
@@ -192,6 +210,10 @@ class Rules:
         if not m:
             raise MissingSection("earlier-Findings line")
         self.earlier_line = m.group(1)
+        m = re.search(r'^When earlier open Findings are passed in, .*? get: "(.*)"$', finders, re.M)
+        if not m:
+            raise MissingSection("fixed-or-still-open request")
+        self.fixed_or_open = m.group(1)
         self.format = section(finders, "## Finding format", "Finding format")
         self.report_format = section(finders, "## Report format", "Report format")
         self.report_file = quoted(finders, "Report file", "report file rule")
@@ -226,6 +248,7 @@ class Rules:
         verify = read_skill_file("review-rounds/VERIFY.md")
         self.verifier_brief = quoted(verify, "Brief", "Verifier brief")
         self.verifier_report_file = quoted(verify, "Report file", "Verifier report file rule")
+        self.noted_reports = quoted(verify, "Noted reports", "Verifier note on off-format reports")
         if "<report path>" not in self.verifier_report_file:
             raise MissingSection("path place in the Verifier report file rule")
         m = re.search(r"on the (cheap|regular|premium) tier \((cheap|regular|premium) at Deep\)", verify)
@@ -251,6 +274,11 @@ class Rules:
         if not m:
             raise MissingSection("tier of the later-Round Finder")
         self.later_tiers = m.groups()
+        row = re.search(r"^\| Ticket check[^\n]*$", skill, re.M)
+        m = row and re.search(r"Finder[^|]*\((cheap|regular|premium)\)", row.group(0))
+        if not m:
+            raise MissingSection("tier of the Ticket-check Finder")
+        self.ticket_tier = m.group(1)
         self.tiers = {
             "standards": tier(finders, "## Standards Finder", "Standards Finder"),
             "spec": tier(finders, "## Spec Finder", "Spec Finder"),
@@ -500,7 +528,7 @@ def build_round1(rules, a):
     std_parts.append(spec_part)
 
     files = {}
-    if rv.kind == "later":
+    if rv.kind in ("later", "ticket"):
         # One Finder does the standards and spec Finders' work: both inputs and both briefs, (a) to (d) of each.
         text = "Do the work of both briefs below on this Round's diff.\n\n## Standards Finder brief\n\n" \
                + drop_items(rules.standards_brief, keep)
@@ -509,7 +537,10 @@ def build_round1(rules, a):
         parts = list(std_parts)
         if a.level == "deep":
             text += "\n\n## Security Finder brief\n\n" + rules.security_brief
-        files["finder-later.md"] = ("later", brief("Later-Round Finder brief", text, *parts, finder="later"))
+        if earlier and earlier.strip():
+            text += "\n\n## Earlier open Findings: fixed or still open\n\n" + rules.fixed_or_open
+        title = "Later-Round Finder brief" if rv.kind == "later" else "Ticket-check Finder brief"
+        files["finder-%s.md" % rv.kind] = (rv.kind, brief(title, text, *parts, finder=rv.kind))
         return out, files, rv
     roles = ROLES[a.level]
     if "standards" in roles:
@@ -542,6 +573,8 @@ def write_finders(rules, args):
         if role == "later":
             tier_name = rules.later_tiers[1 if args.level == "deep" else 0]
             print("%s\tlater-Round Finder\t%s tier" % (out / name, tier_name))
+        elif role == "ticket":
+            print("%s\tTicket-check Finder\t%s tier" % (out / name, rules.ticket_tier))
         else:
             print("%s\t%s Finder\t%s tier" % (out / name, role, rules.tiers[role]))
 
@@ -568,7 +601,7 @@ def later(args):
 
 # ---- the Verifier brief ----
 
-FINDERS_ALL = ("standards", "spec", "adversarial", "security", "later")
+FINDERS_ALL = ("standards", "spec", "adversarial", "security", "later", "ticket")
 NOTES = re.compile(r"^## Notes\s*$")
 NOTES_RULE = ("the Report format (FINDERS.md): Findings only, each under its own Finding heading, and any notes after "
               "the last Finding under one '## Notes' heading, with no other heading")
@@ -580,32 +613,34 @@ def has_findings(rules, text):
     return any(level == rules.format_level for _i, level, _l in headings(text))
 
 
-def report_problem(rules, text):
-    """Why a Finder's report is neither Findings in the Report format nor "nothing found"; None when it is one."""
-    if not text.strip():
-        return "it is empty"
+def report_problems(rules, text):
+    """Every way a non-empty Finder report is neither Findings in the Report format nor "nothing found"; [] when it is
+    one. Every problem is listed, not only the first."""
+    problems = []
     lines = text.splitlines()
     hs = headings(text)
     notes = [i for i, _l, line in hs if NOTES.match(line)]
     for i, level, line in hs:
         if level != rules.format_level and not NOTES.match(line):
-            return "heading '%s' is neither a Finding nor '## Notes'; see %s" % (line.strip(), NOTES_RULE)
+            problems.append("heading '%s' is neither a Finding nor '## Notes'" % line.strip())
     if len(notes) > 1:
-        return "it has %d '## Notes' headings; see %s" % (len(notes), NOTES_RULE)
+        problems.append("it has %d '## Notes' headings" % len(notes))
     found = [(i, line) for i, level, line in hs if level == rules.format_level]
-    if notes and any(i > notes[0] for i, _line in found):
-        return "a Finding comes after '## Notes'; see %s" % NOTES_RULE
+    if notes:
+        for i, line in found:
+            if i > notes[0]:
+                problems.append("Finding '%s' comes after '## Notes'" % line.lstrip("# ").strip())
     if not found:
-        if any(NOTHING.match(line) for line in lines[:notes[0] if notes else len(lines)]):
-            return None
-        return "it has no Finding heading and has no line starting with \"nothing found\" (optionally followed by ':', '.' or ' - ' and a short explanation); see %s" % NOTES_RULE
+        if not any(NOTHING.match(line) for line in lines[:notes[0] if notes else len(lines)]):
+            problems.append("it has no Finding heading and has no line starting with \"nothing found\" (optionally "
+                            "followed by ':', '.' or ' - ' and a short explanation)")
     ends = sorted(i for i, _l, _line in hs)
     for i, line in found:
         block = lines[i + 1:next((j for j in ends if j > i), len(lines))]
         for f in rules.format_fields:
             if not any(re.match(r"^- %s(?: \([^)]*\))?:" % re.escape(f), b) for b in block):
-                return "Finding '%s' has no '%s' line; see %s" % (line.lstrip("# ").strip(), f, NOTES_RULE)
-    return None
+                problems.append("Finding '%s' has no '%s' line" % (line.lstrip("# ").strip(), f))
+    return problems
 
 
 def words(s):
@@ -649,29 +684,39 @@ def build_verify(rules, a):
     if not rdir.is_dir():
         raise Usage("the reports directory %s does not exist; the Finders write their reports there (or pass "
                     "--reports)" % rdir)
-    finders = ["later"] if a.kind == "later" else [r for r in ROLES[a.level] if r != "spec" or spec is not None]
-    extra = sorted(f for f in ("standards", "spec", "adversarial", "security", "later")
+    finders = [a.kind] if a.kind in ("later", "ticket") else [r for r in ROLES[a.level] if r != "spec" or spec is not None]
+    extra = sorted(f for f in FINDERS_ALL
                    if f not in finders and (rdir / (f + ".md")).exists())
     if extra:
         raise Usage("--reports holds %s, but this Round's arguments list no such Finder; repeat the Round's own "
                     "--level and --spec (and --round, --for) here" % ", ".join(f + ".md" for f in extra))
-    reports, problems = {}, []
+    reports, missing, noted = {}, [], {}
     for f in finders:
         text = read_report(rdir / (f + ".md"))
-        why = "there is no report file %s.md" % f if text is None else report_problem(rules, text)
-        if why:
-            problems.append("%s Finder: %s" % (f, why))
+        if text is None:
+            missing.append("%s Finder: there is no report file %s.md" % (f, f))
+        elif not text.strip():
+            missing.append("%s Finder: its report is empty" % f)
         else:
             reports[f] = text
-    if problems:
-        raise BadReports("; ".join(problems))
-    raised = [t for t in reports.values() if has_findings(rules, t)]
-    if not raised and not (earlier and earlier.strip()):
-        return rv.out, None
+            problems = report_problems(rules, text)
+            if problems:
+                noted[f] = problems
+    if missing:
+        raise BadReports("; ".join(missing))
+    # an off-format report is passed on as written, so it counts as raising candidates: the Verifier reads it
+    raised = [t for f, t in reports.items() if f in noted or has_findings(rules, t)]
+    still_open = bool(earlier and earlier.strip()) and not a.fixes_confirmed
+    if not raised and not still_open:
+        return rv.out, None, noted
     classes = [m.group(1) for t in raised for m in re.finditer(r"^- Bug class:[ \t]*(.*)$", t, re.M)]
     lines = [text for text, _globs in rv.always if named_by(text, classes)]
+    note = []
+    if noted:
+        note = ["## Reports off the Report format\n\n" + rules.noted_reports + "\n\n" + "\n".join(
+            "- %s Finder: %s" % (f, "; ".join(ps)) for f, ps in noted.items())]
     parts = [
-        "# Verifier brief", rules.verifier_brief,
+        "# Verifier brief", *note, rules.verifier_brief,
         "## This Round\n\n" + rv.label,
         rv.diff_part, rv.important_part, rv.skip_part,
         "## The spec, the earlier open Findings and the design answers",
@@ -688,7 +733,7 @@ def build_verify(rules, a):
     ]
     for f in finders:
         parts.append("### Report of the %s Finder\n\n%s" % (f, raw_fence(reports[f])))
-    return rv.out, "\n\n".join(parts) + "\n"
+    return rv.out, "\n\n".join(parts) + "\n", noted
 
 
 def verify(args):
@@ -700,13 +745,24 @@ def verify(args):
     elif args.level is None:
         raise Usage("--level is required")
     args.round = args.round if args.kind == "later" else 1
+    if args.fixes_confirmed and args.kind not in ("later", "ticket"):
+        raise Usage("--fixes-confirmed is for --for later or ticket only: in Round 1 every earlier open Finding goes "
+                    "to a Verifier")
     rules = Rules()
-    out, text = build_verify(rules, args)
+    out, text, noted = build_verify(rules, args)
     out.mkdir(parents=True, exist_ok=True)
     (out / "verifier.md").unlink(missing_ok=True)
     drop_stale_verifier_report(out)
+    if noted:
+        print("review_briefs.py: warning, off the Report format, passed to the Verifier as written with a note (%s): %s"
+              % (NOTES_RULE, "; ".join("%s Finder: %s" % (f, "; ".join(ps)) for f, ps in noted.items())),
+              file=sys.stderr)
     if text is None:
-        print("no Verifier runs: every Finder reported nothing found and no earlier Finding is open; nothing written")
+        if args.fixes_confirmed and args.earlier:
+            print("no Verifier runs: the Finder found nothing new and confirmed every earlier open Finding fixed, "
+                  "none disputed; nothing written")
+        else:
+            print("no Verifier runs: every Finder reported nothing found and no earlier Finding is open; nothing written")
         return
     (out / "verifier.md").write_bytes(text.encode("utf-8", "surrogateescape"))
     print("%s\tVerifier\t%s tier" % (out / "verifier.md", rules.verifier_tiers[1 if args.level == "deep" else 0]))
@@ -787,11 +843,18 @@ def main(argv):
     vf.add_argument("--spec", help="the Round's own --spec file; pass it when the Round had a spec Finder")
     vf.add_argument("--earlier", help="a file of the earlier open Findings with their disputes")
     vf.add_argument("--design", help="a file of the design answers")
+    vf.add_argument("--fixes-confirmed", action="store_true",
+                    help="later and ticket only: the Finder's report gives every earlier open Finding as fixed and none "
+                         "is disputed; with no new candidate, no Verifier runs")
+    vf.add_argument("--standards", help="accepted and ignored: the Round's own option, so the Round's arguments repeat unchanged")
+    vf.add_argument("--angle", help="accepted and ignored: the Round's own option, so the Round's arguments repeat unchanged")
     vf.set_defaults(run=verify)
     dp = sub.add_parser("disputes", help="the Verifier-alone Round: a Verifier brief of the disputes, the meaning of Important and the Skip list")
     common(dp, base_help="the last Round's head")
     dp.add_argument("--round", type=int, choices=(2, 3), default=2, help="the Round number")
     dp.add_argument("--disputes", required=True, help="a file of the disputed Findings and their disputes")
+    for opt in ("--spec", "--standards", "--earlier", "--design", "--angle"):
+        dp.add_argument(opt, help="accepted and ignored: the Round's own option, so the Round's arguments repeat unchanged")
     dp.set_defaults(run=disputes)
     args = p.parse_args(argv)
     try:
@@ -802,7 +865,8 @@ def main(argv):
         print("review_briefs.py: %s" % e, file=sys.stderr)
         return 2
     except BadReports as e:
-        print("review_briefs.py: ask these Finders again, nothing was written: %s" % e, file=sys.stderr)
+        print("review_briefs.py: ask these Finders again (a missing or empty report), nothing was written: %s" % e,
+              file=sys.stderr)
         return 3
     except MissingSection as e:
         print("review_briefs.py: could not find %s in the skill files; nothing was written" % e, file=sys.stderr)

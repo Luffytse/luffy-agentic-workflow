@@ -18,15 +18,15 @@ One review of a change by the `agentic-review` skill: **Round 0** sizes it, and 
 The step, run by the top-level session itself before any agent starts, that sizes a Review: it picks the **Review level** with a one-line reason and records it. At None that line is the whole review comment. Owned by `agentic-review`.
 
 **Review level**:
-How much review a change gets, picked by Round 0: **None** (the project's checks only), **Quick** (text that does not change what a rule or code does), **Standard** (everything else, the default) or **Deep** (what the Boundary record or `REVIEW.md` marks risky, or the user asks). `REVIEW.md` may name a project's own paths per level; what each level covers is `agentic-review`'s. Older records call it the Review depth.
+How much review a change gets, picked by Round 0: **None** (the project's checks only), **Quick** (text that does not change what a rule or code does, and a change that touches only prose docs; skills, `CLAUDE.md`, `AGENTS.md`, `REVIEW.md` and decision records stay Standard), **Standard** (everything else, the default) or **Deep** (what the Boundary record or `REVIEW.md` marks risky, or the user asks). `REVIEW.md` may name a project's own paths per level; what each level covers is `agentic-review`'s. Older records call it the Review depth.
 _Avoid_: depth, mode
 
 **Round**:
-One pass of Find, Verify and Rank over a pull request, its one comment, and the fix commits after it; a pull request gets at most 3. **Round 1** reviews the whole pull request; **Rounds 2 and 3** review only its new commits. A Round is **clean** when no Important is open after its Verify step, which means ready to merge. Owned by `review-rounds` (ADR 0003).
+One pass of Find, Verify and Rank over a pull request, its one comment, and the fix commits after it; a pull request gets at most 3. **Round 1** reviews the whole pull request; **Rounds 2 and 3** review only its new commits. A Round is **clean** when no Important is open after its Verify step (or, when no Verifier ran, after the Finder's report), which means ready to merge. Owned by `review-rounds` (ADR 0003).
 _Avoid_: pass, iteration
 
 **After-Round-3 sort**:
-What happens when Round 3 is not clean: a premium-tier agent turns each open Important into a bug Ticket or dismisses it with a reason, open Nits are dropped, and the pull request is ready to merge. Owned by `review-rounds`.
+What happens when Round 3 is not clean: a premium-tier agent turns each open Important into a bug Ticket or dismisses it with a reason, open Nits are dropped, and the pull request is ready to merge. Each bug Ticket carries a `Joins the running Release:` line (`severe`, `blocks #<n>`, `breaks an acceptance criterion of #<n>` or `no`); the thread reports each Ticket to its caller and builds none. Owned by `review-rounds`.
 
 **Dispute**:
 An owner's written case, with evidence (`file:line`, a command and its output), that a Finding is wrong, in place of a fix. The next Round's Verifier decides it (`review-rounds`).
@@ -46,15 +46,15 @@ _Avoid_: Round (for a batch of questions)
 A short file at a repo's root telling reviewers what Important means there, what to skip, what to always check (the **Always check** lines, each a Bug class earlier reviews caught) and optionally its own Review levels. The line form is `review-record`'s.
 
 **Finder**:
-A reviewer agent that looks for problems and reports candidate Findings, as a Markdown report in the **Report format** (Findings, then any notes under one `## Notes` heading), written to the file its brief names. Its kinds are the **standards Finder** and **spec Finder** (from Upstream), the **adversarial Finder**, the premium **security Finder** and the **later-Round Finder**; which run at each level and Round is `review-rounds`'.
+A reviewer agent that looks for problems and reports candidate Findings, as a Markdown report in the **Report format** (Findings, then any notes under one `## Notes` heading), written to the file its brief names; a report off that format goes to the Verifier with a note, and the Finder is asked again only when its report is missing or empty. Its kinds are the **standards Finder** and **spec Finder** (from Upstream), the **adversarial Finder**, the premium **security Finder**, the **later-Round Finder** and a Ticket check's one **Ticket-check Finder**, the last two doing the standards and spec work in one and reporting each earlier open Finding as fixed or still open; which run at each level and Round is `review-rounds`'.
 _Avoid_: reviewer (too broad), scanner
 
 **Brief script**:
-`review_briefs.py`, in the `review-rounds` folder: it writes each Round's Finder and Verifier briefs, one complete Markdown file per agent, cut from the skill's brief files, and its `verify` checks each Finder's report against the **Report format**. How the briefs are handed out, or built by hand when it cannot run, is `review-rounds`'.
+`review_briefs.py`, in the `review-rounds` folder: it writes each Round's Finder and Verifier briefs, one complete Markdown file per agent, cut from the skill's brief files, and its `verify` checks each Finder's report against the **Report format**, passing an off-format report to the Verifier as written with a note and a warning, and stopping only for a missing or empty one. How the briefs are handed out, or built by hand when it cannot run, is `review-rounds`'.
 _Avoid_: brief builder
 
 **Verifier**:
-The one agent per Round that checks each candidate Finding, and each open Finding with any dispute of it, against the code, keeps only what it confirmed and makes the final call on it. When it is skipped and its tier are `review-rounds`'.
+The one agent per Round that checks each candidate Finding, and each open Finding with any dispute of it, against the code, keeps only what it confirmed and makes the final call on it. Round 1 sends it any candidate, a proposed Nit included; in Rounds 2 and 3 and a Ticket check it runs only on a new candidate, an earlier Finding reported still open or left out, or a dispute, and otherwise the Finder's report stands. The exact rule and its tier are `review-rounds`'.
 _Avoid_: judge, triage agent
 
 **Finding**:

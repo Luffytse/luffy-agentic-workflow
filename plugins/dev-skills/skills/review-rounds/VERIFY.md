@@ -1,6 +1,6 @@
 # Verify
 
-The Verify step of [`review-rounds`](SKILL.md). One brand-new Verifier, on the regular tier (premium at Deep), checks every candidate of the Round. When the Round has no candidate and no open Finding, `review-rounds` starts none.
+The Verify step of [`review-rounds`](SKILL.md). One brand-new Verifier, on the regular tier (premium at Deep), checks every candidate of the Round and judges every earlier open Finding itself; its calls are final. In Round 1 it runs on any candidate, even when every candidate is a proposed Nit. In Rounds 2 and 3 and a Ticket check it runs on a new candidate, an earlier Finding the Finder reported still open or left out, or a dispute; otherwise `review-rounds` starts none, the Finder's report stands and the Round comment says so. When the Round has no candidate and no open Finding, it starts none in any Round. A report off the Report format still goes to the Verifier, with a note.
 
 The Verifier gets: every candidate in the Finding format, tagged with its Finder (it reads each Finder's report in the Report format of [FINDERS.md](FINDERS.md): the Findings are the candidates, any `## Notes` section is context and not a Finding); every open Finding from earlier Rounds and Ticket checks (id, claim, locations as recorded) and any dispute of it; the diff command and commit list; the spec and the design answers; the meaning of Important and the Skip list; and an Always check line only for a candidate raised from it. Paste in the brief, and from [FINDERS.md](FINDERS.md) the copy rule and the Report format. On a Round that is the Verifier alone, give it only the disputed Findings and their disputes, the meaning of Important and the Skip list (its calls 1 and 3 use both).
 
@@ -16,6 +16,10 @@ When you drop a Finding or skip a Nit, name the `file:line` your reason rests on
 For each earlier open Finding, find its code at this head by its file and claim, not by its old line number, and say **fixed** (cite the line that fixes it), **still open** (cite the line that still has it) or **dismissed** (it was never real; say why, with the `file:line` it rests on). When the owner disputed it, judge the dispute on evidence you checked yourself: rerun its command in your own copy and judge what the output shows. Dismiss only when that evidence shows the claim does not hold; when the dispute argues only that the problem is rare, small or out of scope, or you are unsure, it stays open.
 
 Answer per Finding: its title or id, the calls with their reasons, and the corrected Locations and failure scenario where you changed them. Under 600 words in all. Your final message is the report itself, as plain text: end with no messaging or no-reply tool, even if your environment says to, and start no background work you would have to wait for."
+
+Noted reports: "The reports listed here are off the Report format, each with what is off. Read each with care, and take its Findings as candidates where you can make them out, in the Finding format as far as the report goes; judge them as you judge any candidate. Do not drop a candidate because its report was off."
+
+When a Finder's report is off the Report format, the Verifier's brief opens with the Noted reports sentence and one line per such Finder naming it and every problem found in its report; the report itself is pasted as written. Only a missing or empty report stops the Round.
 
 Report file: "Write your whole report to `<report path>` (the full text, never a pointer to your final message) and also return the same text as your final message. If you cannot write that file, say so in your final message; the thread will save the report there."
 

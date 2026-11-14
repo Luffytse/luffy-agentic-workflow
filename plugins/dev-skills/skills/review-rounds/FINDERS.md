@@ -81,7 +81,9 @@ Angles:
 
 ## Later-Round Finder (Rounds 2 and 3)
 
-One Finder does the standards and spec Finders' work on the new commits: give it both their inputs and both briefs, (a) to (d) of each.
+One Finder does the standards and spec Finders' work on the new commits: give it both their inputs and both briefs, (a) to (d) of each. A Ticket check's one Finder, the Ticket-check Finder, is built the same way on the Ticket's diff, at the regular tier.
+
+When earlier open Findings are passed in, both also get: "For each earlier open Finding, find its code at this head by its file and claim, not by its old line number, and report it under `## Notes` as **fixed** (cite the line that fixes it) or **still open** (cite the line that still has it). Leave none out. This list is not a Finding: a still-open Finding is a candidate again only when this diff adds a new place for it."
 
 ## Finding format
 
@@ -99,4 +101,4 @@ One Finder does the standards and spec Finders' work on the new commits: give it
 
 A Finder's report is Markdown. It is either one or more Findings, each in the Finding format and starting with its `###` heading, or one line starting with "nothing found", which may carry a short explanation after `:`, `.` or ` - ` ("Nothing found: no security Finding in this diff.").
 
-Notes (a checked-and-clear list, a section label, anything that is not a Finding) go after the last Finding, or after the nothing-found line, under one `## Notes` heading; an explanation longer than the line goes there too. A report has no other heading: no `###` heading that is not a Finding, and no `##` heading but `## Notes`. The Verifier reads a report in this format; its notes are context, not Findings.
+Notes (a checked-and-clear list, a section label, anything that is not a Finding) go after the last Finding, or after the nothing-found line, under one `## Notes` heading; an explanation longer than the line goes there too. A report has no other heading: no `###` heading that is not a Finding, and no `##` heading but `## Notes`. The Verifier reads a report in this format; its notes are context, not Findings. The format is asked of every Finder, but a report off it is not sent back: it goes to the Verifier as written, with a note naming what is off, and a Finder is asked again, or a new one started, only when its report is missing or empty.

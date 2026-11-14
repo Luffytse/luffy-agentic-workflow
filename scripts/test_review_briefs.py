@@ -589,6 +589,7 @@ class Boundaries(Base):
 
 FORMAT_FIELDS = re.findall(r"^- ([^:(]+?)(?: \([^)]*\))?:", FORMAT, re.M)
 VERIFIER_BRIEF = quoted(VERIFY := (REVIEW_ROUNDS / "VERIFY.md").read_text(), "Brief")
+NOTED_REPORTS = quoted(VERIFY, "Noted reports")
 VERIFIER_TIERS = re.search(r"on the (cheap|regular|premium) tier \((cheap|regular|premium) at Deep\)", VERIFY).groups()
 
 
@@ -683,9 +684,8 @@ class VerifierBrief(Base):
                 self.assertIn("Verifier", line)
                 self.assertIn(want, line)
 
-    def test_missing_empty_and_off_format_reports_each_stop_and_are_all_named(self):
-        bad = {"missing": None, "empty": "", "blank": "  \n\n", "prose": "Looks fine to me, no problems.\n",
-               "partial": "### A title\n- Severity (proposed): Nit\n", "no-heading": "- Bug class: x\n- Locations: a:1\n"}
+    def test_missing_and_empty_reports_each_stop_and_are_all_named(self):
+        bad = {"missing": None, "empty": "", "blank": "  \n\n"}
         for kind, text in bad.items():
             with self.subTest(kind=kind):
                 s = self.scratch()
@@ -699,7 +699,7 @@ class VerifierBrief(Base):
                 self.assertEqual(s.files(), [])
         s = self.scratch()
         reports = self.all_clear("deep")
-        reports.update({"standards": None, "spec": "", "security": "prose only\n"})
+        reports.update({"standards": None, "spec": "", "security": "  \n"})
         r = self.verify(s, reports, level="deep")
         self.assertEqual(r.returncode, 3)
         for name in ("standards", "spec", "security"):
@@ -707,7 +707,96 @@ class VerifierBrief(Base):
         self.assertNotIn("adversarial", r.stderr)
         self.assertEqual(s.files(), [])
 
-    def test_plain_nothing_found_variants_are_accepted_and_prose_is_not(self):
+    def assertNoted(self, text, finder, what, others=None):
+        """Run verify with `text` as the `finder` report: it exits 0, writes the brief with the report carried byte
+        for byte and a note at its top naming the Finder and `what`, and prints the same warning."""
+        s = self.scratch()
+        reports = self.all_clear()
+        reports.update(others or {})
+        reports[finder] = text
+        r = self.verify(s, reports)
+        self.ok(r)
+        brief = (s.out / "verifier.md").read_text()
+        self.assertIn(text, brief)
+        top = brief[:brief.index(VERIFIER_BRIEF)]
+        self.assertIn(finder, top)
+        self.assertIn(what, top)
+        self.assertIn(NOTED_REPORTS, top)
+        self.assertIn(finder, r.stderr)
+        self.assertIn(what, r.stderr)
+        return r, s
+
+    def test_an_off_format_report_goes_on_with_a_note_and_a_warning_in_each_off_format_case(self):
+        for kind, text, what in (
+                ("field", finding("First", "x").replace("- Evidence: X-Evidence value\n", ""), "Evidence"),
+                ("label", "### (a) Documented standards\n\n" + finding("First", "x"), "(a) Documented standards"),
+                ("two-notes", finding("First", "x") + "\n## Notes\n\na\n\n## Notes\n\nb\n", "2 '## Notes'"),
+                ("after-notes", finding("First", "x") + "\n## Notes\n\na\n\n" + finding("Late", "y"), "after '## Notes'")):
+            with self.subTest(kind=kind):
+                self.assertNoted(text, "standards", what)
+
+    def test_a_report_with_several_problems_has_all_of_them_in_the_note_and_two_bad_reports_are_both_named(self):
+        text = ("### (a) First label\n\n" + finding("One", "x").replace("- Evidence: X-Evidence value\n", "")
+                + "\n## Notes\n\na\n\n## Notes\n\nb\n\n" + finding("Late", "y"))
+        r, s = self.assertNoted(text, "standards", "(a) First label",
+                                others={"adversarial": "Looks fine to me.\n"})
+        top = (s.out / "verifier.md").read_text()
+        top = top[:top.index(VERIFIER_BRIEF)]
+        for what in ("Evidence", "2 '## Notes'", "after '## Notes'", "adversarial"):
+            self.assertIn(what, top)
+            self.assertIn(what, r.stderr)
+
+    def test_a_clean_round_has_no_note_and_an_off_format_report_alone_still_gets_a_verifier(self):
+        s = self.scratch()
+        reports = self.all_clear()
+        reports["standards"] = finding("First", "x")
+        self.ok(self.verify(s, reports))
+        self.assertNotIn(NOTED_REPORTS, (s.out / "verifier.md").read_text())
+        r, s = self.assertNoted("Looks fine to me.\n", "standards", "nothing found")  # no Finding, yet a brief is written
+        self.assertTrue((s.out / "verifier.md").exists())
+
+    def test_verify_and_disputes_accept_the_full_option_list_of_the_rounds_own_kind(self):
+        kinds = {  # the Round's own kind -> the options its briefs take (--level not for ticket)
+            "round1": ["--level", "standard", "--spec", "S", "--standards", "ST", "--earlier", "E", "--design", "D",
+                       "--angle", "Bugs and edge cases"],
+            "later": ["--level", "standard", "--round", "2", "--spec", "S", "--standards", "ST", "--earlier", "E",
+                      "--design", "D"],
+            "ticket": ["--spec", "S", "--standards", "ST", "--earlier", "E", "--design", "D", "--angle",
+                       "Bugs and edge cases"],
+            "fixed": ["--level", "standard", "--spec", "S", "--standards", "ST", "--earlier", "E", "--design", "D",
+                      "--angle", "Bugs and edge cases"],
+        }
+        for kind, opts in kinds.items():
+            with self.subTest(sub="verify", kind=kind):
+                s = self.scratch()
+                names = {"S": s.spec, "ST": s.standards, "E": s.earlier, "D": s.design}
+                opts = [str(names.get(o, o)) for o in opts]
+                rdir = s.root / "reports"
+                rdir.mkdir()
+                (rdir / ("%s.md" % kind if kind in ("later", "ticket") else "standards.md")).write_text(
+                    finding("First", "x"))
+                if kind in ("round1", "fixed"):
+                    (rdir / "spec.md").write_text("Nothing found.\n")
+                    if kind in ("round1", "fixed"):
+                        (rdir / "adversarial.md").write_text("Nothing found.\n")
+                r = run_cmd(s, "verify", "--for", kind, "--base", "main", "--reports", rdir, *opts)
+                self.ok(r)
+            with self.subTest(sub="disputes", kind=kind):
+                s = self.scratch()
+                names = {"S": s.spec, "ST": s.standards, "E": s.earlier, "D": s.design}
+                d = s.write_at(s.root / "disputes.md", "R1-2: wrong.\nDispute: it holds.\n")
+                own = {"--level", "--round"}  # disputes takes --level and --round itself; the rest must be accepted
+                rest, i = [], 0
+                while i < len(kinds[kind]):
+                    if kinds[kind][i] in own:
+                        i += 2
+                        continue
+                    rest += [kinds[kind][i], str(names.get(kinds[kind][i + 1], kinds[kind][i + 1]))]
+                    i += 2
+                r = run_cmd(s, "disputes", "--level", "standard", "--round", 2, "--base", "main", "--disputes", d, *rest)
+                self.ok(r)
+
+    def test_plain_nothing_found_variants_are_accepted_and_prose_is_noted(self):
         for text in ("No issues found.\n", "no findings found\n", "  No candidates found!  \n", "NOTHING FOUND\n",
                      "Reviewed the diff.\n\nNo issues found\n"):
             with self.subTest(text=text):
@@ -719,13 +808,7 @@ class VerifierBrief(Base):
                 self.assertRegex(r.stdout.lower(), r"no verifier")
         for text in ("I found no issues in this diff.\n", "No issues found in the parser, but the cache is wrong.\n"):
             with self.subTest(text=text):
-                s = self.scratch()
-                reports = self.all_clear()
-                reports["standards"] = text
-                r = self.verify(s, reports)
-                self.assertEqual(r.returncode, 3)
-                self.assertIn("standards", r.stderr)
-                self.assertIn("nothing found", r.stderr)
+                self.assertNoted(text, "standards", "nothing found")
 
     def test_nothing_found_line_may_carry_a_short_explanation_after_a_separator(self):
         for text in ("nothing found\n",
@@ -742,20 +825,13 @@ class VerifierBrief(Base):
                 self.ok(r)
                 self.assertRegex(r.stdout.lower(), r"no verifier")
 
-    def test_a_report_without_a_finding_or_a_line_starting_with_nothing_found_is_still_refused(self):
+    def test_a_report_without_a_finding_or_a_line_starting_with_nothing_found_is_noted(self):
         for text in ("## Notes\n\n- checked the parser\n", "Reviewed the diff.\n\nAll fine.\n",
                      "I found nothing found-like in this diff.\n", "Result: nothing found\n",
                      "Nothing found-like in this diff.\n", "Nothing found here, the cache is wrong.\n",
                      "Reviewed.\n\n## Notes\n\nNothing found: clear\n"):
             with self.subTest(text=text):
-                s = self.scratch()
-                reports = self.all_clear()
-                reports["standards"] = text
-                r = self.verify(s, reports)
-                self.assertEqual(r.returncode, 3)
-                self.assertIn("standards", r.stderr)
-                self.assertIn("nothing found", r.stderr)
-                self.assertEqual(s.files(), [])
+                self.assertNoted(text, "standards", "nothing found")
 
     def test_a_report_of_a_finder_the_arguments_leave_out_is_refused_and_named(self):
         s = self.scratch()
@@ -787,7 +863,7 @@ class VerifierBrief(Base):
                     first, _, rest = e.partition("\n")
                     self.assertTrue(re.search(r"\S\s{2,}\S", first) or rest.strip(), "no help: " + first)
 
-    def test_a_good_report_next_to_one_bad_report_writes_nothing(self):
+    def test_a_good_report_next_to_an_empty_report_writes_nothing(self):
         s = self.scratch()
         reports = self.all_clear()
         reports["standards"] = finding("First", "unescaped input")
@@ -798,13 +874,8 @@ class VerifierBrief(Base):
     def test_a_finding_missing_a_field_of_the_format_is_off_format(self):
         for field in FORMAT_FIELDS:
             with self.subTest(field=field):
-                s = self.scratch()
                 text = re.sub(r"^- %s.*\n" % re.escape(field), "", finding("First", "x"), flags=re.M)
-                reports = self.all_clear()
-                reports["standards"] = text
-                r = self.verify(s, reports)
-                self.assertEqual(r.returncode, 3)
-                self.assertIn("standards", r.stderr)
+                self.assertNoted(text, "standards", field)
 
     def test_a_report_with_marked_notes_passes_and_its_notes_are_not_findings(self):
         s = self.scratch()
@@ -817,45 +888,27 @@ class VerifierBrief(Base):
         self.assertIn(std.encode(), (s.out / "verifier.md").read_bytes())  # carried byte for byte, notes included
         # the last Finding's field block ends at the notes: a missing last field is still caught there
         broken = finding("Only", "x").replace("- Evidence: ", "- Evidenc: ") + "\n" + notes
-        reports["standards"] = broken
-        r = self.verify(s, reports)
-        self.assertEqual(r.returncode, 3)
-        self.assertIn("standards", r.stderr)
+        self.assertNoted(broken, "standards", "Evidence")
 
-    def test_a_finding_missing_a_field_is_refused_with_the_report_format_in_the_message(self):
-        s = self.scratch()
-        reports = self.all_clear()
-        reports["standards"] = "### A title\n- Severity (proposed): Nit\n"
-        r = self.verify(s, reports)
-        self.assertEqual(r.returncode, 3)
+    def test_a_finding_missing_a_field_is_noted_with_the_report_format_in_the_warning(self):
+        r, _s = self.assertNoted("### A title\n- Severity (proposed): Nit\n", "standards", "A title")
         self.assertIn("## Notes", r.stderr)
         self.assertIn("Report format", r.stderr)
 
-    def test_a_section_label_heading_is_refused_naming_the_rule(self):
+    def test_a_section_label_heading_is_noted_naming_the_rule(self):
         for label in ("### (a) Documented standards broken", "## (a) Documented standards broken", "#### Sub label",
                       "# Review report"):
             with self.subTest(label=label):
-                s = self.scratch()
-                reports = self.all_clear()
-                reports["standards"] = label + "\n\n" + finding("First", "x")
-                r = self.verify(s, reports)
-                self.assertEqual(r.returncode, 3, r.stdout + r.stderr)
-                self.assertIn("standards", r.stderr)
+                r, _s = self.assertNoted(label + "\n\n" + finding("First", "x"), "standards", label.lstrip("# "))
                 self.assertIn("## Notes", r.stderr)
-                self.assertEqual(s.files(), [])
 
-    def test_two_notes_sections_or_findings_after_notes_are_refused(self):
+    def test_two_notes_sections_or_findings_after_notes_are_noted(self):
         for kind, text in (("two", finding("First", "x") + "\n## Notes\n\na\n\n## Notes\n\nb\n"),
                            ("after", finding("First", "x") + "\n## Notes\n\na\n\n" + finding("Late", "y")),
                            ("before", "## Notes\n\na\n\n" + finding("Late", "y")),
                            ("nothing-two", "Nothing found.\n\n## Notes\n\na\n\n## Notes\n\nb\n")):
             with self.subTest(kind=kind):
-                s = self.scratch()
-                reports = self.all_clear()
-                reports["standards"] = text
-                r = self.verify(s, reports)
-                self.assertEqual(r.returncode, 3, r.stdout + r.stderr)
-                self.assertIn("standards", r.stderr)
+                r, _s = self.assertNoted(text, "standards", "## Notes")
                 self.assertIn("## Notes", r.stderr)
 
     def test_nothing_found_with_a_notes_section_passes_and_counts_as_nothing_found(self):
@@ -998,6 +1051,9 @@ LATER_SENTENCE = re.search(r'In Rounds 2 and 3, add: "(.*?)"', FINDERS).group(1)
 LATER_DIFF = re.search(r"`(git log -p [^`]*<last-head>[^`]*)`", SKILL).group(1)
 LATER_ROW = next(l for l in cut(SKILL, "## Who runs").splitlines() if l.startswith("| Rounds 2 and 3"))
 LATER_TIERS = re.search(r"\((cheap|regular|premium); (cheap|regular|premium) at Deep\)", LATER_ROW).groups()
+FIXED_OR_OPEN = re.search(r'^When earlier open Findings are passed in, .*? get: "(.*)"$', FINDERS, re.M).group(1)
+TICKET_ROW =next(l for l in cut(SKILL, "## Who runs").splitlines() if l.startswith("| Ticket check"))
+TICKET_TIER = re.search(r"Finder[^|]*\((cheap|regular|premium)\)", TICKET_ROW).group(1)
 
 
 def run_cmd(s, sub, *args, out=None, env=None, script=None):
@@ -1106,6 +1162,18 @@ class LaterRound(Base):
         self.assertIn(STANDARDS_BRIEF.split("(a)")[0], t)
         self.assertNotIn(SPEC_BRIEF, t)
 
+    def test_earlier_open_findings_bring_the_fixed_or_still_open_request_and_none_leave_it_out(self):
+        s = self.scratch()
+        last, _ = second_commit(s)
+        self.ok(self.later(s, last))
+        t = s.brief("finder-later.md")
+        self.assertIn(FIXED_OR_OPEN, t)
+        self.assertIn("PLANTED-EARLIER", t)
+        s2 = self.scratch()
+        last, _ = second_commit(s2)
+        self.ok(run_cmd(s2, "later", "--level", "standard", "--base", last, "--round", 2, "--spec", s2.spec))
+        self.assertNotIn(FIXED_OR_OPEN, s2.brief("finder-later.md"))
+
     def test_round_must_be_2_or_3_and_the_base_must_exist(self):
         s = self.scratch()
         last, _ = second_commit(s)
@@ -1116,7 +1184,11 @@ class LaterRound(Base):
     def test_a_missing_later_section_stops_with_its_name(self):
         for rel, old, new, name in (("review-rounds/FINDERS.md", "In Rounds 2 and 3, add:", "In later rounds, add:",
                                      "new-commits sentence"),
-                                    ("review-rounds/SKILL.md", "<last-head>", "<previous>", "later-Round diff")):
+                                    ("review-rounds/SKILL.md", "<last-head>", "<previous>", "later-Round diff"),
+                                    ("review-rounds/FINDERS.md", "When earlier open Findings are passed in,",
+                                     "With earlier Findings,", "fixed-or-still-open request"),
+                                    ("review-rounds/SKILL.md", "| Ticket check |", "| Ticket review |",
+                                     "Ticket-check Finder")):
             with self.subTest(name=name):
                 s = self.scratch()
                 skills = pathlib.Path(s.root) / "skills"
@@ -1132,7 +1204,7 @@ class LaterRound(Base):
 
 
 class LaterVerifier(Base):
-    def verify_later(self, s, last, reports, level="standard", rnd=2, earlier=True):
+    def verify_later(self, s, last, reports, level="standard", rnd=2, earlier=True, extra=()):
         rdir = s.root / "reports"
         rdir.mkdir(exist_ok=True)
         for old in rdir.iterdir():
@@ -1140,7 +1212,7 @@ class LaterVerifier(Base):
         for name, text in reports.items():
             (rdir / ("%s.md" % name)).write_text(text)
         args = ["--for", "later", "--round", rnd, "--level", level, "--base", last, "--reports", rdir, "--spec", s.spec,
-                "--design", s.design] + (["--earlier", s.earlier] if earlier else [])
+                "--design", s.design] + (["--earlier", s.earlier] if earlier else []) + list(extra)
         return run_cmd(s, "verify", *args)
 
     def test_a_later_round_verifier_expects_the_later_finders_report_and_says_the_right_round(self):
@@ -1173,12 +1245,56 @@ class LaterVerifier(Base):
         self.assertIn("standards", r.stderr)
         self.assertEqual(s.files(), [])
 
-    def test_off_format_later_report_stops_naming_the_finder(self):
+    def test_fixes_confirmed_and_nothing_new_writes_no_verifier_brief(self):
+        s = self.scratch()
+        last, _ = second_commit(s)
+        s.out.mkdir()
+        (s.out / "verifier.md").write_text("stale")
+        nothing = "Nothing found.\n\n## Notes\n\n- R1-1: fixed, src/app.py:2 returns 3.\n"
+        r = self.verify_later(s, last, {"later": nothing}, extra=["--fixes-confirmed"])
+        self.ok(r)
+        self.assertRegex(r.stdout.lower(), r"no verifier")
+        self.assertEqual(s.files(), [])
+
+    def test_without_fixes_confirmed_an_earlier_open_finding_still_gets_a_verifier(self):
+        s = self.scratch()
+        last, _ = second_commit(s)
+        r = self.verify_later(s, last, {"later": "Nothing found.\n"})
+        self.ok(r)
+        self.assertIn("PLANTED-EARLIER", (s.out / "verifier.md").read_text())
+
+    def test_a_new_candidate_or_an_off_format_report_gets_a_verifier_even_with_fixes_confirmed(self):
+        for kind, text in (("candidate", finding("New", "x")), ("off-format", "Looks fine.\n")):
+            with self.subTest(kind=kind):
+                s = self.scratch()
+                last, _ = second_commit(s)
+                r = self.verify_later(s, last, {"later": text}, extra=["--fixes-confirmed"])
+                self.ok(r)
+                t = (s.out / "verifier.md").read_text()
+                self.assertIn(text, t)
+                self.assertIn("PLANTED-EARLIER", t)  # the Verifier still judges every earlier open Finding itself
+
+    def test_fixes_confirmed_is_refused_for_round_1_and_a_fixed_point(self):
+        for kind in ("round1", "fixed"):
+            with self.subTest(kind=kind):
+                s = self.scratch()
+                rdir = s.root / "reports"
+                rdir.mkdir()
+                for n in ("standards", "spec"):
+                    (rdir / ("%s.md" % n)).write_text("Nothing found.\n")
+                r = run_cmd(s, "verify", "--for", kind, "--level", "quick", "--base", "main", "--reports", rdir,
+                            "--spec", s.spec, "--earlier", s.earlier, "--fixes-confirmed")
+                self.assertEqual(r.returncode, 2, r.stdout + r.stderr)
+                self.assertIn("--fixes-confirmed", r.stderr)
+                self.assertEqual(s.files(), [])
+
+    def test_off_format_later_report_goes_on_with_a_note_naming_the_finder(self):
         s = self.scratch()
         last, _ = second_commit(s)
         r = self.verify_later(s, last, {"later": "prose\n"})
-        self.assertEqual(r.returncode, 3)
+        self.ok(r)
         self.assertIn("later", r.stderr)
+        self.assertIn("prose\n", (s.out / "verifier.md").read_text())
 
 
 class DisputesRound(Base):
@@ -1253,22 +1369,39 @@ class TicketCheck(Base):
         git(s.repo, "add", "-A")
         git(s.repo, "commit", "-q", "-m", "ticket work")
 
-    def test_writes_the_quick_round_1_briefs_with_the_ticket_branch_against_the_spec_branch(self):
+    def test_writes_one_finder_brief_with_the_ticket_branch_against_the_spec_branch(self):
         s = self.scratch()
         self.setUp_ticket(s)
         r = run_cmd(s, "ticket", "--base", "feature", "--head", "ticket-1", *inputs(s))
         self.ok(r)
-        self.assertEqual(s.files(), sorted("finder-%s.md" % n for n in table_finders("quick")))
+        self.assertEqual(s.files(), ["finder-ticket.md"])
         head = git(s.repo, "rev-parse", "ticket-1").strip()
-        for name in s.files():
-            t = s.brief(name)
-            self.assertIn("ticket work", t)
-            self.assertNotIn("planted change", t)  # that is on the Spec branch
-            self.assertIn(head, t)
-            self.assertRegex(t, r"git -C \S+ diff \S*feature\S*ticket-1|git -C \S+ diff \S*feature\S*" + head[:7])
-            self.assertRegex(t, r"(?i)ticket check")
-        self.assertIn("PLANTED-PY", s.brief("finder-standards.md"))  # src/ticket.py is a .py file
-        self.assertNotIn("PLANTED-DOCS", s.brief("finder-standards.md"))  # no docs file in the Ticket's diff
+        t = s.brief("finder-ticket.md")
+        self.assertIn("ticket work", t)
+        self.assertNotIn("planted change", t)  # that is on the Spec branch
+        self.assertIn(head, t)
+        self.assertRegex(t, r"git -C \S+ diff \S*feature\S*ticket-1|git -C \S+ diff \S*feature\S*" + head[:7])
+        self.assertRegex(t, r"(?i)ticket check")
+        self.assertIn("PLANTED-PY", t)  # src/ticket.py is a .py file
+        self.assertNotIn("PLANTED-DOCS", t)  # no docs file in the Ticket's diff
+        self.assertIn(str(s.out.resolve() / "reports" / "ticket.md"), t)
+
+    def test_the_one_finder_brief_holds_both_finders_inputs_and_briefs_at_the_tables_tier(self):
+        s = self.scratch()
+        self.setUp_ticket(s)
+        r = run_cmd(s, "ticket", "--base", "feature", "--head", "ticket-1", *inputs(s))
+        self.ok(r)
+        t = s.brief("finder-ticket.md")
+        for part in (STANDARDS_BRIEF, SPEC_BRIEF, SHARED, COPY, FORMAT, REPORT_FORMAT, SMELL, DRIFT, INDEX_CONTRACT,
+                     RECORD_TERMS, EARLIER_LINE):
+            self.assertIn(part, t)
+        for marker in ("PLANTED-SPEC", "PLANTED-STANDARD", "PLANTED-EARLIER", "PLANTED-DESIGN", "PLANTED-IMPORTANT",
+                       "PLANTED-SKIP", "PLANTED-BOUNDARY"):
+            self.assertIn(marker, t)
+        for gone in (ADV_BRIEF.split("<angle>")[0], SECURITY_BRIEF, LATER_SENTENCE):
+            self.assertNotIn(gone, t)
+        line = next(l for l in r.stdout.splitlines() if "finder-ticket.md" in l)
+        self.assertIn(TICKET_TIER, line)
 
     def test_ticket_check_has_no_level_option_and_never_runs_more_than_quick(self):
         s = self.scratch()
@@ -1280,15 +1413,63 @@ class TicketCheck(Base):
         self.setUp_ticket(s)
         rdir = s.root / "reports"
         rdir.mkdir()
-        (rdir / "standards.md").write_text(finding("First", "x"))
-        (rdir / "spec.md").write_text("Nothing found.\n")
+        (rdir / "ticket.md").write_text(finding("First", "x"))
         r = run_cmd(s, "verify", "--for", "ticket", "--base", "feature", "--head", "ticket-1", "--reports", rdir, "--spec", s.spec)
         self.ok(r)
         t = (s.out / "verifier.md").read_text()
         self.assertRegex(t, r"(?i)ticket check")
         self.assertNotIn("Round 1 of", t)
         self.assertIn("ticket work", t)
+        self.assertIn(finding("First", "x"), t)
         self.assertIn(VERIFIER_TIERS[0], next(l for l in r.stdout.splitlines() if "verifier.md" in l))
+
+    def test_a_later_check_of_the_ticket_asks_for_each_earlier_open_finding_as_fixed_or_still_open(self):
+        s = self.scratch()
+        self.setUp_ticket(s)
+        self.ok(run_cmd(s, "ticket", "--base", "feature", "--head", "ticket-1", *inputs(s)))
+        self.assertIn(FIXED_OR_OPEN, s.brief("finder-ticket.md"))
+        s2 = self.scratch()
+        self.setUp_ticket(s2)
+        self.ok(run_cmd(s2, "ticket", "--base", "feature", "--head", "ticket-1", "--spec", s2.spec))
+        self.assertNotIn(FIXED_OR_OPEN, s2.brief("finder-ticket.md"))
+
+    def test_round_1_finders_get_no_fixed_or_still_open_request(self):
+        s = self.scratch()
+        self.ok(s.run("quick"))  # with --earlier
+        for name in s.files():
+            self.assertNotIn(FIXED_OR_OPEN, s.brief(name))
+
+    def test_a_later_check_with_fixes_confirmed_and_nothing_new_writes_no_verifier_brief(self):
+        s = self.scratch()
+        self.setUp_ticket(s)
+        rdir = s.root / "reports"
+        rdir.mkdir()
+        (rdir / "ticket.md").write_text("Nothing found.\n\n## Notes\n\n- T1.1-1: fixed, src/ticket.py:1.\n")
+        args = ["verify", "--for", "ticket", "--base", "feature", "--head", "ticket-1", "--reports", rdir, *inputs(s)]
+        r = run_cmd(s, *args, "--fixes-confirmed")
+        self.ok(r)
+        self.assertRegex(r.stdout.lower(), r"no verifier")
+        self.assertEqual(s.files(), [])
+        r = run_cmd(s, *args)  # an earlier Finding not confirmed fixed still goes to a Verifier
+        self.ok(r)
+        self.assertIn("PLANTED-EARLIER", (s.out / "verifier.md").read_text())
+
+    def test_a_ticket_check_verify_reads_only_its_one_report(self):
+        s = self.scratch()
+        self.setUp_ticket(s)
+        rdir = s.root / "reports"
+        rdir.mkdir()
+        (rdir / "standards.md").write_text(finding("First", "x"))  # a Round 1 Finder's report is not this check's
+        r = run_cmd(s, "verify", "--for", "ticket", "--base", "feature", "--head", "ticket-1", "--reports", rdir,
+                    "--spec", s.spec)
+        self.assertEqual(r.returncode, 2, r.stderr)
+        self.assertIn("standards", r.stderr)
+        (rdir / "standards.md").unlink()
+        r = run_cmd(s, "verify", "--for", "ticket", "--base", "feature", "--head", "ticket-1", "--reports", rdir,
+                    "--spec", s.spec)
+        self.assertEqual(r.returncode, 3, r.stderr)  # its one report is missing
+        self.assertIn("ticket", r.stderr)
+        self.assertEqual(s.files(), [])
 
 
 class FixedPoint(Base):
