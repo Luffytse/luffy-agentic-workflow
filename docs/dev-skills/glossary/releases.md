@@ -5,7 +5,7 @@ The words of cutting a Release and planning the next. Each entry says what a wor
 ## Language
 
 **Release**:
-A named step of a Milestone (for example "Milestone 1 · Release 1"; a small Release is a Milestone with one Release), and the items it delivers, at most the **Release size** of them, picked from the top of the **Ranked list**. Every issue in it carries its release label (here `release-m<milestone>-r<n>`), and one release issue holds its plan, its **Main check** verdicts, what it carried over and, once cut, its notes. Its name is never a version: `release` is version-free, and what a repo does with a version is its release doc's (ADR 0012, ADR 0016). Not a Milestone, which is the product goal its Releases work toward.
+A named step of a Milestone (for example "Milestone 1 · Release 1"; a small Release is a Milestone with one Release), and the items it delivers, at most the **Release size** of them, picked from the top of the **Ranked list**. Every issue in it carries its release label (here `release-m<milestone>-r<n>`), and one release issue holds its plan, its **Main check** verdicts, the issues that **left the Release** at the cut (a **Parked** issue and what **waits with** it) and, once cut, its notes. A cut asks the user nothing unless an unparked issue of the Release is still open, and carries no issue over. Its name is never a version: `release` is version-free, and what a repo does with a version is its release doc's (ADR 0012, ADR 0016). Not a Milestone, which is the product goal its Releases work toward.
 _Avoid_: sprint, version bump
 
 **Release size**:
@@ -17,7 +17,7 @@ The first part of **Release planning**: `release` reads each open candidate issu
 _Avoid_: validity check, re-triage
 
 **Ranked list**:
-The one list `release` sorts every candidate for the next Release into once the **Main check** has run, in three priority groups: severe and `next-release` issues; the Milestone's planned features, each after its open blockers; then carried-over issues and other `ready-for-agent` bugs. A feature the Milestone issue does not list is never ranked. The ordering rules are `release`'s.
+The one list `release` sorts every candidate for the next Release into once the **Main check** has run, in three priority groups: severe and `next-release` issues; the Milestone's planned features, each after its open blockers; then the `ready-for-agent` bugs. A feature the Milestone issue does not list is never ranked. The ordering rules are `release`'s.
 
 **Release planning**:
 The last step of `release`: the **Main check**, the **Ranked list**, then taking from the top up to the **Release size**, opening the release issue and labelling what it takes; when nothing qualifies it opens none and says why. It runs with no approval; the user's part is planning the Milestone with `milestone`.

@@ -41,7 +41,7 @@ The **Team lead** replacing a stalled worker with a fresh worker on the same iss
 _Avoid_: replacement, restart
 
 **Parked**:
-The state of an issue the **Team lead** could not take over safely, whose feature stalled a second time, or that the user parked: marked with the tracker doc's **Park** operation (the `parked` label and a comment saying why). Other work goes on; it waits on the user, who lifts it by removing the label. Owned by `team-lead`; a Review never parks (ADR 0003).
+The state of an issue the **Team lead** could not take over safely, whose feature stalled a second time, or that the user parked: marked with the tracker doc's **Park** operation (the `parked` label and a comment saying why). Other work goes on; it waits on the user, who lifts it by removing the label. An open, labelled issue **waits with** a parked issue when it has at least one open blocker and each is parked, already left the Release for that reason, or itself waits with a parked issue; at a Release cut both leave the Release (`release` owns the cut). Owned by `team-lead`; a Review never parks (ADR 0003).
 _Avoid_: stuck, shelved, deferred
 
 **Pause**:
