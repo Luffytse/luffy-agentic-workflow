@@ -87,14 +87,22 @@ class SkillLoadingPackaging(unittest.TestCase):
         self.check(0)
 
     def test_listed_skill_file_that_grew_fails(self):
-        # release/SKILL.md is on known_over: it may not grow past its recorded count.
-        self.plant("plugins/dev-skills/skills/release/SKILL.md", "word")
+        # implement-spec/SKILL.md is on known_over: it may not grow past its recorded count.
+        (self.repo / "plugins/dev-skills/skills/implement-spec/SKILL.md").write_text(
+            "---\nname: implement-spec\ndescription: Use when building a Spec.\n---\n\n" + "word " * 4500)
         self.check(1, "grown past its recorded")
 
     def test_listed_skill_file_at_or_under_4000_words_must_leave_the_list(self):
-        (self.repo / "plugins/dev-skills/skills/release/SKILL.md").write_text(
-            "---\nname: release\ndescription: Use when cutting a Release.\n---\n\n" + "word " * 3900)
+        (self.repo / "plugins/dev-skills/skills/implement-spec/SKILL.md").write_text(
+            "---\nname: implement-spec\ndescription: Use when building a Spec.\n---\n\n" + "word " * 3900)
         self.check(1, "remove it from known_over")
+
+    def test_release_is_off_the_list_and_over_4000_words_fails(self):
+        # release/SKILL.md left known_over once Spec #173 brought it under the limit; under its last
+        # recorded 4,139 words but over 4,000 it now fails as any unlisted file does.
+        (self.repo / "plugins/dev-skills/skills/release/SKILL.md").write_text(
+            "---\nname: release\ndescription: Use when cutting a Release.\n---\n\n" + "word " * 4100)
+        self.check(1, "release/SKILL.md: 4110 words, over 4000")
 
     def test_retro_planning_is_off_the_list_and_over_4000_words_fails(self):
         # retro-planning/SKILL.md left known_over once Spec #157 brought it under the limit; under its old

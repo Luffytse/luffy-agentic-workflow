@@ -10,7 +10,7 @@ A **Milestone** is a product goal the user sets, written down in one Milestone i
 1. **Planning**, with the user: the features are named, sorted and planned, then the Milestone issue is written and every feature in it is labelled.
 2. **The Plugin version check**, once planning settles: one read that threads here load main's plugin text.
 3. **Delivery**, run by the coordinator with the `team-lead` skill (see "Delivery"), once both phases before it are done.
-4. **The report**, once every feature is merged or parked: it ends with a stop for the user's Milestone review ("Milestone review").
+4. **The report**, once `team-lead`'s "End of delivery" finds every feature merged, parked or waiting with a parked issue: it ends with a stop for the user's Milestone review ([reporting.md](reporting.md)).
 
 **No Milestone.** A project is inside a Milestone only while its Milestone issue is open: an open issue carrying a label in the Boundary record's Milestone label form, whose body is the Milestone rather than a feature. With none open, no delivery runs: the next plan the user makes starts one.
 
@@ -22,7 +22,7 @@ A Milestone planning session runs it with the user, at the **premium** tier (`mo
 
 A feature is **planned** when its Spec and its Tickets are published, or, for a lone Ticket or each of a few related issues, when its issue holds an agent-ready brief with acceptance criteria. An existing issue the user names and says is planned counts, and needs no session.
 
-**A one-Release Milestone.** For a small Release or one Release's worth of work, plan a Milestone with one Release: step 7 asks nothing and writes its defaults into the draft: one at a time, in an order that respects the graph of the features the user named; Acceptance holds only its first line; Excluded names the set-aside work left out in step 3, or `- None.`. The user may change any of them in step 8; a changed default is planned like any other field.
+**A one-Release Milestone.** For a small Release or one Release's worth of work, plan a Milestone with one Release: step 7 asks nothing and writes its defaults into the draft: Acceptance holds only its first line; Excluded names the set-aside work left out in step 3, or `- None.`. The user may change any of them in step 8; a changed default is planned like any other field.
 
 ### Steps
 
@@ -32,7 +32,7 @@ A feature is **planned** when its Spec and its Tickets are published, or, for a 
 4. **First dependency graph.** Sort the named features by dependency: a feature waits for another whose work it builds on. Show it, one line per feature naming those it waits for (or none), and change it until the user agrees it.
 5. **One planning session per feature.** Plan no feature here. Ask the coordinator (where none runs, the user) to start one planning session per feature not yet planned, in graph order: a feature starts once each one it waits for has reported; independent features may run side by side. Each brief carries the Milestone's number (the one step 9's label carries), this session's link, the goal, the graph, what earlier sessions settled that it builds on, the planning skills (`grill-with-docs`, or `grilling` with no repo, loaded by name before the first question; then `to-spec` and `to-tickets`, or one lone Ticket) and the **top** tier. Each session reports its Spec and Ticket numbers, each Ticket's blockers, and any change to the goal, acceptance, exclusions or another feature, which you bring to the user; you keep the draft. On a resumed planning, read what each feature has published and ask the coordinator which sessions still run; restart only one that ended without its report. Done when every session has reported and every feature is planned.
 6. **Second dependency graph.** Build the graph again from the Tickets' blockers: a feature waits for another when one of its issues is blocked by one of the other's. Show the user each dependency that changed since step 4.
-7. **Build limit, acceptance and exclusions.** Unless the Milestone is a one-Release one, ask whether features are built one at a time or several at once (and how many), how the user will accept the Milestone at its review, and what is excluded. "Nothing excluded" is an answer; silence is not.
+7. **Acceptance and exclusions.** Unless the Milestone is a one-Release one, ask how the user will accept the Milestone at its review and what is excluded. "Nothing excluded" is an answer; silence is not.
 8. **Agree the draft.** Only once every named feature is planned, show the user the whole Milestone issue with its title and label, in the shape below, its rows ordered by the step 6 graph, and change it until the user agrees it.
 9. **Write it.** The membership label fills the Boundary record's form with the next Milestone number: one more than the highest among the labels already in that form (1 when there are none); create it if the tracker lacks it. Create the Milestone issue (**Create an issue**), carrying the label, with the agreed text. Then, for each feature in order, apply the label (**Apply / remove labels**) to every open issue it holds (its own issue, its Tickets, the issues it absorbs or its related issues), and make its own issue a sub-issue of the Milestone issue (**Make an issue a sub-issue of a parent**) where it has no parent yet: the label, not the link, makes it a member. Read the Milestone issue and every labelled issue back.
 
@@ -49,7 +49,7 @@ Title: `Milestone <n>: <name>`, with the number of its label. Body:
 
 ## Features, in build order
 
-<One at a time, in this order. | In this order, up to <k> at once.> Each feature is its own issue carrying `<label>`.
+Each feature is its own issue carrying `<label>`.
 
 | # | Feature | Kind | Accepted when | After |
 | --- | --- | --- | --- | --- |
@@ -79,10 +79,4 @@ The **Plugin version check**, run once planning settles, shows threads load main
 
 ## Delivery
 
-Delivery is the `team-lead` skill's. Delivery starts once planning has settled and the Plugin version check holds, or the user's word to go on is recorded. Then the coordinator loads `team-lead` by name and runs it (a coordinator that cannot load it follows the project instructions `setup-project` writes for it, and starts a thread for each step that needs a skill, this skill's Plugin version check and report included): it reads this Milestone issue for the features and their order, and the Boundary record for the boundaries, and takes every worker action through `worker-control`. Until then nothing is built, labelled for a Release or started as a build thread for this Milestone.
-
-## Milestone review
-
-The team lead applies this gate at every wake of delivery, after reading the state and before starting work: re-read the latest Milestone agreement and each feature's issues, pull requests and Park state. When every planned feature is merged or is parked (a Spec blocked by its parked Ticket counts as parked, naming that Ticket), delivery stops for review. An open, unparked feature, even one blocked or outside the current Release, keeps this gate closed; a closed issue whose merge evidence is missing needs its merged state checked. Missing acceptance evidence is reported as unverified, not a success claim. A pause keeps reporting on hold until the user resumes. Finish any Release cut already in progress before reporting; an open Release containing parked work need not be falsely closed to reach review. If the final merged Release still needs its cut, the team lead starts that Release worker first and awaits its report; then re-read this gate. Its final checks and maintenance decisions must be available before reporting.
-
-Once the gate holds and any final Release cut has finished, start no further build or Release planning. First read existing report comments: reuse an unchanged pending report as reporting.md's re-entry rule says, taking no duplicate action. For a new report, the team lead first ends the check-in as its "End of delivery" says; then follow [reporting.md](reporting.md) to gather evidence, post the report comment on the Milestone issue and stop for the user's Milestone review. Acceptance belongs to the user: the report marks the Milestone ready for review, leaves it open until the user accepts (reporting.md says what closes it), and makes no acceptance or proof-pass claim.
+Delivery is the `team-lead` skill's. Delivery starts once planning has settled and the Plugin version check holds, or the user's word to go on is recorded. Then the coordinator loads `team-lead` by name and runs it (a coordinator that cannot load it follows the project instructions `setup-project` writes for it, and starts a thread for each step that needs a skill, this skill's Plugin version check and report included): it reads this Milestone issue for the features and their graph, and the Boundary record for the boundaries, takes every worker action through `worker-control`, and decides when delivery stops for the Milestone review (its "End of delivery"), which then enters [reporting.md](reporting.md). Until then nothing is built, labelled for a Release or started as a build thread for this Milestone.

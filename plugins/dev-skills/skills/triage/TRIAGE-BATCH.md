@@ -14,7 +14,7 @@ Done when no open issue but those waiting on the user is at `needs-triage`.
 
 ### 2. Sweep the backlog
 
-The **sweep** keeps the `ready-for-agent` backlog true, since Release planning ranks all of it.
+The **sweep** keeps the `ready-for-agent` backlog true, since Release planning takes its waiting issues from it.
 
 The **`next-release` mark** goes on a `ready-for-agent` issue that is **severe** (a security hole, lost data, or delivery stopped: nothing can merge or ship) or that blocks a **planned feature** (one the Milestone issue lists: the open issue carrying a label in the Boundary record's Milestone label form, or for a batch the one its release issue names). Only the batch sets it by this rule.
 

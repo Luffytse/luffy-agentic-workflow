@@ -12,11 +12,11 @@ The skills speak in terms of 5 state roles + 2 category roles, plus the `next-re
 | `bug`                | `bug`                | Something is broken                      |
 | `enhancement`        | `enhancement`        | New feature or improvement               |
 
-The `next-release` role is neither a state nor a category role. It marks an issue that must join the next Release. Only `triage` sets it: its Triage batch on a severe issue or one that blocks a planned feature, and a session with the user when the user asks; `release` takes marked issues into the next Release and removes the mark once they carry the release label.
+The `next-release` role is neither a state nor a category role. It marks an issue that the next Release planning takes first among the waiting issues, after severe ones and while the Release size has room (a severe one joins past it). Only `triage` sets it: its Triage batch on a severe issue or one that blocks a planned feature, and a session with the user when the user asks; `release` removes the mark once a marked issue carries the release label.
 
 | Role in `dev-skills` | Label in our tracker | Meaning                                       |
 | -------------------- | -------------------- | --------------------------------------------- |
-| `next-release`       | `next-release`       | Must join the next Release                    |
+| `next-release`       | `next-release`       | Taken first among the waiting issues          |
 
 When a skill mentions a role (e.g. "apply the AFK-ready triage label"), use the corresponding label string from this table.
 
@@ -29,4 +29,4 @@ Labels this repo records for its own kinds of work, each with one line saying wh
 
 ## Other labels
 
-`retro` and `retro-planning` are not triage roles. A `retro` issue carries `needs-triage` only once Retro planning has handed it over to triage; until then it carries no state role and triage leaves it out (see [ADR 0007](adr/0007-retro-issues-pile-up-per-repo-and-are-planned-in-batches.md)). The `wayfinder:*` labels mark a wayfinder map and its tickets; see `issue-tracker.md`. `parked` marks an issue that, inside a Milestone, had a stalled thread that could not be taken over safely or a feature that stalled twice, or that the user parked, and now waits on the user; it is the tracker doc's **Park** operation's label, set and read there. The `release-m<milestone>-r<n>` labels (`release-X.Y.Z` up to 0.25.0) mark the issues of one Release; see `release.md`.
+`retro` and `retro-planning` are not triage roles. A `retro` issue carries `needs-triage` only once Retro planning has handed it over to triage; until then it carries no state role and triage leaves it out (see [ADR 0007](adr/0007-retro-issues-pile-up-per-repo-and-are-planned-in-batches.md)). The `wayfinder:*` labels mark a wayfinder map and its tickets; see `issue-tracker.md`. `parked` marks an issue that, inside a Milestone, had a stalled thread that could not be taken over safely or a feature that stalled twice, or a setup Ticket whose second guiding thread ended with it open, or that the user parked, and now waits on the user; it is the tracker doc's **Park** operation's label, set and read there. The `release-m<milestone>-r<n>` labels (`release-X.Y.Z` up to 0.25.0) mark the issues of one Release; see `release.md`.
