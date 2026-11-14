@@ -39,7 +39,7 @@ A Finding that questions the design itself (a gap in the agreed behaviour, two r
 The one way a Review stops for a person: a fix, a design answer, a bug Ticket or the merge would cross a boundary as the `merging` skill defines it. The user's answer clears it. Owned by `review-rounds`.
 
 **Question round**:
-One batch of questions a skill (`grilling`, `triage`) puts to the user at once. Not a Round, and not a Review: the skills' "round" without a capital R means this.
+One turn of questions a skill (`grilling`, `triage`) puts to the user: a big question alone, or small ones together. Not a Round, and not a Review: the skills' "round" without a capital R means this.
 _Avoid_: Round (for a batch of questions)
 
 **REVIEW.md**:
