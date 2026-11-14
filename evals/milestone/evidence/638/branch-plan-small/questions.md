@@ -1,2 +1,0 @@
-- What outcome do you want by the end of this Milestone (a one-Release Milestone for the quiet flag)? Please give the goal in one paragraph, in your own words.
-- Here is the whole draft Milestone issue, its title `Milestone 1: Quiet flag` and its label `milestone-1` (one at a time in the order you named, Acceptance with only its first line, Excluded: None.). Is this right, or what should change before I write it?

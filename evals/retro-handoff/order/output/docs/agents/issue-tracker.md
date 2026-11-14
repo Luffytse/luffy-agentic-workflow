@@ -1,2 +1,0 @@
-# Fixture issue tracker
-This repository uses only Markdown files under issues/ as its tracker. Read full files including comments. Each issue has State, Labels and Created lines. New issue: next unused number filename, with its issue body and metadata. Append comments under Comments. Edit state to close. Read files to verify writes. Native dependencies and parents are unavailable: use Blocked by and Part of body lines when needed. Source briefs link as issues/<number>.md. No remote tools or real tracker actions. No build is authorized; this is planning only.

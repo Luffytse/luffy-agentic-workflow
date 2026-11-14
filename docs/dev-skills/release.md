@@ -18,7 +18,7 @@ How this repo versions `dev-skills` and cuts a Release with the `release` skill:
 
 Releases here cover the `dev-skills` plugin, the only plugin in this repo.
 
-Bare issue and pull request numbers in text written before the move on 2026-11-05 (ADRs 0001 to 0013, changelog entries before the move entry, eval results and evidence, and the issues moved from the archive, which link their original) refer to the private archive `Luffytse/luffy-dev-skills`; from the move on, a bare number means this repo's issue, and a reference to an archive issue is written in full as `Luffytse/luffy-dev-skills#<n>`. The commits recorded for past Releases (`Commits:` lines) are the archive's IDs; the history here was rewritten (ADR 0014), so those IDs do not resolve in this repo.
+Bare issue and pull request numbers in text written before the move on 2026-11-05 (ADRs 0001 to 0013, changelog entries before the move entry, and the issues moved from the archive, which link their original) refer to the private archive `Luffytse/luffy-dev-skills`; from the move on, a bare number means this repo's issue, and a reference to an archive issue is written in full as `Luffytse/luffy-dev-skills#<n>`. The commits recorded for past Releases (`Commits:` lines) are the archive's IDs; the history here was rewritten (ADR 0014), so those IDs do not resolve in this repo.
 
 ## The bump at merge
 

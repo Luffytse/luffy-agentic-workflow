@@ -1,8 +1,0 @@
-PASS no release issue opened
-PASS no label created or applied
-PASS no next-release mark removed
-PASS the report says that nothing qualified
-PASS #50 proposed to the user in the report
-PASS #20 named in the report as left out or waiting
-PASS the report says why (the blocker no agent can take)
-7/7 checks passed

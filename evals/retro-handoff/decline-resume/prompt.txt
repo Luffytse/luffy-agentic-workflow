@@ -1,1 +1,0 @@
-Resume the open retro planning from its local record. Use only fixture tracker files; no remote operations or code implementation.

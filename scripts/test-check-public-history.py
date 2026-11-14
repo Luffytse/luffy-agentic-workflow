@@ -109,13 +109,13 @@ class CheckPublicHistory(unittest.TestCase):
         # The email is known from the source history (its author field), as in the rewrite's own check.
         source = Repo(self.root / "source")
         source.commit("init\n", {"x": "x\n"}, author="Pat <" + PERSONAL_EMAIL + ">")
-        sha = self.repo.commit("docs: log\n", {"evals/log.txt": "Author: Pat <" + PERSONAL_EMAIL + ">\n"})
+        sha = self.repo.commit("docs: log\n", {"notes/log.txt": "Author: Pat <" + PERSONAL_EMAIL + ">\n"})
         self.assert_fails_naming(sha, "personal email", "--source", str(source.path))
 
     def test_personal_email_in_a_file_fails_from_a_terms_file(self):
         terms = self.root / "terms.txt"
         terms.write_text("# private terms\n" + PERSONAL_EMAIL + "\n")
-        sha = self.repo.commit("docs: log\n", {"evals/log.txt": "mail " + PERSONAL_EMAIL.upper() + "\n"})
+        sha = self.repo.commit("docs: log\n", {"notes/log.txt": "mail " + PERSONAL_EMAIL.upper() + "\n"})
         self.assert_fails_naming(sha, "private term", "--terms", str(terms))
 
     def test_session_link_in_a_commit_message_fails(self):

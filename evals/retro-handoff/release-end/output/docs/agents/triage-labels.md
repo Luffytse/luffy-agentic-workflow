@@ -1,1 +1,0 @@
-State roles: ready-for-agent, needs-triage, needs-info, ready-for-human, wontfix. Category: bug, enhancement. Next-release role: `next-release` (an issue that must join the next Release). No agent-only mapping.
