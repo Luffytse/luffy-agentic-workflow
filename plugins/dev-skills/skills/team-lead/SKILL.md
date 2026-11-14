@@ -17,7 +17,7 @@ The open Milestone issue (as `milestone`'s **No Milestone** test finds it) gives
 
 The project's own instructions add their thread limit, if any, tier map and what else a brief carries. Do every tracker read and write with the tracker doc's operations (`docs/dev-skills/issue-tracker.md`), cited by name below.
 
-An open issue **waits with** a parked issue when it has at least one open blocker (**Count open blockers**) and each is parked (**Park**), is listed under a release issue's `## Left the Release`, or itself waits with a parked issue; a Spec and its open Tickets go together, as `release` step 1 says. A **setup Ticket** is an issue at `ready-for-human` that planning published for an account, product or credential the person must provide for a live step.
+An open issue **waits with** a parked issue when it has at least one open blocker (**Count open blockers**) and each is parked (**Park**), is listed under a release issue's `## Left the Release`, or itself waits with a parked issue; a Spec and its open Tickets go together once no worker runs on the Spec, as `release` step 1 says. A **setup Ticket** is an issue at `ready-for-human` that planning published for an account, product or credential the person must provide for a live step.
 
 ## Wakes
 
