@@ -22,13 +22,13 @@ Before you make anything, on every entry, read the ticket against freshly fetche
 
 - **still valid**: go on.
 - **already fixed** or **obsolete**: write no code. Give the coordinator (the user, when none runs) the evidence on main, the file and the commit or pull request, and stop; it closes or re-plans the ticket.
-- **changed scope** or **cannot tell**: say what changed or what is missing, with the same evidence, and wait, building nothing. Then do as the answer says, checking again only what merged since.
+- **changed scope** or **cannot tell**: a decision, as "When you need the user" says. Give what changed or what is missing, with the same evidence, park the Ticket as that paragraph says, building nothing, and stop. The answer lifts the park and you re-enter at step 1: do as it says, checking again only what merged since.
 
 ## 2. Build
 
 Make the Ticket branch off freshly fetched main in your own checkout and push it; where the harness gives the thread one designated branch, that branch is the Ticket branch. On re-entry, go on from the pushed branch and its pull request.
 
-Build with `tdd`, at seams agreed before the first test. A bug whose cause is not known goes to `diagnosing-bugs` first, then to `tdd` for the fix; a bug whose failing test is its reproduction goes straight to `tdd`. Run each new test and see it fail before the fix: a failure inferred or read off the code is not evidence. Give trivial or noisy jobs, such as rerunning a test suite, to a cheap-tier subagent (`model-tiers` maps the tier), so your context stays small.
+Build with `tdd`, at seams agreed before the first test. A bug whose cause is not known goes to `diagnosing-bugs` first, then to `tdd` for the fix; a bug whose failing test is its reproduction goes straight to `tdd`. Run each new test and see it fail before the fix: a failure inferred or read off the code is not evidence. A run you cannot make yourself is asked of the user, as an action. Give trivial or noisy jobs, such as rerunning a test suite, to a cheap-tier subagent (`model-tiers` maps the tier), so your context stays small.
 
 Before the pull request, check your diff against each Always-check line of the repo's review rules file, if it has one, as the reviewer will.
 
