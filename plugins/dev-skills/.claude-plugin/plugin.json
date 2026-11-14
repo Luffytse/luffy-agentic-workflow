@@ -1,7 +1,7 @@
 {
   "name": "dev-skills",
   "description": "Development skills (wayfinder, grilling, specs, tickets, TDD, code review and more), model-invoked except one a person starts. They began as Matt Pocock's skills and are now our own.",
-  "version": "3.0.0",
+  "version": "4.0.0",
   "author": {
     "name": "lufei.xie",
     "email": "12742482+Luffytse@users.noreply.github.com"

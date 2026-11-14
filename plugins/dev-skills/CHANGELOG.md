@@ -2,6 +2,30 @@
 
 What each version of `dev-skills` brought, newest first. Each Release adds one entry here covering everything since the last Release: its goal, the version it delivered (older entries list the versions delivered one per skill pull request), the issues it shipped, and what a project using the plugin must do when something breaks. Entries up to 0.25.0 are one per version, when only a Release bumped it.
 
+## Milestone 4 · Release 3 (2026-11-14)
+
+The rest of Milestone 4 lands: `grilling`, `pr`, `tdd`, `diagnosing-bugs`, the design skills and `writing-for-agents` back near the inherited text, no versioning policy text in the plugin, the review skills tuned, `setup-dev-skills` and `setup-project` trimmed, and `ask-luffy` in place of `ask-matt`, so every planned feature is merged.
+
+Versions: 4.0.0. Commits: 66f40a5..5749afe.
+
+- `grilling` asks a big question alone and small ones together; `grill-with-docs` goes back to its one inherited line (#169)
+- `pr`: CI is the proof for checks, the Door keeps one clause on effects outside git, and a repo's own template is kept (#181)
+- `tdd` and `diagnosing-bugs` go back to the inherited text (#182)
+- Design skills: `improve-codebase-architecture` is person-started, the glossary split steps get their own file, and the docs index is loaded only for a new file (#189)
+- `writing-for-agents` goes back to the inherited text; the rules for shared skills move to this repo's docs (#190)
+- No versioning policy text in the plugin: a repo that keeps a version writes its bump as cut steps in its own release doc (#191)
+- Spec: the review skills are tuned: prose docs get Quick, the Finder confirms fixes, a Ticket check runs one Finder, the brief script warns, and a bug Ticket says how it joins the Release (#183), with its Tickets: Round 0 picks Quick for prose-only docs, a bug Ticket filed after Round 3 says how it joins the running Release, and two dead sentences leave (#184); the Brief script's verify warns about an off-format Finder report and passes it on, stops only for a missing or empty one, and takes the Round's own options (#185); the later-Round Finder confirms the fixes and a Verifier runs only when something is left, Rank drops nothing confirmed, a Ticket check runs one Finder, and the record names who raised each Finding (#186)
+- `setup-dev-skills` asks less, and the tracker doc keeps its REST routes in a second file (#192)
+- `setup-project`: one path, a cycle checklist that names its points only, and a draft held to the size limit (#193)
+- `ask-luffy` replaces `ask-matt`: it explains how the workflow runs, where the person steps in and how the skills fit together (#194)
+
+### What to do
+
+- Every project: the skill `ask-matt` is renamed `ask-luffy` (#194). Wherever your docs, `CLAUDE.md`, `AGENTS.md` or coordinator instructions name `ask-matt` (or `dev-skills:ask-matt`), write `ask-luffy` (`dev-skills:ask-luffy`) instead; nothing else changes.
+- A project whose release doc keeps a "Policy:" section: `release` now reads only the release doc's **Cut steps** line, not what a policy section adds to it (#191). Move any bump or `Versions:` line step from that section into the Cut steps line, or the cut changes no version. `setup-dev-skills` leaves such a section as your own text.
+- A project whose coordinator follows instructions `setup-project` assembled: run `setup-project` again, as it lost its outside-a-Milestone path and now holds the draft to the coordinator tool's size limit (#193).
+- Optional: run `setup-dev-skills` again to split the tracker doc's REST routes into `docs/dev-skills/issue-tracker-rest.md` (#192); a tracker doc set up before keeps working.
+
 ## Milestone 4 · Release 2 (2026-11-14)
 
 The delivery core of Milestone 4 lands: the `top` tier, Milestone planning along a graph, a short Milestone report, delivery that follows the graph, a trimmed `merging`, `wayfinder` and `to-tickets` near the inherited text, and `implement` and `implement-spec` rebuilt, so `implement-spec` falls under 4,000 words.
