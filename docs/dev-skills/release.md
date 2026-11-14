@@ -2,10 +2,9 @@
 
 How this repo versions `dev-skills` and cuts a Release with the `release` skill: where the version lives, how a Release raises it, where the changelog goes, how Releases and their labels are named, and the whole-Release check (see [ADR 0016](adr/0016-releases-bump-the-plugin-version-once.md), which replaced ADR 0008).
 
-- **Bump mode**: Releases bump. A pull request never changes the version, a skill pull request included: it merges like any other, with no number to ask for. The Release's changelog pull request raises it once, in the plugin manifest, by the biggest size among the Release's changes (see the cut steps).
+- **Version**: a pull request never changes the version, a skill pull request included: it merges like any other, with no number to ask for. The Release's changelog pull request raises it once, in the plugin manifest, by the biggest size among the Release's changes (see the cut steps). This is this repo's own bump, written as cut steps; the plugin holds no versioning rules.
 - **Version file**: `plugins/dev-skills/.claude-plugin/plugin.json`, the `"version"` field. This is the canonical source for reading the current version, and for locating Releases up to 0.25.0 in git history.
 - **Changelog**: `plugins/dev-skills/CHANGELOG.md`, newest entry first. One entry per Release, covering everything since the last Release, listing the versions it delivered and its start and end commits (its `Versions:` and `Commits:` line).
-- **Versioning policy**: Releases bump (the **Bump mode** line above is the same fact under its earlier name).
 - **Label prefix**: `release-`.
 - **Release name**: `Milestone <m> · Release <n>`, with the label `release-m<m>-r<n>` (for example `release-m1-r1`) on every issue in it and a release issue titled `Release Milestone <m> · Release <n>`. A Release is named, not numbered; the next Release in the same Milestone raises `<n>`, and a new Milestone starts again at `<n>` = 1. Releases up to 0.25.0 were numbered (`release-X.Y.Z`, titled `Release X.Y.Z`).
 - **Release size**: 10. A Release takes at most 10 items, counted of any kind: a Spec with its Tickets is 1, a lone Ticket is 1, a bug is 1. A severe issue (a security hole, lost data, delivery stopped) joins past the size.
