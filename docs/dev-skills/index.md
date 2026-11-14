@@ -11,6 +11,7 @@ Read this first, then open only the docs whose line fits your work. Specs and ti
 ## Agent setup
 
 - [docs/dev-skills/issue-tracker.md](issue-tracker.md): this repo's issues live on GitHub, and the commands for each tracker operation the skills use. Read when a skill creates, reads, edits, labels, parks or closes an issue, or merges a pull request.
+- [docs/dev-skills/issue-tracker-rest.md](issue-tracker-rest.md): the `gh api` route of each tracker operation, for a session that has `gh` without GraphQL. Read only when `gh issue view` fails with "GraphQL is not available".
 - [docs/dev-skills/triage-labels.md](triage-labels.md): the label string for each triage role, the `next-release` role, the Repo labels table with the rule that applies them, and the other labels. Read when applying or filtering triage labels.
 - [docs/dev-skills/domain.md](domain.md): the single-context doc layout and how skills read the glossary and ADRs. Read when a skill looks for domain docs or flags an ADR conflict.
 - [docs/dev-skills/release.md](release.md): the release doc: version sources, the bump, Release size, change sizes, cut steps, naming and the whole-Release check. Read when running the `release` skill, raising the version at a cut or giving an issue a release label.
