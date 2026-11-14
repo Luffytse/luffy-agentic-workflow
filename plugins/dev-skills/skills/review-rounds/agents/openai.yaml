@@ -1,5 +1,0 @@
-interface:
-  display_name: "Review Rounds"
-  short_description: "Run a review's Rounds after Round 0"
-policy:
-  allow_implicit_invocation: true

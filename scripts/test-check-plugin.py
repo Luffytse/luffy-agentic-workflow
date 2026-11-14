@@ -16,20 +16,13 @@ class SkillLoadingPackaging(unittest.TestCase):
         source = pathlib.Path(__file__).resolve().parents[1]
         shutil.copytree(source, self.repo, symlinks=True, ignore=shutil.ignore_patterns(".git", "__pycache__"))
         self.skill = self.repo / "plugins/dev-skills/skills/fixture-contract"
-        (self.skill / "agents").mkdir(parents=True)
+        self.skill.mkdir(parents=True)
         self.write_skill("user-invocable: false\n")
-        self.write_policy("  allow_implicit_invocation: true\n")
 
     def write_skill(self, controls):
         (self.skill / "SKILL.md").write_text(
             "---\nname: fixture-contract\ndescription: Use when a caller needs the fixture contract.\n"
             + controls + "---\n\nReturn the fixture record.\n"
-        )
-
-    def write_policy(self, policy):
-        (self.skill / "agents/openai.yaml").write_text(
-            'interface:\n  display_name: "Fixture Contract"\n'
-            '  short_description: "Interpret fixture records"\npolicy:\n' + policy
         )
 
     def check(self, expected, message=None):
@@ -52,13 +45,14 @@ class SkillLoadingPackaging(unittest.TestCase):
         self.write_skill("user-invocable: false\ndisable-model-invocation: true\n")
         self.check(1)
 
-    def test_hidden_skill_cannot_disable_implicit_invocation(self):
-        self.write_policy("  allow_implicit_invocation: false\n")
-        self.check(1)
-
-    def test_hidden_skill_still_requires_agent_metadata(self):
-        (self.skill / "agents/openai.yaml").unlink()
-        self.check(1)
+    def test_tree_without_codex_files_passes(self):
+        # The plugin is Claude Code only: no Codex manifest, catalog or agent metadata file is required.
+        for path in (".codex-plugin", "../../.agents"):
+            shutil.rmtree(self.repo / "plugins/dev-skills" / path, ignore_errors=True)
+        for meta in (self.repo / "plugins/dev-skills/skills").glob("*/agents"):
+            shutil.rmtree(meta)
+        self.assertFalse(any(self.repo.rglob("openai.yaml")))
+        self.check(0)
 
     def test_missing_boundary_seed_fails(self):
         (self.repo / "plugins/dev-skills/skills/setup-dev-skills/boundaries.md").unlink()
@@ -276,28 +270,9 @@ class SkillLoadingPackaging(unittest.TestCase):
         path.write_text(path.read_text().replace('"repository"', '"homepage"'))
         self.fails_with("plugin.json has no repository field")
 
-    def test_codex_version_drift_fails(self):
-        path = self.repo / "plugins/dev-skills/.codex-plugin/plugin.json"
-        data = json.loads(path.read_text())
-        data["version"] = "9.9.9"
-        path.write_text(json.dumps(data))
-        self.fails_with("Codex manifest version differs from Claude manifest")
-
-    def test_codex_marketplace_offering_a_second_plugin_fails(self):
-        path = self.repo / ".agents/plugins/marketplace.json"
-        data = json.loads(path.read_text())
-        data["plugins"].append(dict(data["plugins"][0], name="other-plugin"))
-        path.write_text(json.dumps(data))
-        self.fails_with("Codex marketplace must offer only dev-skills")
-
     def test_missing_release_skill_fails(self):
         shutil.rmtree(self.repo / "plugins/dev-skills/skills/release")
         self.fails_with("missing plugins/dev-skills/skills/release/SKILL.md")
-
-    def test_display_name_of_another_skill_fails(self):
-        path = self.skill / "agents/openai.yaml"
-        path.write_text(path.read_text().replace("Fixture Contract", "Implement"))
-        self.fails_with('display_name "Implement" does not match the skill name')
 
     def test_repo_only_names_in_skill_text_fail(self):
         for text in ("Read ADR " + "0004 first.\n", "Ask Upstream.\n", "Run scripts/check-" + "plugin.sh.\n"):

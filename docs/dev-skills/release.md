@@ -2,9 +2,8 @@
 
 How this repo versions `dev-skills` and cuts a Release with the `release` skill: where the version lives, how a Release raises it, where the changelog goes, how Releases and their labels are named, and the whole-Release check (see [ADR 0016](adr/0016-releases-bump-the-plugin-version-once.md), which replaced ADR 0008).
 
-- **Bump mode**: Releases bump. A pull request never changes the version, a skill pull request included: it merges like any other, with no number to ask for. The Release's changelog pull request raises it once, in every manifest that holds it, by the biggest size among the Release's changes (see the cut steps).
+- **Bump mode**: Releases bump. A pull request never changes the version, a skill pull request included: it merges like any other, with no number to ask for. The Release's changelog pull request raises it once, in the plugin manifest, by the biggest size among the Release's changes (see the cut steps).
 - **Version file**: `plugins/dev-skills/.claude-plugin/plugin.json`, the `"version"` field. This is the canonical source for reading the current version, and for locating Releases up to 0.25.0 in git history.
-- **Synchronized version copy**: `plugins/dev-skills/.codex-plugin/plugin.json`, the `"version"` field. The Release's bump changes only the version field in both manifests, to the same version. Do not use this copy to locate Release history: its creation introduces the existing version without cutting a Release.
 - **Changelog**: `plugins/dev-skills/CHANGELOG.md`, newest entry first. One entry per Release, covering everything since the last Release, listing the versions it delivered and its start and end commits (its `Versions:` and `Commits:` line).
 - **Versioning policy**: Releases bump (the **Bump mode** line above is the same fact under its earlier name).
 - **Label prefix**: `release-`.
@@ -17,7 +16,7 @@ How this repo versions `dev-skills` and cuts a Release with the `release` skill:
   - **rides along**: changes outside `plugins/dev-skills/skills/` (the README, the changelog, ADRs, the glossary, scripts, tooling) never decide the size.
 - **Cut steps**: after the changelog entry is written, in this order:
   1. Read every change the Release delivers (the merged pull requests since the last Release's end commit) and give it a size. The Release's size is the biggest among them: major for a breaking change, minor for a new or changed skill, patch when the skill changes are fixes or reverts only. A Release that changed no file under `plugins/dev-skills/skills/` leaves the version as it is.
-  2. Raise the version in the changelog pull request, in every manifest that holds it (`plugins/dev-skills/.claude-plugin/plugin.json` and `plugins/dev-skills/.codex-plugin/plugin.json`, both, to the same version), from the current version with every part after the raised one set to 0, and change nothing else in them. The `codex-packaging` check rejects drift.
+  2. Raise the version in the changelog pull request, in `plugins/dev-skills/.claude-plugin/plugin.json`, from the current version with every part after the raised one set to 0, and change nothing else in it.
   3. Put the line `Versions: <the one new version, or "none, the version stays X.Y.Z" for a Release that changed no skill file>. Commits: <start>..<end>.` under the entry's goal.
   4. Run the whole-Release check below on that pull request's branch.
   5. The Release thread merges the changelog pull request as the Boundary record allows. A merged version bump is no one-way door here, and no cut waits for the user.

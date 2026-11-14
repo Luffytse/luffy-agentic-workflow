@@ -20,7 +20,7 @@ Read this first, then open only the docs whose line fits your work. Specs and ti
 
 ## Packaging
 
-- [README.md](../../README.md): Claude Code and Codex marketplace install, update and local-development steps. Read when changing install steps.
+- [README.md](../../README.md): Claude Code marketplace install, update and local-development steps. Read when changing install steps.
 - [LICENSE](../../LICENSE): the MIT license for our own work. Read when asking what the repo's license covers.
 - [dev-skills README](../../plugins/dev-skills/README.md): the plugin's install, update and development steps, folder layout, one line per skill and the last Upstream commit looked at. Read when installing the plugin or adding a skill of our own.
 - [scripts/run-tests.sh](../../scripts/run-tests.sh): the test runner CI runs; it runs every `test*` file under `scripts/` and names each failure ([scripts/test-run-tests.sh](../../scripts/test-run-tests.sh) tests it). Read when pushing a change under `scripts/`.

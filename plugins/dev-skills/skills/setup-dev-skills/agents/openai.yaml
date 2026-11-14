@@ -1,5 +1,0 @@
-interface:
-  display_name: "Setup Dev Skills"
-  short_description: "Configure a repository for the development skills"
-policy:
-  allow_implicit_invocation: true

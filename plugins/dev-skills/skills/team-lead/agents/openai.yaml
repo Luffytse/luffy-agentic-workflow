@@ -1,5 +1,0 @@
-interface:
-  display_name: "Team Lead"
-  short_description: "Deliver planned work: start, watch and replace workers"
-policy:
-  allow_implicit_invocation: true
