@@ -25,7 +25,7 @@ The last step of `release`: the **Slice** and the waiting issues, each passing t
 _Avoid_: release triage
 
 **Cut steps**:
-What a repo's release doc says the cut runs once the changelog entry is written, in order: what its versioning policy adds, anything else the repo must change or run, and optionally a step between Releases for a fix that cannot wait. A cut step wins over `release`'s own text where they differ, so the skill names no version policy.
+What a repo's release doc says the cut runs once the changelog entry is written, in order: anything the repo must change or run (a version bump, for a repo that keeps a version), and optionally a step between Releases for a fix that cannot wait. A cut step wins over `release`'s own text where they differ, so the skill names no version rules.
 
 **Triage batch**:
 The run of `triage` that the Release thread makes at each Release end, naming the release issue just closed: agents decide every open `needs-triage` issue, a **Handed-over Retro issue** included, against the Milestone without asking the user per issue, make the **Backlog sweep** and post one `## Triage batch` summary on the release issue. Its procedure lives in its own file in the `triage` folder, `TRIAGE-BATCH.md`, which a session triaging with the user does not read; only the batch sets `next-release` by rule. Owned by `triage`.

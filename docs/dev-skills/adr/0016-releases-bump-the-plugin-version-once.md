@@ -49,7 +49,7 @@ While the plugin was below 1.0.0, a breaking change bumped the minor part instea
 - ADR 0008 is marked superseded and keeps its text as history; its "How a Release works" Release definition still stands, amended by ADR 0012 and this one.
 - ADR 0012 gets an amendment note: this repo's versioning policy is Releases bump, and the cut steps add the bump and the `Versions:` line.
 - `scripts/check-plugin.sh` drops its `no-repo-merge-rules` check, which guarded skill text against naming the two rules above, with its test cases.
-- The plugin's `release` and `setup-dev-skills` text is not changed here; #143 removes versioning policy text from the plugin later, and the Codex manifest goes with #123, so the cut still names both manifests.
+- The plugin's `release` and `setup-dev-skills` text is not changed here; #143 removes versioning policy text from the plugin later (done in Ticket #191: this repo's bump stands as its own cut steps in `docs/dev-skills/release.md`, with no policy text behind it), and the Codex manifest goes with #123, so the cut still names both manifests.
 - The project's coordinator instructions describe the hand-out and the re-read until `setup-project` is re-run at the end of Milestone 4.
 - Past changelog entries, which record versions delivered one per pull request, stay as written.
 
