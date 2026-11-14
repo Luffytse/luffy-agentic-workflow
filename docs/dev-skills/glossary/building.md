@@ -20,7 +20,7 @@ The check against main a **Build thread** makes on its own issue before it makes
 _Avoid_: validity check, pre-build triage
 
 **Spec thread**:
-A project thread that builds one Spec with `implement-spec`. It owns the Spec by an **owner record**: a comment on the Spec naming its thread and how to reach it, left before it builds, so a second thread entering the Spec stops while the first runs.
+A project thread that builds one Spec with `implement-spec`, on the regular tier, coordinating Implementers and writing no code (ADR 0004). A thread that finds another thread building the Spec, which its brief does not say it replaces, stops and asks its coordinator.
 
 **Ticket thread**:
 A project thread that builds one lone Ticket with `implement`, writing the code itself in its own checkout, as a trial (ADR 0004).
@@ -30,11 +30,11 @@ A subagent that a **Spec thread** starts to build one of the Spec's Tickets test
 _Avoid_: coder, worker
 
 **Spec branch**:
-The long-lived branch a Spec is built on. Its Tickets are squash-merged into it, and it merges into main with a merge commit (ADR 0005).
+The long-lived branch a Spec is built on. Its Tickets are squash-merged into it, and it merges into main with a merge commit, unless the repo's own rules name another method (ADR 0005).
 _Avoid_: integration branch, feature branch
 
 **Ticket branch**:
-The branch one Ticket is built on. A Spec's Ticket branches start from the Spec branch and stay inside the thread; a lone Ticket's branch starts from main and is pushed.
+The branch one Ticket is built on. A Spec's Ticket branches start from the Spec branch, stay inside the thread and are deleted only after the Spec pull request merges (ADR 0005); a lone Ticket's branch starts from main and is pushed.
 
 **Ticket check**:
 One Quick Round over a Spec's Ticket branch, against the Spec branch, before the Ticket joins it, recorded on the Spec pull request. Its open Findings carry into the Spec pull request's Round 1. Not one of the Spec pull request's Rounds.

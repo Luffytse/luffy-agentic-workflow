@@ -10,6 +10,8 @@ Amended 2026-11-03 (#513): a Ticket that carries another coding agent's agent-on
 
 *Amendment note, 2026-11-14, Ticket #154 (Spec #151).* The amendment of 2026-11-03 (#513) above no longer applies: the plugin is Claude Code only for now (ADR 0001), the agent-only label role is gone, and `implement-spec` has no continuation path. Every Ticket of a Spec is built by its Spec thread on the spec branch, and a thread handed one Ticket under a Spec says so and stops.
 
+*Amendment note, 2026-11-14, Ticket [#180](https://github.com/Luffytse/luffy-agentic-workflow/issues/180) (absorbing #134 and #116).* **Nothing is deleted during the build.** After a Ticket lands only its worktree is removed; the local Ticket branches are deleted once, after the spec pull request has merged, and while the thread waits on the user every branch is kept. The user, on deleting a Ticket branch after each landing: "That just doesn't sound right to me. Like, why we doing that?" The landing check that guarded the delete goes with it (#14, #200). The spec pull request merges with a merge commit unless the repo's own rules name another merge method, which `merging` applies (#116). A spec never merges in part: its pull request waits until every Ticket of its graph has landed or the user has dropped it.
+
 ## Why
 
 - A live test in a cloud thread (2026-10-29) showed two subagents can each work in their own worktree off a spec branch, commit, and be squash-merged back, in parallel.
