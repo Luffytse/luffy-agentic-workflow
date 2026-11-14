@@ -65,7 +65,7 @@ Each ticket carries a `wayfinder:<type>` label, one of `research`, `prototype`, 
 
 A session **claims** a ticket by assigning it to the dev driving the map, **first**, before any work, so concurrent sessions skip it. That assignee _is_ the claim: an open, unassigned ticket is unclaimed.
 
-Blocking uses the tracker's **native** dependency relationship (the tracker doc's Blocking operation): essential because it renders the frontier _visually_ in the tracker's own UI, so the human sees what's takeable without opening the map. Where native blocking is unavailable, or the write fails at run time, write the tracker doc's fallback form for that ticket instead, using the tracker doc's way of adding a line to an issue body (the ticket already exists), listing every blocker of that ticket, then check with the tracker doc's way of counting open blockers that every blocker is in place in one form or the other. A ticket is **unblocked** when every ticket blocking it is closed; the **frontier** is the open, unblocked, unclaimed children, the edge of the known.
+Blocking uses the tracker's **native** dependency relationship (the tracker doc's Blocking operation): essential because it renders the frontier _visually_ in the tracker's own UI, so the human sees what's takeable without opening the map. Only a tracker that lacks native blocking falls back to a body convention; the tracker doc's Blocking operation says how. A ticket is **unblocked** when every ticket blocking it is closed; the **frontier** is the open, unblocked, unclaimed children, the edge of the known.
 
 The answer isn't part of the body; it's recorded on resolution (see [Work through the map](#work-through-the-map)). Assets created while resolving a ticket are linked from the issue, not pasted in.
 
@@ -112,7 +112,7 @@ User invokes with a loose idea.
 3. **Create the map** (label `wayfinder:map`): Destination and Notes filled in, Decisions-so-far empty, the fog sketched into **Not yet specified**.
 4. **Create the tickets you can specify now** as child issues of the map, then wire blocking edges in a **second pass** (issues need ids before they can reference each other). Write cross-references in that pass too, with real ids: a placeholder `#<n>` auto-links to an unrelated issue. Wiring sorts them into the frontier and the blocked; everything you can't yet specify stays in the fog: the **Not yet specified** section.
 5. **Fire the research subagents.** For each `research` ticket you just created, spin up a subagent with a fresh context window that calls the Skill tool with "research" to resolve it in parallel, capturing its findings on a throwaway `research/<name>` branch with a context pointer from the ticket. Push the branch but open no PR: it is never merged.
-6. [Offer `setup-project`](#offer-setup-project), then stop: charting is one session's work; it hand-resolves nothing.
+6. Stop: charting is one session's work; it hand-resolves nothing.
 
 ### Work through the map
 
@@ -123,10 +123,5 @@ User invokes with a map (URL or number). A ticket is **optional**: without one, 
 3. Resolve it as the type its `wayfinder:<type>` label names (see [Ticket Types](#ticket-types)). Read the label, not just the body: the body never states the type. **Zoom as needed**: fetch the full body of any related or closed ticket on demand; call the Skill tool for whichever skills the `## Notes` block names. If in doubt, call the Skill tool twice, for "grilling" and "domain-modeling".
 4. Record the resolution: post the answer as a **resolution comment**, **close** the issue, and **append a context pointer** to the map's Decisions-so-far.
 5. Add newly-surfaced tickets (create-then-wire); graduate any fog the answer has made specifiable, clearing each graduated patch from **Not yet specified** so it lives only as its new ticket. If the answer reveals that a ticket (this one or another) sits beyond the destination, **rule it out of scope** rather than resolving it on the route. If the decision invalidates other parts of the map, update or delete those tickets.
-6. [Offer `setup-project`](#offer-setup-project).
 
 The user may run unblocked tickets in parallel, so expect other sessions to be editing the tracker concurrently.
-
-## Offer `setup-project`
-
-At the end of either mode, decide whether this session changed what the project's threads need: a new repo, a new kind of thread, or a new standing rule. If so, offer the user `setup-project` in one line naming what changed. Only offer: call the Skill tool with "setup-project" only after the user says yes. If nothing changed, say nothing about it.
