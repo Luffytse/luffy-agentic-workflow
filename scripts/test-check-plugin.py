@@ -106,6 +106,20 @@ class SkillLoadingPackaging(unittest.TestCase):
         with open(self.repo / rel, "a") as f:
             f.write("\n" + text)
 
+    def test_index_bullet_over_60_words_fails_and_names_the_line(self):
+        index = self.repo / "docs/dev-skills/index.md"
+        index.write_text("# Docs index\n\n- [a](glossary.md): short. Read when short.\n- [Long one](glossary.md): " + "word " * 61 + "\n")
+        result = self.run_checker()
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("FAIL: index-line-length: - [Long one](glossary.md)", result.stdout)
+        self.assertIn("over 60", result.stdout)
+        self.assertNotIn("[a](glossary.md)", result.stdout)
+
+    def test_index_bullets_of_60_words_or_fewer_pass(self):
+        index = self.repo / "docs/dev-skills/index.md"
+        index.write_text("# Docs index\n\nA long prose line is not a bullet. " + "word " * 80 + "\n\n- [a](glossary.md): " + "word " * 58 + "\n")
+        self.check(0)
+
     def test_model_name_in_readme_fails(self):
         self.plant("plugins/dev-skills/README.md")
         self.check(1)
