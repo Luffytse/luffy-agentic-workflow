@@ -29,12 +29,6 @@ _Avoid_: Client, buyer, account
 - **Only include terms specific to this project's context.** General programming concepts (timeouts, error types, utility patterns) don't belong even if the project uses them extensively. Before adding a term, ask: is this a concept unique to this context, or a general programming concept? Only the former belongs.
 - **Group terms under subheadings** when natural clusters emerge. If all terms belong to a single cohesive area, a flat list is fine.
 
-## Single glossary, or one page per Area
-
-A repo starts with one glossary, `docs/dev-skills/glossary.md`. When it passes about 10 KB, `domain-modeling` splits it into one page per Area at `docs/dev-skills/glossary/<area>.md`, and `docs/dev-skills/glossary.md` becomes the map listing the pages (see "Splitting the glossary" in [SKILL.md](./SKILL.md)). The entry point keeps its path; only its content changes from terms to the map. A page uses the same structure as above, with the Area as its title. Load `docs-index` when updating the index after a glossary split.
-
-A map that points at `docs/dev-skills/glossary/` lists Area pages of one glossary. The map format below also covers multi-context repos, where the map points into `src/` and the pages live next to the code.
-
 ## Single vs multi-context repos
 
 **Single context (most repos):** `docs/dev-skills/glossary.md` holds the terms.
