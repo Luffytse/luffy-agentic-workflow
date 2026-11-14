@@ -21,7 +21,7 @@ Post one comment with the tracker doc's **Comment on an issue** operation. First
    - the unplanned step-ins as a count with causes;
    - the proposals for the next Milestone, one line each; proposals, not scope.
 2. **Outcomes:** each feature and acceptance criterion with its outcome and evidence links; satisfied, unmet and unverified kept apart. Include regression or end-of-Milestone checks actually run and their limits. Invent no pass or acceptance.
-3. **Parked and maintenance:** each parked feature or Ticket with its blocker and each issue that waits with it; each worker or issue still waiting on the user (its `wait` record); each maintenance issue left open, with its recorded reason.
+3. **Parked and maintenance:** each parked feature or Ticket with its blocker and each issue that waits with it; each worker still waiting on the user (its `wait` record); each maintenance issue left open, with its recorded reason.
 4. **Unplanned step-ins:** each with time, source link and cause.
 5. **Time and tokens, Versions, Agent decisions:** the lines above.
 

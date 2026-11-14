@@ -10,7 +10,7 @@ A **Milestone** is a product goal the user sets, written down in one Milestone i
 1. **Planning**, with the user: the features are named, sorted and planned, then the Milestone issue is written and every feature in it is labelled.
 2. **The Plugin version check**, once planning settles: one read that threads here load main's plugin text.
 3. **Delivery**, run by the coordinator with the `team-lead` skill (see "Delivery"), once both phases before it are done.
-4. **The report**, once `team-lead`'s "End of delivery" finds every feature merged, parked, waiting with a parked issue or waiting on the user: it ends with a stop for the user's Milestone review ([reporting.md](reporting.md)).
+4. **The report**, once `team-lead`'s "End of delivery" finds every feature merged, parked or waiting with a parked issue: it ends with a stop for the user's Milestone review ([reporting.md](reporting.md)).
 
 **No Milestone.** A project is inside a Milestone only while its Milestone issue is open: an open issue carrying a label in the Boundary record's Milestone label form, whose body is the Milestone rather than a feature. With none open, no delivery runs: the next plan the user makes starts one.
 
