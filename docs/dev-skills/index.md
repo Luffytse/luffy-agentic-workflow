@@ -14,6 +14,7 @@ Read this first, then open only the docs whose line fits your work. Specs and ti
 - [docs/dev-skills/triage-labels.md](triage-labels.md): the label string for each triage role, the `next-release` role, the Repo labels table and the other labels. Read when applying or filtering triage labels.
 - [docs/dev-skills/domain.md](domain.md): the single-context doc layout and how skills read the glossary and ADRs. Read when a skill looks for domain docs or flags an ADR conflict.
 - [docs/dev-skills/release.md](release.md): the release doc: version sources, versioning policy, Release size, change sizes, cut steps, naming and the whole-Release check. Read when running the `release` skill, raising the version at a cut or giving an issue a release label.
+- [docs/dev-skills/environment-check.md](environment-check.md): this repo's own test of the `worker-control` references: six rows, who acts, scratch rules, the result table and the clean-up, for a cloud project and a local session. Read when running the Environment check or changing a `worker-control` reference.
 - [docs/dev-skills/boundaries.md](boundaries.md): this repo's Boundary record: approvals, budget, skill file size limit, check-in interval and Milestone label form. Read when a skill or thread decides whether an action needs the user, or when giving an issue a Milestone label.
 - [Agent setup glossary](glossary/agent-setup.md): Repo labels, `next-release`, Boundary record and Door. Read when a skill labels an issue or decides who merges.
 - [docs/dev-skills/upstream-watch.md](upstream-watch.md): the prompt of the Upstream watch, run by hand every 2 weeks, and how its reminder issue works. Read when running or changing the watch.
@@ -37,7 +38,7 @@ Read this first, then open only the docs whose line fits your work. Specs and ti
 
 ## Building
 
-- [Delivery glossary](glossary/delivery.md): Milestone, project threads, Plugin version check, Harness, Worker control, Team lead, Takeover, Parked and Pause. Read when working on `milestone`, `team-lead` or `worker-control`.
+- [Delivery glossary](glossary/delivery.md): Milestone, project threads, Plugin version check, Harness, Worker control, Environment check, Team lead, Takeover, Parked and Pause. Read when working on `milestone`, `team-lead` or `worker-control`.
 - [Releases glossary](glossary/releases.md): Release, Release size, Main check, Ranked list, Cut steps, Triage batch and Release thread. Read when working on `release` or the Triage batch.
 - [Build glossary](glossary/building.md): Spec, Ticket, build threads, branches, Build check, Implementer and Merging. Read when working on `implement`, `implement-spec` or `merging`.
 - [ADR 0004](adr/0004-build-threads-coordinate-and-subagents-code.md): build threads coordinate and Implementer subagents code; a pull request goes to the user only at a boundary crossing; a build thread reads its issue against main first. Read when working on `implement`, `implement-spec`, `to-tickets` or `setup-project`.

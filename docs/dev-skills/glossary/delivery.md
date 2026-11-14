@@ -21,8 +21,12 @@ The tool a coordinator runs its workers in, named by the way workers run there (
 _Avoid_: runtime adapter, platform
 
 **Worker control**:
-The `worker-control` Base skill: it starts, checks, stops, pauses and resumes workers in the **Harness** it runs in, and arranges and ends a check-in, from one reference per Harness; deciding which work starts and when stays with its caller. Its short check proves those methods here before unattended work relies on them. How it detects the Harness and its role, and what a reference holds, are its own.
+The `worker-control` Base skill: it starts, checks, stops, pauses and resumes workers in the **Harness** it runs in, and arranges and ends a check-in, from one reference per Harness; deciding which work starts and when stays with its caller. How it detects the Harness and its role, and what a reference holds, are its own.
 _Avoid_: harness-team (its working name), lifecycle agent
+
+**Environment check**:
+This repo's own test of the `worker-control` references: six probes (start a worker, worker state, pause and resume, confirmed stop, end or failure notice, recurring check-in) run in a cloud project and in a local Claude Code session, whose result is one comment on the Milestone issue. It tests worker control only, and no skill names it. Its doc is `docs/dev-skills/environment-check.md`; `CLAUDE.md` says when it runs.
+_Avoid_: Worker control check (the earlier check inside the skill), Startup verification, smoke test
 
 **Team lead**:
 The `team-lead` skill: the role the coordinator runs to deliver planned work, always a Milestone's (ADR 0010, ADR 0012). It manages the work, not the machinery: it starts build and Release threads, reacts to what workers and the **Harness** report, and holds the **Stand-up**, **Takeover** and **Pause**, with every worker action through **Worker control**. "Coordinator" stays the name of the project's own agent; the team lead is what it runs, and a coordinator that cannot load the plugin's skills follows the project instructions `setup-project` assembles instead.

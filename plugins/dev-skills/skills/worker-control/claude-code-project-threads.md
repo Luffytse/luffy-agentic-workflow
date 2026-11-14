@@ -1,6 +1,6 @@
 # Claude Code project threads
 
-Workers run as **threads** of a claude.ai Claude Code project, this reference's **Harness**: the coordinator is the project conversation, and each thread is a separate cloud session (or a session on the user's machine through Remote Control) with its own branch. Docs read 2026-11-03. A line marked **runtime-reported** names a fact no doc page states but the runtime's own tools showed; the check proves it here or records it as a limit.
+Workers run as **threads** of a claude.ai Claude Code project, this reference's **Harness**: the coordinator is the project conversation, and each thread is a separate cloud session (or a session on the user's machine through Remote Control) with its own branch. Docs read 2026-11-03. A line marked **runtime-reported** names a fact no doc page states but the runtime's own tools showed; it is a fact seen in use, not one the docs promise.
 
 ## Detect
 
@@ -38,12 +38,12 @@ A thread hands any of these over once, as the build and merge skills say; none i
 
 ### Start a worker
 
-`mcp__hearthbot__start_thread`, briefed with the task; record the thread's id and its session's id from the answer (the tool is runtime-reported: the doc page says the coordinator starts threads, not with which tool; unproven until the check passes). The new thread starts from the repository's default branch unless the brief names another.
+`mcp__hearthbot__start_thread`, briefed with the task; record the thread's id and its session's id from the answer (the tool is runtime-reported: the doc page says the coordinator starts threads, not with which tool). The new thread starts from the repository's default branch unless the brief names another.
 Source: [send work and read results](https://code.claude.com/docs/en/claude-projects#send-work-and-read-results), [review a thread's pull request](https://code.claude.com/docs/en/claude-projects#review-a-threads-pull-request)
 
 ### Read a worker's state
 
-`list_threads`, reading **every page** until it returns no next cursor: a state filter applies page by page, so one page can miss a thread. `list_threads` can lag about a minute behind a thread's end, so a thread that just ended may be missing from it: read `get_session` on its session, or wait and list again. `get_session` gives the session status (running, idle, archived) and status bucket (runtime-reported). A coordinator may not hold `get_session` (the check's coordinator did not): it then relies on `list_threads` and, for a finer or fresher reading, asks a thread to read `get_session` for it. A thread reads it. Running and idle are not ended. Tracker comments and the thread's last message are never the state.
+`list_threads`, reading **every page** until it returns no next cursor: a state filter applies page by page, so one page can miss a thread. `list_threads` can lag about a minute behind a thread's end, so a thread that just ended may be missing from it: read `get_session` on its session, or wait and list again. `get_session` gives the session status (running, idle, archived) and status bucket (runtime-reported). A coordinator may not hold `get_session` (a project coordinator has been seen without it): it then relies on `list_threads` and, for a finer or fresher reading, asks a thread to read `get_session` for it. A thread reads it. Running and idle are not ended. Tracker comments and the thread's last message are never the state.
 Source: [see what needs you](https://code.claude.com/docs/en/claude-projects#see-what-needs-you-in-overview), [work with sessions](https://code.claude.com/docs/en/claude-code-on-the-web#work-with-sessions)
 
 ### Notice a worker ended or failed
@@ -54,7 +54,7 @@ Source: [how a project is organized](https://code.claude.com/docs/en/claude-proj
 ### Stop a worker and read the stop back
 
 1. Ask the thread (`message_thread`) to push its work and stop itself; read its state back.
-2. If it does not answer, start a short **stop thread** briefed with the hung thread's session: it archives that session (`archive_session`), reads it back with `get_session` (archived is ended), reports both readings and ends. One thread archiving another's session is runtime-reported and unproven until the check passes. The coordinator then reads the record again itself.
+2. If it does not answer, start a short **stop thread** briefed with the hung thread's session: it archives that session (`archive_session`), reads it back with `get_session` (archived is ended), reports both readings and ends. One thread archiving another's session is runtime-reported. The coordinator then reads the record again itself.
 
 The user's **Stop** only interrupts the current turn and leaves the thread resumable; `interrupt_session` is the same. An archived session accepts no message. An archive can be undone by unarchiving, so it is a stop only while no one undoes it.
 Source: [archive sessions](https://code.claude.com/docs/en/claude-code-on-the-web#archive-sessions), [errors when sending to a cloud session](https://code.claude.com/docs/en/claude-code-on-the-web#errors-when-sending-to-a-cloud-session), [open a thread when you need control](https://code.claude.com/docs/en/claude-projects#open-a-thread-when-you-need-control)
@@ -66,6 +66,6 @@ Source: [pause, archive, or delete a project](https://code.claude.com/docs/en/cl
 
 ### Arrange and end a check-in
 
-Arrange: start a short thread briefed to create one recurring scheduled task (`create_trigger` with a cron expression, aimed at the coordinator's session by `persistent_session_id`, named with the run's token) at the interval the caller gives, report its id and end. These tools are runtime-reported; a recurring task arriving in the coordinator is unproven until the check passes. Before arranging, list the tasks (`list_triggers`) and end any left by an earlier run. The task outlives that thread, and its target followed the coordinator when the coordinator's session was recycled (runtime-reported). A recurring schedule runs at most hourly, and a run waits until its target session is idle. Read each arrival from the coordinator's own session events (`list_events` or `get_event` on its session, runtime-reported), never from the scheduler's success record alone.
+Arrange: start a short thread briefed to create one recurring scheduled task (`create_trigger` with a cron expression, aimed at the coordinator's session by `persistent_session_id`, named with the run's token) at the interval the caller gives, report its id and end. These tools are runtime-reported, and so is a recurring task arriving in the coordinator. Before arranging, list the tasks (`list_triggers`) and end any left by an earlier run. The task outlives that thread, and its target followed the coordinator when the coordinator's session was recycled (runtime-reported). A recurring schedule runs at most hourly, and a run waits until its target session is idle. Read each arrival from the coordinator's own session events (`list_events` or `get_event` on its session, runtime-reported), never from the scheduler's success record alone.
 End: start a short thread briefed to delete that task (`delete_trigger`, runtime-reported) and read back with `list_triggers` that it no longer runs. When to arrange and end it is the caller's decision.
 Source: [scheduled tasks](https://code.claude.com/docs/en/routines#add-a-schedule-trigger), [edit and control scheduled tasks](https://code.claude.com/docs/en/routines#edit-and-control-scheduled-tasks), [how projects relate to other features](https://code.claude.com/docs/en/claude-projects#how-projects-relate-to-other-claude-code-features)

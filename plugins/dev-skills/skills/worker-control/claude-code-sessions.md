@@ -1,6 +1,6 @@
 # Claude Code sessions
 
-Workers run inside or beside one Claude Code session (desktop app, CLI or web), this reference's **Harness**: **subagents** started with the Agent tool, and, in the desktop app, **other sessions** started with the `ccd_session` tools. A subagent works within its parent session and cannot outlive it, so it suits work that ends within that session, not workers that wait hours for a wake. Docs read 2026-11-03. A line marked **runtime-reported** names a fact no doc page states; the check proves it here or records it as a limit.
+Workers run inside or beside one Claude Code session (desktop app, CLI or web), this reference's **Harness**: **subagents** started with the Agent tool, and, in the desktop app, **other sessions** started with the `ccd_session` tools. A subagent works within its parent session and cannot outlive it, so it suits work that ends within that session, not workers that wait hours for a wake. Docs read 2026-11-03. A line marked **runtime-reported** names a fact no doc page states; it is a fact seen in use, not one the docs promise.
 
 ## Detect
 
@@ -29,7 +29,7 @@ Source: [tools reference](https://code.claude.com/docs/en/tools-reference), [sub
 
 ### Read a worker's state
 
-Subagent: running until its completion notification arrives. There is no polling tool for it (the old output tool was removed; a background task's output file is read with Read), so the notification is the record. Desktop session: `get_session` or `list_sessions` on its id (runtime-reported, not on the doc page; unproven until the check passes).
+Subagent: running until its completion notification arrives. There is no polling tool for it (the old output tool was removed; a background task's output file is read with Read), so the notification is the record. Desktop session: `get_session` or `list_sessions` on its id (runtime-reported, not on the doc page).
 Source: [results of background subagents](https://code.claude.com/docs/en/sub-agents#tools-permissions-and-results-of-background-subagents), [tools reference](https://code.claude.com/docs/en/tools-reference), [work across sessions](https://code.claude.com/docs/en/desktop#work-across-sessions)
 
 ### Notice a worker ended or failed
@@ -44,7 +44,7 @@ Source: [tools reference](https://code.claude.com/docs/en/tools-reference), [res
 
 ### Pause and resume
 
-No pause of its own. Pause: start no new worker, and ask each running one to stop at its next natural step, or stop it as above. Resume: SendMessage to the subagent's ID or name, which resumes it in the background with its history; for a desktop session, `send_message` (runtime-reported; unproven until the check passes). Pausing by a message is a convention the worker follows, not a Harness pause.
+No pause of its own. Pause: start no new worker, and ask each running one to stop at its next natural step, or stop it as above. Resume: SendMessage to the subagent's ID or name, which resumes it in the background with its history; for a desktop session, `send_message` (runtime-reported). Pausing by a message is a convention the worker follows, not a Harness pause.
 Source: [resume subagents](https://code.claude.com/docs/en/sub-agents#resume-subagents), [work across sessions](https://code.claude.com/docs/en/desktop#work-across-sessions)
 
 ### Arrange and end a check-in
