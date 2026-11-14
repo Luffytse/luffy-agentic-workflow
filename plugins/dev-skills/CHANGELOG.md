@@ -2,6 +2,32 @@
 
 What each version of `dev-skills` brought, newest first. Each Release adds one entry here covering everything since the last Release: its goal, the version it delivered (older entries list the versions delivered one per skill pull request), the issues it shipped, and what a project using the plugin must do when something breaks. Entries up to 0.25.0 are one per version, when only a Release bumped it.
 
+## Milestone 4 · Release 1 (2026-11-14)
+
+The serial base of Milestone 4 lands: this repo develops itself without model evals, the version is bumped once at the Release cut, the docs index and glossary are short, the plugin targets Claude Code only, shared rules are said once, the environment check is this repo's own test, and the Triage batch and Retro planning run with no human.
+
+Versions: 2.0.0. Commits: ae30934..878771e.
+
+- Spec: this repo develops itself without model evals, names the skills it uses, and holds skill files to 4,000 words (#147), with its Tickets: retire the model evals (#148); lower the skill file size limit to 4,000 words (#149)
+- Cloud threads load dev-skills once: remove this repo's skills links (#161)
+- Bump the plugin version once, at the Release cut; the version hand-out and the Ticket re-read leave this repo's docs (#150)
+- Docs index and plugin README: one short line per doc and per skill, and a check on index line length (#187)
+- Glossary: Area pages behind a map, each entry a definition that names the skill owning its rule (#188)
+- Spec: the plugin targets Claude Code only for now (#151), with its Tickets: remove the Codex packaging and its checks (#152); remove Codex from the worker, tier and writing skills (#153); remove the agent-only label role and `implement-spec`'s continuation for another agent's Tickets (#154)
+- Say the docs reading rule once, in the `CLAUDE.md` block `setup-dev-skills` writes (#155)
+- The repo labels rule lives in the triage-labels doc beside its table (#156)
+- Spec: the environment check is this repo's own test; a project keeps only a plugin version check (#162), with its Tickets: `milestone` keeps only a plugin version check (#163); the worker control probes leave `worker-control` and become this repo's Environment check (#164); the Claude Code reference says how a cloud environment keeps the plugin current (#165)
+- Spec: the Triage batch and Retro planning run at a Release end with no human; `retro` only files (#157), with its Tickets: the Triage batch moves into its own file (#158); `retro` only files, a repeated Bug class becomes a Retro issue (#159); Retro planning becomes one unattended sort (#160)
+
+Also merged: the plugin checks run on a self-hosted runner (#133).
+
+### What to do
+
+- A project that runs the plugin in Codex: the plugin no longer ships Codex packaging (`.codex-plugin/`, `agents/openai.yaml`) or the Codex worker reference, so Codex installs stop updating; use Claude Code (#151).
+- Run `setup-dev-skills` again: the agent-only label role is gone, so its section leaves `docs/dev-skills/triage-labels.md` (#154); that doc gains the **Repo labels** rule beside its table (#156); the `## Agent skills` block in `CLAUDE.md` or `AGENTS.md` gets its new reading-rule line (#155).
+- A project whose coordinator follows instructions `setup-project` assembled: run `setup-project` again, as `team-lead` and `milestone` changed (#162, #157). A Milestone now starts with a plugin version check only; the worker probes of Startup verification are gone from the skills (#162).
+- Retro planning and the Triage batch now run unattended at a Release end, with no walk-through for the user (#157).
+
 ## Milestone 3 · Release 2 (2026-11-09)
 
 A skill-loading coordinator closes the Milestone issue once the user accepts the Milestone, so Milestone 3's own end runs the cycle cleanly without Lufei stepping in.
