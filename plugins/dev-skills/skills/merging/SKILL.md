@@ -47,7 +47,7 @@ Name what stops the merge: the boundary (the action, as the Boundary record list
    - the one last commit of "fix" Nits that `review-rounds` has the owner make after a clean Round;
    - a merge of main with conflicts that a later resolutions check covers, with no open Important.
 
-   A Round 0 comment at level None on the current head has no Result line and counts as ready by its checks. In any other case do not merge: go back to the caller's review step.
+   A Result reading `waiting on a boundary` counts as `clean` only when the merge was what waited and the user's answer is on the pull request after that comment. A Round 0 comment at level None on the current head has no Result line and counts as ready by its checks. In any other case do not merge: go back to the caller's review step.
 3. **Check the closing lines.** The pull request's body carries a `Closes #<n>` line for each issue the caller names as built by it, and for each source it absorbs (as `issue-absorption` says); add any missing one by editing the body.
 4. **Sync with main.** Fetch main. If the branch lacks commits from main, the committer merges main in (a merge, never a rebase) and pushes. A merge with conflicts has its resolutions reviewed as `review-rounds` says under "Merges from main"; a merge without conflicts needs only the checks.
 5. Rerun the checks on the branch's head, in the committer's worktree where it has one, and wait for CI (if the repo has any).
