@@ -29,8 +29,6 @@ _Avoid_: Client, buyer, account
 - **Only include terms specific to this project's context.** General programming concepts (timeouts, error types, utility patterns) don't belong even if the project uses them extensively. Before adding a term, ask: is this a concept unique to this context, or a general programming concept? Only the former belongs.
 - **Group terms under subheadings** when natural clusters emerge. If all terms belong to a single cohesive area, a flat list is fine.
 
-A map that points at `docs/dev-skills/glossary/` lists Area pages of one glossary. The map format below also covers multi-context repos, where the map points into `src/` and the pages live next to the code.
-
 ## Single vs multi-context repos
 
 **Single context (most repos):** `docs/dev-skills/glossary.md` holds the terms.

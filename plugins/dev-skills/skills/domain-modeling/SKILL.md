@@ -61,7 +61,7 @@ Create files lazily: only when you have something to write. If `docs/dev-skills/
 
 ## Keeping the docs index current
 
-A new ADR or glossary page gets its line in the docs index (`docs-index` has the format). Editing a term or an existing ADR needs no index change.
+A new ADR or glossary page gets its line in the docs index (`docs-index` has the format). Editing a term needs no index change; an existing ADR's line changes only when it is renamed, deleted or superseded.
 
 ## During the session
 
