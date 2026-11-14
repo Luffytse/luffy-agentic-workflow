@@ -1,6 +1,6 @@
 # Issue tracker: REST routes
 
-Open this only in a session that has `gh` but no GraphQL (`gh issue view` and its neighbours fail with "GraphQL is not available"). A session with the GitHub tools needs no route here. Each bullet names an operation of [issue-tracker.md](./issue-tracker.md), which says what it means; here is its `gh api` route (REST, no GraphQL), where `<owner>/<repo>` is the repo.
+Open this only in a session whose `gh` fails with "GraphQL is not available", or is older than 2.94. A session with the GitHub tools needs no route here. Each bullet gives the `gh api` route (REST, no GraphQL) of an operation of [issue-tracker.md](./issue-tracker.md), which says what it means, or of a case it names; `<owner>/<repo>` is the repo. The operations without a bullet, the **Map** and **Claim** of wayfinding among them, use the route of the bullet their text names.
 
 - **Create an issue**: `gh api --method POST repos/<owner>/<repo>/issues -f title="..." -f 'labels[]=<label>' -F body=@- <<'EOF'` with the body on the lines after it, ended by `EOF` (`-F body=@-` reads the body from stdin; repeat `-f 'labels[]=...'` for more labels).
 - **Read an issue**: `gh api repos/<owner>/<repo>/issues/<number>` for the issue and `gh api --paginate repos/<owner>/<repo>/issues/<number>/comments` for its comments.

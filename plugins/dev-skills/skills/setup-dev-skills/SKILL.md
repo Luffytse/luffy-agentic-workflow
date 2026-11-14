@@ -24,7 +24,7 @@ This is a prompt-driven skill, not a deterministic script. Explore, present what
 Read whatever exists; assume nothing:
 
 - `git remote -v`: which host and which `<owner>/<repo>`? Take it from either URL form, `https://github.com/<owner>/<repo>(.git)` or `git@github.com:<owner>/<repo>(.git)`, and drop a trailing `.git`. Only GitHub is supported. If the remote is not GitHub, tell the user the plugin does not support that tracker yet, and stop.
-- Is the repo reachable? Use the **Check the repo is reachable** operation of the tracker doc, or of the seed `issue-tracker-github.md` where the repo has no tracker doc yet (a session without `gh` uses the GitHub tools it has for the same read). If the repo cannot be reached, stop and tell the user what is missing.
+- Is the repo reachable? Use the **Check the repo is reachable** operation of the tracker doc, or of the seed `issue-tracker-github.md` where the repo has no tracker doc yet (a session without `gh` uses the GitHub tools it has for the same read, and one whose `gh` fails for lack of GraphQL uses the `gh api` route of the seed `rest-routes.md`). If the repo cannot be reached, stop and tell the user what is missing.
 - `AGENTS.md` and `CLAUDE.md` at the repo root: does either exist? Is there already an `## Agent skills` section?
 - `docs/dev-skills/glossary.md` (the glossary, or its map once split), and the legacy `CONTEXT.md` / `CONTEXT-MAP.md` at the repo root. If a legacy file exists, offer to `git mv` it to `docs/dev-skills/glossary.md` (a `CONTEXT-MAP.md` becomes the map).
 - `docs/dev-skills/adr/` and any `src/*/docs/adr/` directories.
@@ -164,7 +164,7 @@ Check, and report each failure to the user. Never change a setting, and never cr
 | --- | --- | --- |
 | Sub-issues and dependencies | (**Read repo settings**) Any issue's sub-issue and dependency summaries are present; report "not checked" when the repo has no issue to probe. Note whether the installed command-line tool has the native parent and blocked-by options, or only the routes in the seed | `to-tickets` and `wayfinder` fall back to `Part of #<n>` and `Blocked by:` lines |
 | Draft PRs | The repo is public, which allows drafts. A private repo needs a paid plan: the "Upgrade to GitHub Pro" message from the branch protection read means a free plan, so fail; if the plan cannot be told, report "not checked" | `implement-spec` cannot open the Spec pull request as a draft |
-| Merge methods | The merge method the repo uses is allowed: the one its own rules name, else the one the build skill asks for (`implement` squashes, `implement-spec` merges with a merge commit) | the build skill cannot merge |
+| Merge methods | The merge method each build skill will use is allowed: the one the repo's own rules name, else squash merging for `implement` and merge commits for `implement-spec` | that build skill cannot merge |
 | Default branch | The default branch is `main` | the build skills assume `main` |
 | Branch protection | Neither classic protection nor branch rules require reviews or restrict who can merge in a way that stops the agent merging its own pull request | the agent cannot merge; the user must merge |
 
