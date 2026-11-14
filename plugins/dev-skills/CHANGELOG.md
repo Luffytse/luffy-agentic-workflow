@@ -2,6 +2,29 @@
 
 What each version of `dev-skills` brought, newest first. Each Release adds one entry here covering everything since the last Release: its goal, the version it delivered (older entries list the versions delivered one per skill pull request), the issues it shipped, and what a project using the plugin must do when something breaks. Entries up to 0.25.0 are one per version, when only a Release bumped it.
 
+## Milestone 4 · Release 2 (2026-11-14)
+
+The delivery core of Milestone 4 lands: the `top` tier, Milestone planning along a graph, a short Milestone report, delivery that follows the graph, a trimmed `merging`, `wayfinder` and `to-tickets` near the inherited text, and `implement` and `implement-spec` rebuilt, so `implement-spec` falls under 4,000 words.
+
+Versions: 3.0.0. Commits: 878771e..66f40a5.
+
+- Add a `top` Model tier for planning a feature with the user, and for advice to Release planning on a dependency graph; Milestone planning stays on premium (#166)
+- `wayfinder`'s blocking sentence goes back to the inherited words, and `wayfinder` and `to-tickets` stop offering `setup-project` (#170)
+- `merging` checks the review record before a merge, follows the repo's own merge method, and loses merge-time steps, old tracker text and the Retro origin input (#178)
+- Milestone planning: name the features, plan each in its own session along a dependency graph, and fix them once planning settles (#167)
+- Milestone report: one screen of key points first, and the detail trimmed (#168)
+- `to-tickets` goes back near the inherited text: the user approves every split, and the rules added on one sighting leave (#171)
+- Spec: delivery follows the Milestone's graph: Release planning takes the next slice, the team lead starts whatever is unblocked, and a parked issue never stops the rest (#173), with its Tickets: the Release cut carries nothing over, a parked issue and what waits with it leave the Release, and a hand-closed issue is checked against main (#174); Release planning takes the next slice of the Milestone's graph with the waiting bugs, and lists each entry with its blockers (#175); `team-lead` starts every unblocked entry with no limit, holds the Milestone review gate, resumes an ended worker first, and loses merge-time steps, old records and most of pause (#176)
+- A Ticket with a live step lists what the person provides, and planning checks each item before the build starts (#172)
+- `implement`: the Ticket thread builds the lone Ticket itself as a trial, an action waits and a decision parks, and the retro only files (#179)
+- `implement-spec`: a regular Spec thread, no owner record, nothing deleted before the merge, and a parked Ticket never stops the others (#180)
+
+### What to do
+
+- A project whose release doc bumps the version per pull request, or whose `CLAUDE.md` or `AGENTS.md` holds steps to take just before a merge: `merging` no longer reads or runs a repo's merge-time steps (#178). Run `setup-dev-skills` again, or copy the release doc's "The bump at merge" steps into the agent instructions yourself, so the thread that merges still takes them.
+- A project whose coordinator follows instructions `setup-project` assembled: run `setup-project` again, as `team-lead`, `milestone` and `release` changed (#166, #167, #173). Delivery now starts every unblocked Order entry with no thread limit unless the project sets one, the instructions no longer copy merge-time steps, and feature planning threads run on the `top` tier.
+- A project with its own tier map: add a `top` entry, or `model-tiers` falls back to its own map for it (#166).
+
 ## Milestone 4 · Release 1 (2026-11-14)
 
 The serial base of Milestone 4 lands: this repo develops itself without model evals, the version is bumped once at the Release cut, the docs index and glossary are short, the plugin targets Claude Code only, shared rules are said once, the environment check is this repo's own test, and the Triage batch and Retro planning run with no human.
