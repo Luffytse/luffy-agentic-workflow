@@ -8,7 +8,7 @@ description: "Configure a GitHub repo for the dev-skills plugin: tracker, label,
 Derived from Matt Pocock's setup skill; the seed files in this folder are mostly his text (MIT, see `LICENSE-mattpocock-skills` in the plugin folder). Scaffold the per-repo configuration the other skills read. Every file it writes lives in `docs/dev-skills/`, the one folder only the skills use, so it never mixes with the repo's own docs; only `REVIEW.md` and the `## Agent skills` block in `CLAUDE.md` or `AGENTS.md` go at the repo root, where reviewers and coding agents expect them:
 
 - **Issue tracker**: GitHub Issues, in `docs/dev-skills/issue-tracker.md`.
-- **Labels**: the 5 state roles and 2 category roles that `triage` uses, the `next-release` role, the repo's own labels, if it has any, each with a line saying when it applies (the **Repo labels** table, which `triage`, `to-spec`, `to-tickets` and `review-rounds` apply), the `wayfinder:*` labels and the `parked` label (the tracker doc's **Park** operation uses it), in `docs/dev-skills/triage-labels.md` and on the repo.
+- **Labels**: the 5 state roles and 2 category roles that `triage` uses, the `next-release` role, the repo's own labels, if it has any, each with a line saying when it applies (the **Repo labels** table, under the rule that section holds for `triage`, `to-spec`, `to-tickets` and `review-rounds`), the `wayfinder:*` labels and the `parked` label (the tracker doc's **Park** operation uses it), in `docs/dev-skills/triage-labels.md` and on the repo.
 - **Domain docs**: where the glossary (`docs/dev-skills/glossary.md`) and ADRs (`docs/dev-skills/adr/`) live and how skills read them, in `docs/dev-skills/domain.md`, plus the `docs/dev-skills/index.md` that lists the docs.
 - **Review rules**: a starter `REVIEW.md` at the repo root, where the repo's own review rules go.
 - **Releases**: the versioning policy (none, pull requests bump or Releases bump, with that policy's text), the Release name form, the Release size, the changelog path, the release label prefix, the cut steps and the whole-Release check, that `release` reads, in `docs/dev-skills/release.md`, for a repo that cuts Releases, versioned or not.
@@ -60,7 +60,7 @@ On **no**, add no row: the seed's **Repo labels** table stays empty (a row an ea
 2. For each picked label, draft its one-line "when it applies" from its name and the issues that carry it (the tracker doc's **List issues** with that label filter), and show it for the user to confirm or correct. Never record a line the user has not confirmed.
 3. Ask whether to add labels the tracker does not have yet; for each, take its string and its line from the user. Step 4 creates them.
 
-Record each label as a row of the table: the label string and its line. On a re-run, show the existing table first and offer to add (as above), edit a row's line, or drop a row; keep every row the user leaves alone, with its line. Dropping a row removes it from `docs/dev-skills/triage-labels.md` only: never delete the label from the tracker, and say so when the user drops one.
+Record each label as a row of the table: the label string and its line. On a re-run, show the existing table first and offer to add (as above), edit a row's line, or drop a row; keep every row the user leaves alone, with its line. A repo set up before the rule moved into the doc's **Repo labels** section gets the seed's section written on a re-run, its rows kept. Dropping a row removes it from `docs/dev-skills/triage-labels.md` only: never delete the label from the tracker, and say so when the user drops one.
 
 **Section C: Domain docs.** Default to **single-context** (one `docs/dev-skills/glossary.md` and one `docs/dev-skills/adr/`); write it without asking. Offer **multi-context** (`docs/dev-skills/glossary.md` as a map pointing to a glossary beside each context's code) only when exploration found monorepo signals.
 
@@ -139,7 +139,7 @@ Start at `docs/dev-skills/index.md` and open only the docs whose line fits your 
 
 ### Triage labels
 
-[one-line summary of the label vocabulary, for example "5 state roles + 2 category roles: ...", plus the `next-release` role and the Repo labels table when the repo has them]. See `docs/dev-skills/triage-labels.md`.
+[one-line summary of the label vocabulary, for example "5 state roles + 2 category roles: ...", plus the `next-release` role and the Repo labels table and rule when the repo has them]. See `docs/dev-skills/triage-labels.md`.
 
 ### Domain docs
 
