@@ -96,6 +96,13 @@ class SkillLoadingPackaging(unittest.TestCase):
             "---\nname: release\ndescription: Use when cutting a Release.\n---\n\n" + "word " * 3900)
         self.check(1, "remove it from known_over")
 
+    def test_retro_planning_is_off_the_list_and_over_4000_words_fails(self):
+        # retro-planning/SKILL.md left known_over once Spec #157 brought it under the limit; under its old
+        # recorded 4,589 words but over 4,000 it now fails as any unlisted file does.
+        (self.repo / "plugins/dev-skills/skills/retro-planning/SKILL.md").write_text(
+            "---\nname: retro-planning\ndescription: Use when sorting the Retro backlog.\n---\n\n" + "word " * 4100)
+        self.check(1, "retro-planning/SKILL.md: 4111 words, over 4000")
+
     def plant(self, rel, text="Run it on Son" + "net.\n"):
         with open(self.repo / rel, "a") as f:
             f.write("\n" + text)

@@ -18,4 +18,4 @@ The words used in luffy-agentic-workflow, a plugin marketplace: the skills codin
 - **Delivery → Releases → Building**: a Milestone holds Releases; the Team lead starts Release threads, which plan the issues that build threads then build.
 - **Building → Code review**: every build thread's pull request gets a Review before `merging` finishes it.
 - **Agent setup → Building, Code review**: the Boundary record decides who merges and when a Review waits on a boundary.
-- **Code review → Retros**: `retro` looks back on a finished, reviewed pull request and files Retro issues.
+- **Code review → Retros**: `retro` looks back on a finished, reviewed pull request and only files Retro issues, repeated Bug classes included.

@@ -73,8 +73,8 @@ One line per skill under `skills/`; each skill's own `SKILL.md` has the rest.
 - `prototype`: builds a throwaway prototype to answer a design question.
 - `release`: cuts a Release and plans the next one.
 - `research`: investigates a question against primary sources and writes the findings to a file.
-- `retro`: reviews a finished session or pull request and proposes environment improvements.
-- `retro-planning`: works through a repo's Retro backlog by root cause.
+- `retro`: reviews a finished session or pull request and files environment improvements as Retro issues.
+- `retro-planning`: sorts a repo's Retro backlog by root cause, closing one-offs and handing repeated problems to triage.
 - `review-record`: the shape and reading of review comments (a Base skill).
 - `review-rounds`: runs a review's Rounds, Finders to Rank (a hidden Base skill).
 - `setup-dev-skills`: configures a GitHub repo for the plugin.

@@ -44,7 +44,7 @@ The review stops for a person only when a fix, a design answer, a bug Ticket or 
 
 ## Records
 
-One comment per Round, each Finding with an id, Severity, Bug class, `file:line`, claim and status (open, fixed or dismissed), so a fresh session can continue a review and `retro` can find recurring Bug classes. After the last Round, Pre-existing Findings are filed as issues, grouped by Bug class.
+One comment per Round, each Finding with an id, Severity, Bug class, `file:line`, claim and status (open, fixed or dismissed), so a fresh session can continue a review and `retro` can find recurring Bug classes. *Amended 2026-11-14, Spec #157:* a retro no longer adds a check or a `REVIEW.md` line itself; it files a Retro issue that proposes it. After the last Round, Pre-existing Findings are filed as issues, grouped by Bug class.
 
 ## Considered options
 

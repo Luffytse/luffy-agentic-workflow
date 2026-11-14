@@ -12,7 +12,7 @@ The skills speak in terms of 5 state roles + 2 category roles, plus the `next-re
 | `bug`                | `bug`                | Something is broken                      |
 | `enhancement`        | `enhancement`        | New feature or improvement               |
 
-The `next-release` role is neither a state nor a category role. It marks an issue that must join the next Release. `triage` sets it on a severe issue or one that blocks a planned feature, and `retro-planning` on the Ticket of a group that joins; `release` takes marked issues into the next Release and removes the mark once they carry the release label.
+The `next-release` role is neither a state nor a category role. It marks an issue that must join the next Release. Only `triage` sets it: its Triage batch on a severe issue or one that blocks a planned feature, and a session with the user when the user asks; `release` takes marked issues into the next Release and removes the mark once they carry the release label.
 
 | Role in `dev-skills` | Label in our tracker | Meaning                                       |
 | -------------------- | -------------------- | --------------------------------------------- |
@@ -29,4 +29,4 @@ Labels this repo records for its own kinds of work, each with one line saying wh
 
 ## Other labels
 
-`retro` and `retro-planning` are not triage roles. A `retro` issue carries no `needs-triage` and is left out of triage. The `wayfinder:*` labels mark a wayfinder map and its tickets; see `issue-tracker.md`. `parked` marks an issue that, inside a Milestone, had a stalled thread that could not be taken over safely or a feature that stalled twice, or that the user parked, and now waits on the user; it is the tracker doc's **Park** operation's label, set and read there. In a repo that cuts Releases, the release labels (the label prefix in `release.md` plus a version) mark the issues of one Release; see `release.md`.
+`retro` and `retro-planning` are not triage roles. A `retro` issue carries `needs-triage` only once Retro planning has handed it over to triage; until then it carries no state role and triage leaves it out. The `wayfinder:*` labels mark a wayfinder map and its tickets; see `issue-tracker.md`. `parked` marks an issue that, inside a Milestone, had a stalled thread that could not be taken over safely or a feature that stalled twice, or that the user parked, and now waits on the user; it is the tracker doc's **Park** operation's label, set and read there. In a repo that cuts Releases, the release labels (the label prefix in `release.md` plus a version) mark the issues of one Release; see `release.md`.

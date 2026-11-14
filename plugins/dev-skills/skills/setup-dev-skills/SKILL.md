@@ -114,7 +114,7 @@ Build every file from the seeds in this folder:
 - [domain.md](./domain.md) becomes `docs/dev-skills/domain.md`
 - [release.md](./release.md) becomes `docs/dev-skills/release.md`, only when Section E was **yes**
 - [boundaries.md](./boundaries.md) becomes `docs/dev-skills/boundaries.md`
-- [review.md](./review.md) becomes `REVIEW.md` at the repo root, but only when the repo has none, first run or re-run. An existing `REVIEW.md` (one `retro` made, or the user's own) is never drafted over: nothing in it is removed or rewritten, and only a missing section of Important, Skip and Always check is offered, alone, as a diff; with all three present, report "no change".
+- [review.md](./review.md) becomes `REVIEW.md` at the repo root, but only when the repo has none, first run or re-run. An existing `REVIEW.md` (the user's own or an earlier run's) is never drafted over: nothing in it is removed or rewritten, and only a missing section of Important, Skip and Always check is offered, alone, as a diff; with all three present, report "no change".
 - the `## Agent skills` block (step 4)
 - `docs/dev-skills/index.md`, new or updated, listing every `docs/dev-skills/` file, `REVIEW.md` (with a "read when reviewing a change or adding an Always check line" line) and every other doc found while exploring, by loading `docs-index` and applying its contract
 
