@@ -10,7 +10,7 @@
 #
 # Checks:
 #   skill-layout                 skills/ holds only skill folders, each with a SKILL.md
-#   model-invoked                every skill remains model-loadable; user-menu hiding is allowed
+#   model-invoked                every skill is model-invoked (user-menu hiding is allowed), except a skill on the short person-started list, which sets disable-model-invocation
 #   skill-name-matches-folder    each SKILL.md frontmatter name equals its folder name
 #   skill-links                  each relative .md link in a SKILL.md points at a file that exists
 #   plugin-manifest              plugin.json, README.md, CHANGELOG.md and the licence file exist; plugin.json names its repository
@@ -59,9 +59,18 @@ else
   done
 fi
 
-# model-invoked: every skill is model-invoked
-if [ -d "$skills" ] && grep -rn --include=SKILL.md -E '^[[:space:]]*["'"'"']?disable-model-invocation["'"'"']?[[:space:]]*:' "$skills"; then
-  bad "a skill sets disable-model-invocation in frontmatter"
+# model-invoked: every skill is model-invoked, except the person-started skills named here (a person types
+# their name; the model never starts them). Add a skill to the list only by a decision recorded in an ADR or issue.
+person_started="improve-codebase-architecture"
+if [ -d "$skills" ]; then
+  while IFS= read -r hit; do
+    [ -n "$hit" ] || continue
+    skill_dir="$(basename "$(dirname "${hit%%:*}")")"
+    case " $person_started " in
+      *" $skill_dir "*) ;;
+      *) echo "$hit"; bad "skill $skill_dir sets disable-model-invocation in frontmatter and is not on the person-started list" ;;
+    esac
+  done < <(grep -rn --include=SKILL.md -E '^[[:space:]]*["'"'"']?disable-model-invocation["'"'"']?[[:space:]]*:' "$skills")
 fi
 
 # skill-name-matches-folder: a skill's SKILL.md frontmatter name: equals its folder name. The frontmatter is the

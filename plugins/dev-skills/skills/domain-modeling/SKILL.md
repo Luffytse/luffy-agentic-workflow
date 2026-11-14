@@ -55,24 +55,13 @@ If `docs/dev-skills/glossary.md` is a map that points into `src/`, the repo has 
 │       └── docs/adr/
 ```
 
-If `docs/dev-skills/glossary.md` holds terms and grows past about 10 KB (10,240 bytes; check with `wc -c`) when you add a term, split it per Area (see [Splitting the glossary](#splitting-the-glossary)). The repo still keeps one `docs/dev-skills/adr/`.
+If `docs/dev-skills/glossary.md` holds terms and grows past about 10 KB (10,240 bytes; check with `wc -c`) when you add a term, split it per Area by [SPLITTING-THE-GLOSSARY.md](./SPLITTING-THE-GLOSSARY.md), read only then. The repo still keeps one `docs/dev-skills/adr/`.
 
 Create files lazily: only when you have something to write. If `docs/dev-skills/glossary.md` does not exist, create it when the first term is resolved. If no `docs/dev-skills/adr/` exists, create it when the first ADR is needed.
 
-## Splitting the glossary
-
-Do this only in a single-context repo whose `docs/dev-skills/glossary.md` holds the terms, when you are adding a term and that file is over about 10 KB. Check the size with `wc -c docs/dev-skills/glossary.md`; do not split before then.
-
-1. Group the terms by Area (the same Areas the docs index uses).
-2. `git mv docs/dev-skills/glossary.md` to the first Area's page (`docs/dev-skills/glossary/<area>.md`) so history follows, then move the other groups into their own pages.
-3. Write a new `docs/dev-skills/glossary.md` as the map, listing one page per Area (format in [GLOSSARY-FORMAT.md](./GLOSSARY-FORMAT.md)). The entry point keeps its path, so skills that read `docs/dev-skills/glossary.md` find the pages from it.
-4. Change the glossary's line in the docs index to say it is now the map, add a line for each Area page, and fix any other doc that links a term's old place. Load `docs-index` for the index update, including creation when absent.
-
-If `docs/dev-skills/glossary.md` is already a map (split per Area, or a multi-context layout), add the term to the page the map points to for its Area or context; never put terms back into the map or split again just because a map exists. A page that grows past about 10 KB splits again by sub-area, and the map gets the new page.
-
 ## Keeping the docs index current
 
-When creating or editing a glossary or ADR, load `docs-index` and apply its contract.
+A new ADR or glossary page gets its line in the docs index (`docs-index` has the format). Editing a term needs no index change; an existing ADR's line changes only when it is renamed, deleted or superseded.
 
 ## During the session
 
