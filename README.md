@@ -67,11 +67,18 @@ Start a new Codex session after updating (restart the desktop app if using it).
 
 ### Claude Code
 
-**In this repo:** we develop the skills here, so Claude Code reads them directly
-from the checkout. Edits are available without reinstalling the plugin.
+**In this repo:** we develop the skills here, so start Claude Code from the repo
+root with the plugin folder flag and it loads the checkout's plugin directly.
+Edits are available without reinstalling the plugin:
 
-- `.claude/skills` links to `plugins/dev-skills/skills` for local skill discovery.
-- `.claude/settings.json` disables the cached plugin in this repo to avoid loading duplicate skills.
+```bash
+claude --plugin-dir plugins/dev-skills
+```
+
+Without the flag, a local session loads no `dev-skills` skill.
+`.claude/settings.json` disables the installed marketplace copy in this repo, so
+a session never loads a stale cached copy. Cloud threads of this project load
+the plugin from the checkout through the cloud environment's plugin folder setting.
 
 **Across repos:** point the marketplace at your local clone instead of GitHub:
 
@@ -85,7 +92,6 @@ claude plugin install dev-skills@luffy-agentic-workflow
 **In this repo:** we develop the skills here, so Codex reads them directly from
 the checkout. Edits are available without reinstalling the plugin.
 
-- `.agents/skills` links to `plugins/dev-skills/skills` for local skill discovery.
 - `.codex/config.toml` disables the cached plugin in this repo to avoid loading duplicate skills.
 
 **Across repos (CLI):** register your local clone as a user-level marketplace:
@@ -106,12 +112,10 @@ For `dev-skills`, run `scripts/check-plugin.sh`, `scripts/run-tests.sh` (every `
 ```
 luffy-agentic-workflow/
 ├── .agents/
-│   ├── plugins/
-│   │   └── marketplace.json    # Codex catalog (dev-skills only)
-│   └── skills -> ../plugins/dev-skills/skills  # Codex skills from this checkout
+│   └── plugins/
+│       └── marketplace.json    # Codex catalog (dev-skills only)
 ├── .claude/
-│   ├── settings.json           # disable the cached plugin in this repo
-│   └── skills -> ../plugins/dev-skills/skills  # Claude Code skills from this checkout
+│   └── settings.json           # disable the cached plugin in this repo
 ├── .codex/
 │   └── config.toml             # disable the cached plugin in this repo
 ├── .claude-plugin/
