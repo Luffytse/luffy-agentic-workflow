@@ -62,7 +62,7 @@ One line per skill under `skills/`; each skill's own `SKILL.md` has the rest.
 - `grill-with-docs`: interviews you about a plan, recording glossary terms and ADRs as decisions settle.
 - `grilling`: interviews you about a plan with nothing written down.
 - `handoff`: compacts the conversation into a handoff document for a fresh agent.
-- `implement`: builds one lone Ticket as its thread, from Implementer to merge.
+- `implement`: builds one lone Ticket as its thread, writing the code itself, from branch to merge.
 - `implement-spec`: builds one Spec as its thread, Tickets first, then the Spec pull request.
 - `improve-codebase-architecture`: scans a codebase for refactors that deepen shallow modules.
 - `issue-absorption`: records and reads the issues a Ticket absorbs (a Base skill).

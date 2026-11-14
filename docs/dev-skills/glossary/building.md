@@ -23,10 +23,10 @@ _Avoid_: validity check, pre-build triage
 A project thread that builds one Spec with `implement-spec`. It owns the Spec by an **owner record**: a comment on the Spec naming its thread and how to reach it, left before it builds, so a second thread entering the Spec stops while the first runs.
 
 **Ticket thread**:
-A project thread that builds one lone Ticket with `implement`.
+A project thread that builds one lone Ticket with `implement`, writing the code itself in its own checkout, as a trial (ADR 0004).
 
 **Implementer**:
-A subagent that builds a Ticket test-first and fixes its Findings. Build threads coordinate; Implementers write the code (ADR 0004). What it checks and reports before it hands back is in the Implementer brief of `implement` and `implement-spec`.
+A subagent that a **Spec thread** starts to build one of the Spec's Tickets test-first and fix its Findings; a **Ticket thread** has none (ADR 0004). What it checks and reports before it hands back is in `implement-spec`'s Implementer brief.
 _Avoid_: coder, worker
 
 **Spec branch**:

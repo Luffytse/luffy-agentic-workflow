@@ -1,92 +1,57 @@
 ---
 name: implement
-description: "Build one lone Ticket as its Ticket thread: Implementer, pull request, review, merge. Use when you are handed a lone Ticket (a bug fix, chore or small feature under no Spec) to build and ship."
+description: "Build one lone Ticket as its Ticket thread: build it test-first, pull request, review, merge. Use when you are handed a lone Ticket (a bug fix, chore or small feature under no Spec) to build and ship."
 ---
 
-You are the **Ticket thread**: you coordinate one lone Ticket from issue to merged pull request. **Implementers write the code.** You brief them, check their evidence, open the pull request, run the Review, talk to the user and merge. You never write or edit code yourself, not even to resolve a merge conflict.
+You are the **Ticket thread**: you build one lone Ticket yourself, in your own checkout, and take it from issue to merged pull request. Read the project's issue-tracker doc before any tracker operation; if there is none, tell the user to run `setup-dev-skills`.
 
-Read the configured project issue-tracker doc before tracker operations. If none was provided, tell the user to run `setup-dev-skills`.
+**When you need the user.** Ask: do I already know exactly what I will do once the user says yes?
+
+- **Yes: it is an action** (an approval to run on their device, a step the environment refuses, a credential, a merge that is theirs). Ask once, as soon as you know it, naming the exact action. Comment on the Ticket that you wait and for what, and tell the coordinator if one runs. Go on with everything that does not depend on it, then wait. The Ticket is not parked.
+- **No: it is a decision** (the Ticket cannot be built as written, or a choice it does not settle would change what was agreed or cannot be undone). Push your work, park the Ticket with the tracker doc's **Park** operation, giving the question, the options and your recommendation, tell the user (or the coordinator) and stop. The user's answer lifts the park.
+
+A choice inside what the Ticket agreed that can be undone is yours: make it and name it in the pull request. Never split the Ticket.
 
 ## 1. Read the ticket
 
-Fetch the ticket from the issue tracker and state its title. If the reference is ambiguous, ask.
-
-- If it is a Spec, stop and use `implement-spec` instead, carrying the Spec. If it is a Ticket under a Spec, say so to whoever handed it to you and stop: a Spec's Tickets are built by its Spec thread.
-- Use the tracker doc's **Count open blockers** operation and its completion rules. If any blocker remains uncleared, stop and tell the user (or the coordinator) which.
-- Read whether the ticket is parked with the tracker doc's **Park** operation. If it is, stop and tell the user (or the coordinator): it waits on the user, and the user lifts the park. A ticket labelled with the `ready-for-human` role: stop and tell the same; it waits on the person.
+Fetch the ticket from the issue tracker and state its title; if the reference is ambiguous, ask. A Spec goes to `implement-spec`, carrying the Spec. A Ticket under a Spec is its Spec thread's: say so to whoever handed it to you and stop. Stop and tell the user (or the coordinator) when the tracker doc's **Count open blockers** operation finds a blocker uncleared, its **Park** operation reads the ticket parked, or the ticket carries the `ready-for-human` role.
 
 ### Check against main
 
-Before you make anything for the ticket, on every entry, re-entry included, read it against freshly fetched main: its code and docs, and the changes merged since it was written. Your own branch and pull request are not evidence: the check is for what others merged. Give it one verdict:
+Before you make anything, on every entry, read the ticket against freshly fetched main: its code and docs, and what merged since the ticket was written. Your own branch and pull request are not evidence. Give one verdict:
 
-- **still valid**: main still has the problem, or does not yet do what the ticket asks. Go on.
-- **already fixed** or **obsolete**: main no longer has the problem or already does what the ticket asks (reproduce it or read the code to confirm), or what it is about is gone from main. Write no code. Tell the coordinator (the user, when none runs) the verdict and its evidence, the file or text on main and the commit or pull request when you find it, so it can close the ticket as completed naming where on main, and any branch or pull request you made; then stop. The coordinator closes or re-plans it.
-- **changed scope**: part of it still holds, or it holds in another place or form. Tell the coordinator what changed, with the same evidence, and wait for its answer, building nothing; a change that would alter the Milestone's goal, acceptance or exclusions it takes to the user.
-- **cannot tell**: the ticket or main does not say enough to decide. Tell the coordinator what is missing and wait, as for changed scope.
+- **still valid**: go on.
+- **already fixed** or **obsolete**: write no code. Give the coordinator (the user, when none runs) the evidence on main, the file and the commit or pull request, and stop; it closes or re-plans the ticket.
+- **changed scope** or **cannot tell**: say what changed or what is missing, with the same evidence, and wait, building nothing. Then do as the answer says, checking again only what merged since.
 
-On the coordinator's answer, re-enter at step 1. Its answer, on the ticket or to you, settles this check: do as it says (build the ticket as it now reads, or stop if it closed or re-planned it), checking again only what merged since.
+## 2. Build
 
-Done when you have stated the title, every blocker is cleared under the tracker doc, the check against main lets you build, and you know the ticket's **Model tier**: premium if the issue says so, otherwise regular.
+Make the Ticket branch off freshly fetched main in your own checkout and push it; where the harness gives the thread one designated branch, that branch is the Ticket branch. On re-entry, go on from the pushed branch and its pull request.
 
-## 2. Make the Ticket branch
+Build with `tdd`, at seams agreed before the first test. A bug whose cause is not known goes to `diagnosing-bugs` first, then to `tdd` for the fix; a bug whose failing test is its reproduction goes straight to `tdd`. Run each new test and see it fail before the fix: a failure inferred or read off the code is not evidence. Give trivial or noisy jobs, such as rerunning a test suite, to a cheap-tier subagent (`model-tiers` maps the tier), so your context stays small.
 
-Give the Implementer its own git worktree on the Ticket branch, so nothing you do to read a branch can move the checkout its commits land in. Fetch main (the repo's default branch), then make the worktree yourself, outside your checkout: `git worktree add <path> -b <ticket-branch> origin/<default-branch>`, and push the branch from it (`git -C <path> push -u origin <ticket-branch>`). Your own checkout stays where it is. If the harness allows a thread only one designated branch, that branch is the Ticket branch: first detach your own checkout from it (`git switch --detach`; no Implementer holds it yet), then make the worktree on it (`git worktree add <path> <ticket-branch>`), so you still write no code. When the environment refuses an action the rules allow (a new branch off main, the merge itself, pushing a CI workflow file), the thread does not stall or work around it: it hands the action once, with the exact change, to the coordinator (for a fresh thread) or to the user, and records that it waits on it. Done when the branch exists on the remote and the worktree is on it.
+Before the pull request, check your diff against each Always-check line of the repo's review rules file, if it has one, as the reviewer will.
 
-## 3. Start one Implementer
+## 3. Open the pull request
 
-Start **one Implementer** subagent on the ticket's tier. Load `model-tiers` by name for the model each tier is in your coding agent; the project's own tier map overrides it. Brief it with pointers, not copies:
+Write its title and body with the `pr` skill: its closing lines, its Evidence (each new test's observed failure, the checks, screenshots for anything visual) and its Door. Open it.
 
-- the ticket link, its worktree path and the Ticket branch, and that it commits there and works only in that worktree, running every git command as `git -C <path> ...` (a shell may start each command back in your checkout);
-- the worktree is a fresh checkout and may need its dependencies installed again;
-- start at `docs/dev-skills/index.md`;
-- build test-first with the `tdd` skill, at seams agreed before the first test (for instructions to an agent, see the next line);
-- When the change is instructions for an agent (a skill, a prompt, an agent instructions file), its test is an eval, not a grep for a sentence: a fresh agent run on a fixture, compared with the default branch's version and scored by scripts first; the repo's own docs say how to run one, and you choose its seam without the user.
-- before reporting, read the repo's review rules file, if any, and check your diff against each Always-check line as the reviewer will;
-- when the change adds a rule that runs over a sequence of Rounds or steps, before Round 1 list the sequences (each ordering of the events the rule touches, including "it happens again") and write what the text tells the reader to do for each;
-- when an acceptance criterion names a run that needs tools you do not hold (scheduling a check-in, stopping a worker, a recorded run only the top-level session can make), the Ticket thread produces that evidence, not you: build everything else, draft the criterion's eval or record entry with a `PENDING: <the run>` marker in place of each runtime fact you cannot read (for example where skills load from), report the criterion as owed, and never claim it or leave a marker in an entry you call done;
-- before each push, check that `git status -sb` shows the Ticket branch (never a detached HEAD), and after it, report that `git rev-parse origin/<branch>` equals `HEAD`, as evidence the push landed;
-- leave the version as it is on main until the merge step: any commit the repo's merge-time steps ask for, such as a version bump, is made then (step 7), when you are asked;
-- report its evidence: the tests that fail before and pass after (for instructions to an agent, the eval run or its stated gap instead), the typecheck or the repo's checks, screenshots for anything visual (or "not visual"), and its one-way-door call (would reverting its commits undo everything the change did, including anything outside git?).
+## 4. Review
 
-Give trivial jobs, such as rerunning a test suite, to a cheap subagent.
+Run `agentic-review` on the pull request: its Round 0 picks the level and, above None, hands over to `review-rounds`. Supply the Ticket, the pull request, the branch, the base and any level the user asked for.
 
-Keep this same Implementer, in the same worktree, for every later fix and merge of main on the ticket: continue it by message. Only if it can no longer be reached, start a new Implementer on the same tier with a handoff (ticket, worktree, branch, what is done, what is open), and tell the user you did. If the worktree is gone (for example the machine was reclaimed): fetch, run `git worktree prune`, make it again with `git worktree add <path> <ticket-branch>`, and brief the Implementer that anything it had not pushed is lost.
+Before each Round, fetch main; if it moved, merge it into the Ticket branch (a merge, never a rebase), resolve any conflicts and push. Fix each open Finding, or dispute it with evidence, as `review-rounds` says, to the review's end. After Round 3, report each bug Ticket its sort filed; you build none of them.
 
-**You never run `git checkout`, `switch`, `stash` or `reset` in the Implementer's worktree**, because they move the checkout under it: a later commit lands off the branch and its push says "Everything up-to-date". To read the branch's head for a Round or a check, fetch and read: `git fetch origin <ticket-branch>`, then `git show` or `git diff` against `origin/<ticket-branch>`, or `git archive origin/<ticket-branch>` into a scratch directory.
+## 5. Merge
 
-## 4. Check the evidence
+Load `merging` by name and follow it to its end. Give it the pull request and the Ticket it builds; the method, a **squash-merge** into main titled with the pull request's typed title; yourself as the committer; and no pre-merge step of your own.
 
-Read the Implementer's report against the ticket's acceptance criteria and rerun the checks in the Implementer's worktree (a cheap subagent can, running no git command that moves the checkout). Check that it reports `origin/<branch>` equal to `HEAD` for every push. Anything missing or failing goes back to the Implementer. For each criterion the Implementer reported as owed, make the run yourself with your own tools (it is evidence, not code), then message the Implementer the output as observed; it replaces that entry's pending markers with it and pushes. A run that fails, or whose result contradicts the entry, goes back as a fix; after any fix that could change what the run showed, make the run again. If you cannot make the run either, ask the user for it and wait. Done when every acceptance criterion has evidence, no added line holds a `PENDING:` marker (grep the diff against main), and the checks pass on the branch's head, or, when the repo has no checks, the evidence says what was checked instead.
+## 6. Report
 
-## 5. Open the pull request
+Tell the user (or the coordinator) the pull request link and the outcome as `merging` hands it back: merged with its commit, or with the user and what stops it, with each bug Ticket the review filed.
 
-Write the title and body with the `pr` skill: it closes the ticket (and any other issue it lists, one `Closes #<n>` line each, as `pr` says), carries the evidence in its Evidence section, and the Implementer's call as its Door. Open the pull request; the branch is already pushed, and the Implementer pushes any later commits.
+If the pull request is with the user, stay open. Once they merge it or tell you it is merged, run `merging`'s "After the merge", then step 7; if they close it unmerged, ask whether they want a retro.
 
-## 6. Review
+## 7. Run the retro
 
-Run `agentic-review` on the pull request in this thread: its Round 0 picks the level and, above None, hands over to `review-rounds`, which runs at most 3 Rounds. Supply the Ticket, pull request, Implementer's worktree path, Ticket branch, base and any level the user asked for. Run your git reads with `git -C <path> ...` so they inspect that branch; pass the worktree path to the review for its reviewers.
-
-Before each Round, fetch main. If it moved, have the same Implementer merge main into the Ticket branch (a merge, never a rebase), resolve any conflicts and push; the next Round reviews the resolutions.
-
-Route each Round's open Importants and "fix" Nits to the same Implementer by message. It fixes, commits and pushes, or disputes a Finding with its evidence, as `review-rounds` says. For a criterion the Implementer reported as owed, after a fix that could change what an owed run showed, return to step 4 and make the run again before the next Round or the merge. Continue the review to its end, its after-Round-3 sort, design answers and Pre-existing filing included. Review policy belongs to `review-rounds`; the merge decision below remains yours.
-
-The review ends **ready to merge**, or **waiting on a boundary** when a fix, a design answer, a bug Ticket or the merge would cross the Boundary record: then the merge waits, and you bring the pull request to the user as `merging` says (step 7), naming the Finding and the boundary. Each bug Ticket the after-Round-3 sort creates is built straight after this pull request merges, as a lone Ticket of its own, with this skill from step 1.
-
-## 7. Merge, or bring it to the user
-
-Load `merging` by name and follow it to its end: it decides whether you merge or bring the pull request to the user, and finishes it. Give it:
-
-- the pull request and the Ticket it builds;
-- the method: **squash-merge** into main, titled with the pull request's typed title (or the repo's own title convention), the body as the commit message;
-- the same Implementer, with its worktree path, as the committer of every commit the finish needs, so you still write no code;
-- readiness: the review ended ready to merge (step 6); and no pre-merge step of its own.
-
-Done when `merging` has merged the pull request and closed its issues, or the pull request is with the user and you have named what stops it (its "After the merge" then runs from step 9).
-
-## 8. Report
-
-Tell the user (or the coordinator) the pull request link and the outcome: merged with its commit, waiting on a boundary (the Finding and the boundary), or waiting for the user and why (what `merging` named), with any bug Tickets the review created. For every merge of yours, also list each ADR, glossary, `CLAUDE.md`, `AGENTS.md` and `REVIEW.md` file it changed, and each agent design answer on it: the items of the `Agent-merged rules:` line.
-
-## 9. Run the retro
-
-Run the `retro` skill on this thread once the pull request is merged and its issue is closed, so the retro looks back on finished work. If you handed the pull request to the user, report as in step 8, stay open, and when they merge it or tell you that it is merged, first run `merging`'s "After the merge" (confirm the merge on the tracker, close the issues), then run the retro; if they drop it or close it unmerged, ask whether they want a retro on what happened. If it finds a repeated Bug class to turn into a check, a regular-tier Implementer builds the check on a branch off main, in its own worktree made as in step 2, briefed as in step 3 (you still write no code), and you open its pull request with `pr`, its body recording `Retro origin: <Ticket issue link>`; the check builds no issue, so its body is its spec. Review it as in step 6. Merge it as in step 7, with its Retro origin issue in place of a Ticket (it closes none) and the check's Implementer: a check that changes `REVIEW.md` is merged by you unless `merging` brings it to the user, and listed on its `Agent-merged rules:` line. Tell the user (or the coordinator) the retro's outcome.
+Run `retro` once the pull request is merged and its issue is closed; it files issues and builds nothing.
