@@ -5,6 +5,6 @@ description: "Interview the user relentlessly about a plan or design, recording 
 
 Call the Skill tool twice, for "grilling" and "domain-modeling".
 
-When you explore the repo, start at `docs/dev-skills/index.md` and open only the docs that fit (with no index, fall back to `docs/dev-skills/glossary.md` and `docs/dev-skills/adr/`). For glossary and ADR edits, follow `domain-modeling` and load `docs-index`.
+For glossary and ADR edits, follow `domain-modeling` and load `docs-index`.
 
 When the plan renames or reworks a skill, the first fact to gather is what every other skill expects of that skill (what they call it, load it for, or rely on it to do).

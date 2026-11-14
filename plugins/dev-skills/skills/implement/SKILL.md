@@ -15,8 +15,6 @@ Fetch the ticket from the issue tracker and state its title. If the reference is
 - Use the tracker doc's **Count open blockers** operation and its completion rules. If any blocker remains uncleared, stop and tell the user (or the coordinator) which.
 - Read whether the ticket is parked with the tracker doc's **Park** operation. If it is, stop and tell the user (or the coordinator): it waits on the user, and the user lifts the park.
 
-Start at `docs/dev-skills/index.md` and open only the docs that fit the ticket (with no index, fall back to `docs/dev-skills/glossary.md` and `docs/dev-skills/adr/`).
-
 ### Check against main
 
 Before you make anything for the ticket, on every entry, re-entry included, read it against freshly fetched main: its code and docs, and the changes merged since it was written. Your own branch and pull request are not evidence: the check is for what others merged. Give it one verdict:
