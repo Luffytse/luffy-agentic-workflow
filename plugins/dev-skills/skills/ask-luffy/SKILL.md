@@ -1,6 +1,6 @@
 ---
 name: ask-luffy
-description: "Explain how development runs with these skills: the stages from an idea to an accepted Milestone, who does each, where the person steps in, and a map of which skill hands to which. Use when the user asks how the development process works, when they are needed, how the skills fit together, or where a piece of work starts."
+description: "Explain how development runs with these skills: the stages from an idea to an accepted Milestone, who does each, where the person steps in, and a map of which skill hands to which. Use when the user asks how the development process works, when they are needed, or how the skills fit together."
 ---
 
 # ask-luffy
@@ -21,16 +21,16 @@ Before you say what one skill does or how, or that a step can be skipped, open t
 Every plan is a Milestone; a small Release is a Milestone with one Release.
 
 0. **Set up the repo** (person, with an agent): `setup-dev-skills` writes the docs the other skills read, the Boundary record and the release doc among them; `setup-project` writes the coordinator's instructions.
-1. **Plan the Milestone** (person, with a planning session): with `milestone`, the person sets the goal and names the features; the session sorts them into a dependency graph and writes the Milestone issue.
-2. **Plan each feature** (person, with one session per feature): `grill-with-docs` (`grilling` with no repo) sharpens it; `to-spec` and `to-tickets` publish a Spec with its Tickets, or one lone Ticket. A foggy effort is charted first with `wayfinder`; a question that needs running code detours through `prototype`; `research` gathers sources.
+1. **Plan the Milestone** (person, with a planning session): with `milestone`, the person sets the goal and names the features, and the session sorts them into a dependency graph.
+2. **Plan each feature** (person, with one session per feature): `grill-with-docs` (`grilling` with no repo) sharpens it; `to-spec` and `to-tickets` publish a Spec with its Tickets, or one lone Ticket. A foggy effort is charted first with `wayfinder`; a question that needs running code detours through `prototype`; `research` gathers sources. Once every feature is planned, the Milestone planning session writes the Milestone issue with the person.
 3. **Check the plugin** (coordinator, or a worker it starts): `milestone`'s Plugin version check reads that threads load main's plugin text.
-4. **Deliver** (coordinator): `team-lead` starts a Release thread, then build threads as their blockers close, takes every worker action through `worker-control`, checks in on a silent one and replaces or parks a stalled one.
-5. **Plan and cut each Release** (Release thread): `release` takes the next slice of the Milestone's features; once they are done it cuts the Release, runs `retro-planning` and `triage`'s Triage batch, and plans the next.
+4. **Deliver** (coordinator): `team-lead` starts a Release thread, then build threads as their blockers close and takes every worker action through `worker-control`.
+5. **Plan and cut each Release** (Release thread): `release` takes the next slice of the Milestone's features; once stage 6 has built them, it cuts the Release, runs `retro-planning` and `triage`'s Triage batch, and plans the next.
 6. **Build** (build thread): `implement` builds a lone Ticket itself; `implement-spec` coordinates Implementer subagents, one per Ticket, onto one Spec branch. The code is built with `tdd`; the pull request is written with `pr`, reviewed with `agentic-review` (whose Rounds `review-rounds` runs), merged with `merging`, and the thread ends with `retro`.
 7. **Report** (coordinator, or a thread it starts): once delivery stops, `milestone` writes the Milestone report.
 8. **Accept** (person): the Milestone review. The person accepts it, sends a feature back or lifts a park.
 
-Stages 4 to 6 repeat for each Release. Work that arrives raw joins on the way: an incoming issue goes through `triage`; a bug whose cause is unknown is diagnosed with `diagnosing-bugs` before its fix is built (`implement`); `improve-codebase-architecture` surfaces refactors and grills the one the person picks.
+Stages 5 and 6 repeat for each Release. Work that arrives raw joins on the way: an incoming issue goes through `triage`; a bug whose cause is unknown is diagnosed with `diagnosing-bugs` before its fix is built (`implement`); `improve-codebase-architecture` surfaces refactors and grills the one the person picks.
 
 ## Where the person steps in
 
