@@ -235,7 +235,7 @@ then
   bad "team-lead-no-harness-detail failed (see above; requires python3): say it through worker-control"
 fi
 
-# milestone-no-delivery-detail: the milestone skill holds planning, adding a feature, the Plugin version check and the report;
+# milestone-no-delivery-detail: the milestone skill holds planning, the Plugin version check and the report;
 # delivery is the team-lead skill's and worker lifecycle is worker-control's. So milestone's SKILL.md names team-lead, and its
 # text (*.md under skills/milestone) names no harness tool (no mcp__ name, no backticked name a worker-control reference puts
 # in backticks) and no delivery record kind (a `<!-- milestone <kind> -->` or `<!-- team-lead <kind> -->` marker other than

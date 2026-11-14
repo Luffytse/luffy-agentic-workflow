@@ -1,0 +1,17 @@
+# Milestone features are planned in their own sessions along a dependency graph, and fixed once planning settles
+
+Milestone planning names the features first, sorts them into a dependency graph the user agrees, and plans none of them itself: the coordinator starts one planning session per feature, at the `top` tier, in graph order, and the Milestone planning session, at premium, waits for every one, rebuilds the graph from the Tickets' blockers and shows the user any change. Only then is the draft Milestone issue shown, its features table carrying an "After" column for the graph. Once planning settles the features are fixed until the Milestone ends; a feature planned later waits, unlabelled and titled for the next Milestone. "Adding a feature mid-Milestone" is gone. Decided with the user in the Milestone 4 skill walk (2026-11-11, [#127](https://github.com/Luffytse/luffy-agentic-workflow/issues/127)), settled in Milestone 4 planning (2026-11-13, Ticket [#167](https://github.com/Luffytse/luffy-agentic-workflow/issues/167)).
+
+## Why
+
+- **A feature counted as planned too early.** "Planned" meant an issue holding acceptance criteria, so a Spec with no Tickets passed. A planning thread showed a Milestone draft with four of eight features still unsplit Specs and proposed delivering early ([#100](https://github.com/Luffytse/luffy-agentic-workflow/issues/100)). Planned now means the Spec and its Tickets are published, or a lone Ticket holds an agent-ready brief.
+- **Features planned in any order needed blockers nobody had filed.** Sorting the features first and planning them in graph order lets each session build on what earlier ones settled, and the second graph catches a dependency that appeared during planning, so `to-tickets`' rule for a blocker not yet filed can leave ([#124](https://github.com/Luffytse/luffy-agentic-workflow/issues/124); the rule stands until that change lands).
+- **The planning thread planned a feature itself, informally** ([#101](https://github.com/Luffytse/luffy-agentic-workflow/issues/101)). A planning session that only names, sorts and dispatches cannot skip the feature planning skills; the hard design work runs in feature sessions on `top`, which is why the Milestone session itself stays on premium (the user's choice, 2026-11-13).
+- **Adding a feature mid-Milestone was rare and costly.** One added row was found in this repo and one in another project; its Ticket-update step left no trace on any issue; it produced [#104](https://github.com/Luffytse/luffy-agentic-workflow/issues/104) and was the "sanctioned shortcut" in #100. Waiting for the next Milestone costs a day or two, in the user's words, and removes a second way into a Milestone. The sentence that let the goal, the acceptance or an exclusion be rewritten at another time went with it.
+
+## Consequences
+
+- `team-lead` no longer gives a Spec without Tickets `to-tickets` in a build slot: every Spec has its Tickets before delivery starts.
+- `release` and `setup-project` send a feature the Milestone does not list to the next Milestone's planning.
+- The question "one at a time or several at once" and the line of the Milestone issue that records it stay until [#88](https://github.com/Luffytse/luffy-agentic-workflow/issues/88) decides the limit.
+- This replaces ADR 0010's "add a feature mid-Milestone" and ADR 0012's sentence that a feature planned while a Milestone runs joins it.
