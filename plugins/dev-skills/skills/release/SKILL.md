@@ -5,9 +5,9 @@ description: "Cut a Release and plan the next: changelog, cut steps, close it, p
 
 # Release
 
-A **Release** is one named step of a Milestone and the items it ships. An **item** is one piece of work: a Spec with its Tickets, a lone Ticket, or a bug, each counted as 1. Every issue in a Release carries its **release label**. One **release issue** holds its goal, its label, its Milestone, the size used, its ranked order, what was left out, the verdicts of its check against main, the issues that left it at the cut and, once it is cut, its notes; the release issue carries no release label itself. Run this thread at the **premium** tier; only for a dependency graph or another special planning case, ask a **top**-tier subagent's advice. Load `model-tiers` by name for each tier's model; the project's own map overrides it.
+A **Release** is one named step of a Milestone and the items it ships. An **item** is one piece of work: a Spec with its Tickets, a lone Ticket, or a bug, each counted as 1. Every issue in a Release carries its **release label**. One **release issue** holds its goal, its label, its Milestone, the size used, its Order with each entry's blockers, what was left out, the verdicts of its check against main, the issues that left it at the cut and, once it is cut, its notes; the release issue carries no release label itself. Run this thread at the **premium** tier; only for a dependency graph or another special planning case, ask a **top**-tier subagent's advice. Load `model-tiers` by name for each tier's model; the project's own map overrides it.
 
-The user plans the Milestone and its features with `milestone`; everything in this skill runs without waiting for a reply, except where a step says to stop. A feature to plan is proposed to the user, and nothing waits on the answer. A fix that cannot wait for the next Release is built and merged like any issue; the next changelog entry lists it.
+The user plans the Milestone and its features with `milestone`; everything in this skill runs without waiting for a reply, except where a step says to stop. A feature the Milestone issue does not list waits for the next Milestone's planning. A fix that cannot wait for the next Release is built and merged like any issue; the next changelog entry lists it.
 
 ## Before you start
 
@@ -21,10 +21,9 @@ The **heading test**: the changelog has an entry for a Release when it has a lin
 
 Every run, first or rerun, starts here, from freshly fetched main and the tracker; take the first case that fits:
 
-1. An open release issue whose Order lists nothing, or lists an issue that does not carry its label or still carries `next-release` (or a Spec with an open Ticket without the label), is a planning that stopped part way: go to step 5, whose "Rerun first" finishes it (or, when the planning still yields nothing, leaves the issue as it is and reports it: see "When nothing qualifies"). An issue that the same release issue lists under `## Left the Release` (step 1), and an open Ticket of a Spec listed there, has left the Release on purpose: it makes none of these fit.
+1. An open release issue whose Order lists nothing, or lists an issue that does not carry its label or still carries `next-release` (or a Spec with an open Ticket without the label), is a planning that stopped part way: go to step 5, whose "Rerun first" finishes it. An issue listed under that release issue's `## Left the Release` (step 1), and an open Ticket of a Spec listed there, left on purpose and makes this case not fit.
 2. An open release issue whose Order issues each carry its label or are listed under its `## Left the Release` is the **current Release**. If the changelog on main has its entry (the heading test), its changelog pull request merged: go to step 3. Otherwise go to step 1. If several are open, take the oldest and say so in your report.
-3. No open release issue, but open issues carry a release label that no release issue names: a planning stopped before its release issue was opened: go to step 5.
-4. Otherwise, the last release issue is the closed one cut most recently. Go to step 4 unless it holds both end-of-Release records, and then to step 5. With no release issue at all, this is the repo's first Release: go to step 5.
+3. Otherwise, the last release issue is the closed one cut most recently. Go to step 4 unless it holds both end-of-Release records, and then to step 5. With no release issue at all, this is the repo's first Release: go to step 5.
 
 ## 1. Check the current Release is done
 
@@ -80,68 +79,54 @@ Done when the release issue is closed with its notes.
 
 Load `retro-planning` by name and run its Retro planning for the Release just closed; then load `triage` and run its Triage batch (`TRIAGE-BATCH.md`), naming the release issue. Both run before the planning, so it sees what they changed.
 
-After each one, comment on the closed release issue, first line `<!-- release end-of-Release pass -->`, second line `retro-planning ran for this Release: <its record's link>.` (or `triage ran for this Release.`). If one cannot run, write `<skill> could not run: <why>.` instead and go on: the planning ranks what the tracker shows, and your report names the pass that did not run. A rerun skips each skill that already has its record.
+After each one, comment on the closed release issue, first line `<!-- release end-of-Release pass -->`, second line `retro-planning ran for this Release: <its record's link>.` (or `triage ran for this Release.`). If one cannot run, write `<skill> could not run: <why>.` instead and go on: the planning reads what the tracker shows, and your report names the pass that did not run. A rerun skips each skill that already has its record.
 
 Done when the closed release issue holds a record for `triage` and one for `retro-planning`.
 
 ## 5. Plan the next Release
 
-With no open Milestone, plan nothing: tell the user the next Release needs a Milestone, planned with `milestone` (a small Release is a Milestone with one Release), list any severe or `next-release` issues waiting, and stop. Otherwise read the Milestone issue: its goal, features in order, acceptance criteria and exclusions.
+With no open Milestone, plan nothing: tell the user the next Release needs a Milestone, planned with `milestone` (a small Release is a Milestone with one Release), list any severe or `next-release` issues waiting, and stop. Otherwise read the Milestone issue: its goal, its features table in order with its "After" column, its acceptance criteria and its exclusions.
 
-**Rerun first.** If "Find where you are" found an open release issue whose planning stopped part way: when its Order lists issues, that order stands; rank nothing again and finish only what is missing (see "Write it down"). When its Order lists nothing, plan it as below and write the result into that issue instead of opening another; when the planning still takes nothing, "When nothing qualifies" applies and that issue gets no Order or label, only the verdicts of the check against main in its `## Checked against main` section. If open issues carry a release label that no release issue names, those issues are the scope so far: keep each, count it toward the size, rank the rest around them, and open the release issue for the whole set. On every rerun path, an issue in the scope that now reads parked (the tracker doc's **Park** operation) stays in it and is reported as parked and skipped for building; remove no release label.
+**Rerun first.** When "Find where you are" found an open release issue whose planning stopped part way, write into that issue and open no second one. If its Order lists entries, that Order stands: plan and check nothing again, finish the labels and marks "Write it down" applies (an entry that now reads parked is labelled too; the cut takes it out), and report. If its Order lists nothing, plan into it as below.
+
+### What planning reads
+
+- The **features** are the issues of the Milestone issue's features table, in its order; a Ticket of a listed Spec belongs to its Spec.
+- The **waiting issues** are the other open issues at `ready-for-agent` or marked `next-release`, whatever their category label (a bug, a chore, a `retro` issue with its brief), that carry no release label, do not read parked (the tracker doc's **Park** operation) and do not belong to a later Milestone (one the Milestone issue leaves to the next). One is **severe** when it is a security hole, lost data, or delivery stopped (nothing can merge or ship).
+- An **unplanned feature** (a Spec, or another issue that adds a feature, that the table does not list; never a `retro` issue) is no waiting issue: it is not taken and not proposed, and waits for the next Milestone's planning. No other issue is taken.
+- An issue's **open blockers** are those the tracker doc's **Count open blockers** operation counts (a blocker closed without the work done stays open); a Spec's are those of the Spec and of its Tickets that lie outside it.
 
 ### Check against main
 
-Before ranking, check every open issue that carries no release label, does not read parked and does not belong to a later Milestone (one the Milestone issue leaves to the next Milestone) against freshly fetched main: its code and docs, and the changes merged since the issue was written. Records and backlogs that other steps or skills keep are not checked: the Milestone issue, release issues, `retro-planning` records, `retro` issues not at `ready-for-agent` (their own skills keep them) and wayfinder maps. Give each issue one verdict:
+Before taking a feature or a waiting issue, and nothing else, check it against freshly fetched main: its code and docs, and the changes merged since it was written. Give each one verdict:
 
 - **still valid**: main still has the problem, or does not yet do what the issue asks;
-- **already fixed** or **obsolete**: main no longer has the problem or already does what the issue asks, or what the issue is about is gone from main; this is the Obsolete test of `triage`'s sweep (test 3), and you confirm it as that test says;
-- **changed scope**: part of it still holds, or it holds in another place or form than the issue says;
-- **cannot tell**: the issue or main does not say enough to decide; say what is missing.
+- **already fixed** or **obsolete**: main no longer has the problem or already does what it asks, or what it is about is gone from main (the Obsolete test of `triage`'s sweep, test 3, confirmed as that test says);
+- **changed scope**: part of it still holds, or it holds in another place or form;
+- **cannot tell**: the issue or main does not say enough; say what is missing.
 
-A verdict that is not still valid carries its evidence: the file or text on main, and the commit or pull request when you find it. With 5 issues or fewer, read them yourself; with more, hand them in batches to subagents at the **premium** tier that only read and return each verdict with its evidence, and write nothing. Open the evidence of every verdict that is not still valid yourself before acting on it, and make every write yourself. Read an issue again just before writing to it; if it changed since it was checked, check it again.
+Any other verdict carries its evidence on main: the file or text, and the commit or pull request when you find it. For more than 5 issues, batches may go to **premium**-tier subagents that only read and return verdicts with evidence. Open that evidence yourself before acting, make every write yourself, and read an issue again just before writing to it; if it changed, check it again.
 
-- **Already fixed or obsolete**: close it as completed, with the reason and where on main: main already has the work, so nothing is left to do, and a planned feature it blocks is unblocked and ranked. A planned feature or a Ticket of a planned Spec (closing it would change the Milestone's agreement), or an issue at `ready-for-human` (it waits on the user), is not closed: it goes to the user as one question, and a planned feature waits for the answer, unranked.
-- **Changed scope**: update the issue: read its whole body, write it whole back with only that change and a one-line note naming what on main changed it, and read it back. A change that would alter the Milestone's goal, acceptance criteria or exclusions is not made: it goes to the user as one question, and that feature waits, unranked.
-- **Cannot tell**: leave the issue as it is; the release issue lists it as unchecked, and it is not ranked.
+- **Already fixed or obsolete**: close it as completed, with the reason and where on main, which unblocks what it blocks. A feature or a Ticket of a planned Spec is not closed (that would change the Milestone's agreement): it goes to the user as one question, and the feature is left out.
+- **Changed scope**: write the issue's whole body back with only that change and a one-line note naming what on main changed it, and read it back. A change to the Milestone's goal, acceptance criteria or exclusions is not made: it goes to the user as one question, and that feature is left out.
+- **Cannot tell**: no write; the issue is not taken, and the release issue lists it as unchecked.
 - **Still valid**: no write.
 
-A question to the user is a comment on the issue and a line in your report; nothing waits on the reply. The close reason, the one-line note and the question each start `Checked against main:`. Each verdict goes in the release issue's `## Checked against main` section (see "Write it down"). A rerun, on every path of "Rerun first", checks before it finishes anything else, and skips an issue that already has a verdict in this planning's release issue. With no release issue for this planning yet, an issue carrying a `Checked against main:` note or question written since the last Release was closed has its verdict there, from an earlier run of this planning: take it, and do not ask again.
+A question to the user is a comment on the issue and a line in your report; nothing waits on the reply. The close reason, the note and the question each start `Checked against main:`, and each verdict goes in the release issue's `## Checked against main` section. A rerun skips an issue with a verdict in this planning's release issue, or with a `Checked against main:` note or question written since the last Release was closed.
 
-### The candidates
+### The slice
 
-Every open issue that survived the check against main (not closed by it, not waiting on the user, not unchecked), that carries no release label and does not read parked, of these kinds:
+Go down the features table in its order, never re-ordered, and take each feature that is open, carries no release label and does not read parked, until the items taken reach the release doc's **Release size**: stop at the first feature that, with the waiting issues the pass below would place before it, no longer fits.
 
-- a **severe** issue (a security hole, lost data, or delivery stopped: nothing can merge or ship), at `ready-for-agent` or marked `next-release`;
-- an issue marked `next-release`;
-- a **planned feature**: one the Milestone issue lists (including any added since the last Release), together with its open blockers (the tracker doc's **Count open blockers** operation); a Ticket of a listed Spec belongs to its Spec;
-- a `ready-for-agent` bug or `retro` issue at `ready-for-agent`.
+A feature whose open blocker is parked, waits with a parked issue, is an unplanned feature or is one no agent can take (at another role, or a feature left out) is **left out**, naming that blocker; so, through it, is every later feature that depends on it. One blocker leaves no feature out: a **setup Ticket** for the person (an issue at `ready-for-human` that planning published for an account, product or credential a live step needs). The feature is taken, its `After:` line names that Ticket, and only the Tickets it blocks wait for the person.
 
-A parked issue is left out, waiting on the user to lift its park. An **unplanned feature** (an enhancement, or any other feature-sized issue, that the Milestone issue does not list; never a `retro` issue) is never ranked, whatever its label or whoever suggested it: propose each one to the user in one line, saying the Milestone issue does not list it, so it waits for the next Milestone's planning. Any other issue, such as one at `needs-triage`, `needs-info`, `ready-for-human` or `wontfix`, is not a candidate.
+**The bug dependency pass.** Before taking a feature, decide for each waiting issue not yet placed whether it blocks that feature: a blocker link says so, or the feature's work would be built on the fault the issue describes. Place each one that does just before the feature, in the order below, and record the blocker link with the tracker doc's **Blocking** operation where it is missing. A placed waiting issue's own open blockers are placed before it the same way, in the order they must land; when one of them is not a waiting issue (parked, waiting with a parked issue, or one no agent can take), place none of them and leave the feature out, naming it. A feature is taken once each of its open blockers is in the Order or is a setup Ticket.
 
-### The ranked list
-
-Sort every candidate into one list, in descending priority:
-
-1. **Group 1**: severe issues, then issues marked `next-release`; within each, oldest first.
-2. **Group 2**: the planned features, in the order you set this planning (below), each preceded by its open blockers in the order they must land. A blocker already placed higher stays where it is. A feature with a blocker an agent cannot take (parked, not at `ready-for-agent`, or closed without the work done: as not planned, duplicate or `wontfix`, which never clears) is left out, naming that blocker. A blocker closed as completed, the check against main's closes included, is cleared.
-3. **Group 3**: the `ready-for-agent` bugs and `ready-for-agent` `retro` issues, oldest first.
-
-An issue that meets several conditions goes in its highest group, and first within it: a severe issue also marked `next-release` comes before the other severe issues; a bug that blocks a planned feature goes before that feature in group 2, not in group 3. Each issue appears once. A Spec is one entry, standing for its Tickets.
-
-**Re-order the planned features** at every planning, starting from the Milestone issue's order: a feature that others depend on comes first; then the one that moves the Milestone's goal furthest; the Milestone issue's order breaks ties. Write one line of reason for each feature's place, and for every other entry one line on why it is in its group (the harm, the mark's reason, the feature it unblocks, the bug's age).
-
-### Pick from the top
-
-Take entries from the top, one item at a time, until the items taken reach the release doc's **Release size**. Once the size is full, every severe issue still in the list joins anyway, past the size; nothing else does. Every ranked candidate not taken is **left out**, with why: the size was reached, a blocker an agent cannot take, or parked.
+**After the features**, take the other waiting issues: severe, then marked `next-release`, then the rest, oldest first within each, until the size is full. Every severe issue still waiting then joins past the size; nothing else does. A waiting issue is placed only when its own open blockers are in the Order, placed before it as the pass places them; otherwise it is left out, naming them. Each issue appears once; a Spec is one entry standing for its Tickets. Every feature and waiting issue not taken is **left out**, with why: the size was reached, the blocker it names, or its check against main.
 
 ### When nothing qualifies
 
-When nothing is taken (the ranked list is empty, or every entry in it is left out, so no candidate qualifies), the planning ends here: open no release issue, create and apply no label, remove no `next-release` mark and write nothing else to the tracker beyond what the check against main already did. Report that nothing qualified and why: the unplanned features proposed to the user, each question the check against main raised, each issue unchecked, each parked issue and each planned feature left out with the blocker an agent cannot take; then stop. This holds on every path:
-
-- **Fresh planning** (no release issue for it): open none.
-- **Rerun first** on an open release issue whose Order lists nothing: open no second issue, write no Order or label into that issue, only the verdicts the check against main made into its `## Checked against main` section (a rerun then skips an issue that already holds one), and report it as the open release issue with nothing to plan. That issue keeps matching case 1, so each rerun plans again: while nothing is taken it reports and stops with no write beyond a verdict not yet recorded, so it never loops or opens another issue; once something qualifies, the rerun writes the plan into that issue.
-- **Dry run**: return the same report, writing nothing.
+When nothing is taken, open no release issue and write nothing to the tracker beyond what the check against main did (an open release issue found by "Rerun first" stays as it is). Tell the user why, naming each feature left out with its blocker, each question the check raised and each issue unchecked, and stop.
 
 ### Name it
 
@@ -149,7 +134,7 @@ Fill the release doc's name, label and title forms for the next Release: the las
 
 ### Write it down
 
-When at least one entry is taken, open the release issue (when nothing is taken it opens none: see "When nothing qualifies"), with no release label of its own:
+When at least one entry is taken, open the release issue, with no release label of its own:
 
 ```md
 Title: <the title form, filled>
@@ -164,11 +149,11 @@ Title: <the title form, filled>
 
 ## Order
 
-1. #<n> <title>: <one line of reason>
+1. #<n> <title>: <why it is here: its row of the table, the feature it blocks, severe, the mark's reason, or its age>. After: <#<n>, #<n>: its open blockers when planned, or none>
 
 ## Left out
 
-- #<n> <title>: <why: the size was reached, a blocker an agent cannot take, or parked>
+- #<n> <title>: <why: the size was reached, the blocker it names, or its check against main>
 
 ## Checked against main
 
@@ -176,19 +161,13 @@ Main at `<commit>`.
 
 - #<n> <title>: <verdict>: <evidence, or what is missing; leave it out when the verdict is still valid>
 
-## Proposed to the user
-
-- #<n> <title>: <an unplanned feature; the Milestone issue does not list it>
-
 ## Notes
 
 Posted as a comment when the Release is cut. Issues filed from now on wait for the next planning, apart from Tickets added to a Spec in this Release.
 ```
 
-Write `None.` under a heading with nothing in it. Then create the label if the repo lacks it, and apply it to each issue in the Order and to every open Ticket of a Spec in it (its sub-issues, by the tracker doc's way of checking a sub-issue link, and any issue whose body has a `Part of #<spec>` line). Remove `next-release` from each taken issue that carries it, once it carries the release label; an issue left out keeps its mark. Label nothing outside the Order.
+The tracker's blocker links stay the record; the `After:` line is for reading. Write `None.` under a heading with nothing in it. Then create the label if the repo lacks it, and apply it to each issue in the Order and to every open Ticket of a Spec in it (its sub-issues, by the tracker doc's way of checking a sub-issue link, and any issue whose body has a `Part of #<spec>` line). Remove `next-release` from each taken issue that carries it, once it carries the release label; an issue left out keeps its mark. Label nothing outside the Order.
 
-Report to the user the Order with its reasons, the size used, what was left out and why, each question the check against main raised, and the features proposed; nothing waits on a reply. When nothing qualified there is no Order: the report says so and why, as "When nothing qualifies" says.
+Report to the user the Order, the size used, what was left out and why, and each question the check against main raised; nothing waits on a reply.
 
-When the caller asks for a dry run, run this step read-only: write nothing to the tracker (the check against main closes and edits nothing either) and return the Release it would plan, with the check's verdicts.
-
-Done when nothing was taken, no release issue was opened for it, no Order or label was written (an open release issue found by "Rerun first" holds only the verdicts the check made, in its `## Checked against main` section) and the report says that nothing qualified and why; or else the release issue is open with its Goal, Size, Order, Left out, Checked against main and Proposed sections, every issue in the check's scope when it ran has a verdict in it, every issue in its Order (and every open Ticket of a Spec in it) carries the label, no other issue does, and no taken issue still carries `next-release`.
+Done when nothing was taken, nothing was written beyond the check's own writes, and the user was told why; or else the release issue is open with its sections, each Order entry with its `After:` line and each issue taken with a verdict, every issue in its Order (and every open Ticket of a Spec in it) carries the label, no other issue does, and no taken issue still carries `next-release`.

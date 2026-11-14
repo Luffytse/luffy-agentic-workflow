@@ -17,4 +17,4 @@ The unattended sort of one repo's Retro backlog by `retro-planning`, run by the 
 _Avoid_: retro triage, retro review
 
 **Handed-over Retro issue**:
-A Retro issue that **Retro planning** gave the `needs-triage` role, keeping its `retro` label. The Triage batch triages it as the Ticket itself, by `triage`'s rule for it, and `release` ranks it once it reaches `ready-for-agent`. A repo's own rules may add to that rule, as this repo's `CLAUDE.md` does for a fix in a skill.
+A Retro issue that **Retro planning** gave the `needs-triage` role, keeping its `retro` label. The Triage batch triages it as the Ticket itself, by `triage`'s rule for it, and `release` takes it with the waiting bugs once it reaches `ready-for-agent`. A repo's own rules may add to that rule, as this repo's `CLAUDE.md` does for a fix in a skill.

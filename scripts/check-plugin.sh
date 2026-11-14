@@ -281,7 +281,6 @@ import sys
 LIMIT = 4000
 known_over = {  # path under skills/ -> words when the limit went to 4,000
     "implement-spec/SKILL.md": 4423,
-    "release/SKILL.md": 4139,
 }
 skills = pathlib.Path(sys.argv[1])
 failed = False

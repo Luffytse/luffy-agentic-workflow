@@ -39,7 +39,7 @@ Read this first, then open only the docs whose line fits your work. Specs and ti
 ## Building
 
 - [Delivery glossary](glossary/delivery.md): Milestone, project threads, Plugin version check, Harness, Worker control, Environment check, Team lead, Takeover, Parked and Pause. Read when working on `milestone`, `team-lead` or `worker-control`.
-- [Releases glossary](glossary/releases.md): Release, Release size, Main check, Ranked list, Cut steps, Triage batch and Release thread. Read when working on `release` or the Triage batch.
+- [Releases glossary](glossary/releases.md): Release, Release size, Main check, Slice, Cut steps, Triage batch and Release thread. Read when working on `release` or the Triage batch.
 - [Build glossary](glossary/building.md): Spec, Ticket, build threads, branches, Build check, Implementer and Merging. Read when working on `implement`, `implement-spec` or `merging`.
 - [ADR 0004](adr/0004-build-threads-coordinate-and-subagents-code.md): build threads coordinate and Implementer subagents code; a pull request goes to the user only at a boundary crossing; a build thread reads its issue against main first. Read when working on `implement`, `implement-spec`, `to-tickets` or `setup-project`.
 - [ADR 0005](adr/0005-a-spec-is-one-long-lived-branch.md): the spec branch model, ticket worktrees and merges. Read when working on `implement-spec` or anything about branches.
@@ -68,5 +68,5 @@ Read this first, then open only the docs whose line fits your work. Specs and ti
 - [Docs glossary](glossary/docs.md): Skill docs folder, Docs index and Area. Read when a skill writes or reads docs.
 - [ADR 0006](adr/0006-docs-are-found-through-one-index.md): this index and the glossary pages per area, and which skills keep the index up to date; its layout part is replaced by ADR 0011. Read when a skill writes or reads docs.
 - [ADR 0011](adr/0011-skill-files-live-in-docs-dev-skills.md): every file the skills require lives at a fixed path in `docs/dev-skills/`. Read when a skill names a path to a doc it writes or reads, or when setting up a repo.
-- [ADR 0012](adr/0012-release-is-version-free-and-command-free.md): `release` is version-free and command-free; every plan is a Milestone, the next Release comes from one ranked list, and a cut carries nothing over (amended by ADR 0016). Read when changing `release`, the Triage batch (`TRIAGE-BATCH.md`), the release doc seed or how a Release is cut or chosen.
+- [ADR 0012](adr/0012-release-is-version-free-and-command-free.md): `release` is version-free and command-free; every plan is a Milestone, the next Release takes the next slice of the Milestone's features with the waiting issues, and a cut carries nothing over (amended by ADR 0016). Read when changing `release`, the Triage batch (`TRIAGE-BATCH.md`), the release doc seed or how a Release is cut or chosen.
 - [ADR 0014](adr/0014-dev-skills-moved-to-its-own-public-repo-with-a-rewritten-history.md): why `dev-skills` moved to its own public repo with a rewritten history, and the archive numbering. Read when asking why issue numbers or past Release commits do not resolve here.

@@ -39,7 +39,7 @@ Five **state** roles:
 
 **Repo labels** are the labels the repo records for its own kinds of work; apply them as the **Repo labels** section of its triage-labels doc says.
 
-One **mark** role, `next-release`, says an issue must join the next Release; Release planning takes it and removes the mark. It is neither a category nor a state role. Set it only when the user asks. Triage applies no release label.
+One **mark** role, `next-release`, says Release planning takes an issue first among its waiting issues, after severe ones, and removes the mark once it is taken. It is neither a category nor a state role. Set it only when the user asks. Triage applies no release label.
 
 An **agent-found enhancement** (an audit, investigation or retro finding: an enhancement an agent filed, or whose body says an agent found it) waits for the user at `ready-for-human`: the user decides every new feature, and only the user moves it on or closes it. An agent never ranks, closes, expires or marks one. A Retro issue that Retro planning handed over is not one: the Triage batch's rule for it decides it.
 
