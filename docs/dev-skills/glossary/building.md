@@ -37,7 +37,7 @@ _Avoid_: integration branch, feature branch
 The branch one Ticket is built on. A Spec's Ticket branches start from the Spec branch, stay inside the thread and are deleted only after the Spec pull request merges (ADR 0005); a lone Ticket's branch starts from main and is pushed.
 
 **Ticket check**:
-One Quick Round over a Spec's Ticket branch, against the Spec branch, before the Ticket joins it, recorded on the Spec pull request. Its open Findings carry into the Spec pull request's Round 1. Not one of the Spec pull request's Rounds.
+One Quick Round over a Spec's Ticket branch, against the Spec branch, before the Ticket joins it, recorded on the Spec pull request. It runs one Finder doing the standards and spec work, and a Verifier only when something is left to judge (`review-rounds`). Its open Findings carry into the Spec pull request's Round 1. Not one of the Spec pull request's Rounds.
 
 **Merging**:
 The `merging` Base skill, hidden from the menu: the finish of one pull request that is ready to merge. It decides who merges from the **Boundary record** alone (none means an empty one), checks the review record (the latest Round comment is clean or sorted and names the current head, or a head ahead of it only by the commits the review allows), syncs with main, merges with the repo's own merge method where its rules name one, confirms the merge on the tracker and closes the issues. `implement`, `implement-spec` and `release` load it at their merge step, and `review-rounds` defines a boundary crossing by it.

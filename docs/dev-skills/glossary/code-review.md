@@ -22,7 +22,7 @@ How much review a change gets, picked by Round 0: **None** (the project's checks
 _Avoid_: depth, mode
 
 **Round**:
-One pass of Find, Verify and Rank over a pull request, its one comment, and the fix commits after it; a pull request gets at most 3. **Round 1** reviews the whole pull request; **Rounds 2 and 3** review only its new commits. A Round is **clean** when no Important is open after its Verify step, which means ready to merge. Owned by `review-rounds` (ADR 0003).
+One pass of Find, Verify and Rank over a pull request, its one comment, and the fix commits after it; a pull request gets at most 3. **Round 1** reviews the whole pull request; **Rounds 2 and 3** review only its new commits. A Round is **clean** when no Important is open after its Verify step (or, when no Verifier ran, after the Finder's report), which means ready to merge. Owned by `review-rounds` (ADR 0003).
 _Avoid_: pass, iteration
 
 **After-Round-3 sort**:
@@ -46,7 +46,7 @@ _Avoid_: Round (for a batch of questions)
 A short file at a repo's root telling reviewers what Important means there, what to skip, what to always check (the **Always check** lines, each a Bug class earlier reviews caught) and optionally its own Review levels. The line form is `review-record`'s.
 
 **Finder**:
-A reviewer agent that looks for problems and reports candidate Findings, as a Markdown report in the **Report format** (Findings, then any notes under one `## Notes` heading), written to the file its brief names; a report off that format goes to the Verifier with a note, and the Finder is asked again only when its report is missing or empty. Its kinds are the **standards Finder** and **spec Finder** (from Upstream), the **adversarial Finder**, the premium **security Finder** and the **later-Round Finder**; which run at each level and Round is `review-rounds`'.
+A reviewer agent that looks for problems and reports candidate Findings, as a Markdown report in the **Report format** (Findings, then any notes under one `## Notes` heading), written to the file its brief names; a report off that format goes to the Verifier with a note, and the Finder is asked again only when its report is missing or empty. Its kinds are the **standards Finder** and **spec Finder** (from Upstream), the **adversarial Finder**, the premium **security Finder**, the **later-Round Finder** and a Ticket check's one **Ticket-check Finder**, the last two doing the standards and spec work in one and reporting each earlier open Finding as fixed or still open; which run at each level and Round is `review-rounds`'.
 _Avoid_: reviewer (too broad), scanner
 
 **Brief script**:
@@ -54,7 +54,7 @@ _Avoid_: reviewer (too broad), scanner
 _Avoid_: brief builder
 
 **Verifier**:
-The one agent per Round that checks each candidate Finding, and each open Finding with any dispute of it, against the code, keeps only what it confirmed and makes the final call on it. When it is skipped and its tier are `review-rounds`'.
+The one agent per Round that checks each candidate Finding, and each open Finding with any dispute of it, against the code, keeps only what it confirmed and makes the final call on it. Round 1 sends it any candidate, a proposed Nit included; in Rounds 2 and 3 and a Ticket check it runs only on a new candidate, an earlier Finding reported still open, or a dispute, and otherwise the Finder's report stands. The exact rule and its tier are `review-rounds`'.
 _Avoid_: judge, triage agent
 
 **Finding**:

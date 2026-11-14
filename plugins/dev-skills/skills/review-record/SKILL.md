@@ -25,32 +25,32 @@ One comment per Round on the pull request. Its first line is the marker:
 Level: Standard (changes what the export rule does)
 Reviewed: the whole pull request | the new commits <base>..<head>
 Result: clean | not clean, <n> Important open
-Finders: standards and spec
+Finders: later-Round (standards and spec in one)
 Verifier: ran
 
 | id | Severity | Bug class | Locations | Claim | Status | Note |
 |----|----------|-----------|-----------|-------|--------|------|
-| R2-1 | Important | unescaped user input | src/page.ts:42, src/list.ts:17 | a name is shown raw in HTML | open | spec Finder |
-| R2-2 | Nit (fix) | mysterious name | src/split.ts:8 | `tmp` holds the shares | fixed | standards Finder; fixed in <sha> |
-| R2-3 | Nit (skip) | duplicated code | src/a.ts:3, src/b.ts:9 | two copies of one check | dismissed | Verifier: two lines, extracting adds churn |
-| R2-4 | Important | null dereference | src/load.ts:30 | a missing file crashes the load | dismissed | Verifier: the guard at src/load.ts:22 covers it |
-| R2-5 | Pre-existing | float money math | src/money.ts:4 | a 0.10 bill split three ways loses a cent | open | adversarial Finder |
-| R1-1 | Important | off-by-one | src/settle.ts:12 | the last creditor is never paid | fixed | fixed in <sha>, confirmed by Verifier |
+| R2-1 | Important | unescaped user input | src/page.ts:42, src/list.ts:17 | a name is shown raw in HTML | open | later-Round Finder |
+| R2-2 | Nit (fix) | mysterious name | src/split.ts:8 | `tmp` holds the shares | fixed | later-Round Finder; fixed in <sha> |
+| R2-3 | Nit (skip) | duplicated code | src/a.ts:3, src/b.ts:9 | two copies of one check | dismissed | later-Round Finder; Verifier: two lines, extracting adds churn, rests on src/a.ts:3 |
+| R2-4 | Important | null dereference | src/load.ts:30 | a missing file crashes the load | dismissed | later-Round Finder; Verifier: the guard covers it, rests on src/load.ts:22 |
+| R2-5 | Pre-existing | float money math | src/money.ts:4 | a 0.10 bill split three ways loses a cent | open | later-Round Finder |
+| R1-1 | Important | off-by-one | src/settle.ts:12 | the last creditor is never paid | fixed | spec Finder; fixed in <sha>, confirmed by Verifier |
 ```
 
 - **Round 0 at None** posts one line, `agentic-review`'s, and it is the whole review: its marker reads `kind=round round=0 level=None` and it has no table.
 - **Level** is None, Quick, Standard or Deep, with Round 0's one-line reason.
 - **Ids** are `R<round>-<n>`; a Ticket check uses `T<ticket number>.<check>-<n>`. A Finding keeps its first id in every later comment.
 - **Locations** are `file:line` or `file:start-end`, counted within the file at the comment's head.
-- **Verifier** is `ran`, or `none (no candidates, no open Finding)` when no Finder returned a candidate and no earlier Finding was open, so no candidates went to a Verifier; the table then has no rows. A Round comment without the line ran its Verifier.
+- **Verifier** is `ran`, or `none (no candidates, no open Finding)` when no Finder returned a candidate and no earlier Finding was open, so no candidates went to a Verifier; the table then has no rows. In Round 2 or 3 or a Ticket check it is `none (the Finder confirmed every earlier Finding fixed)` when the Finder raised nothing new, reported every earlier open Finding fixed and none was disputed, so nothing went to a Verifier; each of those rows is `fixed`, its Note ending `confirmed by <Finder>`. A Round comment without the line ran its Verifier.
 - **Rows:** every Finding this Round raised or dismissed, plus every earlier Finding whose status changed.
-- **Status** is `open`, `fixed` or `dismissed`. `fixed` names the fixing commit in the Note. A dismissal's Note says who and why: `Verifier: <reason>, rests on <file:line>`; `design kept: <link to the answer>`; or `dismissed after Round 3: <reason>`. An Important that became a bug Ticket after Round 3 stays `open` with `bug Ticket: <link>` in its Note.
-- **Note** starts with the Finder that raised the Finding, or with who closed it; keep it short.
+- **Status** is `open`, `fixed` or `dismissed`. `fixed` names the fixing commit in the Note. A dismissal's Note says, after the raising Finder, who and why: `Verifier: <reason>, rests on <file:line>`; `design kept: <link to the answer>`; or `dismissed after Round 3: <reason>`. An Important that became a bug Ticket after Round 3 stays `open` with `bug Ticket: <link>` in its Note, after the raising Finder.
+- **Note** starts with the Finder that raised the Finding first, then says who closed it, so a dismissed row still says where it came from; keep it short.
 - **Result** after Round 3 is edited to `sorted after Round 3: <n> bug Tickets, <m> dismissed`. A review stopped for a person reads `waiting on a boundary: <what would be crossed>` until the user's answer, on the pull request after it, clears it.
 
 ## Ticket-check comment
 
-The same table and fields, with the marker `<!-- code-review kind=ticket-check ticket=<number> check=<n> level=Quick head=<sha> -->` and the heading `## Ticket check: Ticket <number>`. It is posted on the Spec's pull request.
+The same table and fields, with the marker `<!-- code-review kind=ticket-check ticket=<number> check=<n> level=Quick head=<sha> -->` and the heading `## Ticket check: Ticket <number>`. Its `Finders:` line names its one Finder: `Finders: Ticket-check (standards and spec in one)`. It is posted on the Spec's pull request.
 
 ## Resolutions check
 

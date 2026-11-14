@@ -81,7 +81,9 @@ Angles:
 
 ## Later-Round Finder (Rounds 2 and 3)
 
-One Finder does the standards and spec Finders' work on the new commits: give it both their inputs and both briefs, (a) to (d) of each.
+One Finder does the standards and spec Finders' work on the new commits: give it both their inputs and both briefs, (a) to (d) of each. A Ticket check's one Finder, the Ticket-check Finder, is built the same way on the Ticket's diff, at the regular tier.
+
+When earlier open Findings are passed in, both also get: "For each earlier open Finding, find its code at this head by its file and claim, not by its old line number, and report it under `## Notes` as **fixed** (cite the line that fixes it) or **still open** (cite the line that still has it). Leave none out. This list is not a Finding: a still-open Finding is a candidate again only when this diff adds a new place for it."
 
 ## Finding format
 
