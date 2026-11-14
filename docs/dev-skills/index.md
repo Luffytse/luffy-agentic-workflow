@@ -34,6 +34,7 @@ Read this first, then open only the docs whose line fits your work. Specs and ti
 - [ADR 0001](adr/0001-dev-skills-is-one-plugin-forked-from-matt-pocock.md): why `dev-skills` is one plugin that began as Matt Pocock's skills, and which skills it keeps. Read when adding or dropping a skill, or when the Upstream watch finds an idea.
 - [ADR 0002](adr/0002-skills-name-model-tiers-not-models.md): skills name cheap, regular, premium or top tiers, never models; the `model-tiers` skill holds the default map. Read when a skill picks a model or the map changes.
 - [Packaging glossary](glossary/packaging.md): Marketplace, Plugin, Skill, Upstream, Model tier, Shared rule and Base skill. Read when writing skill text or sharing a rule.
+- [docs/dev-skills/shared-skill-rules.md](shared-skill-rules.md): how this plugin shares a rule between skills: reuse a workflow or extract a Base skill, our contracts by name, the fresh-runtime check, migration notes, Base skill frontmatter, and why not a plain file. Read when sharing a rule or adding a Base skill.
 - [ADR 0009](adr/0009-shared-rules-have-one-owner-skill.md): shared rules have one owner skill, with workflow reuse and consumer inventory. Read when sharing a rule, composing skills or adding a Base skill.
 
 ## Building

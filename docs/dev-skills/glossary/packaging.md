@@ -25,7 +25,7 @@ How strong a model a step needs: **cheap**, **regular**, **premium** or **top**.
 _Avoid_: model size, model class
 
 **Model-invoked skill**:
-A Skill the agent may start by itself when a task fits its description; hiding it from the user menu (`user-invocable: false` in Claude Code) keeps that model access. A **user-only skill** (`disable-model-invocation: true`) starts only when a person types its name; `improve-codebase-architecture` is the one, and the plugin checker's `model-invoked` check lists it. The settings are `writing-for-agents`' (`SKILL-MECHANICS.md`).
+A Skill the agent may start by itself when a task fits its description; hiding it from the user menu (`user-invocable: false` in Claude Code) keeps that model access. A **user-only skill** (`disable-model-invocation: true`) starts only when a person types its name; `improve-codebase-architecture` is the one, and the plugin checker's `model-invoked` check lists it. The settings are in `writing-for-agents` (`SKILL-MECHANICS.md`) and, for a Base skill, in `docs/dev-skills/shared-skill-rules.md`.
 _Avoid_: auto skill, manual skill
 
 **Shared rule**:
@@ -33,5 +33,5 @@ A rule two or more skills must follow the same way, such as a record contract, a
 _Avoid_: common rule, duplicated rule
 
 **Base skill**:
-A Skill holding one focused Shared rule, which consumers load by name instead of a larger workflow, hidden from the menu where supported: `docs-index`, `review-record`, `issue-absorption`, `worker-control` and `merging` (ADR 0009).
+A Skill holding one focused Shared rule, which consumers load by name instead of a larger workflow, hidden from the menu where supported: `docs-index`, `review-record`, `issue-absorption`, `worker-control` and `merging` (ADR 0009); how one is shared and its frontmatter are in `docs/dev-skills/shared-skill-rules.md`.
 _Avoid_: library skill, helper skill
