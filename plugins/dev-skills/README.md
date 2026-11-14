@@ -54,7 +54,7 @@ To add a skill, create `skills/<name>/SKILL.md`; `plugin.json` already points at
 One line per skill under `skills/`; each skill's own `SKILL.md` has the rest.
 
 - `agentic-review`: sizes a review (Round 0) and picks its level.
-- `ask-matt`: routes you to the right skill, from idea to ship.
+- `ask-luffy`: explains how the workflow runs, where you step in and how the skills fit together.
 - `codebase-design`: shared vocabulary for designing deep modules.
 - `diagnosing-bugs`: a diagnosis loop for hard bugs and performance regressions.
 - `docs-index`: the documentation-index contract (a Base skill).
