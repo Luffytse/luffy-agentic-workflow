@@ -1,6 +1,6 @@
 # dev-skills
 
-The development skills as one plugin for Claude Code: the path from `wayfinder` through specs, tickets and implementation to `agentic-review` and `retro`. The skills began as 22 of [Matt Pocock's skills](https://github.com/mattpocock/skills) (MIT) and are our own now. Every skill is model-invoked, so an agent in a project thread (where nobody types slash commands) can start any of them. See [ADR 0001](../../docs/dev-skills/adr/0001-dev-skills-is-one-plugin-forked-from-matt-pocock.md).
+The development skills as one plugin for Claude Code: the path from `wayfinder` through specs, tickets and implementation to `agentic-review` and `retro`. The skills began as 22 of [Matt Pocock's skills](https://github.com/mattpocock/skills) (MIT) and are our own now. Every skill but one is model-invoked, so an agent in a project thread (where nobody types slash commands) can start it; `improve-codebase-architecture` is started by a person. See [ADR 0001](../../docs/dev-skills/adr/0001-dev-skills-is-one-plugin-forked-from-matt-pocock.md).
 
 ## Install
 
@@ -47,7 +47,7 @@ plugins/dev-skills/
 └── LICENSE-mattpocock-skills    # Upstream's MIT notice
 ```
 
-To add a skill, create `skills/<name>/SKILL.md`; `plugin.json` already points at the folder. Keep a model-facing `description` in `SKILL.md` and omit `disable-model-invocation`. A Base skill may set `user-invocable: false` for menu hiding while remaining model-loadable; hiding is optional. See [skill mechanics](skills/writing-for-agents/SKILL-MECHANICS.md) for the frontmatter examples. Current consumers keep their instructions and references until the fresh-runtime gate and their migration pass (ADR 0009).
+To add a skill, create `skills/<name>/SKILL.md`; `plugin.json` already points at the folder. Keep a model-facing `description` in `SKILL.md` and omit `disable-model-invocation` (only `improve-codebase-architecture`, named in the checker's `model-invoked` check, sets it). A Base skill may set `user-invocable: false` for menu hiding while remaining model-loadable; hiding is optional. See [skill mechanics](skills/writing-for-agents/SKILL-MECHANICS.md) for the frontmatter examples. Current consumers keep their instructions and references until the fresh-runtime gate and their migration pass (ADR 0009).
 
 ## Skills
 
@@ -64,7 +64,7 @@ One line per skill under `skills/`; each skill's own `SKILL.md` has the rest.
 - `handoff`: compacts the conversation into a handoff document for a fresh agent.
 - `implement`: builds one lone Ticket as its thread, writing the code itself, from branch to merge.
 - `implement-spec`: builds one Spec as its thread, Tickets first, then the Spec pull request.
-- `improve-codebase-architecture`: scans a codebase for refactors that deepen shallow modules.
+- `improve-codebase-architecture`: scans a codebase for refactors that deepen shallow modules (started by a person).
 - `issue-absorption`: records and reads the issues a Ticket absorbs (a Base skill).
 - `merging`: finishes a pull request: who merges, the review-record check, the merge, closing issues (a hidden Base skill).
 - `milestone`: plans a Milestone (names its features, sorts them by dependency and has each planned in its own session before the Milestone issue is written), checks the plugin version and reports at its end, key points first and the detail trimmed.
