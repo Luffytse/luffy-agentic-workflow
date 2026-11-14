@@ -1,6 +1,6 @@
 # Docs index
 
-Read this first, then open only the docs whose line fits your work. Specs and tickets are GitHub issues, not files here. Bare issue and pull request numbers before the 2026-11-05 move refer to the private archive `Luffytse/luffy-dev-skills`; from then on a bare number is this repo's, and an archive issue is written in full as `Luffytse/luffy-dev-skills#<n>`. Commits recorded for past Releases are the archive's IDs (ADR 0014).
+Read this first, then open only the docs whose line fits your work. Specs and tickets are GitHub issues, not files here. Bare issue and pull request numbers in text written before the 2026-11-05 move (ADRs 0001 to 0013, changelog entries before the move entry, and issues moved from the archive, which link their original) refer to the private archive `Luffytse/luffy-dev-skills`; from then on a bare number is this repo's, and an archive issue is written in full as `Luffytse/luffy-dev-skills#<n>`. Commits recorded for past Releases are the archive's IDs (ADR 0014).
 
 ## Whole repo
 
@@ -22,12 +22,12 @@ Read this first, then open only the docs whose line fits your work. Specs and ti
 - [README.md](../../README.md): Claude Code and Codex marketplace install, update and local-development steps. Read when changing install steps.
 - [LICENSE](../../LICENSE): the MIT license for our own work. Read when asking what the repo's license covers.
 - [dev-skills README](../../plugins/dev-skills/README.md): the plugin's install, update and development steps, folder layout, one line per skill and the last Upstream commit looked at. Read when installing the plugin or adding a skill of our own.
-- [scripts/run-tests.sh](../../scripts/run-tests.sh): the test runner CI runs; it runs every `test*` file under `scripts/` and names each failure ([scripts/test-run-tests.sh](../../scripts/test-run-tests.sh) tests it). Read before pushing a change under `scripts/`.
+- [scripts/run-tests.sh](../../scripts/run-tests.sh): the test runner CI runs; it runs every `test*` file under `scripts/` and names each failure ([scripts/test-run-tests.sh](../../scripts/test-run-tests.sh) tests it). Read when pushing a change under `scripts/`.
 - [scripts/test_review_briefs.py](../../scripts/test_review_briefs.py): scratch-repo tests of the plugin's `review_briefs.py`, which writes each Round's briefs. Read when changing `review_briefs.py` or the brief files it cuts from.
 - [scripts/test_snapshot.py](../../scripts/test_snapshot.py): tests of the `team-lead` snapshot command `snapshot.py` on disposable repos. Read when changing `snapshot.py`.
 - [scripts/test-check-plugin.py](../../scripts/test-check-plugin.py): the checker's own tests in disposable repositories, one planted bad case per named check, including `index-line-length`. Read when changing a check.
-- [scripts/check-public-history.py](../../scripts/check-public-history.py): the pre-publish check that walks every commit for private traces (Spec #712); [scripts/test-check-public-history.py](../../scripts/test-check-public-history.py) tests it. Read before publishing a rewritten history.
-- [scripts/rewrite-public-history.py](../../scripts/rewrite-public-history.py): the history rewrite the user runs on a fresh clone (Spec #712); [scripts/test-rewrite-public-history.py](../../scripts/test-rewrite-public-history.py) tests it. Read before running the move's history push.
+- [scripts/check-public-history.py](../../scripts/check-public-history.py): the pre-publish check that walks every commit for private traces (Spec #712); [scripts/test-check-public-history.py](../../scripts/test-check-public-history.py) tests it. Read when publishing a rewritten history.
+- [scripts/rewrite-public-history.py](../../scripts/rewrite-public-history.py): the history rewrite the user runs on a fresh clone (Spec #712); [scripts/test-rewrite-public-history.py](../../scripts/test-rewrite-public-history.py) tests it. Read when running the move's history push.
 - [scripts/check-plugin.sh](../../scripts/check-plugin.sh): this repo's own checker for the plugin layout and repo-wide rules, each check named in its header, among them `index-line-length` (no index bullet over 60 words). Read when adding or changing a check, or before pushing a plugin change.
 - [ADR 0001](adr/0001-dev-skills-is-one-plugin-forked-from-matt-pocock.md): why `dev-skills` is one plugin that began as Matt Pocock's skills, and which skills it keeps. Read when adding or dropping a skill, or when the Upstream watch finds an idea.
 - [ADR 0002](adr/0002-skills-name-model-tiers-not-models.md): skills name cheap, regular or premium tiers, never models; the `model-tiers` skill holds the default map. Read when a skill picks a model or the map changes.
