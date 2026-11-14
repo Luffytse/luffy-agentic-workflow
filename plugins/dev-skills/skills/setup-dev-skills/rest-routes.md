@@ -1,0 +1,26 @@
+# Issue tracker: REST routes
+
+Open this only in a session whose `gh` fails with "GraphQL is not available", or is older than 2.94. A session with the GitHub tools needs no route here. Each bullet gives the `gh api` route (REST, no GraphQL) of an operation of [issue-tracker.md](./issue-tracker.md), which says what it means, or of a case it names; `<owner>/<repo>` is the repo. The operations without a bullet, the **Map** and **Claim** of wayfinding among them, use the route of the bullet their text names.
+
+- **Create an issue**: `gh api --method POST repos/<owner>/<repo>/issues -f title="..." -f 'labels[]=<label>' -F body=@- <<'EOF'` with the body on the lines after it, ended by `EOF` (`-F body=@-` reads the body from stdin; repeat `-f 'labels[]=...'` for more labels).
+- **Read an issue**: `gh api repos/<owner>/<repo>/issues/<number>` for the issue and `gh api --paginate repos/<owner>/<repo>/issues/<number>/comments` for its comments.
+- **List issues**: `gh api --paginate 'repos/<owner>/<repo>/issues?state=open&labels=<label>' --jq '.[] | select(.pull_request | not) | {number, title, body, labels: [.labels[].name]}'` (`state` is `open`, `closed` or `all`; `labels` is a comma-separated list that must all match; this route also returns pull requests, so the `select` drops them). It carries only a comment count, so read the comments of each issue you need with the **Read an issue** route.
+- **Make an issue a sub-issue of a parent**: make the new child with the **Create an issue** route, then link it with `gh api --method POST repos/<owner>/<repo>/issues/<parent>/sub_issues -F sub_issue_id=<child-db-id>` (database id, as in **Blocking** below).
+- **Blocking**: `gh api --method POST repos/<owner>/<repo>/issues/<child>/dependencies/blocked_by -F issue_id=<blocker-db-id>`, where `<blocker-db-id>` is the blocker's numeric **database id** (`gh api repos/<owner>/<repo>/issues/<n> --jq .id`, _not_ the `#number` or `node_id`).
+- **Add a line to an issue body**: write the whole body with `gh api --method PATCH repos/<owner>/<repo>/issues/<number> -F body=@<file>` and read it back with the **Read an issue** route.
+- **Comment on an issue**: `gh api --method POST repos/<owner>/<repo>/issues/<number>/comments -f body="..."`.
+- **Apply / remove labels**: `gh api --method POST repos/<owner>/<repo>/issues/<number>/labels -f 'labels[]=<label>'` to add and `gh api --method DELETE repos/<owner>/<repo>/issues/<number>/labels/<label>` to remove (URL-encode a label with spaces or a colon, as `wayfinder%3Amap`).
+- **Close**: post the comment as in **Comment on an issue**, then `gh api --method PATCH repos/<owner>/<repo>/issues/<number> -f state=closed -f state_reason=completed` (`not_planned` for a wontfix close).
+- **Check the repo is reachable**: `gh api repos/<owner>/<repo>`.
+- **List labels**: `gh api repos/<owner>/<repo>/labels --paginate --jq '.[].name'`.
+- **Create a label**: `gh api --method POST repos/<owner>/<repo>/labels -f name=<label>`.
+- **Read repo settings**: `gh api repos/<owner>/<repo>` returns `private`, `default_branch`, `allow_squash_merge` and `allow_merge_commit`. The branch protection and branch rules, and the dependency and sub-issue summaries, are read as the operation says.
+- **Assign yourself**: `gh api --method POST repos/<owner>/<repo>/issues/<number>/assignees -f "assignees[]=$(gh api user --jq .login)"`.
+- **Read a PR**: `gh api repos/<owner>/<repo>/pulls/<number>` for the PR, `gh api repos/<owner>/<repo>/issues/<number>/comments` for its comments, `gh api repos/<owner>/<repo>/pulls/<number>/comments` for its review comments on the diff, `gh api repos/<owner>/<repo>/pulls/<number>/files` for the changed files and `gh api repos/<owner>/<repo>/pulls/<number> -H 'Accept: application/vnd.github.diff'` for the diff.
+- **List external PRs for triage**: `gh api --paginate 'repos/<owner>/<repo>/pulls?state=open' --jq '.[] | select(.author_association | IN("OWNER","MEMBER","COLLABORATOR") | not) | {number, title, author: .user.login, author_association, labels: [.labels[].name]}'`.
+- **Comment / label / close** (a PR): a PR is an issue for comments, labels and state, so use the issue routes above; `gh api --method PATCH repos/<owner>/<repo>/issues/<number> -f state=closed` closes one.
+- **Resolve a bare `#42`**: `gh api repos/<owner>/<repo>/issues/42` answers for both an issue and a PR; it is a PR when the response has a `pull_request` key.
+- **Merge a PR**: read the body with `gh api repos/<owner>/<repo>/pulls/<number> --jq '.body // ""' > <file>`, then `gh api --method PUT repos/<owner>/<repo>/pulls/<number>/merge -f merge_method=squash -f commit_title='<title>' -F commit_message=@<file>`, or `-f merge_method=merge -f commit_title='<title>'` for a merge commit.
+- **Read whether a PR merged**: `gh api repos/<owner>/<repo>/pulls/<number> --jq .merged` prints `true` only for a merged pull request.
+- **Resolve** (a wayfinding ticket): read the map body with `gh api repos/<owner>/<repo>/issues/<map> --jq '.body // empty'`, append to it, and write it back with `gh api --method PATCH repos/<owner>/<repo>/issues/<map> -F body=@-`. Read it back with the same read.
+- **Fork check**: `gh api repos/<owner>/<repo> --jq '.parent.full_name // empty'`; a non-empty answer means a fork.

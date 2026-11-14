@@ -7,12 +7,12 @@ description: "Configure a GitHub repo for the dev-skills plugin: tracker, label,
 
 Derived from Matt Pocock's setup skill; the seed files in this folder are mostly his text (MIT, see `LICENSE-mattpocock-skills` in the plugin folder). Scaffold the per-repo configuration the other skills read. Every file it writes lives in `docs/dev-skills/`, the one folder only the skills use, so it never mixes with the repo's own docs; only `REVIEW.md` and the `## Agent skills` block in `CLAUDE.md` or `AGENTS.md` go at the repo root, where reviewers and coding agents expect them:
 
-- **Issue tracker**: GitHub Issues, in `docs/dev-skills/issue-tracker.md`.
+- **Issue tracker**: GitHub Issues, in `docs/dev-skills/issue-tracker.md`, with the `gh api` routes for a session without GraphQL in `docs/dev-skills/issue-tracker-rest.md` beside it.
 - **Labels**: the 5 state roles and 2 category roles that `triage` uses, the `next-release` role, the repo's own labels, if it has any, each with a line saying when it applies (the **Repo labels** table, under the rule that section holds for `triage`, `to-spec`, `to-tickets` and `review-rounds`), the `wayfinder:*` labels and the `parked` label (the tracker doc's **Park** operation uses it), in `docs/dev-skills/triage-labels.md` and on the repo.
 - **Domain docs**: where the glossary (`docs/dev-skills/glossary.md`) and ADRs (`docs/dev-skills/adr/`) live and how skills read them, in `docs/dev-skills/domain.md`, plus the `docs/dev-skills/index.md` that lists the docs.
 - **Review rules**: a starter `REVIEW.md` at the repo root, where the repo's own review rules go.
 - **Releases**: the Release name form, the Release size, the changelog path, the release label prefix, the cut steps and the whole-Release check, that `release` reads, in `docs/dev-skills/release.md`, for a repo that cuts Releases, versioned or not.
-- **Boundaries**: which irreversible actions agents may take, which need the user's approval, the resource budget, the check-in interval and the Milestone label form, in the Boundary record, `docs/dev-skills/boundaries.md`.
+- **Boundaries**: which irreversible actions agents may take, which need the user's approval and the resource budget, with the check-in interval and the Milestone label form as defaults, in the Boundary record, `docs/dev-skills/boundaries.md`.
 - **GitHub settings**: checked and reported, never changed.
 
 This is a prompt-driven skill, not a deterministic script. Explore, present what you found, confirm with the user, then write. It runs the same way on a fresh repo and on a re-run; a re-run shows a diff first (step 3).
@@ -24,7 +24,7 @@ This is a prompt-driven skill, not a deterministic script. Explore, present what
 Read whatever exists; assume nothing:
 
 - `git remote -v`: which host and which `<owner>/<repo>`? Take it from either URL form, `https://github.com/<owner>/<repo>(.git)` or `git@github.com:<owner>/<repo>(.git)`, and drop a trailing `.git`. Only GitHub is supported. If the remote is not GitHub, tell the user the plugin does not support that tracker yet, and stop.
-- Is the repo reachable? Use the **Check the repo is reachable** operation of the tracker doc, or of the seed `issue-tracker-github.md` where the repo has no tracker doc yet (a session without `gh` uses the GitHub tools it has for the same read). If the repo cannot be reached, stop and tell the user what is missing.
+- Is the repo reachable? Use the **Check the repo is reachable** operation of the tracker doc, or of the seed `issue-tracker-github.md` where the repo has no tracker doc yet (a session without `gh` uses the GitHub tools it has for the same read, and one whose `gh` fails for lack of GraphQL uses the `gh api` route of the seed `rest-routes.md`). If the repo cannot be reached, stop and tell the user what is missing.
 - `AGENTS.md` and `CLAUDE.md` at the repo root: does either exist? Is there already an `## Agent skills` section?
 - `docs/dev-skills/glossary.md` (the glossary, or its map once split), and the legacy `CONTEXT.md` / `CONTEXT-MAP.md` at the repo root. If a legacy file exists, offer to `git mv` it to `docs/dev-skills/glossary.md` (a `CONTEXT-MAP.md` becomes the map).
 - `docs/dev-skills/adr/` and any `src/*/docs/adr/` directories.
@@ -42,7 +42,7 @@ Done when each item above is a fact or "none".
 
 Summarise what is present and what is missing. Take the sections in order, one answer each, leading with the recommended answer so the user can accept it in a word. Skip a section when exploration settled it.
 
-**Section A: Issue tracker.** GitHub, from the remote. Record it in `docs/dev-skills/issue-tracker.md` with the repo's `<owner>/<repo>` filled in. The seed carries a "PRs as a request surface" flag, defaulted **off**. Leave it off and do not raise it; a user who wants external PRs in the triage queue can flip it later.
+**Section A: Issue tracker.** GitHub, from the remote. Record it in `docs/dev-skills/issue-tracker.md` and `docs/dev-skills/issue-tracker-rest.md`, each with the repo's `<owner>/<repo>` filled in. The seed carries a "PRs as a request surface" flag, defaulted **off**. Leave it off and do not raise it; a user who wants external PRs in the triage queue can flip it later.
 
 **Section B: Triage label vocabulary.** Ask one question:
 
@@ -64,13 +64,7 @@ Record each label as a row of the table: the label string and its line. On a re-
 
 **Section C: Domain docs.** Default to **single-context** (one `docs/dev-skills/glossary.md` and one `docs/dev-skills/adr/`); write it without asking. Offer **multi-context** (`docs/dev-skills/glossary.md` as a map pointing to a glossary beside each context's code) only when exploration found monorepo signals.
 
-**Section D: The repo's own rules for build threads.** Ask one question:
-
-> Does this repo have rules of its own for the build threads, such as who merges which pull requests, or which files are special? (recommended: **no**, add them later)
-
-On **yes**, ask the user for the rules' text, then record them in the repo's `CLAUDE.md` or `AGENTS.md` (the file step 4 picks) or, if they are about review, in `REVIEW.md`. Such rules never go into skill text: every project that loads the plugin reads the skills, so a rule that fits one repo belongs in that repo's own files.
-
-**Section E: Releases.** Ask one question:
+**Section D: Releases.** Ask one question:
 
 > Does this repo cut Releases with the `release` skill, with or without a version? (recommended: **yes**)
 
@@ -86,7 +80,7 @@ Write the release doc from the seed. A repo that keeps a version writes its bump
 
 On a re-run over a release doc that lacks a field the seed has (usually the Release size, the cut steps or the Release name form), ask for it. Any section or line about versions that the doc already holds is the repo's own text from then on: leave it.
 
-**Section F: Boundaries.** Ask the user for the Boundary record's values, one question each, leading with the recommended answer:
+**Section E: Boundaries.** Ask the user for the Boundary record's three values, one question each, leading with the recommended answer:
 
 > Which irreversible actions may agents take without asking you, for example deleting test data they generated? (recommended: **none**)
 
@@ -96,9 +90,7 @@ An empty answer to the second question is valid. `merging` reads this record in 
 
 > Is there a budget agents must stay within, such as a paid service, an API quota or a token limit? (recommended: **none**)
 
-> During a Milestone's delivery, how often should a scheduled check-in wake the coordinator to check on its threads? (recommended: **1 hour**)
-
-> What should a Milestone's membership label look like? (recommended: **`milestone-<n>`**, for example `milestone-1`)
+The check-in interval (**1 hour**: how often a Milestone's scheduled check-ins wake the coordinator) and the Milestone label form (**`milestone-<n>`**) are written as the seed has them, without asking, the way Section C writes the single-context layout; the user edits the file to change them.
 
 Never guess a value. Say that this record is the only one: a Milestone issue holds no boundaries of its own, so an action to allow or reserve for a Milestone goes here; the seed already says so.
 
@@ -109,15 +101,16 @@ On a re-run, fill the fresh draft of the record from the existing record's value
 Build every file from the seeds in this folder:
 
 - [issue-tracker-github.md](./issue-tracker-github.md) becomes `docs/dev-skills/issue-tracker.md`
+- [rest-routes.md](./rest-routes.md) becomes `docs/dev-skills/issue-tracker-rest.md`
 - [triage-labels.md](./triage-labels.md) becomes `docs/dev-skills/triage-labels.md`
 - [domain.md](./domain.md) becomes `docs/dev-skills/domain.md`
-- [release.md](./release.md) becomes `docs/dev-skills/release.md`, only when Section E was **yes**
+- [release.md](./release.md) becomes `docs/dev-skills/release.md`, only when Section D was **yes**
 - [boundaries.md](./boundaries.md) becomes `docs/dev-skills/boundaries.md`
 - [review.md](./review.md) becomes `REVIEW.md` at the repo root, but only when the repo has none, first run or re-run. An existing `REVIEW.md` (the user's own or an earlier run's) is never drafted over: nothing in it is removed or rewritten, and only a missing section of Important, Skip and Always check is offered, alone, as a diff; with all three present, report "no change".
 - the `## Agent skills` block (step 4)
 - `docs/dev-skills/index.md`, new or updated, listing every `docs/dev-skills/` file, `REVIEW.md` (with a "read when reviewing a change or adding an Always check line" line) and every other doc found while exploring, by loading `docs-index` and applying its contract
 
-On a re-run, diff each draft against the file in the repo. Keep the values the earlier run filled in (the repo link, the label strings, the Repo labels rows and their lines, the PR flag, the release doc's values, including its Release name form, Release size, cut steps, any text about versions it holds, and whole-Release check, and the Boundary record's values) and change only what drifted from the seeds. Show the user the diff, or "no change" per file. The rules the user gave in Section D are drafted into the diff of the file they go in (`CLAUDE.md` or `AGENTS.md`, or `REVIEW.md`) and shown before writing; adding a line to an existing `REVIEW.md` is an addition, not a rewrite. Let the user edit before anything is written.
+On a re-run, diff each draft against the file in the repo. Keep the values the earlier run filled in (the repo link, the label strings, the Repo labels rows and their lines, the PR flag, the release doc's values, including its Release name form, Release size, cut steps, any text about versions it holds, and whole-Release check, and the Boundary record's values) and change only what drifted from the seeds. Show the user the diff, or "no change" per file. A repo set up before the tracker doc was split shows the split as a diff: the tracker doc without its REST routes, and `docs/dev-skills/issue-tracker-rest.md` as a new file. A repo set up before the Boundary questions were cut keeps the record's values as they are. Let the user edit before anything is written.
 
 Done when the user has approved the drafts, or approved "no change".
 
@@ -169,9 +162,9 @@ Check, and report each failure to the user. Never change a setting, and never cr
 
 | Check | How | A failure means |
 | --- | --- | --- |
-| Sub-issues and dependencies | (**Read repo settings**) Any issue's sub-issue and dependency summaries are present; report "not checked" when the repo has no issue to probe. Note whether the installed command-line tool has the native parent and blocked-by options, or only the routes in the seed | `to-tickets` and `wayfinder` fall back to `Part of #<n>` and `Blocked by:` lines |
+| Sub-issues and dependencies | (**Read repo settings**) Any issue's sub-issue and dependency summaries are present; report "not checked" when the repo has no issue to probe. Note whether the installed command-line tool has the native parent and blocked-by options, or only the routes in `rest-routes.md` | `to-tickets` and `wayfinder` fall back to `Part of #<n>` and `Blocked by:` lines |
 | Draft PRs | The repo is public, which allows drafts. A private repo needs a paid plan: the "Upgrade to GitHub Pro" message from the branch protection read means a free plan, so fail; if the plan cannot be told, report "not checked" | `implement-spec` cannot open the Spec pull request as a draft |
-| Merge methods | Both squash merging and merge commits are allowed | `implement` squash-merges and `implement-spec` merges with a merge commit, so one of them cannot merge |
+| Merge methods | The merge method each build skill will use is allowed: the one the repo's own rules name, else squash merging for `implement` and merge commits for `implement-spec` | that build skill cannot merge |
 | Default branch | The default branch is `main` | the build skills assume `main` |
 | Branch protection | Neither classic protection nor branch rules require reviews or restrict who can merge in a way that stops the agent merging its own pull request | the agent cannot merge; the user must merge |
 

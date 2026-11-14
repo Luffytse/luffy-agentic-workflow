@@ -77,7 +77,7 @@ One line per skill under `skills/`; each skill's own `SKILL.md` has the rest.
 - `retro-planning`: sorts a repo's Retro backlog by root cause, closing one-offs and handing repeated problems to triage.
 - `review-record`: the shape and reading of review comments (a Base skill).
 - `review-rounds`: runs a review's Rounds, Finders to Rank (a hidden Base skill).
-- `setup-dev-skills`: configures a GitHub repo for the plugin.
+- `setup-dev-skills`: configures a GitHub repo for the plugin, with the tracker doc and its REST-route file beside it.
 - `setup-project`: drafts a project's coordinator instructions.
 - `tdd`: test-driven development, red-green-refactor.
 - `team-lead`: runs a Milestone's delivery as the coordinator: starts every unblocked entry, check-ins, pause and resume, and the stop for the Milestone review.
