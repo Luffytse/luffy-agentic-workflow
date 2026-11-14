@@ -112,12 +112,10 @@ For `dev-skills`, run `scripts/check-plugin.sh`, `scripts/run-tests.sh` (every `
 ```
 luffy-agentic-workflow/
 ├── .agents/
-│   ├── plugins/
-│   │   └── marketplace.json    # Codex catalog (dev-skills only)
-│   └── skills -> ../plugins/dev-skills/skills  # Codex skills from this checkout
+│   └── plugins/
+│       └── marketplace.json    # Codex catalog (dev-skills only)
 ├── .claude/
-│   ├── settings.json           # disable the cached plugin in this repo
-│   └── skills -> ../plugins/dev-skills/skills  # Claude Code skills from this checkout
+│   └── settings.json           # disable the cached plugin in this repo
 ├── .codex/
 │   └── config.toml             # disable the cached plugin in this repo
 ├── .claude-plugin/
