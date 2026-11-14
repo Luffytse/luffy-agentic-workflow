@@ -4,7 +4,7 @@ A Claude Code and Codex plugin marketplace, named `luffy-agentic-workflow`, hold
 
 - `dev-skills`: the development skill set used across projects, skills that began as Matt Pocock's, now our own, plus our own review pipeline. See `docs/dev-skills/adr/`.
 
-Words used here (Finder, Verifier, Finding, Bug class, Review level, Model tier and so on) are defined in `docs/dev-skills/glossary.md`. Decisions are in `docs/dev-skills/adr/`. Start at `docs/dev-skills/index.md`, which says which doc to read for what.
+Words used here (Finder, Verifier, Finding, Bug class, Review level, Model tier and so on) are defined on the Area pages that `docs/dev-skills/glossary.md` maps. Decisions are in `docs/dev-skills/adr/`. Start at `docs/dev-skills/index.md`, which says which doc to read for what.
 
 ## Working rules
 
@@ -40,7 +40,7 @@ Issues and specs live in this repo's GitHub Issues. See `docs/dev-skills/issue-t
 
 ### Domain docs
 
-Single-context: one `docs/dev-skills/glossary.md` and `docs/dev-skills/adr/`. See `docs/dev-skills/domain.md`.
+Single-context: one glossary, split into Area pages behind the map `docs/dev-skills/glossary.md`, and one `docs/dev-skills/adr/`. See `docs/dev-skills/domain.md`.
 
 ### Boundaries
 
