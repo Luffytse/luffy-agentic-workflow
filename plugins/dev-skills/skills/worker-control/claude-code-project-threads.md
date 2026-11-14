@@ -1,6 +1,6 @@
 # Claude Code project threads
 
-Workers run as **threads** of a claude.ai Claude Code project, this reference's **Harness**: the coordinator is the project conversation, and each thread is a separate cloud session (or a session on the user's machine through Remote Control) with its own branch. Docs read 2026-11-03. A line marked **runtime-reported** names a fact no doc page states but the runtime's own tools showed; it is a fact seen in use, not one the docs promise.
+Workers run as **threads** of a claude.ai Claude Code project, this reference's **Harness**: the coordinator is the project conversation, and each thread is a separate cloud session (or a session on the user's machine through Remote Control) with its own branch. Docs read 2026-11-03; the cloud-environment section 2026-11-14. A line marked **runtime-reported** names a fact no doc page states but the runtime's own tools showed; it is a fact seen in use, not one the docs promise.
 
 ## Detect
 
@@ -33,6 +33,14 @@ A thread hands any of these over once, as the build and merge skills say; none i
 - **One designated branch, no force push.** A cloud thread has one designated branch, and a force push is refused, so it cannot restart that branch from main. After its pull request is squash-merged it cannot make a new branch off main for a post-merge bug Ticket or the retro's check, so a fresh thread builds those.
 - **Auto mode may refuse a self-merge the Boundary record allows.** The merge call is denied as "Merge Without Review" until the user says to merge it.
 - **No pushes under `.github/workflows/`.** A cloud thread holds no `workflow` scope: `git push` says "without `workflow` scope" and the GitHub tools say "Insufficient scope". The user pushes such a file.
+
+## Keeping the plugin current in a cloud environment
+
+- **The snapshot.** A setup script finishing within about five minutes gets its disk snapshotted; new sessions start from it; it is rebuilt when the script changes and after about seven days. Source: [environment caching](https://code.claude.com/docs/en/cloud-environments#environment-caching)
+- **Stale copy.** A plugin the script installed stays until a rebuild, so it can lag its source main (runtime-reported: 1.0.0 while main was 1.2.0).
+- **A repo that carries the plugin:** set `CLAUDE_CODE_PLUGIN_DIRS` in the environment's variables to the absolute path of the plugin's folder in the checkout (holding `.claude-plugin/plugin.json`). Source: [load plugins from an environment variable](https://code.claude.com/docs/en/plugins/create#load-plugins-from-an-environment-variable), [environment variables](https://code.claude.com/docs/en/cloud-environments#set-environment-variables). Its `.claude/skills` is no source: [cloud threads do not load it](https://code.claude.com/docs/en/claude-projects#what-threads-pick-up-from-your-repositories).
+- **Any other project:** setup script lines run `claude plugin marketplace update <marketplace>` and `claude plugin update <plugin>@<marketplace>`; edit the script so the snapshot rebuilds. Source: [update plugins now](https://code.claude.com/docs/en/plugins/install#update-plugins-now)
+- **Refresh due** when the plugin's version on its source main changes.
 
 ## Methods the coordinator adds
 

@@ -84,7 +84,7 @@ The **Plugin version check** shows threads load main's plugin text. Run it once 
 - **Read:** invoke by name a plugin skill that only loads text and read where the runtime says it loaded it from; the plugin root holds that skill's `skills` folder. Compare that root's manifest version with main's on the source repository, read from the remote. A load path inside a source checkout compares the checkout's commit with main's instead. A listed skill name proves nothing.
 - **Record:** one comment on the Milestone issue headed `Plugin version check`: the load path and both values, read back.
 - **Holds** when they match: one line to the user; delivery starts.
-- **Mismatch**, or no load path reported: tell the user the cause (an installed plugin copy older than main runs rules main has changed) and the fix (update the plugin, then start fresh threads). Delivery waits for the user's word, recorded on the Milestone issue.
+- **Mismatch**, or no load path reported: tell the user the cause (an installed plugin copy older than main runs rules main has changed) and the fix (update the plugin, then start fresh threads; in a Claude Code cloud environment, as `worker-control`'s Claude Code reference says under "Keeping the plugin current in a cloud environment"). Delivery waits for the user's word, recorded on the Milestone issue.
 
 ## Delivery
 
