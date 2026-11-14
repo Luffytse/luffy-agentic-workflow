@@ -55,8 +55,8 @@ Read this first, then open only the docs whose line fits your work. Specs and ti
 
 ## Retros
 
-- [Retros glossary](glossary/retros.md): Retro issue, Retro backlog, Retro planning, Necessity check and Spin-off. Read when working on `retro` or `retro-planning`.
-- [ADR 0007](adr/0007-retro-issues-pile-up-per-repo-and-are-planned-in-batches.md): how `retro` files Retro issues by Scope and how `retro-planning` works through the backlog. Read when working on `retro`, `retro-planning`, or the end of `implement` and `implement-spec`.
+- [Retros glossary](glossary/retros.md): Retro issue, Retro backlog, Retro planning and Handed-over Retro issue. Read when working on `retro` or `retro-planning`.
+- [ADR 0007](adr/0007-retro-issues-pile-up-per-repo-and-are-planned-in-batches.md): how `retro` only files Retro issues by Scope, repeated Bug classes included, and how `retro-planning` sorts the backlog, handing repeated problems to triage. Read when working on `retro`, `retro-planning`, or the end of `implement` and `implement-spec`.
 
 ## Out of scope
 
@@ -67,5 +67,5 @@ Read this first, then open only the docs whose line fits your work. Specs and ti
 - [Docs glossary](glossary/docs.md): Skill docs folder, Docs index and Area. Read when a skill writes or reads docs.
 - [ADR 0006](adr/0006-docs-are-found-through-one-index.md): this index and the glossary pages per area, and which skills keep the index up to date; its layout part is replaced by ADR 0011. Read when a skill writes or reads docs.
 - [ADR 0011](adr/0011-skill-files-live-in-docs-dev-skills.md): every file the skills require lives at a fixed path in `docs/dev-skills/`. Read when a skill names a path to a doc it writes or reads, or when setting up a repo.
-- [ADR 0012](adr/0012-release-is-version-free-and-command-free.md): `release` is version-free and command-free; every plan is a Milestone, and the next Release is picked from one ranked list (amended by ADR 0016). Read when changing `release`, the Triage batch, the release doc seed or how the next Release is chosen.
+- [ADR 0012](adr/0012-release-is-version-free-and-command-free.md): `release` is version-free and command-free; every plan is a Milestone, and the next Release is picked from one ranked list (amended by ADR 0016). Read when changing `release`, the Triage batch (its own file, `TRIAGE-BATCH.md`), the release doc seed or how the next Release is chosen.
 - [ADR 0014](adr/0014-dev-skills-moved-to-its-own-public-repo-with-a-rewritten-history.md): why `dev-skills` moved to its own public repo with a rewritten history, and the archive numbering. Read when asking why issue numbers or past Release commits do not resolve here.

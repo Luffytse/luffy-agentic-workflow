@@ -1,6 +1,6 @@
 # Filing suggestions as Retro issues
 
-Every candidate from step 4 that is not a repeated Bug class becomes a **Retro issue** in the repo its Scope sends it to, or a "seen again" vote on one that already covers it. Do this before presenting the report.
+Every candidate from step 4, a repeated Bug class included, becomes a **Retro issue** in the repo its Scope sends it to, or a "seen again" vote on one that already covers it. Do this before presenting the report.
 
 ## Scope and route
 
@@ -18,8 +18,8 @@ A candidate that mixes scopes is split, one per Scope. A format the plugin ships
 
 ## Vote or file
 
-1. Search the target repo's open issues labelled `retro` for one that covers the suggestion.
-2. On a match, comment `Seen again in <thread link>` plus one line on what happened this time. Do not open a duplicate.
+1. Search the target repo's issues labelled `retro`, open and closed, for one that covers the suggestion.
+2. On a match, comment `Seen again in <thread link>` plus one line on what happened this time. If the match is closed, reopen it first, whether it was closed as seen once or closed after a fix. Do not open a duplicate.
 3. Otherwise file an issue. Label `retro`; create the label first if the repo lacks it. Title `Retro: <the problem>`. Never apply `needs-triage`. The body opens with the line `Scope: <value>, <the one-clause reason>`, then names the source thread (link), what went wrong, and the suggested fix.
 
 If this thread cannot write to the target repo, do not file. Put the full issue text (title, labels, body) in the report so the coordinator can file it.
