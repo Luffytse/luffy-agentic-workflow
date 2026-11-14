@@ -26,7 +26,7 @@ One pass of Find, Verify and Rank over a pull request, its one comment, and the 
 _Avoid_: pass, iteration
 
 **After-Round-3 sort**:
-What happens when Round 3 is not clean: a premium-tier agent turns each open Important into a bug Ticket or dismisses it with a reason, open Nits are dropped, and the pull request merges. Owned by `review-rounds`.
+What happens when Round 3 is not clean: a premium-tier agent turns each open Important into a bug Ticket or dismisses it with a reason, open Nits are dropped, and the pull request is ready to merge. Owned by `review-rounds`.
 
 **Dispute**:
 An owner's written case, with evidence (`file:line`, a command and its output), that a Finding is wrong, in place of a fix. The next Round's Verifier decides it (`review-rounds`).

@@ -13,7 +13,7 @@ The open Retro issues of one repo.
 _Avoid_: retro queue, improvement list
 
 **Retro planning**:
-The review of a snapshot of one repo's Retro backlog by `retro-planning`, which merges duplicates, closes most one-offs and turns at most 3 groups into Tickets, walking the user through one group at a time (at a Release end, see **Release-end Retro planning**). Its record issue, labelled `retro-planning`, is open while it runs and closed at its end.
+The review of a snapshot of one repo's Retro backlog by `retro-planning`, which merges duplicates, closes most one-offs and files at most 3 Tickets (the cap), walking the user through one group at a time (at a Release end, see **Release-end Retro planning**). Its record issue, labelled `retro-planning`, is open while it runs and closed at its end.
 _Avoid_: retro triage, retro review
 
 **Necessity check**:

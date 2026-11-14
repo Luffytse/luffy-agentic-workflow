@@ -40,7 +40,7 @@ Issues and specs live in this repo's GitHub Issues. See `docs/dev-skills/issue-t
 
 ### Domain docs
 
-Single-context: one `docs/dev-skills/glossary.md` and `docs/dev-skills/adr/`. See `docs/dev-skills/domain.md`.
+Single-context: one glossary, split into Area pages behind the map `docs/dev-skills/glossary.md`, and one `docs/dev-skills/adr/`. See `docs/dev-skills/domain.md`.
 
 ### Boundaries
 
