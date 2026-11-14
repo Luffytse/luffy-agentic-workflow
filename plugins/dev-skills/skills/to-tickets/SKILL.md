@@ -36,7 +36,7 @@ Break the work into **tracer bullet** tickets.
 
 Give each ticket its **blocking edges**: the other tickets that must complete before it can start. A ticket with no blockers can start immediately.
 
-Give each ticket a **model tier**, the tier its Implementer runs on: **regular** by default, **premium** for heavy or tricky work (a subtle design call, wide-reaching changes, concurrency, security or money logic), never top. Name the tier, never a vendor's model.
+Give each ticket a **model tier**, the tier its builder runs on (a lone Ticket's thread, or the Implementer of a Spec's Ticket): **regular** by default, **premium** for heavy or tricky work (a subtle design call, wide-reaching changes, concurrency, security or money logic), never top. Name the tier, never a vendor's model.
 
 A ticket with a **live step** (a step on an outside service: enabling a product, creating a login client, saving an API token, changing DNS) lists what the person provides: accounts and products to enable, credentials to create with their exact permissions and expiry, and where each is saved. A ticket with no live step carries nothing extra.
 
