@@ -25,7 +25,7 @@ A check-in reads one **snapshot**: a command shipped with the team-lead skill (`
 
 ## Harness references cite their docs
 
-Each `worker-control` reference lists what the Harness does by itself and each method the coordinator adds, each with the doc page it comes from, or marked runtime-reported and proved by the check; `scripts/check-plugin.sh` (`worker-reference-sources`) checks that every method and Harness fact carries a link. Pages read for the Claude Code references: [projects](https://code.claude.com/docs/en/claude-projects), [Claude Code on the web](https://code.claude.com/docs/en/claude-code-on-the-web), [scheduled tasks](https://code.claude.com/docs/en/routines), [sub-agents](https://code.claude.com/docs/en/sub-agents), [desktop](https://code.claude.com/docs/en/desktop) and [scheduled tasks in a session](https://code.claude.com/docs/en/scheduled-tasks); the Codex reference (#528) starts from [subagents](https://learn.chatgpt.com/docs/agent-configuration/subagents), [app-server](https://learn.chatgpt.com/docs/app-server) and [automations](https://learn.chatgpt.com/docs/automations). A Harness with no reference falls back to its own docs and names each method they do not give.
+Each `worker-control` reference lists what the Harness does by itself and each method the coordinator adds, each with the doc page it comes from, or marked runtime-reported, and proved in this repo by its Environment check; `scripts/check-plugin.sh` (`worker-reference-sources`) checks that every method and Harness fact carries a link. Pages read for the Claude Code references: [projects](https://code.claude.com/docs/en/claude-projects), [Claude Code on the web](https://code.claude.com/docs/en/claude-code-on-the-web), [scheduled tasks](https://code.claude.com/docs/en/routines), [sub-agents](https://code.claude.com/docs/en/sub-agents), [desktop](https://code.claude.com/docs/en/desktop) and [scheduled tasks in a session](https://code.claude.com/docs/en/scheduled-tasks); the Codex reference (#528) starts from [subagents](https://learn.chatgpt.com/docs/agent-configuration/subagents), [app-server](https://learn.chatgpt.com/docs/app-server) and [automations](https://learn.chatgpt.com/docs/automations). A Harness with no reference falls back to its own docs and names each method they do not give.
 
 ## Considered options
 
@@ -42,3 +42,7 @@ Each `worker-control` reference lists what the Harness does by itself and each m
 ## Note (Spec #151)
 
 Two references remain, both for Claude Code (`claude-code-project-threads.md` and `claude-code-sessions.md`). The Codex reference named above was deleted when the plugin came to support Claude Code only; `worker-reference-sources` checks the two that remain.
+
+## Note (Spec [#162](https://github.com/Luffytse/luffy-agentic-workflow/issues/162), 2026-11-14)
+
+`milestone` keeps only the Plugin version check; Startup verification is gone. `worker-control` no longer runs a short check: its probes are this repo's Environment check (`docs/dev-skills/environment-check.md`), and a Harness with no reference no longer falls back to its own docs: `worker-control` tells the user and stops.

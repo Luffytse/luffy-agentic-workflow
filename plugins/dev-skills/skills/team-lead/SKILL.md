@@ -11,7 +11,7 @@ A coordinator that cannot load this skill follows the project instructions `setu
 
 ## The work it delivers
 
-The open Milestone issue (as `milestone`'s **No Milestone** test finds it) gives the features in build order and its order rule (one at a time, or up to some number at once). Delivery starts only once `milestone`'s planning has settled and the latest Startup verification result on the Milestone issue reads `Verdict: ready`, or, after a failed one, the user's word to go on is recorded there, naming each failed capability. If that result's Runtime line plainly names another environment than this one, tell the user. With no open Milestone issue there is nothing to deliver: tell the user that the next plan starts one, with `milestone`.
+The open Milestone issue (as `milestone`'s **No Milestone** test finds it) gives the features in build order and its order rule (one at a time, or up to some number at once). Delivery starts only once `milestone`'s planning has settled and the Plugin version check holds, or the user's word to go on is recorded, both read from the Milestone issue. With no open Milestone issue there is nothing to deliver: tell the user that the next plan starts one, with `milestone`.
 
 **Boundaries** are the Boundary record's, for every issue; a Milestone issue holds none of its own. A worker's pull request that crosses one goes to the user, and a question about one is the user's to answer.
 

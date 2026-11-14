@@ -20,6 +20,7 @@ Each line names where it came from and the files it applies to, in the form `(fi
 - **skill descriptions do not collide** (files: `plugins/dev-skills/skills/*/SKILL.md`; from #94): when a description or `ask-matt`'s routing changes, no realistic user phrase matches two descriptions, and none contradicts what `ask-matt` says about its skill.
 - **plugin text names nothing only this repo has** (files: `plugins/dev-skills/*`; from #179): no path, file, ADR, issue, person, project or merge rule that exists only here, because every project that loads the plugin reads it. `repo-free-skill-text` in `scripts/check-plugin.sh` catches this repo's own names; this line covers the rest.
 - **a command that decides a step was run on a real example** (files: `plugins/*`, `docs/*`, `scripts/*`, `CLAUDE.md`; from #307): a `gh`, `git` or `jq` command or regex whose output decides a step (shipped, merged, found) has its output shown on a real example of each outcome from this repo's history (the Finder or Verifier runs it if the pull request does not), because it can parse and still read an often-empty field or match inside another word.
+- **reference change shows its Environment check rows** (files: `plugins/dev-skills/skills/worker-control/*`; from #164): a pull request that changes a `worker-control` reference shows in its body the Environment check rows its change touches, run before the merge in the environment that reference describes, and names any row it could not run.
 
 ## Review levels
 

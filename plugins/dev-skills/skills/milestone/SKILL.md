@@ -1,14 +1,14 @@
 ---
 name: milestone
-description: "Plan a Milestone (a small Release is one), verify startup, report; delivery is team-lead's. Use when asked for a Milestone or small Release (cutting one, or planning an open Milestone's next one, is release's), to add a feature to one, or whether one can run unattended, or when a Milestone starts or reaches its review, or a feature is ready."
+description: "Plan a Milestone (a small Release is one), check the plugin version, report; delivery is team-lead's. Use when asked for a Milestone or small Release (cutting one, or planning an open Milestone's next one, is release's), to add a feature to one, or whether one can run unattended, or when a Milestone starts or reaches its review, or a feature is ready."
 ---
 
 # Milestone
 
-A **Milestone** is a product goal the user sets, written down in one Milestone issue, which agents deliver unattended across one or more Releases. Every plan is a Milestone: a small Release is a Milestone with one Release. Planning always involves the user; everything after it is agentic. This skill holds the parts that are the user's and the record: planning with the user, adding a feature, Startup verification and the report. Delivery, the work between them, is the `team-lead` skill's. In order:
+A **Milestone** is a product goal the user sets, written down in one Milestone issue, which agents deliver unattended across one or more Releases. Every plan is a Milestone: a small Release is a Milestone with one Release. Planning always involves the user; everything after it is agentic. This skill holds the parts that are the user's and the record: planning with the user, adding a feature, the Plugin version check and the report. Delivery, the work between them, is the `team-lead` skill's. In order:
 
 1. **Planning**, with the user: the Milestone issue is written and every feature in it is labelled.
-2. **Startup verification**, once the Milestone issue exists: proof that this environment can run delivery unattended.
+2. **The Plugin version check**, once planning settles: one read that threads here load main's plugin text.
 3. **Delivery**, run by the coordinator with the `team-lead` skill (see "Delivery"), once both phases before it are done.
 4. **The report**, once every feature is merged or parked: it ends with a stop for the user's Milestone review ("Milestone review").
 
@@ -32,7 +32,7 @@ The coordinator runs it with the user, when the user asks for a Milestone or a s
 6. **Agree the draft.** Show the user the whole Milestone issue, its title and its label, in the shape below, and change it until the user agrees it.
 7. **Write it.** The membership label fills the Boundary record's form with the next Milestone number: one more than the highest number among the labels already in that form (1 when there are none). Create the label if the tracker lacks it. Create the Milestone issue with the tracker doc's **Create an issue** operation, carrying the label, with the agreed text. Then, for each feature in order, apply the label (**Apply / remove labels**) to every open issue it holds (its own issue, its Tickets, the issues it absorbs or its related issues), and make its own issue a sub-issue of the Milestone issue (**Make an issue a sub-issue of a parent**) where it has no parent yet: the label, not the link, makes it a member. Read the Milestone issue and every labelled issue back from the tracker.
 
-Planning **settles** when the Milestone issue reads back as the user agreed it and every open issue of every feature it lists carries the label. Tell the user in one line, with the issue's link, and go on to Startup verification. A feature planned after this point joins as "Adding a feature mid-Milestone" says.
+Planning **settles** when the Milestone issue reads back as the user agreed it and every open issue of every feature it lists carries the label. Tell the user in one line, with the issue's link, and go on to the Plugin version check. A feature planned after this point joins as "Adding a feature mid-Milestone" says.
 
 ### The Milestone issue
 
@@ -76,31 +76,19 @@ A feature the user plans while a Milestone is open **joins that Milestone**, unl
 Listing before labelling keeps every labelled issue one the Milestone issue lists. A Release already planned keeps its scope; the new feature waits for the next Release planning. Tell the user in one line what was added, where, and which Tickets were updated or left out. A change to the goal, the acceptance or an exclusion at any other time is the user's too: write it the same way, once the user agrees it.
 
 
-## Startup verification
+## Plugin version check
 
-Autonomous delivery assumes the coordinator can start workers, read what they did, confirm a stop and be woken, and that threads run main's skill version. **Startup verification** proves this in this environment before delivery starts, each probe one short, bounded action passing only on evidence observed afterwards, never on a call's success. It has two parts, run by the agent that will start and stop the workers during delivery (the coordinator, or a verification thread started with this skill; a coordinator unable to load `worker-control` or this skill always starts that thread), at the **regular** tier (load `model-tiers` by name; the project's own tier map overrides it):
+The **Plugin version check**, run once planning settles, shows threads load main's plugin text.
 
-1. **The Harness check.** Load `worker-control` by name and run its check. It detects how workers run here, loads that Harness's reference (or reads its docs where there is none) and proves starting, state, pause and resume, confirmed stop, end or failure notice and the check-in. Its result is the first part of this one. A row is **reused** from the last Startup verification result on an earlier Milestone issue (the tracker's record, never session memory) when it passed there, the Harness (how workers run here) and every Runtime-line field match that result's, `worker-control`'s reference for this Harness has no commit on main since it was posted, it is under 30 days old and no failure of that capability was recorded since (Milestone report, Retro or later result). All other rows are re-run, **Loaded skill version** always; a re-run row's prerequisite probe (its started worker) needs no mark. When the coordinator cannot load `worker-control`, the verification thread runs the check: it takes each action it holds the tool for, asks the coordinator by message for any action only the coordinator can take (starting a worker, say), reads the Harness's record afterwards, and records a probe whose tool nobody holds as failed with that limit. The check proves only what that thread and the coordinator can do here, not that the coordinator will keep a loaded skill's rules, which is why it follows its project instructions.
-2. **Loaded skill version**, below.
-
-### Loaded skill version
-
-A **fresh thread** is one whose session started after the plugin's last change on main. A verification thread started for this run usually is one; check by comparing its session start with main's last plugin commit time. A subagent shares its parent's session and load, so is never fresh.
-
-- **Action:** in a fresh thread, invoke by name one skill of this plugin that only loads text (for example `model-tiers`), and read where the runtime says it loaded the skill from (its base directory); the plugin's root is the folder holding that skill's `skills` folder: read its manifest's version. Read the same manifest's version on the source repository's main branch, from the remote (a local checkout may be behind). A fresh-thread runner does this itself; otherwise it starts one fresh worker thread at the **cheap** tier, through `worker-control`, briefed to read and post it in one comment on the Milestone issue whose first line is `<!-- startup-verification marker <token> -->` (a fresh token: `sv-version-` and 8 random hex characters), followed by the load path and the version exactly as read; the runner reads that comment back from the tracker, once more a minute later if it is missing.
-- **Pass:** the runtime reported a load path, and the version in that plugin root's manifest equals main's. Record the load path, both versions, main's commit and the thread's session start time.
-- **Fail:** the versions differ (limit: loaded `<version>`, main `<version>`, a stale cache); the runtime does not say where it loaded the skill from (limit: load path not reported); no fresh thread can be read (limit: not a fresh thread, with the thread's session start time); or main's manifest cannot be read (limit). A skill name in the skill list is not a pass: a stale copy has the same names.
-- **Limits** to record on a pass: a load path inside a source checkout, not an installed or synced plugin folder, means threads here load that checkout: record its branch and commit; the version is the checkout's; equal versions do not show equal text where a skill change can merge without a version bump; a worker thread's reading is its own report of its runtime, read from the tracker.
-
-### The result
-
-Post one comment on the Milestone issue, headed `## Startup verification`: the check's Harness, Runtime line and rows as reported, plus a Loaded skill version row in the same columns (essential: yes), and one Verdict over all the rows: `Verdict: ready`, or `Verdict: not ready: <each failed essential capability>`. A reused row's Evidence reads `reused from <link>`; the Run line names the rows run now. Every probe worker and check-in the run arranged has ended before posting (the check's clean-up says how).
-
-When an essential capability failed, tell the user before any delivery starts, naming each one with what it means: the check's own text for its capabilities, and for **Loaded skill version** that threads here may run other skill text than main's (rules main has since changed) and a stale cache goes unnoticed. Delivery waits for the user's word on how to go on; record it on the Milestone issue, naming each failed capability it starts without. With every essential capability passing, say so in one line linking the result comment.
+- **Who:** the delivery session, when fresh (started after main's last plugin change) and able to load skills. Otherwise it starts one fresh **cheap**-tier worker (`model-tiers`) through `worker-control`, and no other.
+- **Read:** invoke by name a plugin skill that only loads text; read where the runtime says it loaded it from; the plugin root holds that skill's `skills` folder. Compare that root's manifest version with main's, read from the source repository's remote. A load path inside a source checkout compares the checkout's commit with main's instead. A listed skill name proves nothing.
+- **Record:** one Milestone issue comment headed `Plugin version check`: the load path and both values, read back.
+- **Holds** if they match: one line to the user; delivery starts.
+- **Mismatch**, or no load path reported: tell the user the cause (an installed plugin older than main runs rules main has changed) and the fix (update the plugin, then start fresh threads; in a Claude Code cloud environment, see `worker-control`'s Claude Code reference, "Keeping the plugin current in a cloud environment"). Delivery waits for the user's word, recorded on the Milestone issue.
 
 ## Delivery
 
-Delivery is the `team-lead` skill's. Once planning has settled and the latest Startup verification result reads `Verdict: ready` (or the user's word to go on is recorded, as above), the coordinator loads `team-lead` by name and runs it (a coordinator that cannot load it follows the project instructions `setup-project` writes for it, and starts a thread for each step that needs a skill, this skill's Startup verification and report included): it reads this Milestone issue for the features and their order, and the Boundary record for the boundaries, and takes every worker action through `worker-control`. Until then nothing is built, labelled for a Release or started as a build thread for this Milestone.
+Delivery is the `team-lead` skill's. Delivery starts once planning has settled and the Plugin version check holds, or the user's word to go on is recorded. Then the coordinator loads `team-lead` by name and runs it (a coordinator that cannot load it follows the project instructions `setup-project` writes for it, and starts a thread for each step that needs a skill, this skill's Plugin version check and report included): it reads this Milestone issue for the features and their order, and the Boundary record for the boundaries, and takes every worker action through `worker-control`. Until then nothing is built, labelled for a Release or started as a build thread for this Milestone.
 
 ## Milestone review
 

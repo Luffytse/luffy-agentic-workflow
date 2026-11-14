@@ -9,20 +9,24 @@ One task's Claude session inside a Claude project. A **coordinator** (the projec
 _Avoid_: chat, conversation
 
 **Milestone**:
-A product goal the user sets (for example "M3 Trip planning"), written down in one Milestone issue: the goal, the features to deliver by its end in build order, their acceptance criteria and what is excluded. Every plan is one (a small Release is a one-Release Milestone); it holds one or more Releases, which the agents plan, and closes when the user accepts it at the Milestone review. An issue belongs to it, and its pull request is **inside the Milestone**, when the issue (for a Spec's pull request, the Spec) carries the membership label in the form the **Boundary record** names; a build thread's no-issue corrective check records `Retro origin: <issue link>`, and other pull requests that build no issue are outside. Membership plays no part in who merges (ADR 0004). Planning, adding a feature, Startup verification and the report are `milestone`'s; delivery is the **Team lead**'s.
+A product goal the user sets (for example "M3 Trip planning"), written down in one Milestone issue: the goal, the features to deliver by its end in build order, their acceptance criteria and what is excluded. Every plan is one (a small Release is a one-Release Milestone); it holds one or more Releases, which the agents plan, and closes when the user accepts it at the Milestone review. An issue belongs to it, and its pull request is **inside the Milestone**, when the issue (for a Spec's pull request, the Spec) carries the membership label in the form the **Boundary record** names; a build thread's no-issue corrective check records `Retro origin: <issue link>`, and other pull requests that build no issue are outside. Membership plays no part in who merges (ADR 0004). Planning, adding a feature, the **Plugin version check** and the report are `milestone`'s; delivery is the **Team lead**'s.
 _Avoid_: epic, sprint
 
-**Startup verification**:
-The check `milestone` records on the Milestone issue before a Milestone's autonomous delivery starts: the **Worker control** check, proving in this environment with short bounded **probes** that workers start, are read, pause, stop and wake the coordinator and that a check-in arrives, and the loaded-skill-version probe, proving that a fresh thread loads the plugin version on main. It ends in one Verdict, and delivery starts after a failed one only on the user's word. Its probes, evidence and reuse rules are `milestone`'s.
-_Avoid_: preflight, smoke test
+**Plugin version check**:
+The one read, recorded on the Milestone issue once planning settles, of whether the plugin copy a fresh thread loads matches the plugin on the source repository's main: its manifest version, or its commit where threads load a source checkout. It gates the Milestone's delivery. Owned by `milestone`; it replaced Startup verification, whose worker probes a project no longer runs.
+_Avoid_: Startup verification (the replaced check), preflight, smoke test
 
 **Harness**:
 The tool a coordinator runs its workers in, named by the way workers run there (for example a claude.ai project, whose workers are threads, or one Claude Code session, whose workers are subagents and, on desktop, other sessions). Each way has one reference file in **Worker control**. The Harness's record is the only source of a worker's state; tracker comments are an audit trail.
 _Avoid_: runtime adapter, platform
 
 **Worker control**:
-The `worker-control` Base skill: it starts, checks, stops, pauses and resumes workers in the **Harness** it runs in, and arranges and ends a check-in, from one reference per Harness; deciding which work starts and when stays with its caller. Its short check proves those methods here before unattended work relies on them. How it detects the Harness and its role, and what a reference holds, are its own.
+The `worker-control` Base skill: it starts, checks, stops, pauses and resumes workers in the **Harness** it runs in, and arranges and ends a check-in, from one reference per Harness; deciding which work starts and when stays with its caller. How it detects the Harness and its role, and what a reference holds, are its own.
 _Avoid_: harness-team (its working name), lifecycle agent
+
+**Environment check**:
+This repo's own test of the `worker-control` references: six probes (start a worker, worker state, pause and resume, confirmed stop, end or failure notice, recurring check-in) run in a cloud project and in a local Claude Code session, whose result is one comment on the Milestone issue. It tests worker control only, and no skill names it. Its doc is `docs/dev-skills/environment-check.md`; `CLAUDE.md` says when it runs.
+_Avoid_: Worker control check (the earlier check inside the skill), Startup verification, smoke test
 
 **Team lead**:
 The `team-lead` skill: the role the coordinator runs to deliver planned work, always a Milestone's (ADR 0010, ADR 0012). It manages the work, not the machinery: it starts build and Release threads, reacts to what workers and the **Harness** report, and holds the **Stand-up**, **Takeover** and **Pause**, with every worker action through **Worker control**. "Coordinator" stays the name of the project's own agent; the team lead is what it runs, and a coordinator that cannot load the plugin's skills follows the project instructions `setup-project` assembles instead.
