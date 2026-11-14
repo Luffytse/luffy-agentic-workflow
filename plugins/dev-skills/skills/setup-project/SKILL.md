@@ -28,7 +28,7 @@ Outside a Milestone, settle each of these, skipping what exploration already ans
 - **Phases**: the coordinator's project threads, the Build threads (Spec threads run `implement-spec`, Ticket threads run `implement`), and planning threads if the project has them.
 - **Skill per thread kind**: which skill each runs (`wayfinder`, `to-spec`, `to-tickets`, `implement-spec`, `implement`); the coordinator itself runs `team-lead` to deliver planned work (a Release, or a Milestone with `milestone`).
 - **Brief contents**: what every brief carries. Default: skill, Model tier, repo(s), Review level, link to the ticket or spec.
-- **Tier-to-model map**: ask the user which model each Model tier (cheap, regular, premium) maps to in their harness. Vendor model names go only into the user's drafted instructions, never into skill text (the `model-tiers` skill holds the plugin default; the user's map overrides it). If the user has no map yet, record "not needed" and draft the rule without the map.
+- **Tier-to-model map**: ask the user which model each Model tier (cheap, regular, premium, top) maps to in their harness. Vendor model names go only into the user's drafted instructions, never into skill text (the `model-tiers` skill holds the plugin default; the user's map overrides it). If the user has no map yet, record "not needed" and draft the rule without the map.
 - **Standing rules**: how many questions a thread asks the user at once, review Rounds, who merges, how many Build threads run at once, and any rule of the user's own.
 
 Done when every item has an answer or a recorded "not needed".
@@ -52,7 +52,7 @@ Write the full instructions as pointer-style text:
 - build briefs: the line in `team-lead`'s Wakes that has every worker record the plugin load source and version it loaded, its permission and sandbox settings and a session usage reference, and main's copy of each skill where the repo's docs say so;
 - a thread that goes quiet, and whether it still holds its slot;
 - the report, started only once the last Release cut has ended; then the user's review: on acceptance a thread closes the Milestone issue, and a feature sent back goes back into delivery, as `milestone`'s report re-entry says;
-- thread kinds and their tiers, chore threads included, and the tier map, always written (`model-tiers`' map for its harness where the user has none);
+- thread kinds and their tiers, chore threads included, always written (feature planning threads on `top`; Release threads and the Milestone planning thread on premium, a Release thread asking `top` for advice only for a dependency graph or another special planning case), and the tier map (`model-tiers`' map for its harness where the user has none);
 - the coordinator-facing merge-time steps of each repo's `CLAUDE.md` or `AGENTS.md`, copied in full;
 - each term the steps use that only the skills define (parked, Order, order rule, report re-entry), with its meaning;
 - a source stamp, the commit on the source repository's main that last changed `team-lead` or `milestone` (read from the remote), and a line in the brief of the thread that makes the Plugin version check: that thread compares the stamp with main's and reports it, and when it moved the coordinator tells the user once to re-run `setup-project` and goes on unless the user says to wait.
@@ -61,7 +61,7 @@ Where the coordinator can load them, add none of this.
 
 Inside a Milestone, point to the Boundary record, and tell a coordinator that can load them to run `milestone` for the Milestone and `team-lead` for its delivery. For it, keep only the project-specific choices settled in step 2, including a tier-to-model map only where the user overrides the default. Leave the cycle (`team-lead`'s and `milestone`'s), the invoked skills' rules and the Boundary record's values in their owners rather than restating them.
 
-Outside a Milestone, keep the full instructions settled in step 2 (for a coordinator that cannot load the skills, without the line that has it run `team-lead`). Name Model tiers (cheap, regular, premium), write the user's tier-to-model map, and add the rule: "start each thread on the model mapped to its brief's Model tier".
+Outside a Milestone, keep the full instructions settled in step 2 (for a coordinator that cannot load the skills, without the line that has it run `team-lead`). Name Model tiers (cheap, regular, premium, top), write the user's tier-to-model map, and add the rule: "start each thread on the model mapped to its brief's Model tier".
 
 On a re-run, the draft is the full new text; show it with the diff against the existing text. A re-run also removes any state lines the existing text holds (open specs, plannings, the map), and, inside a Milestone, shared rules now reached through the owner pointers. It also drops the assembled cycle where the coordinator can now load the plugin's skills, adds it where it can no longer, and otherwise rebuilds it, with a new stamp, from the skills as they now read.
 

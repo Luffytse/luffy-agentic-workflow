@@ -21,7 +21,7 @@ Matt Pocock's public skills repo (`mattpocock/skills`), where the `dev-skills` s
 _Avoid_: original, source
 
 **Model tier**:
-How strong a model a step needs: **cheap**, **regular** or **premium**. A skill names a tier, never a vendor's model; the plugin's default map is the `model-tiers` skill, and a project's own map overrides it (ADR 0002).
+How strong a model a step needs: **cheap**, **regular**, **premium** or **top**. `top` is for planning a feature with the user and for Release planning advice; Milestone planning stays on premium. A skill names a tier, never a vendor's model; the plugin's default map is the `model-tiers` skill, and a project's own map overrides it (ADR 0002).
 _Avoid_: model size, model class
 
 **Model-invoked skill**:
