@@ -29,6 +29,7 @@
 #   team-lead-no-harness-detail  team-lead text names no harness tool (no mcp__ name, no `name` a worker-control reference puts in backticks); it calls worker-control
 #   milestone-no-delivery-detail the milestone skill plans and reports and hands delivery to team-lead: it names team-lead, and its text names no harness tool and no delivery record kind
 #   skill-file-size              no skill file (a SKILL.md or a reference .md under a skill) is over 4,000 words, except the known files, which may not grow
+#   index-line-length            no bullet of this repo's docs/dev-skills/index.md is over 60 words (a link, one sentence of what the doc is, one "Read when" sentence)
 #
 # `claude plugin validate .` is not run here: CI runs it as its own step; the README says to run it before pushing.
 #
@@ -385,6 +386,27 @@ sys.exit(1 if failed else 0)
 PYCODE
 then
   bad "skill-file-size failed (see above; requires python3)"
+fi
+
+# index-line-length: a bullet (a line starting "- ") of this repo's docs/dev-skills/index.md is over 60 words. Words are
+# whitespace-separated tokens of the whole line. The index is a pointer, not a retelling of the doc it links.
+index_file="$repo/docs/dev-skills/index.md"
+if [ -f "$index_file" ] && ! python3 - "$index_file" <<'PYCODE'
+import pathlib
+import sys
+
+LIMIT = 60
+failed = False
+for line in pathlib.Path(sys.argv[1]).read_text().splitlines():
+    if line.startswith("- "):
+        words = len(line.split())
+        if words > LIMIT:
+            print(f"FAIL: index-line-length: {line[:60]}: {words} words, over {LIMIT}")
+            failed = True
+sys.exit(1 if failed else 0)
+PYCODE
+then
+  bad "index-line-length failed (see above; requires python3)"
 fi
 
 [ "$fail" -eq 0 ] && echo "OK: dev-skills plugin checks passed"
