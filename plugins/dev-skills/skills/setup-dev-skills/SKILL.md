@@ -11,7 +11,7 @@ Derived from Matt Pocock's setup skill; the seed files in this folder are mostly
 - **Labels**: the 5 state roles and 2 category roles that `triage` uses, the `next-release` role, the repo's own labels, if it has any, each with a line saying when it applies (the **Repo labels** table, under the rule that section holds for `triage`, `to-spec`, `to-tickets` and `review-rounds`), the `wayfinder:*` labels and the `parked` label (the tracker doc's **Park** operation uses it), in `docs/dev-skills/triage-labels.md` and on the repo.
 - **Domain docs**: where the glossary (`docs/dev-skills/glossary.md`) and ADRs (`docs/dev-skills/adr/`) live and how skills read them, in `docs/dev-skills/domain.md`, plus the `docs/dev-skills/index.md` that lists the docs.
 - **Review rules**: a starter `REVIEW.md` at the repo root, where the repo's own review rules go.
-- **Releases**: the versioning policy (none, pull requests bump or Releases bump, with that policy's text), the Release name form, the Release size, the changelog path, the release label prefix, the cut steps and the whole-Release check, that `release` reads, in `docs/dev-skills/release.md`, for a repo that cuts Releases, versioned or not.
+- **Releases**: the Release name form, the Release size, the changelog path, the release label prefix, the cut steps and the whole-Release check, that `release` reads, in `docs/dev-skills/release.md`, for a repo that cuts Releases, versioned or not.
 - **Boundaries**: which irreversible actions agents may take, which need the user's approval, the resource budget, the check-in interval and the Milestone label form, in the Boundary record, `docs/dev-skills/boundaries.md`.
 - **GitHub settings**: checked and reported, never changed.
 
@@ -76,16 +76,15 @@ On **yes**, ask the user for the rules' text, then record them in the repo's `CL
 
 On **no**, write no release doc. On **yes**, ask these in order, one answer each, leading with the recommended answer and with what exploration found:
 
-- the **versioning policy** (recommended: **pull requests bump** when exploration found a version file and the repo's pull requests already change it, **Releases bump** for any other repo with a version file, **none** for a repo with no version): **none**, where the repo keeps no version; **pull requests bump**, where each pull request that changes the files the repo names bumps the version as its last commit at merge; or **Releases bump**, where a Release's bump pull request changes the version and ordinary pull requests leave it alone. On pull requests bump or Releases bump, fill the version file and the field or line that holds the version from what exploration found; on pull requests bump, also ask which files make a pull request bump and how the number is given (the repo decides; the seed leaves it as a placeholder to fill in);
 - the **Release name** form: the name, label and release issue title forms with `<...>` placeholders (recommended: the name `Release <n>`, the label `release-<n>` and the title `Release <n>`);
 - the **Release size**, the most items one Release takes, counted of any kind (recommended: **5**);
 - the **changelog path** (an existing `CHANGELOG.md`, else one at the repo root) and the **label prefix** (default `release-`);
-- the **cut steps**: anything else the cut must change or run, after the changelog entry is written (recommended: **none**); on Releases bump, ask whether the bump pull request must change or run anything else, such as a second file that repeats the version, and on pull requests bump, whether the bump commit must (recommended: **nothing**);
+- the **cut steps**: anything the cut must change or run, after the changelog entry is written, such as a version bump (recommended: **none**); the repo writes it in its own words, and `release` carries it out;
 - the **whole-Release check**: the checks to run on the changelog pull request's branch, and any clean-up pass (recommended: the repo's own checks).
 
-Write the seed's matching "Policy:" section and delete the other two. A repo with no version still gets a release doc, with policy none and no version fields. The Releases bump section carries the semver sizes and the bump pull request's steps, and the pull requests bump section the bump each merge takes, so write them from the seed. On pull requests bump, also copy its "The bump at merge" steps into the agent instructions: `merging` does not run them.
+Write the release doc from the seed. A repo that keeps a version writes its bump as cut steps in its own words; the seed holds no version rules.
 
-On a re-run over a release doc that has a "Bump mode" line and no versioning policy, take that mode as the policy (and its Version file, Release name and whole-Release check as the answers), and ask for every field the doc lacks: usually the Release size and the cut steps, and the Release name form too when the doc has none.
+On a re-run over a release doc that lacks a field the seed has (usually the Release size, the cut steps or the Release name form), ask for it. Any section or line about versions that the doc already holds is the repo's own text from then on: leave it.
 
 **Section F: Boundaries.** Ask the user for the Boundary record's values, one question each, leading with the recommended answer:
 
@@ -118,7 +117,7 @@ Build every file from the seeds in this folder:
 - the `## Agent skills` block (step 4)
 - `docs/dev-skills/index.md`, new or updated, listing every `docs/dev-skills/` file, `REVIEW.md` (with a "read when reviewing a change or adding an Always check line" line) and every other doc found while exploring, by loading `docs-index` and applying its contract
 
-On a re-run, diff each draft against the file in the repo. Keep the values the earlier run filled in (the repo link, the label strings, the Repo labels rows and their lines, the PR flag, the release doc's values, including its versioning policy, Release name form, Release size, cut steps and whole-Release check, and the Boundary record's values) and change only what drifted from the seeds. Show the user the diff, or "no change" per file. The rules the user gave in Section D are drafted into the diff of the file they go in (`CLAUDE.md` or `AGENTS.md`, or `REVIEW.md`) and shown before writing; adding a line to an existing `REVIEW.md` is an addition, not a rewrite. Let the user edit before anything is written.
+On a re-run, diff each draft against the file in the repo. Keep the values the earlier run filled in (the repo link, the label strings, the Repo labels rows and their lines, the PR flag, the release doc's values, including its Release name form, Release size, cut steps, any text about versions it holds, and whole-Release check, and the Boundary record's values) and change only what drifted from the seeds. Show the user the diff, or "no change" per file. The rules the user gave in Section D are drafted into the diff of the file they go in (`CLAUDE.md` or `AGENTS.md`, or `REVIEW.md`) and shown before writing; adding a line to an existing `REVIEW.md` is an addition, not a rewrite. Let the user edit before anything is written.
 
 Done when the user has approved the drafts, or approved "no change".
 
@@ -147,7 +146,7 @@ Start at `docs/dev-skills/index.md` and open only the docs whose line fits your 
 
 ### Releases
 
-[one-line summary: the versioning policy (none, pull requests bump or Releases bump), the Release size and the release label prefix]. See `docs/dev-skills/release.md`.
+[one-line summary: the Release size and the release label prefix]. See `docs/dev-skills/release.md`.
 ```
 
 Leave out the `### Releases` part when the repo has no release doc.

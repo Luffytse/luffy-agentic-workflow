@@ -17,7 +17,7 @@ If the repo's own rules (its `CLAUDE.md`, `AGENTS.md` or docs) set another title
 
 ## Body
 
-Use this template for writing the PR body:
+Use this template for writing the PR body. If the repo has its own pull request template, keep its headings and add the Door, Blast Radius and `Closes` lines after them, because `merging` reads them from the body.
 
 ```markdown
 ## Summary
@@ -26,8 +26,7 @@ Use this template for writing the PR body:
 
 ## Evidence
 
-- **Tests:** <the exact test that fails before and passes after, or what was checked instead>
-- **Checks:** <typecheck output, or the repo's checks (lint, validate script)>
+- **Tests:** <the exact test, seen failing before the fix and passing after, or what was checked instead>
 - **Screenshots:** <before and after for anything visual, or "not visual", or why not captured>
 
 <a spec's PR: repeat these bullets per ticket, under the ticket's number; else delete this line>
@@ -176,7 +175,7 @@ Concrete evidence that the change works: what failed before now passes.
 
 Screenshots are S-tier - for anything visual. If the environment can't take them, say so.
 
-Execution-based evidence is A-tier. Test results, console output. Show the exact test that fails before and passes after, using pseudocode. Include the typecheck output, or the output of the repo's checks (a lint or validate script).
+Execution-based evidence is A-tier. Test results, console output. Show the exact test that fails before and passes after, using pseudocode.
 
 When something can't be shown (a docs-only change has no tests), say what was checked instead; never leave an Evidence line empty.
 
@@ -196,9 +195,7 @@ A spec's PR lists the spec and every ticket that has landed on its branch, not e
 
 ### Merge Danger
 
-Describe whether it's a one-way or two-way door. You can walk back through two-way doors, but not one-way doors. A PR that is cheap to roll back is lower risk. Changes that involve destructive actions or hard-to-reverse decisions are one-way doors.
-
-Decide with one test: would reverting the PR's commits undo everything the change did, including anything outside git? If not, it is a one-way door. For example: a data migration, deleted data, a public interface others depend on, a message sent outside the project, a published release. A version bump merged with the PR, where each pull request bumps the version, is not a published release: a revert walks it back with the next version number. Mark it plainly as `**Door:** one-way`, with one line on what a revert would not undo, so a reader or merging agent can find it. The repo's Boundary record decides whether its merging thread may merge a one-way door itself (the build skills' merge step).
+Describe whether it's a one-way or two-way door. You can walk back through two-way doors, but not one-way doors. A PR that is cheap to roll back is lower risk. Changes that involve destructive actions or hard-to-reverse decisions are one-way doors, and so is any change whose revert would not also undo what it did outside git. Mark it plainly as `**Door:** one-way`, with one line on what a revert would not undo, so a reader or merging agent can find it. The repo's Boundary record decides whether its merging thread may merge a one-way door itself (the build skills' merge step).
 
 A PR that collects several tickets (a spec's PR) carries each ticket's Door call into its body, and is one-way if any ticket's Door is, naming those tickets.
 
