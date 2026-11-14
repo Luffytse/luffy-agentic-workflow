@@ -699,8 +699,9 @@ def build_verify(rules, a):
             missing.append("%s Finder: its report is empty" % f)
         else:
             reports[f] = text
-            if report_problems(rules, text):
-                noted[f] = report_problems(rules, text)
+            problems = report_problems(rules, text)
+            if problems:
+                noted[f] = problems
     if missing:
         raise BadReports("; ".join(missing))
     # an off-format report is passed on as written, so it counts as raising candidates: the Verifier reads it

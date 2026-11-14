@@ -54,7 +54,7 @@ _Avoid_: reviewer (too broad), scanner
 _Avoid_: brief builder
 
 **Verifier**:
-The one agent per Round that checks each candidate Finding, and each open Finding with any dispute of it, against the code, keeps only what it confirmed and makes the final call on it. Round 1 sends it any candidate, a proposed Nit included; in Rounds 2 and 3 and a Ticket check it runs only on a new candidate, an earlier Finding reported still open, or a dispute, and otherwise the Finder's report stands. The exact rule and its tier are `review-rounds`'.
+The one agent per Round that checks each candidate Finding, and each open Finding with any dispute of it, against the code, keeps only what it confirmed and makes the final call on it. Round 1 sends it any candidate, a proposed Nit included; in Rounds 2 and 3 and a Ticket check it runs only on a new candidate, an earlier Finding reported still open or left out, or a dispute, and otherwise the Finder's report stands. The exact rule and its tier are `review-rounds`'.
 _Avoid_: judge, triage agent
 
 **Finding**:
