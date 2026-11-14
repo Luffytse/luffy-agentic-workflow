@@ -29,7 +29,7 @@ Model reachability and user-menu visibility are separate choices:
 
 - A **model-invoked** skill has a model-facing `description` with trigger branches, so the agent can discover it and other skills can reach it. Omit `disable-model-invocation` to retain model reachability.
 - A **user-only** skill sets `disable-model-invocation: true` in Claude Code. Its description is not in the model's discovery context, so callers cannot rely on it as an autonomous dependency. `improve-codebase-architecture` is the one, and the plugin checker's `model-invoked` check lists it.
-- A **Base skill** is model-invoked even when hidden from a user menu. In Claude Code, `user-invocable: false` hides the command while retaining model access. Keep the description and omit `disable-model-invocation`. Hiding is preferred; discovery, loading and application are required.
+- A **Base skill** is model-invoked even when hidden from a user menu. In Claude Code, `user-invocable: false` hides the command while retaining model access. Keep the description and omit `disable-model-invocation`. Hiding is preferred where supported, but discovery, loading and application are required; visible bases are valid when the host cannot hide them.
 
 Choose model invocation whenever another skill needs the dependency, including a dependency shared by user-only workflows. Package a shared contract as a named Base skill, not as an external shared folder. Supporting files can stay beside their owning skill, behind pointers from it.
 
