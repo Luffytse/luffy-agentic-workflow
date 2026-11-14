@@ -39,7 +39,7 @@ Verifier: ran
 ```
 
 - **Round 0 at None** posts one line, `agentic-review`'s, and it is the whole review: its marker reads `kind=round round=0 level=None` and it has no table.
-- **Level** is None, Quick, Standard or Deep, with Round 0's one-line reason. Older comments say `depth=` in the marker; read it as the level.
+- **Level** is None, Quick, Standard or Deep, with Round 0's one-line reason.
 - **Ids** are `R<round>-<n>`; a Ticket check uses `T<ticket number>.<check>-<n>`. A Finding keeps its first id in every later comment.
 - **Locations** are `file:line` or `file:start-end`, counted within the file at the comment's head.
 - **Verifier** is `ran`, or `none (no candidates, no open Finding)` when no Finder returned a candidate and no earlier Finding was open, so no candidates went to a Verifier; the table then has no rows. A Round comment without the line ran its Verifier.

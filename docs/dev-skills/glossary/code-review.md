@@ -18,7 +18,7 @@ One review of a change by the `agentic-review` skill: **Round 0** sizes it, and 
 The step, run by the top-level session itself before any agent starts, that sizes a Review: it picks the **Review level** with a one-line reason and records it. At None that line is the whole review comment. Owned by `agentic-review`.
 
 **Review level**:
-How much review a change gets, picked by Round 0: **None** (the project's checks only), **Quick** (text that does not change what a rule or code does), **Standard** (everything else, the default) or **Deep** (what the Boundary record or `REVIEW.md` marks risky, or the user asks). `REVIEW.md` may name a project's own paths per level; what each level covers is `agentic-review`'s. Older records call it the Review depth.
+How much review a change gets, picked by Round 0: **None** (the project's checks only), **Quick** (text that does not change what a rule or code does, and a change that touches only prose docs; skills, `CLAUDE.md`, `AGENTS.md`, `REVIEW.md` and decision records stay Standard), **Standard** (everything else, the default) or **Deep** (what the Boundary record or `REVIEW.md` marks risky, or the user asks). `REVIEW.md` may name a project's own paths per level; what each level covers is `agentic-review`'s. Older records call it the Review depth.
 _Avoid_: depth, mode
 
 **Round**:
@@ -26,7 +26,7 @@ One pass of Find, Verify and Rank over a pull request, its one comment, and the 
 _Avoid_: pass, iteration
 
 **After-Round-3 sort**:
-What happens when Round 3 is not clean: a premium-tier agent turns each open Important into a bug Ticket or dismisses it with a reason, open Nits are dropped, and the pull request is ready to merge. Owned by `review-rounds`.
+What happens when Round 3 is not clean: a premium-tier agent turns each open Important into a bug Ticket or dismisses it with a reason, open Nits are dropped, and the pull request is ready to merge. Each bug Ticket carries a `Joins the running Release:` line (`severe`, `blocks #<n>`, `breaks an acceptance criterion of #<n>` or `no`); the thread reports each Ticket to its caller and builds none. Owned by `review-rounds`.
 
 **Dispute**:
 An owner's written case, with evidence (`file:line`, a command and its output), that a Finding is wrong, in place of a fix. The next Round's Verifier decides it (`review-rounds`).

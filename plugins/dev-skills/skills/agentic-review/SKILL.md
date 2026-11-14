@@ -25,7 +25,7 @@ Defaults, read from the top, first match wins:
 
 - **Deep:** the change touches what the Boundary record or `REVIEW.md` marks risky (security, money, deleting data, migrations).
 - **None:** every changed line is a version field, a changelog entry, a lock file or generated output.
-- **Quick:** every change is text that leaves what each rule or line of code does as it was: a typo, wording, a link, a comment.
+- **Quick:** every change is text that leaves what each rule or line of code does as it was: a typo, wording, a link, a comment. A change that touches only prose docs is Quick too. Docs that agents execute (skills, `CLAUDE.md`, `AGENTS.md`, `REVIEW.md`) and decision records are not prose docs for this rule: they stay Standard.
 - **Standard:** everything else, a change to what a rule or code does included.
 
 When two levels both seem to fit, take the higher one. A level the user or the caller names wins. A Ticket check is always Quick. Write the reason as one line naming the files that decided it.
