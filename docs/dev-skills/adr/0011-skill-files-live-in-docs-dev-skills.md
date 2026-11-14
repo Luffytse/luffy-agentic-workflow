@@ -31,4 +31,4 @@ A multi-context repo keeps a glossary and ADR folder per context beside its code
 
 - No skill keeps a fallback to an old path and `setup-dev-skills` has no migration step: before Milestone 1 rolls out, this repo is the only one that uses the skills, and it moved its own files with `git mv` in #552.
 - The release doc and the Boundary record are found at their fixed paths, not as "the one `CLAUDE.md` points to".
-- Until "Decide when retro's proposed review rules land in REVIEW.md" ([#548](https://github.com/Luffytse/luffy-dev-skills/issues/548)) is decided, `retro` files a judgement-call rule as a Retro issue, since it no longer has `CODING_STANDARDS.md` to write.
+- Until "Decide when retro's proposed review rules land in REVIEW.md" ([#548](https://github.com/Luffytse/luffy-dev-skills/issues/548)) is decided, `retro` files a judgement-call rule as a Retro issue, since it no longer has `CODING_STANDARDS.md` to write. Closed off 2026-11-14 (Spec #157, settling #2): a retro only files, for a repeated Bug class too; a rule reaches `REVIEW.md` after Retro planning hands the issue on.

@@ -11,21 +11,21 @@ The user has asked for a **retrospective**. You are suggesting improvements to t
 
 2. Read the primary sources for the session the user specifies. This may mean searching through session logs on this machine. If the user doesn't specify a session, default to the current one.
 
-3. If the session reviewed or built a pull request with `agentic-review` (or the user names one), load `review-record` by name to interpret its comments, then turn its repeated Bug classes into checks: [BUG-CLASSES.md](BUG-CLASSES.md).
+3. If the session reviewed or built a pull request with `agentic-review` (or the user names one), load `review-record` by name to interpret its comments, then group its repeated Bug classes: [BUG-CLASSES.md](BUG-CLASSES.md).
 
 4. Look for candidates for improvement in these categories.
 
 - **Navigation**: how easy was it for the agent to find the right files? Are there hidden dependencies between files? Would a **navigation pointer** make it easier? _Use when_ the session took a long time to find a piece of information.
 - **Automated checks**: are there automated checks that could catch errors the agent made? Linting, typing, tests, filesystem linters? Read the repo's own check command first (its `package.json`/build-tool `lint`/`check` scripts, its CI workflow), so a check that already exists but sits unwired or silently broken is the finding, not a reinvention. A repo with no **guardrail** (no pre-commit hook and no CI job running its lint/typecheck/test command) is itself a finding: an un-linted repo is a standing missed opportunity, not a neutral default. _Use when_ the agent made a mistake an automated check could have caught, or the repo has no guardrail at all.
-- **Coding standards**: should the **reviewer agent** be given a new rule to enforce? Should an existing rule be removed or clarified? Classify the violation first: a **mechanical** one (a fixed syntactic pattern, a banned API, an import shape, a file-location rule) gets a deterministic check, full stop: a custom rule in the repo's own linter, a new pre-commit hook, or a new CI job, whichever the repo's language and existing guardrail make cheapest. Default to building the check over writing the rule. A genuine **judgement call** (cross-file consistency, "matches the surrounding style," anything no guardrail could ever substitute for) is filed as a Retro issue that proposes the rule (step 5); retro writes no standards file of its own. A repeated Bug class still ends in a `REVIEW.md` Always-check line ([BUG-CLASSES.md](BUG-CLASSES.md)). _Use when_ the reviewer agent failed to catch a mistake.
+- **Coding standards**: should the **reviewer agent** be given a new rule to enforce? Should an existing rule be removed or clarified? Classify the violation first: a **mechanical** one (a fixed syntactic pattern, a banned API, an import shape, a file-location rule) is filed as a Retro issue that proposes a deterministic check: a custom rule in the repo's own linter, a new pre-commit hook, or a new CI job, whichever the repo's language and existing guardrail make cheapest. Default to proposing the check over proposing a rule. A genuine **judgement call** (cross-file consistency, "matches the surrounding style," anything no guardrail could ever substitute for) is filed as a Retro issue that proposes the rule (step 5); retro writes no standards file of its own. A repeated Bug class is filed like any other candidate ([BUG-CLASSES.md](BUG-CLASSES.md)). _Use when_ the reviewer agent failed to catch a mistake.
 - **Global AGENTS.md**: are there any steering instructions that should be moved to coding standards (or automated checks) instead? _Use when_ the AGENTS.md file is particularly large - in the repo OR the user's global scope.
 - **Tool economy**: did the agent make expensive tool calls that could be streamlined? Is there any custom tooling (CLI's, MCP's) that is particularly token-inefficient? _Use when_ the agent made an expensive tool call.
 - **No-ops**: look for instructions in steering files that don't modify the agent's behavior. _Use when_ the steering files are large and unwieldy.
 - **Information access**: look for opportunities to increase the agent's access to information. Teeing dev server logs, readonly access to third-party services. _Use when_ a crucial piece of information was not available to the agent.
 
-5. File every candidate that is not a repeated Bug class as a Retro issue, or vote on an open one that covers it: [FILING.md](FILING.md). Each carries a **Scope** line: `skill`, `environment` or `this repo`, with the reason in one clause answering "would this happen in a fresh repo using the skills, in the same environment?". A `this repo` Retro goes to this project's own tracker and proposes a fix in its own files; `skill` and `environment` go where the plugin's Retros go.
+5. File every candidate as a Retro issue, or vote on an open one that covers it: [FILING.md](FILING.md). Each carries a **Scope** line: `skill`, `environment` or `this repo`, with the reason in one clause answering "would this happen in a fresh repo using the skills, in the same environment?". A `this repo` Retro goes to this project's own tracker and proposes a fix in its own files; `skill` and `environment` go where the plugin's Retros go.
 
-6. Present these candidates to the user, in order of severity. Report repeated Bug classes as done, with the link to the retro's pull request. For each other candidate, give the issue it went to.
+6. Present these candidates to the user, in order of severity. For each candidate, give the issue it went to. The retro builds nothing: no check, no `REVIEW.md` edit, no branch, no pull request.
 
 ## Reference
 
@@ -42,7 +42,6 @@ This means that the review agent should be responsible for imposing coding stand
 You have access to several files in the repo:
 
 - `CLAUDE.md`/`AGENTS.md`: these files are pushed to the context window of any agent working in this repo. They should be used incredibly sparingly, usually only for **navigation pointers** to other files.
-- `REVIEW.md` at the repo root: the review rules, read during review and by the Implementer before it reports. Add **navigation pointers** to docs folders if it gets more than 1,000 lines long.
-- Index: when you add or edit `REVIEW.md` or any other doc, load `docs-index` and apply its contract.
+- `REVIEW.md` at the repo root: the review rules, read during review. Add **navigation pointers** to docs folders if it gets more than 1,000 lines long.
 - Docs: use docs as references files, pointed to by other files. Look for existing docs before writing new ones.
 - Skills: use skills for docs (since their description goes into the agent's context window), or for user-invoked commands. Follow the advice in the `writing-for-agents` skill.

@@ -5,7 +5,7 @@ The words of filing Retro issues and working through them. Each entry says what 
 ## Language
 
 **Retro issue**:
-One suggestion from `retro`, filed as a GitHub issue labelled `retro` in the repo its **Scope** sends it to: `skill` (what the plugin ships) and `environment` (a limit of the coding agent or Harness) go where the plugin's Retros go, `this repo` to that repo's own tracker. It is never `needs-triage`; **Retro planning** decides what happens to it. Owned by `retro` (ADR 0007).
+One suggestion from `retro`, filed as a GitHub issue labelled `retro` in the repo its **Scope** sends it to: `skill` (what the plugin ships) and `environment` (a limit of the coding agent or Harness) go where the plugin's Retros go, `this repo` to that repo's own tracker. A repeated Bug class is filed the same way, proposing the check or the `REVIEW.md` line: a retro only files and builds nothing. It is never `needs-triage`; **Retro planning** decides what happens to it. A closed one is reopened when seen again. Owned by `retro` (ADR 0007).
 _Avoid_: retro ticket, action item
 
 **Retro backlog**:
