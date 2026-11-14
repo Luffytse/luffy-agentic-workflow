@@ -22,7 +22,7 @@ Before you make anything, on every entry, read the ticket against freshly fetche
 
 - **still valid**: go on.
 - **already fixed** or **obsolete**: write no code. Give the coordinator (the user, when none runs) the evidence on main, the file and the commit or pull request, and stop; it closes or re-plans the ticket.
-- **changed scope** or **cannot tell**: a decision, as "When you need the user" says. Give what changed or what is missing, with the same evidence, park the Ticket as that paragraph says, building nothing, and stop. The answer lifts the park and you re-enter at step 1: do as it says, checking again only what merged since.
+- **changed scope** or **cannot tell**: give the coordinator what changed or what is missing, with the same evidence, comment on the Ticket that you wait for its answer, and build nothing. With no coordinator it is a decision for the user: park as "When you need the user" says. On the answer, or the lifted park, re-enter at step 1, checking again only what merged since.
 
 ## 2. Build
 
