@@ -66,7 +66,7 @@ One line per skill under `skills/`; each skill's own `SKILL.md` has the rest.
 - `implement-spec`: builds one Spec as its thread, Tickets first, then the Spec pull request.
 - `improve-codebase-architecture`: scans a codebase for refactors that deepen shallow modules.
 - `issue-absorption`: records and reads the issues a Ticket absorbs (a Base skill).
-- `merging`: finishes a pull request: who merges, merge-time steps, the merge, closing issues (a hidden Base skill).
+- `merging`: finishes a pull request: who merges, the review-record check, the merge, closing issues (a hidden Base skill).
 - `milestone`: plans a Milestone, checks the plugin version and reports at its end.
 - `model-tiers`: maps a Model tier to the models of each coding agent (a Base skill).
 - `pr`: writes a pull request title and body.

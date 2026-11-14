@@ -23,11 +23,11 @@ _(Keep this section only when the policy is pull requests bump; otherwise delete
 
 ### The bump at merge
 
-A merge-time step: the merging thread takes it just before the merge of each pull request that changes `<the files that bump the version>`, the user's merge too. A pull request that changes none of them gets no number and no bump.
+A step before the merge, which `merging` does not run: the repo copies it into its agent instructions (`CLAUDE.md` or `AGENTS.md`), which every thread reads, and the thread that merges takes it just before the merge of each pull request that changes `<the files that bump the version>`, the user's merge too. A pull request that changes none of them gets no number and no bump.
 
 1. Get the next version number just before the merge, as this doc says it is given (from the user when it says nothing), and wait for it.
 2. Have the committer the merge names add the bump as the pull request's last commit, with the bump commit's steps below, and push.
-3. If main moves before the merge and the merge-time steps run again: while main's version is unchanged, keep the bump commit and its number (get no new number, add no second bump commit). When main's version changed, get a new number; the committer merges main in, resolves the version file by taking main's, and redoes the bump as a new commit after that merge, superseding the old bump.
+3. If main moves before the merge and the step runs again: while main's version is unchanged, keep the bump commit and its number (get no new number, add no second bump commit). When main's version changed, get a new number; the committer merges main in, resolves the version file by taking main's, and redoes the bump as a new commit after that merge, superseding the old bump.
 
 "Last commit" means the last of the pull request's own work, so a merge of main after the bump is fine.
 
