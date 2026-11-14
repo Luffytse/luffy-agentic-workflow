@@ -46,3 +46,7 @@ Two references remain, both for Claude Code (`claude-code-project-threads.md` an
 ## Note (Spec [#162](https://github.com/Luffytse/luffy-agentic-workflow/issues/162), 2026-11-14)
 
 `milestone` keeps only the Plugin version check; Startup verification is gone. `worker-control` no longer runs a short check: its probes are this repo's Environment check (`docs/dev-skills/environment-check.md`), and a Harness with no reference no longer falls back to its own docs: `worker-control` tells the user and stops.
+
+## Note (Ticket [#167](https://github.com/Luffytse/luffy-agentic-workflow/issues/167), 2026-11-14)
+
+`milestone` no longer adds a feature mid-Milestone: its features are named, sorted and planned in their own sessions before the Milestone issue is written, and are fixed once planning settles ([ADR 0017](0017-milestone-features-are-planned-in-their-own-sessions-and-fixed-once-planning-settles.md)).

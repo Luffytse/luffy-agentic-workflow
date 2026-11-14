@@ -114,7 +114,7 @@ Every open issue that survived the check against main (not closed by it, not wai
 - a `ready-for-agent` bug or `retro` issue at `ready-for-agent`;
 - every issue still open that is listed under `## Carried over` in the release issue of the Release just cut (the closed release issue cut most recently, in any run); read that section, not the issue's other text.
 
-A parked issue is left out, waiting on the user to lift its park. An **unplanned feature** (an enhancement, or any other feature-sized issue, that the Milestone issue does not list; never a `retro` issue) is never ranked, whatever its label or whoever suggested it: propose each one to the user in one line, saying the Milestone issue does not list it; the user plans it with `milestone` or not. Any other issue that was not carried over, such as one at `needs-triage`, `needs-info`, `ready-for-human` or `wontfix`, is not a candidate.
+A parked issue is left out, waiting on the user to lift its park. An **unplanned feature** (an enhancement, or any other feature-sized issue, that the Milestone issue does not list; never a `retro` issue) is never ranked, whatever its label or whoever suggested it: propose each one to the user in one line, saying the Milestone issue does not list it, so it waits for the next Milestone's planning. Any other issue that was not carried over, such as one at `needs-triage`, `needs-info`, `ready-for-human` or `wontfix`, is not a candidate.
 
 A **carried-over** candidate gets one place, the first of these that fits:
 
