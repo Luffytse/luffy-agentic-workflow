@@ -47,7 +47,7 @@ plugins/dev-skills/
 └── LICENSE-mattpocock-skills    # Upstream's MIT notice
 ```
 
-To add a skill, create `skills/<name>/SKILL.md`; `plugin.json` already points at the folder. Keep a model-facing `description` in `SKILL.md` and omit `disable-model-invocation` (only `improve-codebase-architecture`, named in the checker's `model-invoked` check, sets it). A Base skill may set `user-invocable: false` for menu hiding while remaining model-loadable; hiding is optional. See [skill mechanics](skills/writing-for-agents/SKILL-MECHANICS.md) for the frontmatter examples. Current consumers keep their instructions and references until the fresh-runtime gate and their migration pass (ADR 0009).
+To add a skill, create `skills/<name>/SKILL.md`; `plugin.json` already points at the folder. Keep a model-facing `description` in `SKILL.md` and omit `disable-model-invocation` (only `improve-codebase-architecture`, named in the checker's `model-invoked` check, sets it). A Base skill may set `user-invocable: false` for menu hiding while remaining model-loadable; hiding is optional. See [skill mechanics](skills/writing-for-agents/SKILL-MECHANICS.md) for the frontmatter of a skill and [the shared skill rules](../../docs/dev-skills/shared-skill-rules.md) for the frontmatter example of a Base skill. Current consumers keep their instructions and references until the fresh-runtime gate and their migration pass (ADR 0009).
 
 ## Skills
 

@@ -28,7 +28,7 @@ Upstream deliberately separated reusable interview and domain-modeling capabilit
 
 ## Implemented scope and verification
 
-This narrows ADR 0006's rejected separate index skill: the trigger stays with each writer or checker. #363 established authoring guidance and packaging support. #360 passed the required fresh-runtime discovery, loading and actual application gate for complete-workflow and focused-reference dependencies. Its production composition proved reference readability/application, but its reported fact-finding subagent failure was unverified and is not a complete production workflow pass. User-menu hiding was unmeasured and remains optional; visibility is separate from model reachability.
+This narrows ADR 0006's rejected separate index skill: the trigger stays with each writer or checker. #363 established authoring guidance and packaging support (since Ticket #190 in `docs/dev-skills/shared-skill-rules.md`). #360 passed the required fresh-runtime discovery, loading and actual application gate for complete-workflow and focused-reference dependencies. Its production composition proved reference readability/application, but its reported fact-finding subagent failure was unverified and is not a complete production workflow pass. User-menu hiding was unmeasured and remains optional; visibility is separate from model reachability.
 
 | Owner | Consumers and load point | Migration |
 | --- | --- | --- |
@@ -61,3 +61,5 @@ Local migration evidence covers index writing/checking, record interpretation, a
 *Amendment note, 2026-11-14, Ticket [#179](https://github.com/Luffytse/luffy-agentic-workflow/issues/179).* The "when you need the user" paragraph (an action waits, a decision parks) is one rule kept word for word in both build skills, `implement` and `implement-spec`, and the two copies are edited together. `implement` holds it from Ticket #179; `implement-spec` takes it in Ticket #180, and until then its own text governs a Spec thread. (Ticket #180 has landed it: `implement-spec` holds the paragraph word for word, with a Spec's part after it.)
 
 *Amendment note, 2026-11-14, Ticket #189 (absorbing #142).* "Model discovery, loading and application are required" holds for every skill another skill or a thread loads. `improve-codebase-architecture` is the one person-started skill: it sets `disable-model-invocation: true`, nothing loads it, and the plugin checker's `model-invoked` check lists it by name. No other skill is added to that list without its own decision.
+
+*Amendment note, 2026-11-14, Ticket #190 (absorbing #145).* The authoring guidance #363 added to `writing-for-agents` (the "Shared ownership" section and the Base skill metadata) moved to `docs/dev-skills/shared-skill-rules.md`; the skill is the inherited text again. The page states the one difference from it: a reference two user-invoked skills share is a hidden Base skill here, not "a plain file outside the skill system".
