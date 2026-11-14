@@ -36,7 +36,7 @@ Issues and specs live in this repo's GitHub Issues. See `docs/dev-skills/issue-t
 
 ### Triage labels
 
-5 state roles + 2 category roles: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`, `bug`, `enhancement`; plus the `next-release` role; and a Repo labels table, empty here, with the rule that `triage`, `to-spec`, `to-tickets` and `review-rounds` apply it by, held in the same doc (builders read none). See `docs/dev-skills/triage-labels.md`.
+5 state roles + 2 category roles: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`, `bug`, `enhancement`; plus the `next-release` role; and a Repo labels table, empty here, beside the rule that `triage`, `to-spec`, `to-tickets` and `review-rounds` apply (builders read none). See `docs/dev-skills/triage-labels.md`.
 
 ### Domain docs
 
