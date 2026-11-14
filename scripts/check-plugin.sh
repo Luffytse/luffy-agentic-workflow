@@ -129,11 +129,11 @@ fi
 
 # no-person-names: no person's name in skill or doc text: text says "the user", never the maintainer's name.
 # The marketplace and repo names (luffy-agentic-workflow, and the earlier luffy-dev, luffy-dev-skills), the GitHub owner Luffytse and the project name
-# luffydev are not people. Checks skills/ and the plugin README, and the repo's CLAUDE.md and
+# luffydev are not people, nor is the skill name ask-luffy (the token alone: a person's name beside it still fails). Checks skills/ and the plugin README, and the repo's CLAUDE.md and
 # docs/ (all of it, the glossary in docs/dev-skills/ included). Not the manifests (author fields).
 # Paths are relative to each root (in a subshell, so cwd is unchanged), so a checkout
 # under a home folder named after its user cannot trip the check. awk keeps the script portable (no GNU-only flags).
-name_awk='{l=tolower($0); gsub(/luffy-agentic-workflow|luffy-dev-skills|luffy-dev|luffytse|luffydev/,"",l); if (l ~ /lufei|luffy/) print FILENAME ":" FNR ": " $0}'
+name_awk='{l=tolower($0); gsub(/luffy-agentic-workflow|luffy-dev-skills|luffy-dev|luffytse|luffydev|ask-luffy/,"",l); if (l ~ /lufei|luffy/) print FILENAME ":" FNR ": " $0}'
 name_hits="$(
   (cd "$root" && find skills README.md -type f -print0 2>/dev/null | xargs -0 awk "$name_awk" 2>/dev/null)
   (cd "$repo" && find CLAUDE.md docs -type f -print0 2>/dev/null | xargs -0 awk "$name_awk" 2>/dev/null)

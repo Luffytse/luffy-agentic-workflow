@@ -41,7 +41,7 @@ The limits (at most 3 groups, 2 plannings) are the user's choices, not taken fro
 ## Consequences
 
 - `retro` gains filing, routing, votes (Patches; its trigger was removed by #570). `plugin.json` gains a `repository` field.
-- A new skill of our own, `retro-planning`, lives under `plugins/dev-skills/skills/`, and `ask-matt` routes to it (a Patch).
+- A new skill of our own, `retro-planning`, lives under `plugins/dev-skills/skills/`, and `ask-matt` routes to it (a Patch). (`ask-matt` was replaced by `ask-luffy` in Ticket #194, which routes nothing: its flow map shows `retro-planning` after `release`'s cut and `retro`.)
 - `triage` must skip issues labelled `retro`, since they carry no `needs-triage` and would otherwise look untriaged (a Patch). Since the amendment it skips only a `retro` issue that carries no state role, and triages one Retro planning handed over.
 - `implement` and `implement-spec` end with `retro` (Patches).
 - This repo gets a CI job running `scripts/check-plugin.sh` and `claude plugin validate .` on every pull request.

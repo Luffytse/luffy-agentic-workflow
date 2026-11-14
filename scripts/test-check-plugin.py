@@ -82,6 +82,18 @@ class SkillLoadingPackaging(unittest.TestCase):
         self.plant("docs/dev-skills/glossary.md", "Ask Lu" + "fei.\n")
         self.check(1)
 
+    def test_skill_name_ask_luffy_in_skill_text_passes(self):
+        # ask-luffy is a skill's name, not a person's: the no-person-names check lets it through.
+        self.plant("plugins/dev-skills/skills/implement/SKILL.md", "Load `ask-luffy` for the workflow map.\n")
+        self.check(0)
+
+    def test_person_name_in_skill_text_still_fails_beside_the_skill_name(self):
+        # Only the skill name is let through: a person's name on the same line still fails.
+        self.plant("plugins/dev-skills/skills/implement/SKILL.md", "Load `ask-luffy`, then ask Luf" + "fy.\n")
+        self.check(1, "names a person")
+        self.plant("plugins/dev-skills/skills/implement/SKILL.md", "Ask Lu" + "fei.\n")
+        self.check(1, "names a person")
+
     def test_unlisted_skill_file_over_4000_words_fails(self):
         (self.skill / "big.md").write_text("word " * 4001)
         self.check(1)
