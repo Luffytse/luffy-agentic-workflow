@@ -45,6 +45,18 @@ class SkillLoadingPackaging(unittest.TestCase):
         self.write_skill("user-invocable: false\ndisable-model-invocation: true\n")
         self.check(1)
 
+    def test_listed_person_started_skill_may_disable_model_invocation(self):
+        # improve-codebase-architecture is on the checker's short list of person-started skills.
+        path = self.repo / "plugins/dev-skills/skills/improve-codebase-architecture/SKILL.md"
+        text = path.read_text().replace("disable-model-invocation: true\n", "")
+        path.write_text(text.replace("\n---\n", "\ndisable-model-invocation: true\n---\n", 1))
+        self.assertIn("disable-model-invocation: true", path.read_text())
+        self.check(0)
+
+    def test_unlisted_skill_with_the_mark_fails_while_the_listed_one_carries_it(self):
+        self.write_skill("disable-model-invocation: true\n")
+        self.check(1, "disable-model-invocation")
+
     def test_tree_without_codex_files_passes(self):
         # The plugin is Claude Code only: no Codex manifest, catalog or agent metadata file is required.
         for path in (".codex-plugin", "../../.agents"):

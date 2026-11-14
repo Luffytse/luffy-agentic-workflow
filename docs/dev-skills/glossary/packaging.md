@@ -25,7 +25,7 @@ How strong a model a step needs: **cheap**, **regular**, **premium** or **top**.
 _Avoid_: model size, model class
 
 **Model-invoked skill**:
-A Skill the agent may start by itself when a task fits its description; hiding it from the user menu (`user-invocable: false` in Claude Code) keeps that model access. A **user-only skill** (`disable-model-invocation: true`) starts only when a person types its name. The settings are `writing-for-agents`' (`SKILL-MECHANICS.md`).
+A Skill the agent may start by itself when a task fits its description; hiding it from the user menu (`user-invocable: false` in Claude Code) keeps that model access. A **user-only skill** (`disable-model-invocation: true`) starts only when a person types its name; `improve-codebase-architecture` is the one, and the plugin checker's `model-invoked` check lists it. The settings are `writing-for-agents`' (`SKILL-MECHANICS.md`).
 _Avoid_: auto skill, manual skill
 
 **Shared rule**:
