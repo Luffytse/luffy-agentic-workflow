@@ -137,6 +137,10 @@ class SkillLoadingPackaging(unittest.TestCase):
         self.plant("plugins/dev-skills/skills/implement/SKILL.md", "Run it on GP" + "T 6.\n")
         self.check(1)
 
+    def test_top_tier_model_name_fails(self):
+        self.plant("plugins/dev-skills/skills/implement/SKILL.md", "Run it on Fa" + "ble.\n")
+        self.check(1)
+
     def test_o_series_name_fails(self):
         self.plant("plugins/dev-skills/skills/implement/SKILL.md", "Use o" + "4-mini for this.\n")
         self.check(1)

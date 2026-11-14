@@ -32,7 +32,7 @@ Read this first, then open only the docs whose line fits your work. Specs and ti
 - [scripts/rewrite-public-history.py](../../scripts/rewrite-public-history.py): the history rewrite the user runs on a fresh clone (Spec #712); [scripts/test-rewrite-public-history.py](../../scripts/test-rewrite-public-history.py) tests it. Read when running the move's history push.
 - [scripts/check-plugin.sh](../../scripts/check-plugin.sh): this repo's own checker for the plugin layout and repo-wide rules, each check named in its header, among them `index-line-length` (no index bullet over 60 words). Read when adding or changing a check, or before pushing a plugin change.
 - [ADR 0001](adr/0001-dev-skills-is-one-plugin-forked-from-matt-pocock.md): why `dev-skills` is one plugin that began as Matt Pocock's skills, and which skills it keeps. Read when adding or dropping a skill, or when the Upstream watch finds an idea.
-- [ADR 0002](adr/0002-skills-name-model-tiers-not-models.md): skills name cheap, regular or premium tiers, never models; the `model-tiers` skill holds the default map. Read when a skill picks a model or the map changes.
+- [ADR 0002](adr/0002-skills-name-model-tiers-not-models.md): skills name cheap, regular, premium or top tiers, never models; the `model-tiers` skill holds the default map. Read when a skill picks a model or the map changes.
 - [Packaging glossary](glossary/packaging.md): Marketplace, Plugin, Skill, Upstream, Model tier, Shared rule and Base skill. Read when writing skill text or sharing a rule.
 - [ADR 0009](adr/0009-shared-rules-have-one-owner-skill.md): shared rules have one owner skill, with workflow reuse and consumer inventory. Read when sharing a rule, composing skills or adding a Base skill.
 

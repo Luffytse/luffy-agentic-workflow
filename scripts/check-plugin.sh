@@ -16,7 +16,7 @@
 #   plugin-manifest              plugin.json, README.md, CHANGELOG.md and the licence file exist; plugin.json names its repository
 #   release-files                the release skill, its release doc seed and this repo's release doc exist
 #   boundary-files               the Boundary record seed and this repo's Boundary record exist
-#   vendor-model-names           no vendor model name in the repo's text (ADR 0002): Claude, GPT (spaced or hyphenated), o-series (o1, o3, o4-mini) and Gemini names
+#   vendor-model-names           no vendor model name in the repo's text (ADR 0002): Claude, the Claude model families (haiku, sonnet, opus, fable), GPT (spaced or hyphenated), o-series (o1, o3, o4-mini) and Gemini names
 #   no-person-names              no person's name in skill or doc text
 #   repo-free-skill-text         skill text names nothing that exists only in this repo
 #   tracker-operation-names      each operation cited as the tracker doc's **Name** or "Name" operation exists as a bold bullet in every issue-tracker seed
@@ -103,8 +103,8 @@ for f in "$skills/setup-dev-skills/boundaries.md" "$repo/docs/dev-skills/boundar
   [ -f "$f" ] || bad "missing ${f#"$repo"/}"
 done
 
-# vendor-model-names: no vendor model names (Claude, GPT with an optional space or hyphen before its number, o-series such as o1 or o4-mini, Gemini) in the repo's text (ADR 0002): skills name cheap, regular or
-# premium tiers. The tier map in the `model-tiers` skill (the plugin's one place that names the models) and this script are exempt.
+# vendor-model-names: no vendor model names (Claude, its model families haiku, sonnet, opus and fable, GPT with an optional space or hyphen before its number, o-series such as o1 or o4-mini, Gemini) in the repo's text (ADR 0002): skills name cheap, regular, premium or
+# top tiers. The tier map in the `model-tiers` skill (the plugin's one place that names the models) and this script are exempt.
 plugin_rel="plugins/dev-skills"
 # NUL-separated file list and a check on grep's output (not xargs' exit code), so file
 # names with spaces and multi-batch xargs runs cannot hide a match.
@@ -112,7 +112,7 @@ hits="$(cd "$repo" && find . -type f -not -path './.git/*' \
   -not -path "./$plugin_rel/skills/model-tiers/SKILL.md" \
   -not -path './scripts/check-plugin.sh' -not -path './LICENSE*' \
   -not -path "./$plugin_rel/LICENSE-mattpocock-skills" -print0 |
-  xargs -0 grep -nIiE '\b(haiku|sonnet|opus)\b|claude[-_]?(opus|sonnet|haiku|[0-9])|\bgpt[ -]?[0-9]|\bo[0-9](-(mini|pro|preview))?\b|\bgemini\b')"
+  xargs -0 grep -nIiE '\b(haiku|sonnet|opus|fable)\b|claude[-_]?(opus|sonnet|haiku|[0-9])|\bgpt[ -]?[0-9]|\bo[0-9](-(mini|pro|preview))?\b|\bgemini\b')"
 if [ -n "$hits" ]; then
   echo "$hits"
   bad "text names a vendor model"

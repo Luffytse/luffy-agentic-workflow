@@ -8,7 +8,7 @@ Words used here (Finder, Verifier, Finding, Bug class, Review level, Model tier 
 
 ## Working rules
 
-- Skills name a **model tier** (cheap, regular, premium), never a vendor's model name, because other coding agents may load these plugins. See `docs/dev-skills/adr/0002-skills-name-model-tiers-not-models.md`.
+- Skills name a **model tier** (cheap, regular, premium, top), never a vendor's model name, because other coding agents may load these plugins. See `docs/dev-skills/adr/0002-skills-name-model-tiers-not-models.md`.
 - Rules that only fit this repo live here and never in skill text, because every project that loads the plugin reads the skills. A Harness limit is not a repo rule: it goes in `worker-control`'s Harness reference, not here. A format the plugin ships is fixed in the plugin, not only in this repo's copy.
 - A pull request that changes skill text merges when it shows three things (ADR 0015): **CI is green** (the plugin checker, `claude plugin validate .` and the script tests), **the review is done** as `REVIEW.md` says, and **each acceptance line of the issue it builds is shown as met** in the pull request body, one line of evidence per line (a word count, a word diff against the inherited text, a search that finds nothing, a script test).
 - No model eval is run in this repo. `tdd` and the Implementer briefs of `implement` and `implement-spec` still say that instructions for an agent are tested by an eval and that the repo's docs say how: here that sentence asks for nothing, and the evidence is the acceptance lines shown in the pull request. A gap a real project finds in a skill comes back as a Retro issue.

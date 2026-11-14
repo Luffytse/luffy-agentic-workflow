@@ -91,7 +91,7 @@ One line per skill under `skills/`; each skill's own `SKILL.md` has the rest.
 
 ## Model tiers
 
-Skills name a tier, never a model ([ADR 0002](../../docs/dev-skills/adr/0002-skills-name-model-tiers-not-models.md)). The `model-tiers` skill (`skills/model-tiers/SKILL.md`) holds the map from each tier to each coding agent's models, and is the only place in the plugin that names them; a project's own map overrides it. A new model generation changes that file only.
+Skills name a tier (cheap, regular, premium or top), never a model ([ADR 0002](../../docs/dev-skills/adr/0002-skills-name-model-tiers-not-models.md)). The `model-tiers` skill (`skills/model-tiers/SKILL.md`) holds the map from each tier to each coding agent's models, and is the only place in the plugin that names them; a project's own map overrides it. A new model generation changes that file only.
 
 ## Credits and Upstream
 
